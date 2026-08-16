@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ff7a59">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>わたしのクエスト</title>
+<style>
+  :root{--paper:#fdf3e3;--ink:#3a3226;--coral:#ff7a59;--teal:#2ec5b6;--sun:#ffc857;
+    --line:#d8c7a8;--card:#fffdf7;--soft:#8a7d64}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:"Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;
+    background:var(--paper);color:var(--ink);background-image:radial-gradient(var(--line) 1px,transparent 1px);
+    background-size:22px 22px;padding:14px 12px 70px;line-height:1.5;touch-action:manipulation}
+  .wrap{max-width:520px;margin:0 auto}
+  h1{font-size:1.35rem;text-align:center;margin:.2em 0 .05em}
+  .sub{text-align:center;color:var(--soft);font-size:.8rem;margin-bottom:12px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+  .card{background:var(--card);border:2.5px dashed var(--line);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:3px 4px 0 rgba(0,0,0,.05)}
+  .row{display:flex;gap:10px}
+  .flame{font-size:2.3rem;line-height:1}
+  .stat-big{font-size:1.9rem;font-weight:800}
+  .season-bar{height:16px;background:#eee4cf;border-radius:20px;overflow:hidden;margin-top:8px;border:1.5px solid var(--line)}
+  .season-fill{height:100%;background:linear-gradient(90deg,var(--sun),var(--coral));width:0%;transition:width .5s}
+  .badge{display:inline-block;background:var(--sun);color:#5a4300;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700;margin:2px 4px 2px 0}
+  .player{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px}
+  .player h3{margin:0 0 6px;font-size:1rem;display:flex;align-items:center;gap:6px}
+  .lvl{font-size:.72rem;color:var(--soft)}
+  .xpbar{height:8px;background:#eee4cf;border-radius:10px;overflow:hidden;margin:4px 0 8px}
+  .xpfill{height:100%;background:var(--teal);width:0%}
+  .quest{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:10px;margin-bottom:6px;background:#fbf6ea;cursor:pointer;user-select:none;font-size:.88rem;transition:.15s}
+  .quest.done{background:#dcf5e8;text-decoration:line-through;color:var(--soft)}
+  .chk{width:22px;height:22px;border-radius:7px;border:2.5px solid var(--teal);flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:.9rem;background:#fff}
+  .quest.done .chk{background:var(--teal);color:#fff}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:14px;font-weight:700}
+  .btn{background:var(--coral);color:#fff;padding:12px 16px;font-size:1rem;width:100%;box-shadow:0 4px 0 #d95f40;transition:.1s}
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #d95f40}
+  .btn.gray{background:#e7ddc7;color:var(--ink);box-shadow:0 4px 0 #c9bfa5}
+  .btn.gray:active{box-shadow:0 1px 0 #c9bfa5}
+  .btn:disabled{opacity:.45;box-shadow:none;cursor:default}
+  .gacha-btn{background:linear-gradient(90deg,#a06bff,#ff6bcb);box-shadow:0 4px 0 #7a44d1}
+  .gacha-btn:active{box-shadow:0 1px 0 #7a44d1}
+  .mini{font-size:.8rem;color:var(--soft);text-align:center;margin-top:6px}
+  .spk{position:absolute;top:10px;right:14px;font-size:1.1rem;cursor:pointer;opacity:.6}
+  .chooser h2{font-size:1.05rem;margin:2px 0 10px;text-align:center}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .chip{background:#fff;border:2.5px solid var(--line);border-radius:14px;padding:10px 12px;font-size:.9rem;cursor:pointer;user-select:none;transition:.12s}
+  .chip.sel{border-color:var(--teal);background:#dcf5e8;font-weight:700}
+  .rwd{display:block;width:100%;text-align:left;background:#fff;border:2.5px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;font-size:.95rem;cursor:pointer;transition:.12s}
+  .rwd:active{transform:scale(.98)}.rwd .g{font-size:1.3rem;margin-right:8px}
+  .cheer{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(0,0,0,.35);z-index:50;text-align:center}
+  .cheer .msg{background:#fff;border-radius:22px;padding:26px 30px;font-size:1.6rem;font-weight:800;animation:pop .4s ease;max-width:82%}
+  @keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+  .confetti{position:fixed;top:-30px;font-size:1.4rem;z-index:60;pointer-events:none;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(105vh) rotate(360deg)}}
+  #dad{display:none;position:fixed;inset:0;background:var(--paper);z-index:80;overflow:auto;padding:16px}
+  #dad .inner{max-width:520px;margin:0 auto}
+  label{display:block;font-size:.8rem;font-weight:700;margin:10px 0 3px;color:var(--soft)}
+  input,textarea{width:100%;font-family:inherit;font-size:.9rem;padding:8px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  textarea{min-height:70px;resize:vertical}
+  .two{display:flex;gap:8px}.two>div{flex:1}
+  .hint{font-size:.75rem;color:var(--soft);margin-top:2px}
+  .sec{background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px;margin-top:14px}
+  .sec h3{margin:0 0 6px;font-size:.95rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="title">🗺️ クエスト</h1>
+  <div class="sub" id="dateline"></div>
+
+  <div class="card" style="position:relative">
+    <div class="spk" id="spk" onclick="toggleMute()">🔊</div>
+    <div class="row" style="align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-weight:800" id="seasonName">シーズン</div>
+        <div class="mini" style="text-align:left;margin-top:2px"><span id="seasonProg">0</span> / <span id="seasonGoal">14</span> 日</div>
+        <div class="mini" style="text-align:left" id="seasonReward"></div>
+      </div>
+      <div style="text-align:center">
+        <div class="flame">🔥</div><div class="stat-big" id="streak">0</div><div class="mini">れんぞく</div>
+      </div>
+    </div>
+    <div class="season-bar"><div class="season-fill" id="seasonFill"></div></div>
+    <div style="margin-top:8px">
+      <span class="badge">🎫 お休み券 <span id="freeze">0</span></span>
+      <span class="badge" style="background:#d6c7ff;color:#4a2c8f">🎁 ガチャ <span id="gachaN">0</span></span>
+      <span class="badge" style="background:#ffd9cf;color:#a13f22">🏆 ベスト <span id="best">0</span></span>
+    </div>
+    <div id="freezeArea"></div>
+  </div>
+
+  <div id="stage"></div>
+  <div class="mini" id="rewardLog" style="margin-top:4px"></div>
+</div>
+
+<div class="cheer" id="cheer" onclick="this.style.display='none'"><div class="msg" id="cheerMsg"></div><div style="color:#fff;margin-top:14px;font-size:.9rem">タップでとじる</div></div>
+
+<div id="dad"><div class="inner">
+  <h1 style="text-align:left">🔧 保護者メニュー</h1>
+  <p class="hint">娘に見せる「選べる項目」を用意します。この画面は娘には出ません。</p>
+
+  <div class="sec">
+    <h3>👧 なまえ・絵文字</h3>
+    <div class="two"><div><label>娘の名前</label><input id="d_meName"></div><div><label>絵文字</label><input id="d_meEmoji" maxlength="2"></div></div>
+    <div class="two"><div><label>パパの名前</label><input id="d_paName"></div><div><label>絵文字</label><input id="d_paEmoji" maxlength="2"></div></div>
+  </div>
+
+  <div class="sec">
+    <h3>📋 クエスト</h3>
+    <label>毎日かならずやる（1行1つ）</label><textarea id="d_fixed"></textarea>
+    <label>娘が「今日はどれ？」で選べる候補（1行1つ）</label><textarea id="d_choice"></textarea>
+    <div class="two"><div><label>1日に選ぶ数</label><input id="d_count" type="number" min="0"></div><div><label>目標日数</label><input id="d_goal" type="number" min="1"></div></div>
+    <label>パパのクエスト（1行1つ）</label><textarea id="d_pa"></textarea>
+  </div>
+
+  <div class="sec">
+    <h3>🎁 ごほうび（実現できる物だけ）</h3>
+    <label>シーズン報酬の選択肢（娘が1つ選ぶ・1行1つ）</label><textarea id="d_rewards"></textarea>
+    <label>ガチャの景品（1行1つ）</label><textarea id="d_gacha"></textarea>
+    <label>シーズン名</label><input id="d_season">
+  </div>
+
+  <div class="sec">
+    <h3>🔑 暗証番号</h3>
+    <label>保護者メニューの暗証番号（4桁）</label><input id="d_pin" maxlength="4" inputmode="numeric">
+  </div>
+
+  <button class="btn" style="margin-top:12px" onclick="dadSave()">💾 保存する</button>
+
+  <div class="sec">
+    <h3>📤 娘の端末へ引き継ぎ</h3>
+    <p class="hint">父端末で作った設定を娘のスマホへ移すコードです。先に「保存する」を押してからコピーしてください。</p>
+    <label>引き継ぎコード（コピーして娘端末で貼り付け）</label>
+    <textarea id="d_export" readonly></textarea>
+    <button class="btn gray" onclick="copyExport()">📋 コピーする</button>
+    <label style="margin-top:12px">受け取ったコードを貼り付けて読み込む</label>
+    <textarea id="d_import" placeholder="ここにコードを貼り付け"></textarea>
+    <button class="btn gray" onclick="doImport()">📥 読み込む（設定を上書き）</button>
+  </div>
+
+  <button class="btn gray" style="margin-top:14px" onclick="nextSeason()">➡️ 次のシーズンにする</button>
+  <button class="btn gray" style="margin-top:8px" onclick="dadClose()">✖ とじる</button>
+  <button class="btn gray" style="margin-top:8px;color:#a13f22" onclick="resetAll()">🗑️ 全部リセット</button>
+</div></div>
+
+<script>
+const KEY='questboard_v3';
+const CHEERS=['やったね！🎉','すごい！✨','てんさい！🌟','Great job! 👏','Amazing! 🚀','Молодец! 💪','Отлично! 🎊'];
+const pad=n=>String(n).padStart(2,'0');
+const dstr=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>dstr(new Date());
+function yesterday(){const d=new Date();d.setDate(d.getDate()-1);return dstr(d);}
+const daysBetween=(a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
+
+function def(){return{
+  me:{name:'わたし',emoji:'🦊',xp:0},
+  pa:{name:'パパ',emoji:'🐻',xp:0},
+  cfg:{
+    fixed:['英語 10分（Duolingo か 音読）'],
+    choice:['国語：語彙カード 5分','国語：音読 5分','国語：本を5分よむ','算数：基礎ドリル 5分','算数：そろばん 5分','英語：シャドーイング 5分','今日のできごとを1行日記'],
+    count:2,
+    pa:['パパのチャレンジ（英語か運動 10分）'],
+    season:'シーズン1：スタートダッシュ', goal:14,
+    rewards:['いっしょに映画を見る','週末に公園・おでかけ','すきなごはんリクエスト','いっしょにお菓子づくり'],
+    gacha:['いっしょに動画 30分','すきなおやつ1つ','ゲーム 30分えんちょう券','パパと外あそび','お手つだい交代券','なぞのミッション'],
+    pin:'5290'
+  },
+  season:{reward:'',startClears:0},
+  day:{date:'',picks:[],me:{},pa:{}},
+  prog:{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0},
+  rewards:[], mute:false
+};}
+let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
+if(S.mute===undefined)S.mute=false;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function rollover(){if(S.day.date!==today())S.day={date:today(),picks:[],me:{},pa:{}};}
+
+/* sound */
+let actx;
+function tone(f,dur,type,when){if(S.mute)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const t=actx.currentTime+(when||0);const o=actx.createOscillator(),g=actx.createGain();o.type=type||'sine';o.frequency.value=f;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.18,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.start(t);o.stop(t+dur);}catch(e){}}
+const sTick=()=>tone(760,0.09,'triangle');
+const sWin=()=>{[523,659,784,1047].forEach((f,i)=>tone(f,0.16,'triangle',i*0.09));};
+const sGacha=()=>{[880,1175,1568].forEach((f,i)=>tone(f,0.14,'sine',i*0.07));};
+function toggleMute(){S.mute=!S.mute;save();document.getElementById('spk').textContent=S.mute?'🔇':'🔊';}
+
+function meQuests(){const a=S.cfg.fixed.map((q,i)=>({key:'f'+i,label:q}));S.day.picks.forEach(idx=>{if(S.cfg.choice[idx]!==undefined)a.push({key:'c'+idx,label:S.cfg.choice[idx]});});return a;}
+function meReady(){return S.season.reward && S.day.picks.length>=S.cfg.count;}
+function meAllDone(){return meReady() && meQuests().length>0 && meQuests().every(q=>S.day.me[q.key]);}
+function onClear(){
+  if(S.prog.lastClear===today())return;
+  if(S.prog.lastClear===yesterday())S.prog.streak++;else S.prog.streak=1;
+  S.prog.lastClear=today();S.prog.clears++;S.prog.best=Math.max(S.prog.best,S.prog.streak);
+  if(S.prog.clears%5===0)S.prog.gacha++;
+  if(S.prog.clears%7===0&&S.prog.freeze<2)S.prog.freeze++;
+  celebrate();
+}
+function toggle(who,key){
+  const rec=who==='me'?S.day.me:S.day.pa;const p=who==='me'?S.me:S.pa;
+  if(rec[key]){rec[key]=false;p.xp=Math.max(0,p.xp-10);}else{rec[key]=true;p.xp+=10;sTick();}
+  if(who==='me'&&meAllDone())onClear();
+  save();render();
+}
+function chooseReward(i){S.season.reward=S.cfg.rewards[i];save();render();showCheer('🎁 ごほうび、きめた！');sWin();burst();}
+function togglePick(idx){const p=S.day.picks;const at=p.indexOf(idx);if(at>=0)p.splice(at,1);else{if(p.length>=S.cfg.count)return;p.push(idx);sTick();}save();render();}
+function repick(){if(meQuests().some(q=>S.day.me[q.key]))return;S.day.picks=[];save();render();}
+function useFreeze(){if(S.prog.freeze>0){S.prog.freeze--;S.prog.lastClear=yesterday();save();render();}}
+function spin(){if(S.prog.gacha<=0||!S.cfg.gacha.length)return;S.prog.gacha--;const r=S.cfg.gacha[Math.floor(Math.random()*S.cfg.gacha.length)];S.rewards.unshift(today()+'：'+r);save();render();showCheer('🎁 '+r);sGacha();burst();}
+function celebrate(){showCheer(CHEERS[Math.floor(Math.random()*CHEERS.length)]);sWin();burst();}
+function showCheer(t){const c=document.getElementById('cheer');document.getElementById('cheerMsg').textContent=t;c.style.display='flex';}
+function burst(){const em=['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<26;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=(1.5+Math.random()*1.5)+'s';s.style.fontSize=(1+Math.random()*1.4)+'rem';document.body.appendChild(s);setTimeout(()=>s.remove(),3200);}}
+const lv=xp=>Math.floor(xp/100)+1;
+
+function render(){
+  rollover();
+  document.getElementById('title').textContent='🗺️ '+S.me.name+'のクエスト';
+  const wd=['日','月','火','水','木','金','土'][new Date().getDay()];
+  document.getElementById('dateline').textContent=today().replace(/-/g,'/')+'（'+wd+'）';
+  document.getElementById('spk').textContent=S.mute?'🔇':'🔊';
+  document.getElementById('seasonName').textContent=S.cfg.season;
+  const prog=S.prog.clears-S.season.startClears;
+  document.getElementById('seasonProg').textContent=prog;
+  document.getElementById('seasonGoal').textContent=S.cfg.goal;
+  document.getElementById('seasonFill').style.width=Math.min(100,prog/S.cfg.goal*100)+'%';
+  document.getElementById('seasonReward').textContent=S.season.reward?('🎯 目標のごほうび：'+S.season.reward):'';
+  document.getElementById('streak').textContent=S.prog.streak;
+  document.getElementById('freeze').textContent=S.prog.freeze;
+  document.getElementById('gachaN').textContent=S.prog.gacha;
+  document.getElementById('best').textContent=S.prog.best;
+  const fa=document.getElementById('freezeArea');
+  const gap=S.prog.lastClear?daysBetween(S.prog.lastClear,today()):0;
+  fa.innerHTML=(gap>=2&&S.prog.freeze>0)?`<button class="btn gray" style="margin-top:10px" onclick="useFreeze()">🎫 お休み券で連続をまもる（のこり ${S.prog.freeze}）</button>`:'';
+
+  const stage=document.getElementById('stage');
+  if(!S.season.reward){
+    stage.innerHTML=`<div class="card chooser"><h2>このシーズン、がんばったら…<br>どのごほうびをめざす？🎯</h2>${S.cfg.rewards.map((r,i)=>`<button class="rwd" onclick="chooseReward(${i})"><span class="g">🎁</span>${r}</button>`).join('')}</div>`;
+  }else if(S.day.picks.length<S.cfg.count){
+    const need=S.cfg.count-S.day.picks.length;
+    stage.innerHTML=`<div class="card chooser"><h2>今日のクエストをえらぼう！<br><span style="font-size:.85rem;color:var(--soft)">あと ${need} つ えらんでね</span></h2><div class="chips">${S.cfg.choice.map((q,i)=>`<div class="chip ${S.day.picks.includes(i)?'sel':''}" onclick="togglePick(${i})">${q}</div>`).join('')}</div></div>`;
+  }else{
+    const mq=meQuests();
+    stage.innerHTML=`<div class="row">
+      <div class="player"><h3><span>${S.me.emoji}</span> ${S.me.name}</h3><div class="lvl">Lv.${lv(S.me.xp)}</div><div class="xpbar"><div class="xpfill" style="width:${S.me.xp%100}%"></div></div>
+        ${mq.map(q=>`<div class="quest ${S.day.me[q.key]?'done':''}" onclick="toggle('me','${q.key}')"><div class="chk">${S.day.me[q.key]?'✓':''}</div><div>${q.label}</div></div>`).join('')}
+        ${mq.some(q=>S.day.me[q.key])?'':`<div class="mini" style="cursor:pointer;text-decoration:underline" onclick="repick()">えらび直す</div>`}
+      </div>
+      <div class="player"><h3><span>${S.pa.emoji}</span> ${S.pa.name}</h3><div class="lvl">Lv.${lv(S.pa.xp)}</div><div class="xpbar"><div class="xpfill" style="width:${S.pa.xp%100}%"></div></div>
+        ${S.cfg.pa.map((q,i)=>`<div class="quest ${S.day.pa['p'+i]?'done':''}" onclick="toggle('pa','p'+${i})"><div class="chk">${S.day.pa['p'+i]?'✓':''}</div><div>${q}</div></div>`).join('')}
+      </div></div>
+      <div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">${S.prog.gacha>0?('まわせる回数：'+S.prog.gacha):'5日クリアごとに1回まわせるよ'}</div></div>`;
+  }
+  document.getElementById('rewardLog').innerHTML=S.rewards.length?('🎁 もらったごほうび：<br>'+S.rewards.slice(0,6).map(r=>'・'+r).join('<br>')):'';
+  save();
+}
+
+/* father: long-press on date + PIN */
+(function(){
+  const dl=document.getElementById('dateline');let t=null;
+  const start=()=>{t=setTimeout(()=>{t=null;const p=prompt('暗証番号（4桁）');if(p===S.cfg.pin)dadOpen();else if(p!==null)alert('ちがうよ');},650);};
+  const cancel=()=>{if(t){clearTimeout(t);t=null;}};
+  dl.addEventListener('touchstart',start,{passive:true});
+  dl.addEventListener('touchend',cancel);dl.addEventListener('touchmove',cancel);dl.addEventListener('touchcancel',cancel);
+  dl.addEventListener('mousedown',start);dl.addEventListener('mouseup',cancel);dl.addEventListener('mouseleave',cancel);
+  dl.addEventListener('contextmenu',e=>e.preventDefault());
+})();
+function fillExport(){document.getElementById('d_export').value=cfgExport();}
+function dadOpen(){
+  document.getElementById('d_meName').value=S.me.name;document.getElementById('d_meEmoji').value=S.me.emoji;
+  document.getElementById('d_paName').value=S.pa.name;document.getElementById('d_paEmoji').value=S.pa.emoji;
+  document.getElementById('d_fixed').value=S.cfg.fixed.join('\n');
+  document.getElementById('d_choice').value=S.cfg.choice.join('\n');
+  document.getElementById('d_count').value=S.cfg.count;document.getElementById('d_goal').value=S.cfg.goal;
+  document.getElementById('d_pa').value=S.cfg.pa.join('\n');
+  document.getElementById('d_season').value=S.cfg.season;
+  document.getElementById('d_rewards').value=S.cfg.rewards.join('\n');
+  document.getElementById('d_gacha').value=S.cfg.gacha.join('\n');
+  document.getElementById('d_pin').value=S.cfg.pin;
+  fillExport();document.getElementById('d_import').value='';
+  document.getElementById('dad').style.display='block';window.scrollTo(0,0);
+}
+function dadClose(){document.getElementById('dad').style.display='none';render();}
+const lines=id=>document.getElementById(id).value.split('\n').map(s=>s.trim()).filter(Boolean);
+function dadSave(){
+  S.me.name=document.getElementById('d_meName').value||'わたし';S.me.emoji=document.getElementById('d_meEmoji').value||'🦊';
+  S.pa.name=document.getElementById('d_paName').value||'パパ';S.pa.emoji=document.getElementById('d_paEmoji').value||'🐻';
+  S.cfg.fixed=lines('d_fixed');S.cfg.choice=lines('d_choice');
+  S.cfg.count=Math.max(0,parseInt(document.getElementById('d_count').value)||0);
+  S.cfg.goal=Math.max(1,parseInt(document.getElementById('d_goal').value)||14);
+  S.cfg.pa=lines('d_pa');S.cfg.season=document.getElementById('d_season').value||S.cfg.season;
+  S.cfg.rewards=lines('d_rewards');S.cfg.gacha=lines('d_gacha');
+  const pin=document.getElementById('d_pin').value;if(/^\d{4}$/.test(pin))S.cfg.pin=pin;
+  S.day.picks=S.day.picks.filter(i=>i<S.cfg.choice.length).slice(0,S.cfg.count);
+  save();fillExport();alert('保存しました');
+}
+function cfgExport(){const p={v:3,cfg:S.cfg,me:{name:S.me.name,emoji:S.me.emoji},pa:{name:S.pa.name,emoji:S.pa.emoji}};return btoa(unescape(encodeURIComponent(JSON.stringify(p))));}
+function copyExport(){const t=document.getElementById('d_export');t.select();try{navigator.clipboard.writeText(t.value);}catch(e){document.execCommand('copy');}alert('コピーしました');}
+function doImport(){
+  const code=document.getElementById('d_import').value.trim();if(!code){alert('コードを貼り付けてください');return;}
+  try{const p=JSON.parse(decodeURIComponent(escape(atob(code))));if(!p.cfg)throw 0;
+    S.cfg=p.cfg;if(p.me){S.me.name=p.me.name;S.me.emoji=p.me.emoji;}if(p.pa){S.pa.name=p.pa.name;S.pa.emoji=p.pa.emoji;}
+    S.day.picks=(S.day.picks||[]).filter(i=>i<S.cfg.choice.length).slice(0,S.cfg.count);
+    S.season.reward='';save();alert('設定を読み込みました');dadClose();
+  }catch(e){alert('コードが正しくないみたいです');}
+}
+function nextSeason(){const n=prompt('次のシーズン名は？',S.cfg.season);if(n===null)return;const g=parseInt(prompt('目標日数は？',String(S.cfg.goal)))||S.cfg.goal;S.cfg.season=n;S.cfg.goal=g;S.season={reward:'',startClears:S.prog.clears};save();alert('次のシーズンにしました');dadClose();}
+function resetAll(){if(confirm('全部リセットする？')){S=def();save();dadClose();}}
+render();
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+</script>
+</body>
+</html>
