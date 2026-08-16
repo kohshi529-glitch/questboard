@@ -45,6 +45,10 @@
   .gacha-btn{background:linear-gradient(90deg,#a06bff,#ff6bcb);box-shadow:0 4px 0 #7a44d1}
   .gacha-btn:active{box-shadow:0 1px 0 #7a44d1}
   .mini{font-size:.8rem;color:var(--soft);text-align:center;margin-top:6px}
+  .heat{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 2px;justify-content:center}
+  .hcell{width:15px;height:15px;border-radius:4px;background:#eee4cf;border:1px solid var(--line)}
+  .hcell.on{background:var(--teal);border-color:var(--teal)}
+  .hcell.today{box-shadow:0 0 0 2px var(--sun)}
   .spk{position:absolute;top:10px;right:14px;font-size:1.1rem;cursor:pointer;opacity:.6}
   .chooser h2{font-size:1.05rem;margin:2px 0 10px;text-align:center}
   .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
@@ -185,11 +189,11 @@ function def(){return{
   season:{reward:'',startClears:0},
   day:{date:'',picks:[],me:{},pa:{}},
   prog:{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0},
-  rewards:[], mute:false
+  rewards:[], mute:false, history:{}
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.history=S.history||{};S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
 normalize();
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
 const SYNC={on:false,applying:false,ref:null,lastSent:'',creds:null};
@@ -211,15 +215,19 @@ function meAllDone(){return meReady() && meQuests().length>0 && meQuests().every
 function onClear(){
   if(S.prog.lastClear===today())return;
   if(S.prog.lastClear===yesterday())S.prog.streak++;else S.prog.streak=1;
-  S.prog.lastClear=today();S.prog.clears++;S.prog.best=Math.max(S.prog.best,S.prog.streak);
+  S.prog.lastClear=today();S.prog.clears++;S.prog.best=Math.max(S.prog.best,S.prog.streak);S.history[today()]=true;
   if(S.prog.clears%5===0)S.prog.gacha++;
   if(S.prog.clears%7===0&&S.prog.freeze<2)S.prog.freeze++;
   celebrate();
 }
 function toggle(who,key){
   const rec=who==='me'?S.day.me:S.day.pa;const p=who==='me'?S.me:S.pa;
+  const before=lv(p.xp);
   if(rec[key]){rec[key]=false;p.xp=Math.max(0,p.xp-10);}else{rec[key]=true;p.xp+=10;sTick();}
-  if(who==='me'&&meAllDone())onClear();
+  const after=lv(p.xp);
+  const cleared=(who==='me'&&meAllDone()&&S.prog.lastClear!==today());
+  if(cleared)onClear();
+  else if(who==='me'&&after>before){showCheer('レベルアップ！ Lv.'+after+' 🆙');sWin();burst();}
   save();render();
 }
 function chooseReward(i){S.season.reward=S.cfg.rewards[i];save();render();showCheer('🎁 ごほうび、きめた！');sWin();burst();}
@@ -231,6 +239,8 @@ function celebrate(){showCheer(CHEERS[Math.floor(Math.random()*CHEERS.length)]);
 function showCheer(t){const c=document.getElementById('cheer');document.getElementById('cheerMsg').textContent=t;c.style.display='flex';}
 function burst(){const em=['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<26;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=(1.5+Math.random()*1.5)+'s';s.style.fontSize=(1+Math.random()*1.4)+'rem';document.body.appendChild(s);setTimeout(()=>s.remove(),3200);}}
 const lv=xp=>Math.floor(xp/100)+1;
+function histStrip(){const days=28,out=[],base=new Date(),tk=today();for(let i=days-1;i>=0;i--){const d=new Date(base);d.setDate(base.getDate()-i);const k=dstr(d);const on=!!(S.history&&S.history[k]);out.push('<div class="hcell'+(on?' on':'')+(k===tk?' today':'')+'" title="'+k+'"></div>');}return out.join('');}
+function histCount(){let c=0;const base=new Date();for(let i=0;i<28;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.history&&S.history[dstr(d)])c++;}return c;}
 
 function render(){
   rollover();
@@ -268,7 +278,8 @@ function render(){
       <div class="player"><h3><span>${S.pa.emoji}</span> ${S.pa.name}</h3><div class="lvl">Lv.${lv(S.pa.xp)}</div><div class="xpbar"><div class="xpfill" style="width:${S.pa.xp%100}%"></div></div>
         ${S.cfg.pa.map((q,i)=>`<div class="quest ${S.day.pa['p'+i]?'done':''}" onclick="toggle('pa','p'+${i})"><div class="chk">${S.day.pa['p'+i]?'✓':''}</div><div>${q}</div></div>`).join('')}
       </div></div>
-      <div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">${S.prog.gacha>0?('まわせる回数：'+S.prog.gacha):'5日クリアごとに1回まわせるよ'}</div></div>`;
+      <div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">${S.prog.gacha>0?('まわせる回数：'+S.prog.gacha):'5日クリアごとに1回まわせるよ'}</div></div>
+      <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div><div class="heat">${histStrip()}</div><div class="mini">この28日で ${histCount()} 日 クリア！🔥</div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=S.rewards.length?('🎁 もらったごほうび：<br>'+S.rewards.slice(0,6).map(r=>'・'+r).join('<br>')):'';
   save();maybeSync();
@@ -330,7 +341,7 @@ function nextSeason(){const n=prompt('次のシーズン名は？',S.cfg.season)
 function resetAll(){if(confirm('全部リセットする？')){S=def();normalize();save();dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history};}
 function maybeSync(){
   if(!SYNC.on||SYNC.applying||!SYNC.ref)return;
   const snap=JSON.stringify(snapshotState());
@@ -363,7 +374,7 @@ function initSync(){
       if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
       if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');return;}
       SYNC.applying=true;
-      ['me','pa','cfg','season','day','prog','rewards'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
+      ['me','pa','cfg','season','day','prog','rewards','history'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
       normalize();
       SYNC.lastSent=JSON.stringify(snapshotState());
       SYNC.applying=false;save();render();syncStatus('同期中 ✓（更新を受信）');
