@@ -7,6 +7,8 @@
 <meta name="theme-color" content="#ff7a59">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <title>わたしのクエスト</title>
 <style>
   :root{--paper:#fdf3e3;--ink:#3a3226;--coral:#ff7a59;--teal:#2ec5b6;--sun:#ffc857;
@@ -141,6 +143,18 @@
     <button class="btn gray" onclick="doImport()">📥 読み込む（設定を上書き）</button>
   </div>
 
+  <div class="sec">
+    <h3>🔄 二台同期（Firebase・任意）</h3>
+    <p class="hint">父と娘の端末を同じ「ルームID」でつなぐと、進捗がリアルタイムで共有されます。設定すると引き継ぎコードは不要になります（端末ごとに1回だけ）。</p>
+    <label>Firebase設定（コンソールの firebaseConfig を貼り付け）</label>
+    <textarea id="d_fb" placeholder="{ apiKey: '...', databaseURL: 'https://xxx.firebasedatabase.app', ... }"></textarea>
+    <label>ルームID（父娘で同じ文字列にする）</label>
+    <div class="two"><div><input id="d_room" placeholder="例: fam-8f3a2"></div><div style="flex:0 0 auto"><button class="btn gray" style="width:auto;padding:8px 12px" onclick="genRoom()">生成</button></div></div>
+    <button class="btn" style="margin-top:10px" onclick="startSync()">🔗 同期を開始 / 更新</button>
+    <div class="hint" id="syncState" style="margin-top:6px"></div>
+    <button class="btn gray" style="margin-top:8px" onclick="stopSync()">この端末の同期を停止</button>
+  </div>
+
   <button class="btn gray" style="margin-top:14px" onclick="nextSeason()">➡️ 次のシーズンにする</button>
   <button class="btn gray" style="margin-top:8px" onclick="dadClose()">✖ とじる</button>
   <button class="btn gray" style="margin-top:8px;color:#a13f22" onclick="resetAll()">🗑️ 全部リセット</button>
@@ -175,6 +189,11 @@ function def(){return{
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
+normalize();
+let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
+const SYNC={on:false,applying:false,ref:null,lastSent:'',creds:null};
+try{SYNC.creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function rollover(){if(S.day.date!==today())S.day={date:today(),picks:[],me:{},pa:{}};}
 
@@ -252,7 +271,7 @@ function render(){
       <div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">${S.prog.gacha>0?('まわせる回数：'+S.prog.gacha):'5日クリアごとに1回まわせるよ'}</div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=S.rewards.length?('🎁 もらったごほうび：<br>'+S.rewards.slice(0,6).map(r=>'・'+r).join('<br>')):'';
-  save();
+  save();maybeSync();
 }
 
 /* father: long-press on date + PIN */
@@ -278,6 +297,9 @@ function dadOpen(){
   document.getElementById('d_gacha').value=S.cfg.gacha.join('\n');
   document.getElementById('d_pin').value=S.cfg.pin;
   fillExport();document.getElementById('d_import').value='';
+  document.getElementById('d_fb').value=SYNC.creds?JSON.stringify(SYNC.creds.fb):'';
+  document.getElementById('d_room').value=SYNC.creds?SYNC.creds.room:'';
+  syncStatus(SYNC.on?('同期中 ✓ ルーム: '+SYNC.creds.room):'未接続');
   document.getElementById('dad').style.display='block';window.scrollTo(0,0);
 }
 function dadClose(){document.getElementById('dad').style.display='none';render();}
@@ -292,7 +314,7 @@ function dadSave(){
   S.cfg.rewards=lines('d_rewards');S.cfg.gacha=lines('d_gacha');
   const pin=document.getElementById('d_pin').value;if(/^\d{4}$/.test(pin))S.cfg.pin=pin;
   S.day.picks=S.day.picks.filter(i=>i<S.cfg.choice.length).slice(0,S.cfg.count);
-  save();fillExport();alert('保存しました');
+  save();maybeSync();fillExport();alert('保存しました');
 }
 function cfgExport(){const p={v:3,cfg:S.cfg,me:{name:S.me.name,emoji:S.me.emoji},pa:{name:S.pa.name,emoji:S.pa.emoji}};return btoa(unescape(encodeURIComponent(JSON.stringify(p))));}
 function copyExport(){const t=document.getElementById('d_export');t.select();try{navigator.clipboard.writeText(t.value);}catch(e){document.execCommand('copy');}alert('コピーしました');}
@@ -305,8 +327,52 @@ function doImport(){
   }catch(e){alert('コードが正しくないみたいです');}
 }
 function nextSeason(){const n=prompt('次のシーズン名は？',S.cfg.season);if(n===null)return;const g=parseInt(prompt('目標日数は？',String(S.cfg.goal)))||S.cfg.goal;S.cfg.season=n;S.cfg.goal=g;S.season={reward:'',startClears:S.prog.clears};save();alert('次のシーズンにしました');dadClose();}
-function resetAll(){if(confirm('全部リセットする？')){S=def();save();dadClose();}}
+function resetAll(){if(confirm('全部リセットする？')){S=def();normalize();save();dadClose();}}
+
+/* ---- two-device sync (Firebase Realtime DB) ---- */
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards};}
+function maybeSync(){
+  if(!SYNC.on||SYNC.applying||!SYNC.ref)return;
+  const snap=JSON.stringify(snapshotState());
+  if(snap===SYNC.lastSent)return;
+  SYNC.lastSent=snap;
+  const data=JSON.parse(snap);data.updatedAt=Date.now();data.updatedBy=DEVICE;
+  SYNC.ref.set(data).catch(function(){});
+}
+function parseFbCfg(txt){const m=(txt||'').match(/\{[\s\S]*\}/);if(!m)return null;let s=m[0].replace(/([{,]\s*)([A-Za-z0-9_]+)\s*:/g,'$1"$2":').replace(/,\s*([}\]])/g,'$1').replace(/'/g,'"');try{return JSON.parse(s);}catch(e){return null;}}
+function genRoom(){document.getElementById('d_room').value='fam-'+Math.random().toString(36).slice(2,8);}
+function syncStatus(t){const e=document.getElementById('syncState');if(e)e.textContent=t;}
+function startSync(){
+  const cfg=parseFbCfg(document.getElementById('d_fb').value);
+  const room=(document.getElementById('d_room').value||'').trim();
+  if(!cfg||!cfg.databaseURL){alert('Firebase設定が正しくないみたい（databaseURL が必要です）');return;}
+  if(!room){alert('ルームIDを入れてね');return;}
+  SYNC.creds={fb:cfg,room:room};localStorage.setItem('qb_sync',JSON.stringify(SYNC.creds));
+  initSync();
+}
+function stopSync(){try{if(SYNC.ref)SYNC.ref.off();}catch(e){}SYNC.on=false;SYNC.ref=null;localStorage.removeItem('qb_sync');SYNC.creds=null;syncStatus('停止しました');}
+function initSync(){
+  if(!SYNC.creds)return;
+  if(!window.firebase){syncStatus('（オフライン中：接続できたら同期します）');return;}
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(SYNC.creds.fb);
+    SYNC.ref=firebase.database().ref('rooms/'+SYNC.creds.room+'/state');
+    SYNC.on=true;syncStatus('接続中… ルーム: '+SYNC.creds.room);
+    SYNC.ref.on('value',function(snap){
+      const r=snap.val();
+      if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
+      if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');return;}
+      SYNC.applying=true;
+      ['me','pa','cfg','season','day','prog','rewards'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
+      normalize();
+      SYNC.lastSent=JSON.stringify(snapshotState());
+      SYNC.applying=false;save();render();syncStatus('同期中 ✓（更新を受信）');
+    },function(err){syncStatus('接続エラー: '+((err&&err.message)||''));});
+  }catch(e){syncStatus('初期化エラー: '+e.message);}
+}
+
 render();
+if(SYNC.creds)initSync();
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
 </script>
 </body>
