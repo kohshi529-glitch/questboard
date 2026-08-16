@@ -52,6 +52,8 @@
   .hcell{width:100%;aspect-ratio:1/1;border-radius:4px;background:#eee4cf;border:1px solid var(--line)}
   .hcell.on{background:var(--teal);border-color:var(--teal)}
   .hcell.today{box-shadow:0 0 0 2px var(--sun)}
+  .hcell.pic{position:relative}
+  .hcell.pic::after{content:'';position:absolute;top:1px;right:1px;width:5px;height:5px;border-radius:50%;background:var(--coral)}
   .legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:.72rem;color:var(--soft)}
   .legend i{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:-2px;margin-right:4px;border:1px solid var(--line)}
   .legend .l-on{background:var(--teal);border-color:var(--teal)}
@@ -112,6 +114,7 @@
 </div>
 
 <div class="cheer" id="cheer" onclick="this.style.display='none'"><div class="msg" id="cheerMsg"></div><div style="color:#fff;margin-top:14px;font-size:.9rem">タップでとじる</div></div>
+<div class="cheer" id="photoView" onclick="this.style.display='none'"><img id="pvImg" style="max-width:90%;max-height:78%;border-radius:12px" alt=""><div style="color:#fff;margin-top:10px;font-size:.9rem">タップでとじる</div></div>
 
 <div id="dad"><div class="inner">
   <h1 style="text-align:left">🔧 保護者メニュー</h1>
@@ -175,6 +178,7 @@
 
 <script>
 const KEY='questboard_v3';
+const CFGVER='cfg-2026-08-16b';
 const CHEERS=['やったね！🎉','すごい！✨','てんさい！🌟','Great job! 👏','Amazing! 🚀','Молодец! 💪','Отлично! 🎊'];
 const pad=n=>String(n).padStart(2,'0');
 const dstr=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -198,12 +202,13 @@ function def(){return{
   season:{reward:'',startClears:0},
   day:{date:'',picks:[],me:{},pa:{}},
   prog:{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0},
-  rewards:[], mute:false, history:{}
+  rewards:[], mute:false, history:{}, photoDays:{}, cfgVer:CFGVER
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.history=S.history||{};S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.history=S.history||{};S.photoDays=S.photoDays||{};S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
 normalize();
+if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
 const SYNC={on:false,applying:false,ref:null,lastSent:'',creds:null};
 try{SYNC.creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
@@ -256,12 +261,18 @@ function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','�
 const lv=xp=>Math.floor(xp/100)+1;
 function calHTML(){
   const N=16,base=new Date(),tk=today();let cells='';
-  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const on=!!(S.history&&S.history[k]);cells+='<div class="hcell'+(on?' on':'')+(k===tk?' today':'')+'" title="'+k+'"></div>';}
+  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const on=!!(S.history&&S.history[k]);const pic=!!(S.photoDays&&S.photoDays[k]);cells+='<div class="hcell'+(on?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')"></div>';}
   const lab=(col,txt,al)=>'<span style="grid-column:'+col+(al?';justify-self:'+al:'')+'">'+txt+'</span>';
   const labels=lab(1,'15日前','start')+lab(6,'10日前')+lab(11,'5日前')+lab(16,'きょう','end');
   return '<div class="callabels">'+labels+'</div><div class="calgrid">'+cells+'</div>';
 }
 function histCount(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.history&&S.history[dstr(d)])c++;}return c;}
+const PKEY='qb_photos';
+function loadPhotos(){try{return JSON.parse(localStorage.getItem(PKEY)||'{}');}catch(e){return {};}}
+function savePhotos(p){localStorage.setItem(PKEY,JSON.stringify(p));}
+function prunePhotos(p){const ks=Object.keys(p).sort();while(ks.length>14){delete p[ks.shift()];}}
+function addPhoto(ev){const f=ev.target.files&&ev.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(e){const img=new Image();img.onload=function(){const max=480;let w=img.width,h=img.height;const s=Math.min(1,max/Math.max(w,h));const cw=Math.round(w*s),ch=Math.round(h*s);const cv=document.createElement('canvas');cv.width=cw;cv.height=ch;cv.getContext('2d').drawImage(img,0,0,cw,ch);let data;try{data=cv.toDataURL('image/jpeg',0.6);}catch(err){alert('写真を読み込めませんでした');return;}const ph=loadPhotos();ph[today()]=data;prunePhotos(ph);try{savePhotos(ph);}catch(er){alert('写真がいっぱいです。少し経ってから、または古い写真が消えてから再度おためしください');return;}S.photoDays[today()]=true;save();maybeSync();render();showCheer('📸 きろくしたよ！');burst();};img.src=e.target.result;};rd.readAsDataURL(f);}
+function viewPhoto(k){const ph=loadPhotos();if(ph[k]){document.getElementById('pvImg').src=ph[k];document.getElementById('photoView').style.display='flex';}}
 
 function render(){
   rollover();
@@ -303,8 +314,9 @@ function render(){
       <div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">${S.prog.gacha>0?('まわせる回数：'+S.prog.gacha):'5日クリアごとに1回まわせるよ'}</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
         <div class="calwrap">${calHTML()}</div>
-        <div class="legend"><span><i class="l-on"></i>クリア</span><span><i class="l-off"></i>おやすみ</span><span><i class="l-today"></i>きょう</span></div>
-        <div class="mini">この16日で ${histCount()} 日 クリア！🔥</div></div>`;
+        <div class="legend"><span><i class="l-on"></i>クリア</span><span><i class="l-off"></i>おやすみ</span><span><i class="l-today"></i>きょう</span><span>📷=写真あり</span></div>
+        <div class="mini">この16日で ${histCount()} 日 クリア！🔥</div></div>
+      <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 きょうのきろく</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読どうがやドリルの写真をのこそう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真をえらぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=S.rewards.length?('🎁 もらったごほうび：<br>'+S.rewards.slice(0,6).map(r=>'・'+r).join('<br>')):'';
   save();maybeSync();
@@ -366,7 +378,7 @@ function nextSeason(){const n=prompt('次のシーズン名は？',S.cfg.season)
 function resetAll(){if(confirm('全部リセットする？')){S=def();normalize();save();dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,cfgVer:S.cfgVer};}
 function maybeSync(){
   if(!SYNC.on||SYNC.applying||!SYNC.ref)return;
   const snap=JSON.stringify(snapshotState());
@@ -399,10 +411,12 @@ function initSync(){
       if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
       if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');return;}
       SYNC.applying=true;
-      ['me','pa','cfg','season','day','prog','rewards','history'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
+      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
       normalize();
-      SYNC.lastSent=JSON.stringify(snapshotState());
-      SYNC.applying=false;save();render();syncStatus('同期中 ✓（更新を受信）');
+      var _mig=false;if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;_mig=true;}
+      SYNC.applying=false;
+      SYNC.lastSent=_mig?'':JSON.stringify(snapshotState());
+      save();render();syncStatus('同期中 ✓（更新を受信）');
     },function(err){syncStatus('接続エラー: '+((err&&err.message)||''));});
   }catch(e){syncStatus('初期化エラー: '+e.message);}
 }
