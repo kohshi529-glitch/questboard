@@ -45,10 +45,18 @@
   .gacha-btn{background:linear-gradient(90deg,#a06bff,#ff6bcb);box-shadow:0 4px 0 #7a44d1}
   .gacha-btn:active{box-shadow:0 1px 0 #7a44d1}
   .mini{font-size:.8rem;color:var(--soft);text-align:center;margin-top:6px}
-  .heat{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 2px;justify-content:center}
-  .hcell{width:15px;height:15px;border-radius:4px;background:#eee4cf;border:1px solid var(--line)}
+  .calwrap{margin:10px 2px 2px}
+  .callabels{display:grid;grid-template-columns:repeat(16,1fr);margin-bottom:4px}
+  .callabels span{font-size:.6rem;color:var(--soft);white-space:nowrap;justify-self:center;overflow:visible}
+  .calgrid{display:grid;grid-template-columns:repeat(16,1fr);gap:4px}
+  .hcell{width:100%;aspect-ratio:1/1;border-radius:4px;background:#eee4cf;border:1px solid var(--line)}
   .hcell.on{background:var(--teal);border-color:var(--teal)}
   .hcell.today{box-shadow:0 0 0 2px var(--sun)}
+  .legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:.72rem;color:var(--soft)}
+  .legend i{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:-2px;margin-right:4px;border:1px solid var(--line)}
+  .legend .l-on{background:var(--teal);border-color:var(--teal)}
+  .legend .l-off{background:#eee4cf}
+  .legend .l-today{background:#fff;box-shadow:0 0 0 2px var(--sun)}
   .spk{position:absolute;top:10px;right:14px;font-size:1.1rem;cursor:pointer;opacity:.6}
   .chooser h2{font-size:1.05rem;margin:2px 0 10px;text-align:center}
   .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
@@ -239,8 +247,14 @@ function celebrate(){showCheer(CHEERS[Math.floor(Math.random()*CHEERS.length)]);
 function showCheer(t){const c=document.getElementById('cheer');document.getElementById('cheerMsg').textContent=t;c.style.display='flex';}
 function burst(){const em=['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<26;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=(1.5+Math.random()*1.5)+'s';s.style.fontSize=(1+Math.random()*1.4)+'rem';document.body.appendChild(s);setTimeout(()=>s.remove(),3200);}}
 const lv=xp=>Math.floor(xp/100)+1;
-function histStrip(){const days=28,out=[],base=new Date(),tk=today();for(let i=days-1;i>=0;i--){const d=new Date(base);d.setDate(base.getDate()-i);const k=dstr(d);const on=!!(S.history&&S.history[k]);out.push('<div class="hcell'+(on?' on':'')+(k===tk?' today':'')+'" title="'+k+'"></div>');}return out.join('');}
-function histCount(){let c=0;const base=new Date();for(let i=0;i<28;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.history&&S.history[dstr(d)])c++;}return c;}
+function calHTML(){
+  const N=16,base=new Date(),tk=today();let cells='';
+  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const on=!!(S.history&&S.history[k]);cells+='<div class="hcell'+(on?' on':'')+(k===tk?' today':'')+'" title="'+k+'"></div>';}
+  const lab=(col,txt,al)=>'<span style="grid-column:'+col+(al?';justify-self:'+al:'')+'">'+txt+'</span>';
+  const labels=lab(1,'15日前','start')+lab(6,'10日前')+lab(11,'5日前')+lab(16,'きょう','end');
+  return '<div class="callabels">'+labels+'</div><div class="calgrid">'+cells+'</div>';
+}
+function histCount(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.history&&S.history[dstr(d)])c++;}return c;}
 
 function render(){
   rollover();
@@ -279,7 +293,10 @@ function render(){
         ${S.cfg.pa.map((q,i)=>`<div class="quest ${S.day.pa['p'+i]?'done':''}" onclick="toggle('pa','p'+${i})"><div class="chk">${S.day.pa['p'+i]?'✓':''}</div><div>${q}</div></div>`).join('')}
       </div></div>
       <div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">${S.prog.gacha>0?('まわせる回数：'+S.prog.gacha):'5日クリアごとに1回まわせるよ'}</div></div>
-      <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div><div class="heat">${histStrip()}</div><div class="mini">この28日で ${histCount()} 日 クリア！🔥</div></div>`;
+      <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
+        <div class="calwrap">${calHTML()}</div>
+        <div class="legend"><span><i class="l-on"></i>クリア</span><span><i class="l-off"></i>おやすみ</span><span><i class="l-today"></i>きょう</span></div>
+        <div class="mini">この16日で ${histCount()} 日 クリア！🔥</div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=S.rewards.length?('🎁 もらったごほうび：<br>'+S.rewards.slice(0,6).map(r=>'・'+r).join('<br>')):'';
   save();maybeSync();
