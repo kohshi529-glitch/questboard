@@ -31,7 +31,7 @@
   .player h3{margin:0 0 6px;font-size:1rem;display:flex;align-items:center;gap:6px}
   .lvl{font-size:.72rem;color:var(--soft)}
   .xpbar{height:8px;background:#eee4cf;border-radius:10px;overflow:hidden;margin:4px 0 8px}
-  .xpfill{height:100%;background:var(--teal);width:0%}
+  .xpfill{height:100%;background:var(--teal);width:0%;transition:width .5s}
   .quest{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:10px;margin-bottom:6px;background:#fbf6ea;cursor:pointer;user-select:none;font-size:.88rem;transition:.15s}
   .quest.done{background:#dcf5e8;text-decoration:line-through;color:var(--soft)}
   .chk{width:22px;height:22px;border-radius:7px;border:2.5px solid var(--teal);flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:.9rem;background:#fff}
@@ -62,6 +62,7 @@
   .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   .chip{background:#fff;border:2.5px solid var(--line);border-radius:14px;padding:10px 12px;font-size:.9rem;cursor:pointer;user-select:none;transition:.12s}
   .chip.sel{border-color:var(--teal);background:#dcf5e8;font-weight:700}
+  .cathead{flex-basis:100%;width:100%;text-align:center;font-weight:800;margin:10px 0 2px;font-size:.92rem;color:var(--coral)}
   .rwd{display:block;width:100%;text-align:left;background:#fff;border:2.5px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;font-size:.95rem;cursor:pointer;transition:.12s}
   .rwd:active{transform:scale(.98)}.rwd .g{font-size:1.3rem;margin-right:8px}
   .cheer{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(0,0,0,.35);z-index:50;text-align:center}
@@ -185,13 +186,13 @@ function def(){return{
   me:{name:'わたし',emoji:'🦊',xp:0},
   pa:{name:'パパ',emoji:'🐻',xp:0},
   cfg:{
-    fixed:['英語 10分（Duolingo か 音読）'],
-    choice:['国語：語彙カード 5分','国語：音読 5分','国語：本を5分よむ','算数：基礎ドリル 5分','算数：そろばん 5分','英語：シャドーイング 5分','今日のできごとを1行日記'],
+    fixed:['算数：計算ドリル 20問 / 10分'],
+    choice:['#🎯 めざせ英検準1級！','英語①多読/音読 10分＋新出英語5語メモ','英語②英作文/英語日記 5文以上','#💪 算数・国語 基礎力UP！','算数①計算ドリル ＋20問/10分','国語①読書 10分＋新出漢字5字反復','国語②日本語日記 5文以上','国語③漢字ドリル 10字反復'],
     count:2,
-    pa:['パパのチャレンジ（英語か運動 10分）'],
+    pa:['ビーモン 1回','平日のお迎え 1回','週末の送り迎え 1回'],
     season:'シーズン1：スタートダッシュ', goal:14,
-    rewards:['いっしょに映画を見る','週末に公園・おでかけ','すきなごはんリクエスト','いっしょにお菓子づくり'],
-    gacha:['いっしょに動画 30分','すきなおやつ1つ','ゲーム 30分えんちょう券','パパと外あそび','お手つだい交代券','なぞのミッション'],
+    rewards:['いっしょに映画を見る','行きたかった場所へおでかけ','いっしょにお菓子づくり','自由リクエスト（パパと相談して決める）'],
+    gacha:['ダンス帰りの温泉','クエスト1日おやすみ券','ネトフリ動画30分','いっしょにボードゲーム30分'],
     pin:'5290'
   },
   season:{reward:'',startClears:0},
@@ -201,7 +202,7 @@ function def(){return{
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.history=S.history||{};S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.history=S.history||{};S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
 normalize();
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
 const SYNC={on:false,applying:false,ref:null,lastSent:'',creds:null};
@@ -217,7 +218,7 @@ const sWin=()=>{[523,659,784,1047].forEach((f,i)=>tone(f,0.16,'triangle',i*0.09)
 const sGacha=()=>{[880,1175,1568].forEach((f,i)=>tone(f,0.14,'sine',i*0.07));};
 function toggleMute(){S.mute=!S.mute;save();document.getElementById('spk').textContent=S.mute?'🔇':'🔊';}
 
-function meQuests(){const a=S.cfg.fixed.map((q,i)=>({key:'f'+i,label:q}));S.day.picks.forEach(idx=>{if(S.cfg.choice[idx]!==undefined)a.push({key:'c'+idx,label:S.cfg.choice[idx]});});return a;}
+function meQuests(){const a=S.cfg.fixed.map((q,i)=>({key:'f'+i,label:q}));S.day.picks.forEach(idx=>{const q=S.cfg.choice[idx];if(q!==undefined&&q.charAt(0)!=='#')a.push({key:'c'+idx,label:q});});return a;}
 function meReady(){return S.season.reward && S.day.picks.length>=S.cfg.count;}
 function meAllDone(){return meReady() && meQuests().length>0 && meQuests().every(q=>S.day.me[q.key]);}
 function onClear(){
@@ -226,7 +227,11 @@ function onClear(){
   S.prog.lastClear=today();S.prog.clears++;S.prog.best=Math.max(S.prog.best,S.prog.streak);S.history[today()]=true;
   if(S.prog.clears%5===0)S.prog.gacha++;
   if(S.prog.clears%7===0&&S.prog.freeze<2)S.prog.freeze++;
-  celebrate();
+  const MS={3:'3日れんぞく！すごい！🔥',7:'1週間たっせい！🏅',14:'2週間つづいた！🎖️',21:'3週間！習慣になってきた！🌟',30:'1か月れんぞく！！🏆',50:'50日！でんせつ級！👑',100:'100日！えいゆう！🎇'};
+  const sp=S.prog.clears-S.season.startClears;
+  if(!S.season.done && sp>=(S.cfg.goal||14)){S.season.done=true;bigCelebrate('🎉 シーズンクリア！ ごほうび→ '+(S.season.reward||''));}
+  else if(MS[S.prog.streak]){bigCelebrate(MS[S.prog.streak]);}
+  else{celebrate();}
 }
 function toggle(who,key){
   const rec=who==='me'?S.day.me:S.day.pa;const p=who==='me'?S.me:S.pa;
@@ -239,13 +244,15 @@ function toggle(who,key){
   save();render();
 }
 function chooseReward(i){S.season.reward=S.cfg.rewards[i];save();render();showCheer('🎁 ごほうび、きめた！');sWin();burst();}
-function togglePick(idx){const p=S.day.picks;const at=p.indexOf(idx);if(at>=0)p.splice(at,1);else{if(p.length>=S.cfg.count)return;p.push(idx);sTick();}save();render();}
+function togglePick(idx){if((S.cfg.choice[idx]||'').charAt(0)==='#')return;const p=S.day.picks;const at=p.indexOf(idx);if(at>=0)p.splice(at,1);else{if(p.length>=S.cfg.count)return;p.push(idx);sTick();}save();render();}
 function repick(){if(meQuests().some(q=>S.day.me[q.key]))return;S.day.picks=[];save();render();}
 function useFreeze(){if(S.prog.freeze>0){S.prog.freeze--;S.prog.lastClear=yesterday();save();render();}}
 function spin(){if(S.prog.gacha<=0||!S.cfg.gacha.length)return;S.prog.gacha--;const r=S.cfg.gacha[Math.floor(Math.random()*S.cfg.gacha.length)];S.rewards.unshift(today()+'：'+r);save();render();showCheer('🎁 '+r);sGacha();burst();}
 function celebrate(){showCheer(CHEERS[Math.floor(Math.random()*CHEERS.length)]);sWin();burst();}
+function bigCelebrate(t){showCheer(t);sBig();burst(60,true);}
+function sBig(){[523,659,784,1047,1319].forEach(function(f,i){tone(f,0.18,'triangle',i*0.08);});}
 function showCheer(t){const c=document.getElementById('cheer');document.getElementById('cheerMsg').textContent=t;c.style.display='flex';}
-function burst(){const em=['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<26;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=(1.5+Math.random()*1.5)+'s';s.style.fontSize=(1+Math.random()*1.4)+'rem';document.body.appendChild(s);setTimeout(()=>s.remove(),3200);}}
+function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','🎊','👑','💛','🥳']:['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<N;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=((big?2:1.5)+Math.random()*1.5)+'s';s.style.fontSize=((big?1.5:1)+Math.random()*(big?1.6:1.4))+'rem';document.body.appendChild(s);setTimeout(function(){s.remove();},4200);}}
 const lv=xp=>Math.floor(xp/100)+1;
 function calHTML(){
   const N=16,base=new Date(),tk=today();let cells='';
@@ -281,7 +288,8 @@ function render(){
     stage.innerHTML=`<div class="card chooser"><h2>このシーズン、がんばったら…<br>どのごほうびをめざす？🎯</h2>${S.cfg.rewards.map((r,i)=>`<button class="rwd" onclick="chooseReward(${i})"><span class="g">🎁</span>${r}</button>`).join('')}</div>`;
   }else if(S.day.picks.length<S.cfg.count){
     const need=S.cfg.count-S.day.picks.length;
-    stage.innerHTML=`<div class="card chooser"><h2>今日のクエストをえらぼう！<br><span style="font-size:.85rem;color:var(--soft)">あと ${need} つ えらんでね</span></h2><div class="chips">${S.cfg.choice.map((q,i)=>`<div class="chip ${S.day.picks.includes(i)?'sel':''}" onclick="togglePick(${i})">${q}</div>`).join('')}</div></div>`;
+    const chips=S.cfg.choice.map((q,i)=>{if(q.charAt(0)==='#')return '<div class="cathead">'+q.slice(1).trim()+'</div>';return '<div class="chip '+(S.day.picks.includes(i)?'sel':'')+'" onclick="togglePick('+i+')">'+q+'</div>';}).join('');
+    stage.innerHTML=`<div class="card chooser"><h2>今日のクエストをえらぼう！<br><span style="font-size:.85rem;color:var(--soft)">あと ${need} つ えらんでね</span></h2><div class="chips">${chips}</div></div>`;
   }else{
     const mq=meQuests();
     stage.innerHTML=`<div class="row">
@@ -354,7 +362,7 @@ function doImport(){
     S.season.reward='';save();alert('設定を読み込みました');dadClose();
   }catch(e){alert('コードが正しくないみたいです');}
 }
-function nextSeason(){const n=prompt('次のシーズン名は？',S.cfg.season);if(n===null)return;const g=parseInt(prompt('目標日数は？',String(S.cfg.goal)))||S.cfg.goal;S.cfg.season=n;S.cfg.goal=g;S.season={reward:'',startClears:S.prog.clears};save();alert('次のシーズンにしました');dadClose();}
+function nextSeason(){const n=prompt('次のシーズン名は？',S.cfg.season);if(n===null)return;const g=parseInt(prompt('目標日数は？',String(S.cfg.goal)))||S.cfg.goal;S.cfg.season=n;S.cfg.goal=g;S.season={reward:'',startClears:S.prog.clears,done:false};save();alert('次のシーズンにしました');dadClose();}
 function resetAll(){if(confirm('全部リセットする？')){S=def();normalize();save();dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
