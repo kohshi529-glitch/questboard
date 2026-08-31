@@ -52,8 +52,11 @@
   .hcell{width:100%;aspect-ratio:1/1;border-radius:4px;background:#eee4cf;border:1px solid var(--line)}
   .hcell.on{background:var(--teal);border-color:var(--teal)}
   .hcell.today{box-shadow:0 0 0 2px var(--sun)}
-  .hcell.pic{position:relative}
+  .hcell.pic,.hcell.react{position:relative}
   .hcell.pic::after{content:'';position:absolute;top:1px;right:1px;width:5px;height:5px;border-radius:50%;background:var(--coral)}
+  .hcell.react::before{content:'♡';position:absolute;bottom:-3px;left:1px;font-size:9px;line-height:1;color:var(--coral)}
+  .rbtn{background:#fff;border:2px solid var(--line);border-radius:12px;padding:6px 10px;font-size:.95rem;margin:3px;cursor:pointer;font-family:inherit}
+  .rbtn.on{border-color:var(--teal);background:#dcf5e8;font-weight:700}
   .legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:.72rem;color:var(--soft)}
   .legend i{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:-2px;margin-right:4px;border:1px solid var(--line)}
   .legend .l-on{background:var(--teal);border-color:var(--teal)}
@@ -172,6 +175,15 @@
   </div>
 
   <div class="sec">
+    <h3>💌 娘への応援（今日の達成に）</h3>
+    <p class="hint">スタンプとひとことを選んで送ると、娘の画面に応援が届きます（娘には送信画面は見えません）。</p>
+    <div id="stampRow"></div>
+    <div id="phraseRow" style="margin-top:6px"></div>
+    <button class="btn" style="margin-top:10px" onclick="sendReaction()">💌 応援を送る</button>
+    <div class="hint" id="reactState" style="margin-top:6px"></div>
+  </div>
+
+  <div class="sec">
     <h3>⏰ まいにちのリマインダー</h3>
     <p class="hint">スマホのカレンダーに「毎日の通知」を登録します（アプリを閉じていても鳴ります）。娘の端末で1回だけ設定すればOK。</p>
     <div class="two"><div><label>時刻</label><input id="remTime" type="time" value="19:00"></div><div style="flex:0 0 auto;align-self:flex-end"><button class="btn gray" style="width:auto;padding:10px 12px" onclick="addReminder()">📅 追加</button></div></div>
@@ -210,15 +222,15 @@ function def(){return{
   season:{reward:'',startClears:0},
   day:{date:'',picks:[],me:{},pa:{}},
   prog:{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0},
-  rewards:[], mute:false, history:{}, photoDays:{}, cfgVer:CFGVER
+  rewards:[], mute:false, history:{}, photoDays:{}, reactions:{}, cfgVer:CFGVER
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.history=S.history||{};S.photoDays=S.photoDays||{};S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
-const SYNC={on:false,applying:false,ref:null,lastSent:'',creds:null};
+const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null};
 try{SYNC.creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function rollover(){if(S.day.date!==today())S.day={date:today(),picks:[],me:{},pa:{}};}
@@ -269,7 +281,7 @@ function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','�
 const lv=xp=>Math.floor(xp/100)+1;
 function calHTML(){
   const N=16,base=new Date(),tk=today();let cells='';
-  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const on=!!(S.history&&S.history[k]);const pic=!!(S.photoDays&&S.photoDays[k]);cells+='<div class="hcell'+(on?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')"></div>';}
+  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const on=!!(S.history&&S.history[k]);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);cells+='<div class="hcell'+(on?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')"></div>';}
   const lab=(col,txt,al)=>'<span style="grid-column:'+col+(al?';justify-self:'+al:'')+'">'+txt+'</span>';
   const labels=lab(1,'15日前','start')+lab(6,'10日前')+lab(11,'5日前')+lab(16,'きょう','end');
   return '<div class="callabels">'+labels+'</div><div class="calgrid">'+cells+'</div>';
@@ -279,8 +291,17 @@ const PKEY='qb_photos';
 function loadPhotos(){try{return JSON.parse(localStorage.getItem(PKEY)||'{}');}catch(e){return {};}}
 function savePhotos(p){localStorage.setItem(PKEY,JSON.stringify(p));}
 function prunePhotos(p){const ks=Object.keys(p).sort();while(ks.length>14){delete p[ks.shift()];}}
-function addPhoto(ev){const f=ev.target.files&&ev.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(e){const img=new Image();img.onload=function(){const max=480;let w=img.width,h=img.height;const s=Math.min(1,max/Math.max(w,h));const cw=Math.round(w*s),ch=Math.round(h*s);const cv=document.createElement('canvas');cv.width=cw;cv.height=ch;cv.getContext('2d').drawImage(img,0,0,cw,ch);let data;try{data=cv.toDataURL('image/jpeg',0.6);}catch(err){alert('写真を読み込めませんでした');return;}const ph=loadPhotos();ph[today()]=data;prunePhotos(ph);try{savePhotos(ph);}catch(er){alert('写真がいっぱいです。少し経ってから、または古い写真が消えてから再度おためしください');return;}S.photoDays[today()]=true;save();maybeSync();render();showCheer('📸 きろくしたよ！');burst();};img.src=e.target.result;};rd.readAsDataURL(f);}
+function addPhoto(ev){const f=ev.target.files&&ev.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(e){const img=new Image();img.onload=function(){const max=480;let w=img.width,h=img.height;const s=Math.min(1,max/Math.max(w,h));const cw=Math.round(w*s),ch=Math.round(h*s);const cv=document.createElement('canvas');cv.width=cw;cv.height=ch;cv.getContext('2d').drawImage(img,0,0,cw,ch);let data;try{data=cv.toDataURL('image/jpeg',0.6);}catch(err){alert('写真を読み込めませんでした');return;}const ph=loadPhotos();ph[today()]=data;prunePhotos(ph);try{savePhotos(ph);}catch(er){alert('写真がいっぱいです。少し経ってから、または古い写真が消えてから再度おためしください');return;}S.photoDays[today()]=true;var dts=Object.keys(S.photoDays).sort();while(dts.length>14){var old=dts.shift();delete S.photoDays[old];if(SYNC.pref){try{SYNC.pref.child(old).remove();}catch(e){}}}if(SYNC.on&&SYNC.pref){try{SYNC.pref.child(today()).set(data);}catch(e){}}save();maybeSync();render();showCheer('📸 きろくしたよ！');burst();};img.src=e.target.result;};rd.readAsDataURL(f);}
+function handlePhoto(snap){try{const date=snap.key;const data=snap.val();if(typeof data!=='string'||data.slice(0,5)!=='data:')return;const ph=loadPhotos();if(ph[date]!==data){ph[date]=data;prunePhotos(ph);try{savePhotos(ph);}catch(e){}if(!S.photoDays)S.photoDays={};if(!S.photoDays[date]){S.photoDays[date]=true;save();}render();}}catch(e){}}
 function viewPhoto(k){const ph=loadPhotos();if(ph[k]){document.getElementById('pvImg').src=ph[k];document.getElementById('photoView').style.display='flex';}}
+var STAMPS=['🎉','💮','🔥','👍','🌟','❤️'];
+var PHRASES=['よくできたね！','がんばってるね！','その調子！','毎日えらい！','すごい成長！','パパもうれしい！'];
+var _selE='🎉',_selM='よくできたね！';
+function renderReactPicker(){var sr=document.getElementById('stampRow'),pr=document.getElementById('phraseRow');if(!sr||!pr)return;sr.innerHTML=STAMPS.map(function(e){return '<button class="rbtn'+(e===_selE?' on':'')+'" onclick="pickE(\''+e+'\')">'+e+'</button>';}).join('');pr.innerHTML=PHRASES.map(function(m){return '<button class="rbtn'+(m===_selM?' on':'')+'" onclick="pickM(\''+m+'\')">'+m+'</button>';}).join('');}
+function pickE(e){_selE=e;renderReactPicker();}
+function pickM(m){_selM=m;renderReactPicker();}
+function sendReaction(){var t=today();S.reactions[t]={e:_selE,m:_selM,ts:Date.now()};try{var seen=JSON.parse(localStorage.getItem('qb_seenreact')||'{}');seen[t]=S.reactions[t].ts;localStorage.setItem('qb_seenreact',JSON.stringify(seen));}catch(e){}save();maybeSync();var el=document.getElementById('reactState');if(el)el.textContent='送りました：'+_selE+' '+_selM;}
+function checkNewReaction(){try{var r=S.reactions&&S.reactions[today()];if(!r||!r.ts)return;var seen=JSON.parse(localStorage.getItem('qb_seenreact')||'{}');if(seen[today()]!==r.ts){seen[today()]=r.ts;localStorage.setItem('qb_seenreact',JSON.stringify(seen));showCheer('💌 パパから：'+r.e+' '+r.m);sWin();burst();}}catch(e){}}
 function makeICS(hhmm){const d=today().replace(/-/g,'');const t=(hhmm||'19:00').replace(':','')+'00';const uid='qb-'+t+'-'+d+'@questboard';return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//QuestBoard//JP','CALSCALE:GREGORIAN','BEGIN:VEVENT','UID:'+uid,'DTSTART:'+d+'T'+t,'RRULE:FREQ=DAILY','SUMMARY:クエストの時間だよ！🗺️','DESCRIPTION:きょうのクエストをやろう！','BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:クエストの時間だよ！','TRIGGER:PT0M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');}
 function addReminder(){const t=(document.getElementById('remTime').value)||'19:00';try{localStorage.setItem('qb_rem',t);}catch(e){}const ics=makeICS(t);const el=document.getElementById('remState');const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent||'');if(isIOS){try{window.location.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);el.textContent='カレンダーの追加画面が出たら「追加」を押してね';}catch(e){el.textContent='出ない時は Safari で reminder.ics を開いて追加してください';}return;}const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='quest-reminder.ics';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);el.textContent='カレンダー追加ファイルを開きました。「追加」を押してね';}
 function testNotify(){const el=document.getElementById('remState');if(!('Notification' in window)){el.textContent='このブラウザでは通知テストは使えません（iPhoneのタブ等）。本番は「📅 追加」のカレンダー通知を使ってください。そちらは鳴ります。';return;}Notification.requestPermission().then(function(p){if(p==='granted'){try{new Notification('クエストの時間だよ！🗺️',{body:'きょうのクエストをやろう！'});}catch(e){}el.textContent='通知OK！テストを送りました';}else{el.textContent='通知が許可されていません（端末の設定から許可できます）';}});}
@@ -314,7 +335,8 @@ function render(){
     stage.innerHTML=`<div class="card chooser"><h2>今日のクエストをえらぼう！<br><span style="font-size:.85rem;color:var(--soft)">あと ${need} つ えらんでね</span></h2><div class="chips">${chips}</div></div>`;
   }else{
     const mq=meQuests();
-    stage.innerHTML=`<div class="row">
+    const rc=(S.reactions&&S.reactions[today()])?('<div class="card" style="text-align:center;background:#fff0ea;border-color:#f2c3b2"><div style="font-weight:800">💌 パパからの応援</div><div style="font-size:1.7rem;margin:4px 0">'+S.reactions[today()].e+'</div><div>'+S.reactions[today()].m+'</div></div>'):'';
+    stage.innerHTML=rc+`<div class="row">
       <div class="player"><h3><span>${S.me.emoji}</span> ${S.me.name}</h3><div class="lvl">Lv.${lv(S.me.xp)}</div><div class="xpbar"><div class="xpfill" style="width:${S.me.xp%100}%"></div></div>
         ${mq.map(q=>`<div class="quest ${S.day.me[q.key]?'done':''}" onclick="toggle('me','${q.key}')"><div class="chk">${S.day.me[q.key]?'✓':''}</div><div>${q.label}</div></div>`).join('')}
         ${mq.some(q=>S.day.me[q.key])?'':`<div class="mini" style="cursor:pointer;text-decoration:underline" onclick="repick()">えらび直す</div>`}
@@ -330,6 +352,7 @@ function render(){
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 きょうのきろく</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読どうがやドリルの写真をのこそう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真をえらぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=S.rewards.length?('🎁 もらったごほうび：<br>'+S.rewards.slice(0,6).map(r=>'・'+r).join('<br>')):'';
+  checkNewReaction();
   save();maybeSync();
 }
 
@@ -360,6 +383,7 @@ function dadOpen(){
   document.getElementById('d_room').value=SYNC.creds?SYNC.creds.room:'';
   syncStatus(SYNC.on?('同期中 ✓ ルーム: '+SYNC.creds.room):'未接続');
   try{var _rt=localStorage.getItem('qb_rem');if(_rt&&document.getElementById('remTime'))document.getElementById('remTime').value=_rt;}catch(e){}
+  renderReactPicker();
   document.getElementById('dad').style.display='block';window.scrollTo(0,0);
 }
 function dadClose(){document.getElementById('dad').style.display='none';render();}
@@ -390,7 +414,7 @@ function nextSeason(){const n=prompt('次のシーズン名は？',S.cfg.season)
 function resetAll(){if(confirm('全部リセットする？')){S=def();normalize();save();dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,cfgVer:S.cfgVer};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,cfgVer:S.cfgVer};}
 function maybeSync(){
   if(!SYNC.on||SYNC.applying||!SYNC.ref)return;
   const snap=JSON.stringify(snapshotState());
@@ -410,7 +434,7 @@ function startSync(){
   SYNC.creds={fb:cfg,room:room};localStorage.setItem('qb_sync',JSON.stringify(SYNC.creds));
   initSync();
 }
-function stopSync(){try{if(SYNC.ref)SYNC.ref.off();}catch(e){}SYNC.on=false;SYNC.ref=null;localStorage.removeItem('qb_sync');SYNC.creds=null;syncStatus('停止しました');}
+function stopSync(){try{if(SYNC.ref)SYNC.ref.off();}catch(e){}try{if(SYNC.pref)SYNC.pref.off();}catch(e){}SYNC.on=false;SYNC.ref=null;SYNC.pref=null;localStorage.removeItem('qb_sync');SYNC.creds=null;syncStatus('停止しました');}
 function initSync(){
   if(!SYNC.creds)return;
   if(!window.firebase){syncStatus('（オフライン中：接続できたら同期します）');return;}
@@ -423,13 +447,14 @@ function initSync(){
       if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
       if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');return;}
       SYNC.applying=true;
-      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
+      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
       normalize();
       var _mig=false;if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;_mig=true;}
       SYNC.applying=false;
       SYNC.lastSent=_mig?'':JSON.stringify(snapshotState());
       save();render();syncStatus('同期中 ✓（更新を受信）');
     },function(err){syncStatus('接続エラー: '+((err&&err.message)||''));});
+    try{SYNC.pref=firebase.database().ref('rooms/'+SYNC.creds.room+'/photos');SYNC.pref.on('child_added',handlePhoto);SYNC.pref.on('child_changed',handlePhoto);}catch(e){}
   }catch(e){syncStatus('初期化エラー: '+e.message);}
 }
 
