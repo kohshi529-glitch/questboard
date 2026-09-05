@@ -51,6 +51,8 @@
   .calgrid{display:grid;grid-template-columns:repeat(16,1fr);gap:4px}
   .hcell{width:100%;aspect-ratio:1/1;border-radius:4px;background:#eee4cf;border:1px solid var(--line)}
   .hcell.on{background:var(--teal);border-color:var(--teal)}
+  .hcell.pa{background:var(--coral);border-color:var(--coral)}
+  .pcell{display:flex;align-items:center;justify-content:center;font-size:8px;line-height:1;color:#fff;font-weight:800;overflow:hidden}
   .hcell.today{box-shadow:0 0 0 2px var(--sun)}
   .hcell.pic,.hcell.react{position:relative}
   .hcell.pic::after{content:'';position:absolute;top:1px;right:1px;width:5px;height:5px;border-radius:50%;background:var(--coral)}
@@ -62,7 +64,8 @@
   .legend .l-on{background:var(--teal);border-color:var(--teal)}
   .legend .l-off{background:#eee4cf}
   .legend .l-today{background:#fff;box-shadow:0 0 0 2px var(--sun)}
-  .spk{position:absolute;top:10px;right:14px;font-size:1.1rem;cursor:pointer;opacity:.6}
+  .toolbar{display:flex;justify-content:flex-end;gap:16px;margin:0 4px 8px;font-size:1.2rem}
+  .toolbar span{cursor:pointer;opacity:.75;user-select:none}
   .chooser h2{font-size:1.05rem;margin:2px 0 10px;text-align:center}
   .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   .chip{background:#fff;border:2.5px solid var(--line);border-radius:14px;padding:10px 12px;font-size:.9rem;cursor:pointer;user-select:none;transition:.12s}
@@ -90,9 +93,9 @@
 <div class="wrap">
   <h1 id="title">🗺️ クエスト</h1>
   <div class="sub" id="dateline"></div>
+  <div class="toolbar"><span id="heartbtn" onclick="openReactSend()">💌</span><span id="spk" onclick="toggleMute()">🔊</span></div>
 
-  <div class="card" style="position:relative">
-    <div class="spk" id="spk" onclick="toggleMute()">🔊</div>
+  <div class="card">
     <div class="row" style="align-items:center;justify-content:space-between">
       <div>
         <div style="font-weight:800" id="seasonName">シーズン</div>
@@ -118,6 +121,7 @@
 
 <div class="cheer" id="cheer" onclick="this.style.display='none'"><div class="msg" id="cheerMsg"></div><div style="color:#fff;margin-top:14px;font-size:.9rem">タップでとじる</div></div>
 <div class="cheer" id="photoView" onclick="this.style.display='none'"><img id="pvImg" style="max-width:90%;max-height:78%;border-radius:12px" alt=""><div style="color:#fff;margin-top:10px;font-size:.9rem">タップでとじる</div></div>
+<div class="cheer" id="reactSend"><div class="msg" style="max-width:340px;text-align:left" onclick="event.stopPropagation()"><div style="font-weight:800;text-align:center;margin-bottom:8px">💌 娘への応援（今日の達成に）</div><div id="stampRow"></div><div id="phraseRow" style="margin-top:6px"></div><button class="btn" style="margin-top:10px" onclick="sendReaction()">💌 応援を送る</button><button class="btn gray" style="margin-top:8px" onclick="closeReactSend()">とじる</button><div class="hint" id="reactState" style="margin-top:6px;text-align:center"></div></div></div>
 
 <div id="dad"><div class="inner">
   <h1 style="text-align:left">🔧 保護者メニュー</h1>
@@ -175,12 +179,8 @@
   </div>
 
   <div class="sec">
-    <h3>💌 娘への応援（今日の達成に）</h3>
-    <p class="hint">スタンプとひとことを選んで送ると、娘の画面に応援が届きます（娘には送信画面は見えません）。</p>
-    <div id="stampRow"></div>
-    <div id="phraseRow" style="margin-top:6px"></div>
-    <button class="btn" style="margin-top:10px" onclick="sendReaction()">💌 応援を送る</button>
-    <div class="hint" id="reactState" style="margin-top:6px"></div>
+    <h3>💌 娘への応援</h3>
+    <p class="hint">応援は、ホーム画面上部の 💌 アイコンから送れます（この設定画面には入らなくてOK）。</p>
   </div>
 
   <div class="sec">
@@ -222,11 +222,11 @@ function def(){return{
   season:{reward:'',startClears:0},
   day:{date:'',picks:[],me:{},pa:{}},
   prog:{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0},
-  rewards:[], mute:false, history:{}, photoDays:{}, reactions:{}, cfgVer:CFGVER
+  rewards:[], mute:false, history:{}, photoDays:{}, reactions:{}, papaHistory:{}, cfgVer:CFGVER
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=S.rewards||[];S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
@@ -263,6 +263,7 @@ function toggle(who,key){
   const before=lv(p.xp);
   if(rec[key]){rec[key]=false;p.xp=Math.max(0,p.xp-10);}else{rec[key]=true;p.xp+=10;sTick();}
   const after=lv(p.xp);
+  if(who==='pa'){var bee=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/ビーモン/.test(q);});var car=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/迎/.test(q);});var code=(bee&&car)?'bc':bee?'b':car?'c':'';if(code)S.papaHistory[today()]=code;else delete S.papaHistory[today()];}
   const cleared=(who==='me'&&meAllDone()&&S.prog.lastClear!==today());
   if(cleared)onClear();
   else if(who==='me'&&after>before){showCheer('レベルアップ！ Lv.'+after+' 🆙');sWin();burst();}
@@ -287,6 +288,10 @@ function calHTML(){
   return '<div class="callabels">'+labels+'</div><div class="calgrid">'+cells+'</div>';
 }
 function histCount(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.history&&S.history[dstr(d)])c++;}return c;}
+var CAR='<svg viewBox="0 0 24 24" width="11" height="11" fill="#fff" style="display:inline-block;vertical-align:middle"><path d="M18.9 6.5A1.5 1.5 0 0 0 17.5 5.5h-11A1.5 1.5 0 0 0 5.1 6.5L3 12v6a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-6l-2.1-5.5zM6.5 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm11 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM5 11l1.4-3.8h11.2L19 11H5z"/></svg>';
+function papaCalHTML(){const N=16,base=new Date(),tk=today();let cells='';for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const v=S.papaHistory&&S.papaHistory[k];const on=!!v;var g='';if(v==='b')g='b';else if(v==='c')g=CAR;else if(v==='bc')g='b'+CAR;else if(v)g='●';cells+='<div class="hcell pcell'+(on?' pa':'')+(k===tk?' today':'')+'" title="'+k+'">'+g+'</div>';}return '<div class="calgrid">'+cells+'</div>';}
+function papaCount(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.papaHistory&&S.papaHistory[dstr(d)])c++;}return c;}
+function papaStreak(){let c=0;const base=new Date();let start=(S.papaHistory&&S.papaHistory[dstr(base)])?0:1;for(let j=start;;j++){const d=new Date(base);d.setDate(base.getDate()-j);if(S.papaHistory&&S.papaHistory[dstr(d)])c++;else break;}return c;}
 const PKEY='qb_photos';
 function loadPhotos(){try{return JSON.parse(localStorage.getItem(PKEY)||'{}');}catch(e){return {};}}
 function savePhotos(p){localStorage.setItem(PKEY,JSON.stringify(p));}
@@ -300,7 +305,10 @@ var _selE='🎉',_selM='よくできたね！';
 function renderReactPicker(){var sr=document.getElementById('stampRow'),pr=document.getElementById('phraseRow');if(!sr||!pr)return;sr.innerHTML=STAMPS.map(function(e){return '<button class="rbtn'+(e===_selE?' on':'')+'" onclick="pickE(\''+e+'\')">'+e+'</button>';}).join('');pr.innerHTML=PHRASES.map(function(m){return '<button class="rbtn'+(m===_selM?' on':'')+'" onclick="pickM(\''+m+'\')">'+m+'</button>';}).join('');}
 function pickE(e){_selE=e;renderReactPicker();}
 function pickM(m){_selM=m;renderReactPicker();}
-function sendReaction(){var t=today();S.reactions[t]={e:_selE,m:_selM,ts:Date.now()};try{var seen=JSON.parse(localStorage.getItem('qb_seenreact')||'{}');seen[t]=S.reactions[t].ts;localStorage.setItem('qb_seenreact',JSON.stringify(seen));}catch(e){}save();maybeSync();var el=document.getElementById('reactState');if(el)el.textContent='送りました：'+_selE+' '+_selM;}
+function sendReaction(){var t=today();S.reactions[t]={e:_selE,m:_selM,ts:Date.now()};try{var seen=JSON.parse(localStorage.getItem('qb_seenreact')||'{}');seen[t]=S.reactions[t].ts;localStorage.setItem('qb_seenreact',JSON.stringify(seen));}catch(e){}save();maybeSync();var el=document.getElementById('reactState');if(el)el.textContent='送りました：'+_selE+' '+_selM;setTimeout(closeReactSend,900);}
+var _reactUnlocked=false;
+function openReactSend(){if(!_reactUnlocked){var p=prompt('暗証番号（4桁）');if(p!==S.cfg.pin){if(p!==null)alert('ちがうよ');return;}_reactUnlocked=true;}renderReactPicker();var el=document.getElementById('reactState');if(el)el.textContent='';document.getElementById('reactSend').style.display='flex';}
+function closeReactSend(){document.getElementById('reactSend').style.display='none';}
 function checkNewReaction(){try{var r=S.reactions&&S.reactions[today()];if(!r||!r.ts)return;var seen=JSON.parse(localStorage.getItem('qb_seenreact')||'{}');if(seen[today()]!==r.ts){seen[today()]=r.ts;localStorage.setItem('qb_seenreact',JSON.stringify(seen));showCheer('💌 パパから：'+r.e+' '+r.m);sWin();burst();}}catch(e){}}
 function makeICS(hhmm){const d=today().replace(/-/g,'');const t=(hhmm||'19:00').replace(':','')+'00';const uid='qb-'+t+'-'+d+'@questboard';return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//QuestBoard//JP','CALSCALE:GREGORIAN','BEGIN:VEVENT','UID:'+uid,'DTSTART:'+d+'T'+t,'RRULE:FREQ=DAILY','SUMMARY:クエストの時間だよ！🗺️','DESCRIPTION:きょうのクエストをやろう！','BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:クエストの時間だよ！','TRIGGER:PT0M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');}
 function addReminder(){const t=(document.getElementById('remTime').value)||'19:00';try{localStorage.setItem('qb_rem',t);}catch(e){}const ics=makeICS(t);const el=document.getElementById('remState');const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent||'');if(isIOS){try{window.location.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);el.textContent='カレンダーの追加画面が出たら「追加」を押してね';}catch(e){el.textContent='出ない時は Safari で reminder.ics を開いて追加してください';}return;}const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='quest-reminder.ics';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);el.textContent='カレンダー追加ファイルを開きました。「追加」を押してね';}
@@ -344,11 +352,12 @@ function render(){
       <div class="player"><h3><span>${S.pa.emoji}</span> ${S.pa.name}</h3><div class="lvl">Lv.${lv(S.pa.xp)}</div><div class="xpbar"><div class="xpfill" style="width:${S.pa.xp%100}%"></div></div>
         ${S.cfg.pa.map((q,i)=>`<div class="quest ${S.day.pa['p'+i]?'done':''}" onclick="toggle('pa','p'+${i})"><div class="chk">${S.day.pa['p'+i]?'✓':''}</div><div>${q}</div></div>`).join('')}
       </div></div>
-      <div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">${S.prog.gacha>0?('まわせる回数：'+S.prog.gacha):'5日クリアごとに1回まわせるよ'}</div></div>
+      <div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：${S.prog.gacha}回）</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
         <div class="calwrap">${calHTML()}</div>
         <div class="legend"><span><i class="l-on"></i>クリア</span><span><i class="l-off"></i>おやすみ</span><span><i class="l-today"></i>きょう</span><span>📷=写真あり</span></div>
         <div class="mini">この16日で ${histCount()} 日 クリア！🔥</div></div>
+      <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span></div></div>
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 きょうのきろく</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読どうがやドリルの写真をのこそう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真をえらぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=S.rewards.length?('🎁 もらったごほうび：<br>'+S.rewards.slice(0,6).map(r=>'・'+r).join('<br>')):'';
@@ -383,7 +392,6 @@ function dadOpen(){
   document.getElementById('d_room').value=SYNC.creds?SYNC.creds.room:'';
   syncStatus(SYNC.on?('同期中 ✓ ルーム: '+SYNC.creds.room):'未接続');
   try{var _rt=localStorage.getItem('qb_rem');if(_rt&&document.getElementById('remTime'))document.getElementById('remTime').value=_rt;}catch(e){}
-  renderReactPicker();
   document.getElementById('dad').style.display='block';window.scrollTo(0,0);
 }
 function dadClose(){document.getElementById('dad').style.display='none';render();}
@@ -414,7 +422,7 @@ function nextSeason(){const n=prompt('次のシーズン名は？',S.cfg.season)
 function resetAll(){if(confirm('全部リセットする？')){S=def();normalize();save();dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,cfgVer:S.cfgVer};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,cfgVer:S.cfgVer};}
 function maybeSync(){
   if(!SYNC.on||SYNC.applying||!SYNC.ref)return;
   const snap=JSON.stringify(snapshotState());
@@ -447,7 +455,7 @@ function initSync(){
       if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
       if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');return;}
       SYNC.applying=true;
-      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
+      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
       normalize();
       var _mig=false;if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;_mig=true;}
       SYNC.applying=false;
