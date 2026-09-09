@@ -27,7 +27,19 @@
   .season-bar{height:16px;background:#eee4cf;border-radius:20px;overflow:hidden;margin-top:8px;border:1.5px solid var(--line)}
   .season-fill{height:100%;background:linear-gradient(90deg,var(--sun),var(--coral));width:0%;transition:width .5s}
   .badge{display:inline-block;background:var(--sun);color:#5a4300;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700;margin:2px 4px 2px 0}
-  .player{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px}
+  .player{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px;position:relative}
+  .player.flvl-2{border-color:var(--teal)}
+  .player.flvl-3{border-color:var(--teal)}
+  .player.flvl-4{border-color:var(--sun);background:linear-gradient(180deg,#ffffff,#fffdf2)}
+  .player.flvl-5{border-color:#e6b800;border-width:3px;background:linear-gradient(180deg,#fffdf2,#fff7db)}
+  .player.flvl-6{border-color:#e0a400;border-width:3px;background:linear-gradient(180deg,#fffdf2,#fff2cf);box-shadow:0 0 0 2px #ffe9a8,0 0 12px rgba(230,180,0,.4);animation:frameglow 2s ease-in-out infinite alternate}
+  @keyframes frameglow{from{box-shadow:0 0 0 2px #ffe9a8,0 0 8px rgba(230,180,0,.25)}to{box-shadow:0 0 0 2px #ffe9a8,0 0 16px rgba(230,180,0,.55)}}
+  .orn{position:absolute;font-size:14px;line-height:1;pointer-events:none}
+  .orn.tl{top:-9px;left:-6px}.orn.tr{top:-9px;right:-6px}.orn.bl{bottom:-9px;left:-6px}.orn.br{bottom:-9px;right:-6px}
+  .orn.crown{top:-15px;left:50%;transform:translateX(-50%);font-size:16px}
+  .lvlbadge{display:inline-block;background:#eee4cf;border-radius:10px;padding:1px 8px;font-weight:800;font-size:.72rem;color:var(--soft)}
+  .flvl-5 .lvlbadge,.flvl-6 .lvlbadge{background:linear-gradient(90deg,#ffe08a,#ffc24d);color:#6b4b00}
+  .ava{width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:-6px;display:inline-block;border:1px solid var(--line)}
   .player h3{margin:0 0 6px;font-size:1rem;display:flex;align-items:center;gap:6px}
   .lvl{font-size:.72rem;color:var(--soft)}
   .xpbar{height:8px;background:#eee4cf;border-radius:10px;overflow:hidden;margin:4px 0 8px}
@@ -129,8 +141,17 @@
 
   <div class="sec">
     <h3>👧 なまえ・絵文字</h3>
-    <div class="two"><div><label>娘の名前</label><input id="d_meName"></div><div><label>絵文字</label><input id="d_meEmoji" maxlength="2"></div></div>
-    <div class="two"><div><label>パパの名前</label><input id="d_paName"></div><div><label>絵文字</label><input id="d_paEmoji" maxlength="2"></div></div>
+    <div class="two"><div><label>娘の名前</label><input id="d_meName"></div><div><label>絵文字</label><input id="d_meEmoji" maxlength="8"></div></div>
+    <div class="two"><div><label>パパの名前</label><input id="d_paName"></div><div><label>絵文字</label><input id="d_paEmoji" maxlength="8"></div></div>
+    <label style="margin-top:10px">アバター画像（設定すると絵文字より優先。カピバラの絵などを使えます）</label>
+    <div class="two">
+      <div><label class="btn gray" style="width:auto;padding:8px 12px;display:inline-block">娘の画像を選ぶ<input type="file" accept="image/*" style="display:none" onchange="setAvatar('me',event)"></label> <span id="avaPrevMe"></span></div>
+      <div><label class="btn gray" style="width:auto;padding:8px 12px;display:inline-block">パパの画像を選ぶ<input type="file" accept="image/*" style="display:none" onchange="setAvatar('pa',event)"></label> <span id="avaPrevPa"></span></div>
+    </div>
+    <div class="two" style="margin-top:6px">
+      <div><button class="btn gray" style="width:auto;padding:6px 10px;font-size:.85rem" onclick="clearAvatar('me')">娘を絵文字に戻す</button></div>
+      <div><button class="btn gray" style="width:auto;padding:6px 10px;font-size:.85rem" onclick="clearAvatar('pa')">パパを絵文字に戻す</button></div>
+    </div>
   </div>
 
   <div class="sec">
@@ -266,7 +287,7 @@ function toggle(who,key){
   if(who==='pa'){var bee=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/ビーモン/.test(q);});var car=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/迎/.test(q);});var code=(bee&&car)?'bc':bee?'b':car?'c':'';if(code)S.papaHistory[today()]=code;else delete S.papaHistory[today()];}
   const cleared=(who==='me'&&meAllDone()&&S.prog.lastClear!==today());
   if(cleared)onClear();
-  else if(who==='me'&&after>before){showCheer('レベルアップ！ Lv.'+after+' 🆙');sWin();burst();}
+  else if(who==='me'&&after>before){var ot=Math.min(6,before),nt=Math.min(6,after);if(nt>ot){bigCelebrate('レベルアップ！ Lv.'+after+' ✨ フレームがグレードアップ！');}else{showCheer('レベルアップ！ Lv.'+after+' 🆙');sWin();burst();}}
   save();render();
 }
 function chooseReward(i){S.season.reward=S.cfg.rewards[i];save();render();showCheer('🎁 ごほうび、きめた！');sWin();burst();}
@@ -280,6 +301,8 @@ function sBig(){[523,659,784,1047,1319].forEach(function(f,i){tone(f,0.18,'trian
 function showCheer(t){const c=document.getElementById('cheer');document.getElementById('cheerMsg').textContent=t;c.style.display='flex';}
 function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','🎊','👑','💛','🥳']:['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<N;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=((big?2:1.5)+Math.random()*1.5)+'s';s.style.fontSize=((big?1.5:1)+Math.random()*(big?1.6:1.4))+'rem';document.body.appendChild(s);setTimeout(function(){s.remove();},4200);}}
 const lv=xp=>Math.floor(xp/100)+1;
+function frameClass(level){return 'flvl-'+Math.min(6,Math.max(1,level));}
+function frameOrn(level){var t=Math.min(6,level),o='';if(t>=3)o+='<span class="orn tl">⭐</span><span class="orn tr">⭐</span>';if(t>=6)o+='<span class="orn bl">✨</span><span class="orn br">✨</span>';return o;}
 function calHTML(){
   const N=16,base=new Date(),tk=today();let cells='';
   for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const on=!!(S.history&&S.history[k]);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);cells+='<div class="hcell'+(on?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')"></div>';}
@@ -289,6 +312,13 @@ function calHTML(){
 }
 function histCount(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.history&&S.history[dstr(d)])c++;}return c;}
 var CAR='<svg viewBox="0 0 24 24" width="11" height="11" fill="#fff" style="display:inline-block;vertical-align:middle"><path d="M18.9 6.5A1.5 1.5 0 0 0 17.5 5.5h-11A1.5 1.5 0 0 0 5.1 6.5L3 12v6a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-6l-2.1-5.5zM6.5 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm11 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM5 11l1.4-3.8h11.2L19 11H5z"/></svg>';
+var CAPY_BASE='<ellipse cx="18" cy="31" rx="6.5" ry="7" fill="#b5875a" stroke="#6b4a2e" stroke-width="2.5"/><ellipse cx="46" cy="31" rx="6.5" ry="7" fill="#b5875a" stroke="#6b4a2e" stroke-width="2.5"/><path d="M14 42 C14 31 22 27 32 27 C42 27 50 31 50 42 C52 48 53 53 50 59 C46 68 39 71 32 71 C25 71 18 68 14 59 C11 53 12 48 14 42 Z" fill="#c99a68" stroke="#6b4a2e" stroke-width="2.5"/><ellipse cx="32" cy="60" rx="12" ry="9" fill="#bd9260"/><ellipse cx="15" cy="55" rx="4" ry="2.6" fill="#eaa0a0" opacity="0.75"/><ellipse cx="49" cy="55" rx="4" ry="2.6" fill="#eaa0a0" opacity="0.75"/><circle cx="23" cy="46" r="3.2" fill="#2f2318"/><circle cx="41" cy="46" r="3.2" fill="#2f2318"/><circle cx="24" cy="44.9" r="0.9" fill="#fff"/><circle cx="42" cy="44.9" r="0.9" fill="#fff"/><ellipse cx="28.5" cy="57.5" rx="1.6" ry="1.1" fill="#5a3d25"/><ellipse cx="35.5" cy="57.5" rx="1.6" ry="1.1" fill="#5a3d25"/><path d="M32 59 L32 63 M32 63 Q29.5 65.5 27.5 67.5 M32 63 Q34.5 65.5 36.5 67.5" stroke="#5a3d25" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+var CAPY_ACC=['','<path d="M32 8 C20 10 16 22 25 26 C31 28 44 25 46 15 C47 9 40 6 32 8 Z" fill="#7bbf5a" stroke="#4e8f3a" stroke-width="2"/><path d="M27 24 L42 12" stroke="#4e8f3a" stroke-width="1.4" fill="none"/>','<path d="M32 6 l2.7 6.2 6.8 .5 -5.2 4.4 1.7 6.7 -6-3.5 -6 3.5 1.7-6.7 -5.2-4.4 6.8-.5 z" fill="#ffcf4d" stroke="#e0a800" stroke-width="1.4" stroke-linejoin="round"/>','<path d="M24 13 L32 20 L24 27 Z" fill="#ff9bb3" stroke="#d76b88" stroke-width="1.6"/><path d="M40 13 L32 20 L40 27 Z" fill="#ff9bb3" stroke="#d76b88" stroke-width="1.6"/><circle cx="32" cy="20" r="3" fill="#ff7fa3" stroke="#d76b88" stroke-width="1.6"/>','<path d="M19 25 L21 11 L28 19 L32 9 L36 19 L43 11 L45 25 Z" fill="#ffd24d" stroke="#e0a800" stroke-width="1.8" stroke-linejoin="round"/>','<path d="M19 25 L21 11 L28 19 L32 9 L36 19 L43 11 L45 25 Z" fill="#ffd24d" stroke="#e0a800" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 15 l1.3 2.7 2.7 1.3 -2.7 1.3 -1.3 2.7 -1.3-2.7 -2.7-1.3 2.7-1.3 z" fill="#ffe98a"/><path d="M55 15 l1.3 2.7 2.7 1.3 -2.7 1.3 -1.3 2.7 -1.3-2.7 -2.7-1.3 2.7-1.3 z" fill="#ffe98a"/>'];
+function capySvg(tier){var t=Math.min(6,Math.max(1,tier|0));return '<svg viewBox="0 0 64 76" width="26" height="30" style="vertical-align:-9px;display:inline-block">'+CAPY_BASE+CAPY_ACC[t-1]+'</svg>';}
+function avatarHTML(p){if(p&&p.avatar)return '<img src="'+p.avatar+'" class="ava" alt="">';var s=p&&p.emoji;return (s==='🦫'||s==='capy'||s==='カピバラ')?capySvg(lv(p.xp)):('<span>'+(s||'')+'</span>');}
+function setAvatar(who,ev){var f=ev.target.files&&ev.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(e){var img=new Image();img.onload=function(){var sz=96,cv=document.createElement('canvas');cv.width=sz;cv.height=sz;var ctx=cv.getContext('2d'),m=Math.min(img.width,img.height),sx=(img.width-m)/2,sy=(img.height-m)/2;ctx.drawImage(img,sx,sy,m,m,0,0,sz,sz);var data;try{data=cv.toDataURL('image/jpeg',0.7);}catch(err){alert('画像を読み込めませんでした');return;}S[who].avatar=data;save();maybeSync();renderAvaPrev();render();};img.src=e.target.result;};rd.readAsDataURL(f);}
+function clearAvatar(who){delete S[who].avatar;save();maybeSync();renderAvaPrev();render();}
+function renderAvaPrev(){var me=document.getElementById('avaPrevMe'),pa=document.getElementById('avaPrevPa');if(me)me.innerHTML=S.me.avatar?('<img src="'+S.me.avatar+'" class="ava">'):'（なし）';if(pa)pa.innerHTML=S.pa.avatar?('<img src="'+S.pa.avatar+'" class="ava">'):'（なし）';}
 function papaCalHTML(){const N=16,base=new Date(),tk=today();let cells='';for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const v=S.papaHistory&&S.papaHistory[k];const on=!!v;var g='';if(v==='b')g='b';else if(v==='c')g=CAR;else if(v==='bc')g='b'+CAR;else if(v)g='●';cells+='<div class="hcell pcell'+(on?' pa':'')+(k===tk?' today':'')+'" title="'+k+'">'+g+'</div>';}return '<div class="calgrid">'+cells+'</div>';}
 function papaCount(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.papaHistory&&S.papaHistory[dstr(d)])c++;}return c;}
 function papaStreak(){let c=0;const base=new Date();let start=(S.papaHistory&&S.papaHistory[dstr(base)])?0:1;for(let j=start;;j++){const d=new Date(base);d.setDate(base.getDate()-j);if(S.papaHistory&&S.papaHistory[dstr(d)])c++;else break;}return c;}
@@ -345,11 +375,11 @@ function render(){
     const mq=meQuests();
     const rc=(S.reactions&&S.reactions[today()])?('<div class="card" style="text-align:center;background:#fff0ea;border-color:#f2c3b2"><div style="font-weight:800">💌 パパからの応援</div><div style="font-size:1.7rem;margin:4px 0">'+S.reactions[today()].e+'</div><div>'+S.reactions[today()].m+'</div></div>'):'';
     stage.innerHTML=rc+`<div class="row">
-      <div class="player"><h3><span>${S.me.emoji}</span> ${S.me.name}</h3><div class="lvl">Lv.${lv(S.me.xp)}</div><div class="xpbar"><div class="xpfill" style="width:${S.me.xp%100}%"></div></div>
+      <div class="player ${frameClass(lv(S.me.xp))}">${frameOrn(lv(S.me.xp))}<h3>${avatarHTML(S.me)} ${S.me.name}</h3><div class="lvl"><span class="lvlbadge">Lv.${lv(S.me.xp)}</span></div><div class="xpbar"><div class="xpfill" style="width:${S.me.xp%100}%"></div></div>
         ${mq.map(q=>`<div class="quest ${S.day.me[q.key]?'done':''}" onclick="toggle('me','${q.key}')"><div class="chk">${S.day.me[q.key]?'✓':''}</div><div>${q.label}</div></div>`).join('')}
         ${mq.some(q=>S.day.me[q.key])?'':`<div class="mini" style="cursor:pointer;text-decoration:underline" onclick="repick()">えらび直す</div>`}
       </div>
-      <div class="player"><h3><span>${S.pa.emoji}</span> ${S.pa.name}</h3><div class="lvl">Lv.${lv(S.pa.xp)}</div><div class="xpbar"><div class="xpfill" style="width:${S.pa.xp%100}%"></div></div>
+      <div class="player ${frameClass(lv(S.pa.xp))}">${frameOrn(lv(S.pa.xp))}<h3>${avatarHTML(S.pa)} ${S.pa.name}</h3><div class="lvl"><span class="lvlbadge">Lv.${lv(S.pa.xp)}</span></div><div class="xpbar"><div class="xpfill" style="width:${S.pa.xp%100}%"></div></div>
         ${S.cfg.pa.map((q,i)=>`<div class="quest ${S.day.pa['p'+i]?'done':''}" onclick="toggle('pa','p'+${i})"><div class="chk">${S.day.pa['p'+i]?'✓':''}</div><div>${q}</div></div>`).join('')}
       </div></div>
       <div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：${S.prog.gacha}回）</div></div>
@@ -392,6 +422,7 @@ function dadOpen(){
   document.getElementById('d_room').value=SYNC.creds?SYNC.creds.room:'';
   syncStatus(SYNC.on?('同期中 ✓ ルーム: '+SYNC.creds.room):'未接続');
   try{var _rt=localStorage.getItem('qb_rem');if(_rt&&document.getElementById('remTime'))document.getElementById('remTime').value=_rt;}catch(e){}
+  renderAvaPrev();
   document.getElementById('dad').style.display='block';window.scrollTo(0,0);
 }
 function dadClose(){document.getElementById('dad').style.display='none';render();}
