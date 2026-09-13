@@ -212,6 +212,19 @@
     <div class="hint" id="remState" style="margin-top:6px"></div>
   </div>
 
+  <div class="sec">
+    <h3>🛟 バックアップ / 復元</h3>
+    <p class="hint">操作ミスなどでデータが消えても、ここから元に戻せます。<b>①直前に戻す</b>＝リセットや復元の直前の状態へ。<b>②自動バックアップ</b>＝端末内に自動保存された最新データへ。<b>③手動バックアップ</b>＝コードをコピーしてメモ等に保管し、いつでも復元できます。</p>
+    <button class="btn gray" style="margin-top:4px" onclick="restoreUndo()">↩️ 直前の状態に戻す（取り消し）</button>
+    <button class="btn gray" style="margin-top:8px" onclick="restoreAuto()">🗂️ 自動バックアップから復元 <span id="bkTime" class="hint" style="margin-left:4px"></span></button>
+    <label style="margin-top:10px">手動バックアップ（コピーして保管）</label>
+    <textarea id="d_backup" rows="2" readonly style="font-size:11px"></textarea>
+    <button class="btn gray" style="margin-top:6px" onclick="copyBackup()">📋 バックアップコードをコピー</button>
+    <label style="margin-top:10px">復元コードを貼り付け</label>
+    <textarea id="d_restore" rows="2" placeholder="保管しておいたコードを貼り付け" style="font-size:11px"></textarea>
+    <button class="btn gray" style="margin-top:6px" onclick="importBackup()">⬆️ このコードで復元</button>
+  </div>
+
   <button class="btn gray" style="margin-top:14px" onclick="nextSeason()">➡️ 次のシーズンにする</button>
   <button class="btn gray" style="margin-top:8px" onclick="dadClose()">✖ とじる</button>
   <button class="btn gray" style="margin-top:8px;color:#a13f22" onclick="resetAll()">🗑️ 全部リセット</button>
@@ -253,7 +266,7 @@ if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
 const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null};
 try{SYNC.creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}try{if(S&&S.prog&&(S.prog.clears>0||(S.history&&Object.keys(S.history).length)||(S.rewards&&S.rewards.length))){localStorage.setItem('qb_backup',JSON.stringify({t:Date.now(),s:S}));}}catch(e){}}
 function rollover(){if(S.day.date!==today())S.day={date:today(),picks:[],me:{},pa:{}};}
 
 /* sound */
@@ -425,6 +438,8 @@ function dadOpen(){
   document.getElementById('d_room').value=SYNC.creds?SYNC.creds.room:'';
   syncStatus(SYNC.on?('同期中 ✓ ルーム: '+SYNC.creds.room):'未接続');
   try{var _rt=localStorage.getItem('qb_rem');if(_rt&&document.getElementById('remTime'))document.getElementById('remTime').value=_rt;}catch(e){}
+  try{var _bk=document.getElementById('d_backup');if(_bk)_bk.value=backupExport();var _rs=document.getElementById('d_restore');if(_rs)_rs.value='';}catch(e){}
+  try{var _ab=JSON.parse(localStorage.getItem('qb_backup')||'null');var _bt=document.getElementById('bkTime');if(_bt)_bt.textContent=(_ab&&_ab.t)?('('+_fmtTs(_ab.t)+')'):'(なし)';}catch(e){}
   renderAvaPrev();
   document.getElementById('dad').style.display='block';window.scrollTo(0,0);
 }
@@ -447,13 +462,21 @@ function copyExport(){const t=document.getElementById('d_export');t.select();try
 function doImport(){
   const code=document.getElementById('d_import').value.trim();if(!code){alert('コードを貼り付けてください');return;}
   try{const p=JSON.parse(decodeURIComponent(escape(atob(code))));if(!p.cfg)throw 0;
+    try{localStorage.setItem('qb_undo',JSON.stringify({t:Date.now(),s:S}));}catch(e){}
     S.cfg=p.cfg;if(p.me){S.me.name=p.me.name;S.me.emoji=p.me.emoji;}if(p.pa){S.pa.name=p.pa.name;S.pa.emoji=p.pa.emoji;}
     S.day.picks=(S.day.picks||[]).filter(i=>i<S.cfg.choice.length).slice(0,S.cfg.count);
     S.season.reward='';save();alert('設定を読み込みました');dadClose();
   }catch(e){alert('コードが正しくないみたいです');}
 }
 function nextSeason(){const n=prompt('次のシーズン名は？',S.cfg.season);if(n===null)return;const g=parseInt(prompt('目標日数は？',String(S.cfg.goal)))||S.cfg.goal;S.cfg.season=n;S.cfg.goal=g;S.season={reward:'',startClears:S.prog.clears,done:false};save();alert('次のシーズンにしました');dadClose();}
-function resetAll(){if(confirm('全部リセットする？')){S=def();normalize();save();dadClose();}}
+function resetAll(){if(confirm('全部リセットする？')){try{localStorage.setItem('qb_undo',JSON.stringify({t:Date.now(),s:S}));}catch(e){}S=def();normalize();save();dadClose();}}
+function _fmtTs(t){try{var d=new Date(t);return d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());}catch(e){return '';}}
+function restoreFrom(obj){if(!obj)return false;try{S=obj;normalize();SYNC.lastSent='';save();render();maybeSync();return true;}catch(e){return false;}}
+function backupExport(){try{return btoa(unescape(encodeURIComponent(JSON.stringify(S))));}catch(e){return '';}}
+function copyBackup(){var t=document.getElementById('d_backup');if(!t)return;t.value=backupExport();t.select();try{navigator.clipboard.writeText(t.value);}catch(e){try{document.execCommand('copy');}catch(_){}}alert('バックアップコードをコピーしました。メモ等に保存してください');}
+function importBackup(){var c=(document.getElementById('d_restore').value||'').trim();if(!c){alert('復元コードを貼り付けてください');return;}if(!confirm('このバックアップで現在のデータを置き換えます。よろしいですか？'))return;try{var obj=JSON.parse(decodeURIComponent(escape(atob(c))));if(!obj||(!obj.cfg&&!obj.prog))throw 0;try{localStorage.setItem('qb_undo',JSON.stringify({t:Date.now(),s:S}));}catch(e){}if(restoreFrom(obj)){alert('復元しました');dadClose();}else alert('復元に失敗しました');}catch(e){alert('コードが正しくないみたいです');}}
+function restoreAuto(){var b;try{b=JSON.parse(localStorage.getItem('qb_backup')||'null');}catch(e){}if(!b||!b.s){alert('自動バックアップが見つかりません');return;}if(!confirm('自動バックアップ（'+_fmtTs(b.t)+'）で置き換えます。よろしいですか？'))return;try{localStorage.setItem('qb_undo',JSON.stringify({t:Date.now(),s:S}));}catch(e){}if(restoreFrom(b.s)){alert('自動バックアップから復元しました');dadClose();}}
+function restoreUndo(){var u;try{u=JSON.parse(localStorage.getItem('qb_undo')||'null');}catch(e){}if(!u||!u.s){alert('取り消せる操作がありません');return;}if(!confirm('直前の状態（'+_fmtTs(u.t)+'）に戻します。よろしいですか？'))return;if(restoreFrom(u.s)){alert('直前の状態に戻しました');dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
 function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,cfgVer:S.cfgVer};}
