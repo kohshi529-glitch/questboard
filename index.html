@@ -26,6 +26,17 @@
   .stat-big{font-size:1.9rem;font-weight:800}
   .season-bar{height:16px;background:#eee4cf;border-radius:20px;overflow:hidden;margin-top:8px;border:1.5px solid var(--line)}
   .season-fill{height:100%;background:linear-gradient(90deg,var(--sun),var(--coral));width:0%;transition:width .5s}
+  .zoomcard{border:2px solid #2d8cff;background:#eaf3ff}
+  .zoom-h{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:6px}
+  .zoom-when{font-size:.9rem;color:#33506e;font-weight:700;margin-top:4px}
+  .zoom-call{color:#a13f22;font-weight:800;margin-top:4px;font-size:.92rem}
+  .zoom-open{display:block;text-align:center;background:#2d8cff;color:#fff;padding:13px;border-radius:14px;text-decoration:none;font-weight:800;margin-top:10px;font-size:1.05rem;box-shadow:0 3px 0 #1f6fd0}
+  .zoom-open:active{transform:translateY(2px);box-shadow:0 1px 0 #1f6fd0}
+  .zoom-info{margin-top:10px;display:grid;gap:7px}
+  .zoom-row{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #cfe0f5;border-radius:10px;padding:7px 10px}
+  .zoom-k{font-size:.78rem;color:#60748c;min-width:104px;font-weight:700}
+  .zoom-v{font-weight:800;letter-spacing:.06em;font-size:1.05rem;font-family:'Courier New',monospace}
+  .zoom-copy{margin-left:auto;border:none;background:#2d8cff;color:#fff;font-weight:800;border-radius:8px;padding:6px 10px;font-size:.8rem}
   .badge{display:inline-block;background:var(--sun);color:#5a4300;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700;margin:2px 4px 2px 0}
   .player{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px;position:relative}
   .player.flvl-2{border-color:var(--teal)}
@@ -125,6 +136,16 @@
       <span class="badge" style="background:#ffd9cf;color:#a13f22">🏆 ベスト <span id="best">0</span></span>
     </div>
     <div id="freezeArea"></div>
+  </div>
+
+  <div class="card zoomcard">
+    <div class="zoom-h">🎥 ゆうや先生のじゅぎょう</div>
+    <div class="zoom-when">毎週 月曜日・金曜日　16:00〜</div>
+    <div class="zoom-call">時間の5分前に、自分でZoomに入ろう！</div>
+    <div class="zoom-info">
+      <div class="zoom-row"><span class="zoom-k">ミーティングID</span><span class="zoom-v">895 7983 6556</span></div>
+      <div class="zoom-row"><span class="zoom-k">パスコード</span><span class="zoom-v">419384</span></div>
+    </div>
   </div>
 
   <div id="stage"></div>
@@ -315,6 +336,7 @@ function celebrate(){showCheer(CHEERS[Math.floor(Math.random()*CHEERS.length)]);
 function bigCelebrate(t){showCheer(t);sBig();burst(60,true);}
 function sBig(){[523,659,784,1047,1319].forEach(function(f,i){tone(f,0.18,'triangle',i*0.08);});}
 function showCheer(t){const c=document.getElementById('cheer');document.getElementById('cheerMsg').textContent=t;c.style.display='flex';}
+function copyText(t,msg){try{navigator.clipboard.writeText(t);}catch(e){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}try{showCheer(msg||'コピーしたよ📋');}catch(e){}}
 function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','🎊','👑','💛','🥳']:['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<N;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=((big?2:1.5)+Math.random()*1.5)+'s';s.style.fontSize=((big?1.5:1)+Math.random()*(big?1.6:1.4))+'rem';document.body.appendChild(s);setTimeout(function(){s.remove();},4200);}}
 const lv=xp=>Math.floor(xp/100)+1;
 function frameClass(level){return 'flvl-'+Math.min(6,Math.max(1,level));}
