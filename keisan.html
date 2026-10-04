@@ -67,20 +67,19 @@
 
   /* play */
   #play{flex:1;display:flex;flex-direction:column}
-  .playmid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
   .pbar{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--ink-soft)}
   .pbar .quit{border:1px solid var(--line2);background:var(--card);color:var(--ink-soft);border-radius:10px;padding:7px 11px;font-family:var(--body);font-weight:800;font-size:12.5px;cursor:pointer}
   .pbar .timer{margin-left:auto;font-family:var(--disp);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
   .track{height:9px;background:var(--line);border-radius:999px;overflow:hidden;margin:10px 0 0}
   .track .f{height:100%;background:linear-gradient(90deg,var(--accent),var(--warm));width:0%;transition:width .25s}
-  .qbox{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:4px 0}
+  .qbox{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:4px 0;min-height:200px}
   .q{font-family:var(--disp);font-weight:700;font-size:clamp(44px,13vw,68px);color:var(--ink);letter-spacing:.02em;font-variant-numeric:tabular-nums}
   .ans{min-width:150px;min-height:62px;padding:6px 22px;border:3px solid var(--line2);border-radius:16px;background:var(--card);font-family:var(--disp);font-weight:700;font-size:clamp(34px,10vw,52px);color:var(--accent-d);display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
   .ans.ok{border-color:var(--good);background:var(--good-flash)}
   .ans.ng{border-color:var(--bad);background:var(--bad-soft)}
   .ngmsg{min-height:22px;font-size:14px;font-weight:800;color:var(--bad)}
-  .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
-  .key{border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:14px;padding:18px 0;font-family:var(--disp);font-weight:700;font-size:26px;cursor:pointer;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+  .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:6px;padding-bottom:4px}
+  .key{border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:16px;padding:clamp(18px,2.6vh,26px) 0;font-family:var(--disp);font-weight:700;font-size:28px;cursor:pointer;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
   .key:active{transform:translateY(2px)}
   .key.del{color:var(--bad);font-size:20px;font-family:var(--body);font-weight:800}
   .key.go{background:var(--accent);color:#fff;font-size:20px;font-family:var(--body);font-weight:800;border-color:var(--accent)}
@@ -136,7 +135,6 @@
       <span class="timer" id="timer">0:00</span>
     </div>
     <div class="track"><div class="f" id="track"></div></div>
-    <div class="playmid">
     <div class="qbox">
       <div class="q" id="q">7 × 8 =</div>
       <div class="ans" id="ans">&nbsp;</div>
@@ -155,7 +153,6 @@
       <button class="key del" onclick="del()">けす</button>
       <button class="key" onclick="press('0')">0</button>
       <button class="key go" onclick="submit()">こたえる</button>
-    </div>
     </div>
   </div>
 
