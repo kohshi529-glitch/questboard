@@ -1,0 +1,275 @@
+<title>計算クエスト</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&family=Noto+Sans+JP:wght@500;700&display=swap">
+<style>
+  :root{
+    --bg:#eef2f8; --card:#ffffff; --card2:#f7f9fc;
+    --ink:#1f2740; --ink-soft:#56607a; --ink-faint:#8891a6;
+    --line:#dfe5ef; --line2:#cdd5e3;
+    --accent:#3b6fe0; --accent-d:#2f5bc0; --accent-soft:#e6edfc;
+    --warm:#f08a2c; --warm-soft:#fde9d4;
+    --good:#2f9e5e; --good-soft:#e2f3e9; --good-flash:#c9efd6;
+    --bad:#e2574f; --bad-soft:#fbe4e2;
+    --shadow:0 2px 4px rgba(31,39,64,.06),0 10px 26px rgba(31,39,64,.10);
+    --disp:"Fredoka","Nunito",system-ui,sans-serif;
+    --body:"Nunito",system-ui,-apple-system,sans-serif;
+    --jp:"Noto Sans JP",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#121620; --card:#1d2330; --card2:#242b3a;
+      --ink:#eef1f8; --ink-soft:#b6bfd2; --ink-faint:#868fa6;
+      --line:#2f3646; --line2:#3b4456;
+      --accent:#6f97f0; --accent-d:#8aabf5; --accent-soft:#232d45;
+      --warm:#f3a65c; --warm-soft:#33281a;
+      --good:#6fcf90; --good-soft:#1d3326; --good-flash:#24402f;
+      --bad:#f0837c; --bad-soft:#3a211f;
+      --shadow:0 2px 4px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#121620; --card:#1d2330; --card2:#242b3a;
+    --ink:#eef1f8; --ink-soft:#b6bfd2; --ink-faint:#868fa6;
+    --line:#2f3646; --line2:#3b4456;
+    --accent:#6f97f0; --accent-d:#8aabf5; --accent-soft:#232d45;
+    --warm:#f3a65c; --warm-soft:#33281a;
+    --good:#6fcf90; --good-soft:#1d3326; --good-flash:#24402f;
+    --bad:#f0837c; --bad-soft:#3a211f;
+    --shadow:0 2px 4px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:520px;margin:0 auto;padding-block:18px 24px;padding-left:16px;padding-right:16px;min-height:100%;display:flex;flex-direction:column}
+  header{text-align:center;margin-bottom:8px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-d);font-weight:800;margin:0}
+  h1{font-family:var(--disp);font-weight:700;font-size:26px;margin:2px 0 0;color:var(--ink)}
+
+  /* home */
+  .diffrow{display:flex;gap:8px;justify-content:center;margin:14px 0 6px}
+  .diff{flex:1;max-width:120px;border:1.5px solid var(--line2);background:var(--card);color:var(--ink-soft);border-radius:12px;padding:10px;font-family:var(--body);font-weight:800;font-size:13px;cursor:pointer}
+  .diff.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .stat-strip{display:flex;gap:10px;justify-content:center;margin:12px 0 4px;font-size:12.5px;color:var(--ink-soft);font-weight:800}
+  .stat-strip .pill{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;box-shadow:var(--shadow)}
+  .modes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .mode{border:1px solid var(--line);border-left:6px solid var(--mc);background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:16px;cursor:pointer;text-align:left;font-family:var(--body)}
+  .mode:active{transform:translateY(1px)}
+  .mode .mi{font-size:30px;line-height:1}
+  .mode .mn{font-family:var(--disp);font-weight:700;font-size:18px;margin-top:6px;color:var(--ink)}
+  .mode .mb{font-size:11.5px;color:var(--ink-faint);font-weight:800;margin-top:2px}
+  .mode.wide{grid-column:1 / -1;border-left-color:var(--warm);display:flex;align-items:center;gap:14px}
+  .mode.wide .mi{font-size:34px}
+  .home-tip{text-align:center;font-size:12.5px;color:var(--ink-faint);margin-top:16px;line-height:1.6}
+
+  /* play */
+  #play{flex:1;display:flex;flex-direction:column}
+  .pbar{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--ink-soft)}
+  .pbar .quit{border:1px solid var(--line2);background:var(--card);color:var(--ink-soft);border-radius:10px;padding:7px 11px;font-family:var(--body);font-weight:800;font-size:12.5px;cursor:pointer}
+  .pbar .timer{margin-left:auto;font-family:var(--disp);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .track{height:9px;background:var(--line);border-radius:999px;overflow:hidden;margin:10px 0 0}
+  .track .f{height:100%;background:linear-gradient(90deg,var(--accent),var(--warm));width:0%;transition:width .25s}
+  .qbox{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:10px 0}
+  .q{font-family:var(--disp);font-weight:700;font-size:clamp(44px,13vw,68px);color:var(--ink);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+  .ans{min-width:150px;min-height:62px;padding:6px 22px;border:3px solid var(--line2);border-radius:16px;background:var(--card);font-family:var(--disp);font-weight:700;font-size:clamp(34px,10vw,52px);color:var(--accent-d);display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+  .ans.ok{border-color:var(--good);background:var(--good-flash)}
+  .ans.ng{border-color:var(--bad);background:var(--bad-soft)}
+  .ngmsg{min-height:22px;font-size:14px;font-weight:800;color:var(--bad)}
+  .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+  .key{border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:14px;padding:18px 0;font-family:var(--disp);font-weight:700;font-size:26px;cursor:pointer;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+  .key:active{transform:translateY(2px)}
+  .key.del{color:var(--bad);font-size:20px;font-family:var(--body);font-weight:800}
+  .key.go{background:var(--accent);color:#fff;font-size:20px;font-family:var(--body);font-weight:800;border-color:var(--accent)}
+
+  /* result */
+  #result{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center}
+  .r-emoji{font-size:64px}
+  .r-title{font-family:var(--disp);font-weight:700;font-size:26px;color:var(--ink)}
+  .r-best{font-size:14px;font-weight:800;color:var(--warm);margin-top:2px}
+  .r-grid{display:flex;gap:12px;margin:18px 0 6px;flex-wrap:wrap;justify-content:center}
+  .r-tile{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px 20px;min-width:110px}
+  .r-tile .rk{font-size:12px;font-weight:800;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em}
+  .r-tile .rv{font-family:var(--disp);font-weight:700;font-size:28px;color:var(--ink);margin-top:2px;font-variant-numeric:tabular-nums}
+  .r-btns{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;justify-content:center}
+  .btn{border:none;border-radius:14px;padding:15px 22px;font-family:var(--body);font-weight:800;font-size:15px;cursor:pointer;box-shadow:var(--shadow)}
+  .btn.prim{background:var(--accent);color:#fff}
+  .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line2)}
+  .btn:active{transform:translateY(2px)}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Keisan Quest · 計算</p>
+    <h1 id="h1">計算クエスト ⚡</h1>
+  </header>
+
+  <!-- HOME -->
+  <div id="home">
+    <div class="diffrow">
+      <button class="diff" data-d="0" onclick="setDiff(0)">やさしい</button>
+      <button class="diff on" data-d="1" onclick="setDiff(1)">ふつう</button>
+      <button class="diff" data-d="2" onclick="setDiff(2)">むずかしい</button>
+    </div>
+    <div class="stat-strip">
+      <span class="pill">今日 <span id="todayN">0</span> 問</span>
+      <span class="pill">1セット <span id="setN">20</span> 問</span>
+    </div>
+    <div class="modes">
+      <button class="mode" style="--mc:#3b6fe0" onclick="start('add')"><div class="mi">➕</div><div class="mn">たし算</div><div class="mb" id="bestadd">ベスト —</div></button>
+      <button class="mode" style="--mc:#e2574f" onclick="start('sub')"><div class="mi">➖</div><div class="mn">ひき算</div><div class="mb" id="bestsub">ベスト —</div></button>
+      <button class="mode" style="--mc:#8a5cd6" onclick="start('mul')"><div class="mi">✖️</div><div class="mn">かけ算</div><div class="mb" id="bestmul">ベスト —</div></button>
+      <button class="mode" style="--mc:#2f9e5e" onclick="start('div')"><div class="mi">➗</div><div class="mn">わり算</div><div class="mb" id="bestdiv">ベスト —</div></button>
+      <button class="mode wide" onclick="start('mix')"><div class="mi">🎲</div><div><div class="mn">ミックス</div><div class="mb" id="bestmix">ぜんぶまぜて タイムアタック！</div></div></button>
+    </div>
+    <div class="home-tip">1セット20問を、タイマーで一気に！正しく答えた数だけ「今日の計算」にたまります。<br>目標は1セットを速く・正確に。ベストタイムを更新しよう ⏱️</div>
+  </div>
+
+  <!-- PLAY -->
+  <div id="play" hidden>
+    <div class="pbar">
+      <button class="quit" onclick="quit()">やめる</button>
+      <span id="qnum">1 / 20</span>
+      <span class="timer" id="timer">0:00</span>
+    </div>
+    <div class="track"><div class="f" id="track"></div></div>
+    <div class="qbox">
+      <div class="q" id="q">7 × 8 =</div>
+      <div class="ans" id="ans">&nbsp;</div>
+      <div class="ngmsg" id="ngmsg"></div>
+    </div>
+    <div class="pad">
+      <button class="key" onclick="press('7')">7</button>
+      <button class="key" onclick="press('8')">8</button>
+      <button class="key" onclick="press('9')">9</button>
+      <button class="key" onclick="press('4')">4</button>
+      <button class="key" onclick="press('5')">5</button>
+      <button class="key" onclick="press('6')">6</button>
+      <button class="key" onclick="press('1')">1</button>
+      <button class="key" onclick="press('2')">2</button>
+      <button class="key" onclick="press('3')">3</button>
+      <button class="key del" onclick="del()">けす</button>
+      <button class="key" onclick="press('0')">0</button>
+      <button class="key go" onclick="submit()">こたえる</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" hidden>
+    <div class="r-emoji" id="rEmoji">🎉</div>
+    <div class="r-title" id="rTitle">クリア！</div>
+    <div class="r-best" id="rBest"></div>
+    <div class="r-grid">
+      <div class="r-tile"><div class="rk">タイム</div><div class="rv" id="rTime">0:00</div></div>
+      <div class="r-tile"><div class="rk">正かい</div><div class="rv" id="rScore">0/20</div></div>
+      <div class="r-tile"><div class="rk">正答率</div><div class="rv" id="rAcc">0%</div></div>
+    </div>
+    <div class="r-btns">
+      <button class="btn prim" onclick="again()">🔁 もう1回</button>
+      <button class="btn ghost" onclick="goHome()">モードをえらぶ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SETSIZE=20;
+const MODE_NAME={add:"たし算",sub:"ひき算",mul:"かけ算",div:"わり算",mix:"ミックス"};
+var diff=1, mode='add', problems=[], pi=0, correct=0, cur="", t0=0, timerId=null, locked=false;
+var stats=loadStats();
+
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function loadStats(){var s;try{s=JSON.parse(localStorage.getItem('keisan_stats')||'null');}catch(e){}if(!s||typeof s!=='object')s={};if(s.date!==todayStr()){s.date=todayStr();s.today=0;}s.best=s.best||{};return s;}
+function saveStats(){try{localStorage.setItem('keisan_stats',JSON.stringify(stats));}catch(e){}}
+
+function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function genOne(m){
+  var a,b,op,ans;
+  if(m==='mix')m=['add','sub','mul','div'][rnd(0,3)];
+  if(m==='add'){var mx=[20,100,999][diff];a=rnd(diff===2?10:1,mx);b=rnd(diff===2?10:1,mx);op='+';ans=a+b;}
+  else if(m==='sub'){var mx2=[20,100,999][diff];a=rnd(diff===2?10:2,mx2);b=rnd(1,a);op='−';ans=a-b;}
+  else if(m==='mul'){if(diff===0){a=rnd(1,5);b=rnd(1,5);}else if(diff===1){a=rnd(2,9);b=rnd(2,9);}else{a=rnd(11,99);b=rnd(2,9);}op='×';ans=a*b;}
+  else{var dv,q;if(diff===0){dv=rnd(2,5);q=rnd(1,5);}else if(diff===1){dv=rnd(2,9);q=rnd(2,9);}else{dv=rnd(2,9);q=rnd(11,99);}a=dv*q;b=dv;op='÷';ans=q;}
+  return {text:a+' '+op+' '+b+' =',ans:ans};
+}
+function buildSet(){problems=[];for(var i=0;i<SETSIZE;i++)problems.push(genOne(mode));}
+
+function setDiff(d){diff=d;document.querySelectorAll('.diff').forEach(function(b){b.classList.toggle('on',+b.dataset.d===d);});}
+function fmt(ms){var s=Math.floor(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function fmtBest(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');}
+
+function renderHome(){
+  stats=loadStats();
+  document.getElementById('todayN').textContent=stats.today||0;
+  document.getElementById('setN').textContent=SETSIZE;
+  ['add','sub','mul','div','mix'].forEach(function(m){
+    var el=document.getElementById('best'+m);if(!el)return;
+    var key=m+diff;var bv=stats.best[key];
+    if(m==='mix'){el.textContent=bv?('ベスト '+fmtBest(bv)):'ぜんぶまぜて タイムアタック！';}
+    else el.textContent=bv?('ベスト '+fmtBest(bv)):'ベスト —';
+  });
+}
+function show(id){['home','play','result'].forEach(function(v){document.getElementById(v).hidden=(v!==id);});}
+
+function start(m){mode=m;buildSet();pi=0;correct=0;cur="";locked=false;
+  show('play');document.getElementById('h1').textContent=MODE_NAME[m]+' ⚡';
+  t0=Date.now();if(timerId)clearInterval(timerId);timerId=setInterval(tick,200);tick();
+  showProblem();window.scrollTo(0,0);
+}
+function tick(){document.getElementById('timer').textContent=fmt(Date.now()-t0);}
+function showProblem(){
+  cur="";locked=false;
+  var a=document.getElementById('ans');a.className='ans';a.innerHTML='&nbsp;';
+  document.getElementById('ngmsg').textContent='';
+  document.getElementById('q').textContent=problems[pi].text;
+  document.getElementById('qnum').textContent=(pi+1)+' / '+SETSIZE;
+  document.getElementById('track').style.width=(pi/SETSIZE*100)+'%';
+}
+function press(n){if(locked)return;if(cur.length>=6)return;cur+=n;paint();}
+function del(){if(locked)return;cur=cur.slice(0,-1);paint();}
+function paint(){var a=document.getElementById('ans');a.textContent=cur===""?'':cur;if(cur==='')a.innerHTML='&nbsp;';}
+function submit(){
+  if(locked||cur==="")return;locked=true;
+  var a=document.getElementById('ans');
+  if(parseInt(cur,10)===problems[pi].ans){
+    a.classList.add('ok');correct++;stats.today=(stats.today||0)+1;saveStats();
+    setTimeout(nextProblem,320);
+  }else{
+    a.classList.add('ng');
+    document.getElementById('ngmsg').textContent='せいかい：'+problems[pi].ans;
+    setTimeout(nextProblem,1100);
+  }
+}
+function nextProblem(){pi++;if(pi>=SETSIZE){finish();}else{showProblem();}}
+function finish(){
+  if(timerId)clearInterval(timerId);
+  var ms=Date.now()-t0, sec=Math.round(ms/1000), acc=Math.round(correct/SETSIZE*100);
+  var key=mode+diff, prevBest=stats.best[key], isBest=false;
+  if(correct===SETSIZE){ if(!prevBest||sec<prevBest){stats.best[key]=sec;isBest=true;} }
+  stats.lastAcc=acc;saveStats();
+  show('result');document.getElementById('h1').textContent='けっか';
+  document.getElementById('rTime').textContent=fmt(ms);
+  document.getElementById('rScore').textContent=correct+'/'+SETSIZE;
+  document.getElementById('rAcc').textContent=acc+'%';
+  var em,ti;
+  if(acc===100){em='🏆';ti='全問せいかい！';}else if(acc>=80){em='🎉';ti='よくできた！';}else if(acc>=50){em='💪';ti='その調子！';}else{em='🌱';ti='れんしゅうしよう';}
+  document.getElementById('rEmoji').textContent=em;
+  document.getElementById('rTitle').textContent=ti;
+  var bl=document.getElementById('rBest');
+  if(isBest)bl.textContent='⭐ ベスト更新！（'+fmtBest(sec)+'）';
+  else if(stats.best[key])bl.textContent='ベスト '+fmtBest(stats.best[key]);
+  else bl.textContent='全問せいかいでベスト記録に挑戦！';
+}
+function again(){start(mode);}
+function goHome(){show('home');document.getElementById('h1').textContent='計算クエスト ⚡';renderHome();window.scrollTo(0,0);}
+function quit(){if(timerId)clearInterval(timerId);goHome();}
+
+document.addEventListener('keydown',function(e){
+  if(document.getElementById('play').hidden)return;
+  if(e.key>='0'&&e.key<='9')press(e.key);
+  else if(e.key==='Backspace')del();
+  else if(e.key==='Enter')submit();
+});
+
+renderHome();
+</script>

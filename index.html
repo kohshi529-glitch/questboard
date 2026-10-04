@@ -56,6 +56,12 @@
   .v-sub{font-size:.8rem;color:#4b6b64;font-weight:700;margin-top:6px}
   .v-open{display:block;text-align:center;background:#1f9e8e;color:#fff;padding:12px;border-radius:14px;text-decoration:none;font-weight:800;margin-top:10px;font-size:1.02rem;box-shadow:0 3px 0 #17867a}
   .v-open:active{transform:translateY(2px);box-shadow:0 1px 0 #17867a}
+  .ccard{border:2px solid #3b6fe0;background:#e9effc}
+  .c-h{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:6px;justify-content:space-between}
+  .c-count{font-size:.82rem;color:#2f5bc0;font-weight:800}
+  .c-sub{font-size:.82rem;color:#4a5a7e;font-weight:700;margin-top:6px}
+  .c-open{display:block;text-align:center;background:#3b6fe0;color:#fff;padding:12px;border-radius:14px;text-decoration:none;font-weight:800;margin-top:10px;font-size:1.02rem;box-shadow:0 3px 0 #2f5bc0}
+  .c-open:active{transform:translateY(2px);box-shadow:0 1px 0 #2f5bc0}
   .badge{display:inline-block;background:var(--sun);color:#5a4300;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700;margin:2px 4px 2px 0}
   .player{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px;position:relative}
   .player.flvl-2{border-color:var(--teal)}
@@ -170,6 +176,8 @@
   <div id="hwCard"></div>
 
   <div id="vocabCard"></div>
+
+  <div id="calcCard"></div>
 
   <div id="stage"></div>
   <div class="mini" id="rewardLog" style="margin-top:4px"></div>
@@ -369,6 +377,7 @@ function showCheer(t){const c=document.getElementById('cheer');document.getEleme
 function renderHomework(){var el=document.getElementById('hwCard');if(!el)return;var hw=S.homework||[];if(!hw.length){el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span></div><div class="hw-empty">宿題はまだないよ📝（先生から出たら設定から登録されます）</div></div>';return;}var done=hw.filter(function(h){return h.done;}).length;var all=done===hw.length;var items=hw.map(function(h,i){return '<div class="hw-item'+(h.done?' done':'')+'" onclick="hwToggle('+i+')"><div class="hw-box">'+(h.done?'✓':'')+'</div><div class="hw-txt">'+esc(h.t)+'</div></div>';}).join('');el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span><span class="hw-count">'+done+' / '+hw.length+(all?' 🎉':'')+'</span></div><div class="hw-list">'+items+'</div></div>';}
 function hwToggle(i){if(!S.homework||!S.homework[i])return;S.homework[i].done=!S.homework[i].done;save();maybeSync();renderHomework();if(S.homework[i].done){sWin&&sWin();if(S.homework.every(function(h){return h.done;})){showCheer('📒 宿題ぜんぶ終わったね！よくがんばりました🎉');burst&&burst();}}}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function renderCalc(){var el=document.getElementById('calcCard');if(!el)return;var today=0,best=null;try{var s=JSON.parse(localStorage.getItem('keisan_stats')||'null');if(s){var ds=new Date();var ts=ds.getFullYear()+'-'+(ds.getMonth()+1)+'-'+ds.getDate();if(s.date===ts)today=s.today||0;if(s.best){var vals=Object.keys(s.best).map(function(k){return s.best[k];});if(vals.length)best=Math.min.apply(null,vals);}}}catch(e){}var bestTxt=best!=null?('⏱️ ベスト '+Math.floor(best/60)+':'+String(best%60).padStart(2,'0')):'タイムアタックに挑戦しよう！';el.innerHTML='<div class="card ccard"><div class="c-h"><span>⚡ 計算クエスト</span><span class="c-count">今日 '+today+' 問</span></div><div class="c-sub">'+bestTxt+'</div><a class="c-open" href="./keisan.html">▶ 計算をはじめる</a></div>';}
 function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var learned=st.learned||0;var pct=Math.min(100,Math.round(learned/goal*100));el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+learned+' 語</span></div><div class="v-bar"><div class="v-fill" style="width:'+pct+'%"></div></div><div class="v-sub">合格までの目標 約'+goal.toLocaleString()+'語 ／ 覚えた '+learned+'語（'+pct+'%）</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
 function hwResetAll(){if(!S.homework||!S.homework.length){alert('宿題がまだありません');return;}if(!confirm('宿題のチェックを全部リセットしますか？'))return;S.homework.forEach(function(h){h.done=false;});save();maybeSync();renderHomework();alert('宿題のチェックをリセットしました');}
 function copyText(t,msg){try{navigator.clipboard.writeText(t);}catch(e){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}try{showCheer(msg||'コピーしたよ📋');}catch(e){}}
@@ -439,6 +448,7 @@ function render(){
 
   renderHomework();
   renderVocab();
+  renderCalc();
   const stage=document.getElementById('stage');
   if(!S.season.reward){
     stage.innerHTML=`<div class="card chooser"><h2>このシーズン、がんばったら…<br>どのごほうびをめざす？🎯</h2>${S.cfg.rewards.map((r,i)=>`<button class="rwd" onclick="chooseReward(${i})"><span class="g">🎁</span>${r}</button>`).join('')}</div>`;
