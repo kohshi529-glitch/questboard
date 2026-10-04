@@ -60,20 +60,20 @@
   .goalbox .bar{height:11px;margin:0}
   .goal-sub{margin-top:8px;font-size:12px;color:var(--ink-faint);font-weight:700}
 
-  /* home: stage list */
-  .stages{flex:1;display:grid;grid-auto-rows:minmax(92px,1fr);gap:12px;margin:14px 0}
-  .stage-card{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--sc);border-radius:18px;
-    box-shadow:var(--shadow);padding:16px 18px;cursor:pointer;display:block;width:100%;text-align:left;font-family:var(--body)}
+  /* home: stage list — cards sized to content, bigger text (NOT stretched) */
+  .stages{display:grid;gap:12px;margin:14px 0}
+  .stage-card{background:var(--card);border:1px solid var(--line);border-left:7px solid var(--sc);border-radius:18px;
+    box-shadow:var(--shadow);padding:18px 20px;cursor:pointer;display:block;width:100%;text-align:left;font-family:var(--body)}
   .stage-card:active{transform:translateY(1px)}
   .sc-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .sc-name{font-family:var(--disp);font-weight:700;font-size:18px;color:var(--ink)}
-  .sc-stars{font-size:13px;color:var(--sc);font-weight:800;letter-spacing:1px}
-  .sc-sub{font-size:12.5px;color:var(--ink-faint);font-weight:700;margin-top:2px}
-  .sc-prog{margin-top:12px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-soft);font-weight:800}
-  .sc-bar{flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden}
+  .sc-name{font-family:var(--disp);font-weight:700;font-size:21px;color:var(--ink)}
+  .sc-stars{font-size:15px;color:var(--sc);font-weight:800;letter-spacing:1px}
+  .sc-sub{font-size:13.5px;color:var(--ink-faint);font-weight:700;margin-top:3px}
+  .sc-prog{margin-top:13px;display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-soft);font-weight:800}
+  .sc-bar{flex:1;height:9px;background:var(--line);border-radius:999px;overflow:hidden}
   .sc-fill{height:100%;background:var(--sc);width:0%;transition:width .4s}
-  .sc-clear{font-size:12px;color:var(--good);font-weight:800}
-  .home-tip{text-align:center;font-size:12.5px;color:var(--ink-faint);margin-top:18px;line-height:1.6}
+  .sc-clear{font-size:13px;color:var(--good);font-weight:800}
+  .home-tip{text-align:center;font-size:13.5px;color:var(--ink-faint);margin-top:18px;line-height:1.6}
 
   /* study */
   .topbar{display:flex;align-items:center;gap:10px;margin-bottom:6px}
@@ -88,27 +88,27 @@
   .prog .fill{background:var(--sc)}
 
   #study{flex:1;display:flex;flex-direction:column;min-height:0}
-  .studymid{flex:1;display:flex;flex-direction:column;gap:12px;min-height:0}
-  .card3d{width:100%;flex:1;min-height:300px;display:flex;flex-direction:column}
+  .studymid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:0}
+  .card3d{width:100%;height:clamp(360px,56vh,520px);display:flex;flex-direction:column}
   .inner{position:relative;width:100%;flex:1;cursor:pointer}
   .face{position:absolute;inset:0;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 22px;overflow:hidden;opacity:0;pointer-events:none;transform:scale(.97);transition:opacity .22s ease,transform .22s ease}
   .face::before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:var(--sc)}
   .back{background:var(--card2)}
-  .front{justify-content:center;gap:clamp(14px,3.2vh,32px)}
+  .front{justify-content:center;gap:clamp(16px,3.6vh,38px)}
   /* front shown by default; flip swaps to back. Hidden face gets pointer-events:none so taps always hit the visible face's buttons. */
   .inner .front{opacity:1;pointer-events:auto;transform:scale(1)}
   .inner.flip .front{opacity:0;pointer-events:none;transform:scale(.97)}
   .inner.flip .back{opacity:1;pointer-events:auto;transform:scale(1)}
-  .emoji{font-size:clamp(84px,13vh,150px);line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.12))}
-  .word{font-family:var(--disp);font-weight:700;font-size:clamp(34px,10.5vw,52px);color:var(--ink);line-height:1.1;max-width:100%;overflow-wrap:anywhere;padding:0 6px}
-  .pos{margin-top:10px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sc);background:var(--accent-soft);padding:4px 14px;border-radius:999px;display:inline-block}
-  .tiphint{margin-top:20px;font-size:13.5px;color:var(--ink-faint);font-weight:700}
-  .listen{position:absolute;top:14px;right:14px;border:none;background:var(--accent-soft);color:var(--accent-d);width:46px;height:46px;border-radius:50%;font-size:20px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+  .emoji{font-size:clamp(96px,16vh,176px);line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.12))}
+  .word{font-family:var(--disp);font-weight:700;font-size:clamp(40px,12vw,62px);color:var(--ink);line-height:1.1;max-width:100%;overflow-wrap:anywhere;padding:0 6px}
+  .pos{margin-top:4px;font-size:15px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sc);background:var(--accent-soft);padding:6px 16px;border-radius:999px;display:inline-block}
+  .tiphint{font-size:15px;color:var(--ink-faint);font-weight:700}
+  .listen{position:absolute;top:14px;right:14px;border:none;background:var(--accent-soft);color:var(--accent-d);width:52px;height:52px;border-radius:50%;font-size:23px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
   .listen:active{transform:scale(.92)}
-  .b-label{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:4px}
-  .b-word{font-family:var(--disp);font-weight:700;font-size:clamp(24px,7vw,30px);color:var(--sc);margin-bottom:14px}
-  .def{font-size:clamp(20px,5.6vw,26px);line-height:1.45;color:var(--ink);font-weight:700;max-width:28ch}
-  .ex{margin-top:18px;font-size:clamp(16px,4.4vw,19px);line-height:1.55;color:var(--ink-soft);font-style:italic;max-width:32ch}
+  .b-label{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+  .b-word{font-family:var(--disp);font-weight:700;font-size:clamp(26px,7.6vw,34px);color:var(--sc);margin-bottom:16px}
+  .def{font-size:clamp(22px,6.2vw,30px);line-height:1.45;color:var(--ink);font-weight:700;max-width:28ch}
+  .ex{margin-top:18px;font-size:clamp(17px,4.8vw,21px);line-height:1.55;color:var(--ink-soft);font-style:italic;max-width:32ch}
   .ex b{color:var(--warm);font-style:normal;font-weight:800}
   .jp{margin-top:16px}
   .jp button{border:1px dashed var(--line2);background:transparent;color:var(--ink-faint);font-family:var(--jp);font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 14px;cursor:pointer}
