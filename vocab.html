@@ -94,7 +94,7 @@
   .face{position:absolute;inset:0;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 22px;overflow:hidden;opacity:0;pointer-events:none;transform:scale(.97);transition:opacity .22s ease,transform .22s ease}
   .face::before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:var(--sc)}
   .back{background:var(--card2)}
-  .front{justify-content:space-evenly}
+  .front{justify-content:center;gap:clamp(14px,3.2vh,32px)}
   /* front shown by default; flip swaps to back. Hidden face gets pointer-events:none so taps always hit the visible face's buttons. */
   .inner .front{opacity:1;pointer-events:auto;transform:scale(1)}
   .inner.flip .front{opacity:0;pointer-events:none;transform:scale(.97)}
