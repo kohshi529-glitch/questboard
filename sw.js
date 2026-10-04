@@ -1,4 +1,4 @@
-const CACHE = 'questboard-v4-32';
+const CACHE = 'questboard-v4-33';
 const ASSETS = ['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./apple-touch-icon-180.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -11,13 +11,13 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   const isHTML = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
   if (isHTML) {
-    // network-first: always try to get the latest app shell when online
+    // network-first: always try the latest page when online, cache per URL
     e.respondWith(
       fetch(req).then(resp => {
         const copy = resp.clone();
-        caches.open(CACHE).then(c => c.put('./index.html', copy)).catch(() => {});
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
         return resp;
-      }).catch(() => caches.match('./index.html').then(r => r || caches.match('./')))
+      }).catch(() => caches.match(req).then(r => r || caches.match('./index.html')).then(r => r || caches.match('./')))
     );
     return;
   }

@@ -48,6 +48,14 @@
   .hw-txt{font-size:.95rem;line-height:1.4}
   .hw-item.done .hw-txt{color:#7b8a7b;text-decoration:line-through}
   .hw-empty{margin-top:8px;font-size:.85rem;color:#7a6a93}
+  .vcard{border:2px solid #1f9e8e;background:#e8f5f2}
+  .v-h{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:6px;justify-content:space-between}
+  .v-count{font-size:.82rem;color:#15766a;font-weight:800}
+  .v-bar{height:12px;background:#d2e9e4;border-radius:999px;overflow:hidden;margin-top:10px;border:1.5px solid #bfe0d9}
+  .v-fill{height:100%;background:linear-gradient(90deg,#2f9e5e,#1f9e8e,#e0892a);width:0%;transition:width .4s}
+  .v-sub{font-size:.8rem;color:#4b6b64;font-weight:700;margin-top:6px}
+  .v-open{display:block;text-align:center;background:#1f9e8e;color:#fff;padding:12px;border-radius:14px;text-decoration:none;font-weight:800;margin-top:10px;font-size:1.02rem;box-shadow:0 3px 0 #17867a}
+  .v-open:active{transform:translateY(2px);box-shadow:0 1px 0 #17867a}
   .badge{display:inline-block;background:var(--sun);color:#5a4300;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700;margin:2px 4px 2px 0}
   .player{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px;position:relative}
   .player.flvl-2{border-color:var(--teal)}
@@ -160,6 +168,8 @@
   </div>
 
   <div id="hwCard"></div>
+
+  <div id="vocabCard"></div>
 
   <div id="stage"></div>
   <div class="mini" id="rewardLog" style="margin-top:4px"></div>
@@ -359,6 +369,7 @@ function showCheer(t){const c=document.getElementById('cheer');document.getEleme
 function renderHomework(){var el=document.getElementById('hwCard');if(!el)return;var hw=S.homework||[];if(!hw.length){el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span></div><div class="hw-empty">宿題はまだないよ📝（先生から出たら設定から登録されます）</div></div>';return;}var done=hw.filter(function(h){return h.done;}).length;var all=done===hw.length;var items=hw.map(function(h,i){return '<div class="hw-item'+(h.done?' done':'')+'" onclick="hwToggle('+i+')"><div class="hw-box">'+(h.done?'✓':'')+'</div><div class="hw-txt">'+esc(h.t)+'</div></div>';}).join('');el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span><span class="hw-count">'+done+' / '+hw.length+(all?' 🎉':'')+'</span></div><div class="hw-list">'+items+'</div></div>';}
 function hwToggle(i){if(!S.homework||!S.homework[i])return;S.homework[i].done=!S.homework[i].done;save();maybeSync();renderHomework();if(S.homework[i].done){sWin&&sWin();if(S.homework.every(function(h){return h.done;})){showCheer('📒 宿題ぜんぶ終わったね！よくがんばりました🎉');burst&&burst();}}}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var learned=st.learned||0;var pct=Math.min(100,Math.round(learned/goal*100));el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+learned+' 語</span></div><div class="v-bar"><div class="v-fill" style="width:'+pct+'%"></div></div><div class="v-sub">合格までの目標 約'+goal.toLocaleString()+'語 ／ 覚えた '+learned+'語（'+pct+'%）</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
 function hwResetAll(){if(!S.homework||!S.homework.length){alert('宿題がまだありません');return;}if(!confirm('宿題のチェックを全部リセットしますか？'))return;S.homework.forEach(function(h){h.done=false;});save();maybeSync();renderHomework();alert('宿題のチェックをリセットしました');}
 function copyText(t,msg){try{navigator.clipboard.writeText(t);}catch(e){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}try{showCheer(msg||'コピーしたよ📋');}catch(e){}}
 function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','🎊','👑','💛','🥳']:['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<N;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=((big?2:1.5)+Math.random()*1.5)+'s';s.style.fontSize=((big?1.5:1)+Math.random()*(big?1.6:1.4))+'rem';document.body.appendChild(s);setTimeout(function(){s.remove();},4200);}}
@@ -427,6 +438,7 @@ function render(){
   fa.innerHTML=(gap>=2&&S.prog.freeze>0)?`<button class="btn gray" style="margin-top:10px" onclick="useFreeze()">🎫 お休み券で連続を守る（残り ${S.prog.freeze}）</button>`:'';
 
   renderHomework();
+  renderVocab();
   const stage=document.getElementById('stage');
   if(!S.season.reward){
     stage.innerHTML=`<div class="card chooser"><h2>このシーズン、がんばったら…<br>どのごほうびをめざす？🎯</h2>${S.cfg.rewards.map((r,i)=>`<button class="rwd" onclick="chooseReward(${i})"><span class="g">🎁</span>${r}</button>`).join('')}</div>`;

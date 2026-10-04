@@ -1,0 +1,342 @@
+<title>英検準1級 単語カード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Noto+Sans+JP:wght@500;700&display=swap">
+<style>
+  :root{
+    --bg:#f4f1e8; --card:#ffffff; --card2:#fbf9f3;
+    --ink:#283042; --ink-soft:#5a6475; --ink-faint:#8b94a4;
+    --line:#e6e1d4; --line2:#d8d2c2;
+    --accent:#1f9e8e; --accent-d:#17867a; --accent-soft:#e3f4f1;
+    --warm:#f4a23b; --warm-soft:#fcecd6;
+    --good:#2f9e5e; --good-soft:#e4f3e9;
+    --s1:#2f9e5e; --s2:#1f9e8e; --s3:#e0892a; --s4:#d6504e;
+    --shadow:0 2px 4px rgba(40,48,66,.06),0 10px 26px rgba(40,48,66,.10);
+    --disp:"Fredoka","Nunito",system-ui,sans-serif;
+    --body:"Nunito",system-ui,-apple-system,sans-serif;
+    --jp:"Noto Sans JP",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#14171d; --card:#1f232c; --card2:#262b35;
+      --ink:#eef1f6; --ink-soft:#b9c0cc; --ink-faint:#8a93a2;
+      --line:#333945; --line2:#3e4552;
+      --accent:#49c9b7; --accent-d:#39b3a2; --accent-soft:#1d3330;
+      --warm:#f3b05f; --warm-soft:#33291a;
+      --good:#6fcf90; --good-soft:#1e3326;
+      --s1:#6fcf90; --s2:#49c9b7; --s3:#eab464; --s4:#f0807e;
+      --shadow:0 2px 4px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#14171d; --card:#1f232c; --card2:#262b35;
+    --ink:#eef1f6; --ink-soft:#b9c0cc; --ink-faint:#8a93a2;
+    --line:#333945; --line2:#3e4552;
+    --accent:#49c9b7; --accent-d:#39b3a2; --accent-soft:#1d3330;
+    --warm:#f3b05f; --warm-soft:#33291a;
+    --good:#6fcf90; --good-soft:#1e3326;
+    --s1:#6fcf90; --s2:#49c9b7; --s3:#eab464; --s4:#f0807e;
+    --shadow:0 2px 4px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:560px;margin:0 auto;padding-block:20px 30px;padding-left:18px;padding-right:18px;min-height:100%}
+  header{text-align:center;margin-bottom:8px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-d);font-weight:800;margin:0}
+  h1{font-family:var(--disp);font-weight:700;font-size:26px;margin:2px 0 0;color:var(--ink)}
+  .bar{flex:1;height:9px;background:var(--line);border-radius:999px;overflow:hidden}
+  .fill{height:100%;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3),var(--s4));width:0%;transition:width .4s}
+  .goalbox{margin:14px auto 20px;max-width:420px;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;box-shadow:var(--shadow);padding:16px 18px}
+  .goal-top{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:800;color:var(--ink-soft)}
+  .goal-top .goal-v{color:var(--accent-d)}
+  .goal-main{font-family:var(--disp);font-weight:700;font-size:30px;color:var(--ink);margin:6px 0 10px}
+  .goal-main .goal-unit{font-size:15px;color:var(--ink-faint);font-weight:700}
+  .goalbox .bar{height:11px;margin:0}
+  .goal-sub{margin-top:8px;font-size:12px;color:var(--ink-faint);font-weight:700}
+
+  /* home: stage list */
+  .stages{display:grid;gap:14px}
+  .stage-card{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--sc);border-radius:18px;
+    box-shadow:var(--shadow);padding:16px 18px;cursor:pointer;display:block;width:100%;text-align:left;font-family:var(--body)}
+  .stage-card:active{transform:translateY(1px)}
+  .sc-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .sc-name{font-family:var(--disp);font-weight:700;font-size:18px;color:var(--ink)}
+  .sc-stars{font-size:13px;color:var(--sc);font-weight:800;letter-spacing:1px}
+  .sc-sub{font-size:12.5px;color:var(--ink-faint);font-weight:700;margin-top:2px}
+  .sc-prog{margin-top:12px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-soft);font-weight:800}
+  .sc-bar{flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden}
+  .sc-fill{height:100%;background:var(--sc);width:0%;transition:width .4s}
+  .sc-clear{font-size:12px;color:var(--good);font-weight:800}
+  .home-tip{text-align:center;font-size:12.5px;color:var(--ink-faint);margin-top:18px;line-height:1.6}
+
+  /* study */
+  .topbar{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .back{border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:12px;padding:9px 13px;font-family:var(--body);font-weight:800;font-size:13px;cursor:pointer}
+  .back:active{transform:translateY(1px)}
+  .study-name{font-family:var(--disp);font-weight:700;font-size:17px;color:var(--ink)}
+  .study-stars{font-size:12px;color:var(--sc);font-weight:800;margin-left:auto}
+  .prog{margin:10px 0 6px;display:flex;align-items:center;gap:10px;justify-content:center;font-size:13px;color:var(--ink-soft);font-weight:700}
+  .prog .bar{max-width:220px}
+  .prog .fill{background:var(--sc)}
+
+  .card3d{perspective:1400px;width:100%;margin-top:6px}
+  .inner{position:relative;width:100%;height:360px;transition:transform .55s cubic-bezier(.4,.1,.2,1);transform-style:preserve-3d;cursor:pointer}
+  .inner.flip{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 22px;overflow:hidden}
+  .face::before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:var(--sc)}
+  .back{transform:rotateY(180deg);background:var(--card2)}
+  .emoji{font-size:70px;line-height:1;margin-bottom:12px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.12))}
+  .word{font-family:var(--disp);font-weight:700;font-size:clamp(28px,8.5vw,42px);color:var(--ink);line-height:1.1}
+  .pos{margin-top:6px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sc);background:var(--accent-soft);padding:3px 12px;border-radius:999px;display:inline-block}
+  .tiphint{margin-top:16px;font-size:12.5px;color:var(--ink-faint);font-weight:700}
+  .listen{position:absolute;top:14px;right:14px;border:none;background:var(--accent-soft);color:var(--accent-d);width:46px;height:46px;border-radius:50%;font-size:20px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+  .listen:active{transform:scale(.92)}
+  .b-label{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:4px}
+  .b-word{font-family:var(--disp);font-weight:700;font-size:23px;color:var(--sc);margin-bottom:12px}
+  .def{font-size:18.5px;line-height:1.5;color:var(--ink);font-weight:700;max-width:30ch}
+  .ex{margin-top:16px;font-size:15px;line-height:1.55;color:var(--ink-soft);font-style:italic;max-width:32ch}
+  .ex b{color:var(--warm);font-style:normal;font-weight:800}
+  .jp{margin-top:16px}
+  .jp button{border:1px dashed var(--line2);background:transparent;color:var(--ink-faint);font-family:var(--jp);font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 14px;cursor:pointer}
+  .jp .word-jp{font-family:var(--jp);font-weight:700;color:var(--ink-soft);font-size:15px}
+
+  .controls{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:16px}
+  .nav{border:1px solid var(--line2);background:var(--card);color:var(--ink);width:54px;height:54px;border-radius:16px;font-size:22px;cursor:pointer;box-shadow:var(--shadow);font-weight:800}
+  .nav:active{transform:translateY(2px)}
+  .know{flex:1;max-width:220px;border:none;border-radius:16px;padding:16px;font-family:var(--body);font-weight:800;font-size:15px;cursor:pointer;box-shadow:var(--shadow);background:var(--sc);color:#fff}
+  .know.on{background:var(--good)}
+  .know:active{transform:translateY(2px)}
+  .row2{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .mini{border:1px solid var(--line2);background:var(--card);color:var(--ink-soft);border-radius:12px;padding:9px 14px;font-family:var(--body);font-weight:700;font-size:13px;cursor:pointer}
+  .mini:active{transform:translateY(1px)}
+  .hint-line{text-align:center;font-size:12.5px;color:var(--ink-faint);margin-top:12px;line-height:1.6}
+  .done-msg{text-align:center;background:var(--good-soft);border:1px solid var(--good);border-radius:16px;padding:14px;color:var(--good);font-weight:800;margin-top:12px}
+  @media (max-width:380px){.inner{height:332px}.emoji{font-size:58px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Eiken Pre-1 · Word Cards</p>
+    <h1 id="h1">単語カード 🔤</h1>
+  </header>
+
+  <!-- HOME -->
+  <div id="home">
+    <div class="goalbox">
+      <div class="goal-top"><span>🎯 合格までの目標</span><span class="goal-v">約1,900語</span></div>
+      <div class="goal-main"><span id="ovCount">0</span> <span class="goal-unit">語 覚えた</span></div>
+      <div class="bar"><div class="fill" id="ovFill"></div></div>
+      <div class="goal-sub"><span id="ovPct">0%</span> ・ いま収録 <span id="ovDeck">70</span>語（順次ふやします）</div>
+    </div>
+    <div class="stages" id="stageList"></div>
+    <div class="home-tip">やさしいステージから、少しずつ上へ。⭐が多いほど難しい単語です。<br>全部覚えたステージには「クリア！」がつきます。</div>
+  </div>
+
+  <!-- STUDY -->
+  <div id="study" hidden>
+    <div class="topbar">
+      <button class="back" onclick="showHome()">← 一覧</button>
+      <span class="study-name" id="studyName"></span>
+      <span class="study-stars" id="studyStars"></span>
+    </div>
+    <div class="prog">
+      <span id="posLabel">1 / 14</span>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <span id="knownLabel">覚えた 0</span>
+    </div>
+    <div class="card3d">
+      <div class="inner" id="inner" onclick="flip()">
+        <div class="face front">
+          <button class="listen" onclick="speakWord(event)" aria-label="listen">🔊</button>
+          <div class="emoji" id="fEmoji">🙂</div>
+          <div class="word" id="fWord">word</div>
+          <div class="pos" id="fPos">adj</div>
+          <div class="tiphint">タップで いみを見る 👆</div>
+        </div>
+        <div class="face back">
+          <button class="listen" onclick="speakWord(event)" aria-label="listen">🔊</button>
+          <div class="b-label">meaning</div>
+          <div class="b-word" id="bWord">word</div>
+          <div class="def" id="bDef">definition</div>
+          <div class="ex" id="bEx"></div>
+          <div class="jp"><button id="jpBtn" onclick="toggleJp(event)">日本語でヒント</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="nav" onclick="prev()" aria-label="まえ">◀</button>
+      <button class="know" id="knowBtn" onclick="toggleKnow()">覚えた！</button>
+      <button class="nav" onclick="next()" aria-label="つぎ">▶</button>
+    </div>
+    <div class="row2">
+      <button class="mini" onclick="shuffle()">🔀 シャッフル</button>
+      <button class="mini" id="filterBtn" onclick="toggleFilter()">🔁 まだのカードだけ</button>
+    </div>
+    <div class="hint-line">カードをタップでめくる／🔊で発音／「覚えた！」でチェック。<br>日本語は最後の手段。まずは英語とヒントで考えよう。</div>
+  </div>
+</div>
+
+<script>
+const STAGES=[
+ {name:"ステージ1 スタート",sub:"準1級 基礎（よく出る語）",stars:2,color:"var(--s1)",words:[
+  {w:"accomplish",pos:"verb",e:"✅",def:"to finish something hard successfully",ex:"She <b>accomplished</b> her big goal.",jp:"成しとげる"},
+  {w:"adequate",pos:"adj",e:"👍",def:"enough for what you need",ex:"We had <b>adequate</b> food for the trip.",jp:"十分な"},
+  {w:"anticipate",pos:"verb",e:"🔮",def:"to expect something to happen",ex:"We <b>anticipate</b> rain tomorrow.",jp:"予想する"},
+  {w:"assess",pos:"verb",e:"🧐",def:"to judge how good or big something is",ex:"The teacher <b>assessed</b> her work.",jp:"評価する"},
+  {w:"cautious",pos:"adj",e:"🐢",def:"careful to avoid danger",ex:"Be <b>cautious</b> when crossing the road.",jp:"用心深い"},
+  {w:"comprehend",pos:"verb",e:"🧠",def:"to fully understand",ex:"He could not <b>comprehend</b> the hard book.",jp:"理解する"},
+  {w:"distinguish",pos:"verb",e:"🔍",def:"to see the difference between things",ex:"Can you <b>distinguish</b> the twins?",jp:"見分ける"},
+  {w:"eliminate",pos:"verb",e:"❌",def:"to remove something completely",ex:"We must <b>eliminate</b> the mistake.",jp:"取り除く"},
+  {w:"enhance",pos:"verb",e:"✨",def:"to make something better",ex:"Music can <b>enhance</b> your mood.",jp:"高める"},
+  {w:"evident",pos:"adj",e:"💡",def:"easy to see or understand",ex:"It was <b>evident</b> that she was happy.",jp:"明らかな"},
+  {w:"numerous",pos:"adj",e:"🔢",def:"very many",ex:"She owns <b>numerous</b> books.",jp:"多数の"},
+  {w:"remarkable",pos:"adj",e:"🌟",def:"very special and surprising",ex:"Her progress was <b>remarkable</b>.",jp:"すばらしい"},
+  {w:"reveal",pos:"verb",e:"🎁",def:"to show something that was hidden",ex:"He <b>revealed</b> the secret.",jp:"明かす"},
+  {w:"utilize",pos:"verb",e:"🛠️",def:"to use something for a purpose",ex:"We <b>utilize</b> apps to study.",jp:"活用する"}
+ ]},
+ {name:"ステージ2 スタンダード",sub:"準1級 標準",stars:3,color:"var(--s2)",words:[
+  {w:"abundant",pos:"adj",e:"🌾",def:"existing in large amounts",ex:"Water is <b>abundant</b> in this area.",jp:"豊富な"},
+  {w:"acknowledge",pos:"verb",e:"🙇",def:"to admit that something is true",ex:"She <b>acknowledged</b> her mistake.",jp:"認める"},
+  {w:"apparent",pos:"adj",e:"👓",def:"clear and easy to notice",ex:"It was <b>apparent</b> that he was tired.",jp:"明らかな"},
+  {w:"cease",pos:"verb",e:"🛑",def:"to stop completely",ex:"The rain <b>ceased</b> at night.",jp:"やむ・やめる"},
+  {w:"compel",pos:"verb",e:"💢",def:"to force someone to do something",ex:"The rules <b>compel</b> us to wait.",jp:"強いる"},
+  {w:"confront",pos:"verb",e:"🥊",def:"to face a problem or person directly",ex:"She <b>confronted</b> her fear.",jp:"立ち向かう"},
+  {w:"consistent",pos:"adj",e:"📏",def:"always the same; not changing",ex:"His work is <b>consistent</b>.",jp:"一貫した"},
+  {w:"diminish",pos:"verb",e:"📉",def:"to become smaller or less",ex:"The pain slowly <b>diminished</b>.",jp:"減る"},
+  {w:"emphasize",pos:"verb",e:"📢",def:"to show that something is important",ex:"He <b>emphasized</b> safety.",jp:"強調する"},
+  {w:"inevitable",pos:"adj",e:"⏳",def:"sure to happen; cannot be avoided",ex:"Change is <b>inevitable</b>.",jp:"避けられない"},
+  {w:"obstacle",pos:"noun",e:"🚧",def:"something that blocks your way",ex:"She jumped over the <b>obstacle</b>.",jp:"障害"},
+  {w:"reinforce",pos:"verb",e:"🧱",def:"to make something stronger",ex:"Practice <b>reinforces</b> skills.",jp:"強化する"},
+  {w:"restrain",pos:"verb",e:"🔗",def:"to hold back or keep under control",ex:"He <b>restrained</b> his anger.",jp:"抑える"},
+  {w:"tedious",pos:"adj",e:"😴",def:"boring and taking a long time",ex:"The task was <b>tedious</b>.",jp:"退屈な"}
+ ]},
+ {name:"ステージ3 発展",sub:"準1級 発展（差がつく語）",stars:4,color:"var(--s3)",words:[
+  {w:"ambiguous",pos:"adj",e:"❓",def:"having more than one meaning; not clear",ex:"His answer was <b>ambiguous</b>.",jp:"あいまいな"},
+  {w:"compromise",pos:"noun",e:"🤝",def:"an agreement where each side gives up a little",ex:"They reached a <b>compromise</b>.",jp:"妥協"},
+  {w:"contemplate",pos:"verb",e:"💭",def:"to think about something carefully",ex:"She <b>contemplated</b> her future.",jp:"熟考する"},
+  {w:"endeavor",pos:"verb",e:"🧗",def:"to try hard to do something",ex:"He <b>endeavored</b> to win.",jp:"努力する"},
+  {w:"feasible",pos:"adj",e:"🆗",def:"possible to do",ex:"Is the plan <b>feasible</b>?",jp:"実行可能な"},
+  {w:"hinder",pos:"verb",e:"🚫",def:"to make something harder to do",ex:"The snow <b>hindered</b> the trip.",jp:"妨げる"},
+  {w:"indifferent",pos:"adj",e:"😐",def:"not interested and not caring",ex:"She was <b>indifferent</b> to the news.",jp:"無関心な"},
+  {w:"intricate",pos:"adj",e:"🕸️",def:"very detailed and complicated",ex:"The design is <b>intricate</b>.",jp:"複雑な"},
+  {w:"mitigate",pos:"verb",e:"🧯",def:"to make something bad less serious",ex:"Trees <b>mitigate</b> the heat.",jp:"やわらげる"},
+  {w:"plausible",pos:"adj",e:"🤨",def:"seeming true or reasonable",ex:"That is a <b>plausible</b> excuse.",jp:"もっともらしい"},
+  {w:"prevalent",pos:"adj",e:"🌍",def:"common; happening in many places",ex:"The cold is <b>prevalent</b> in winter.",jp:"広まっている"},
+  {w:"scrutinize",pos:"verb",e:"🔬",def:"to look at something very carefully",ex:"She <b>scrutinized</b> the report.",jp:"細かく調べる"},
+  {w:"sustain",pos:"verb",e:"🌱",def:"to keep something going over time",ex:"Plants <b>sustain</b> life.",jp:"維持する"},
+  {w:"versatile",pos:"adj",e:"🧰",def:"able to do many different things",ex:"A <b>versatile</b> tool is useful.",jp:"多才な・万能な"}
+ ]},
+ {name:"ステージ4 最難",sub:"準1級 最難（1級の入口）",stars:5,color:"var(--s4)",words:[
+  {w:"adverse",pos:"adj",e:"⛈️",def:"bad or harmful",ex:"<b>Adverse</b> weather stopped the game.",jp:"不利な・悪い"},
+  {w:"arbitrary",pos:"adj",e:"🎲",def:"chosen by chance, not by a clear reason",ex:"The rule felt <b>arbitrary</b>.",jp:"勝手な・任意の"},
+  {w:"candid",pos:"adj",e:"💬",def:"honest and open",ex:"She gave a <b>candid</b> answer.",jp:"率直な"},
+  {w:"coherent",pos:"adj",e:"🧩",def:"clear and well organized",ex:"Write a <b>coherent</b> essay.",jp:"筋の通った"},
+  {w:"discern",pos:"verb",e:"👁️",def:"to notice or understand clearly",ex:"He could <b>discern</b> the truth.",jp:"見分ける"},
+  {w:"eloquent",pos:"adj",e:"🗣️",def:"speaking in a clear, powerful way",ex:"She gave an <b>eloquent</b> speech.",jp:"雄弁な"},
+  {w:"meticulous",pos:"adj",e:"📝",def:"very careful about small details",ex:"He is <b>meticulous</b> with his work.",jp:"几帳面な"},
+  {w:"obsolete",pos:"adj",e:"🕰️",def:"no longer used; out of date",ex:"The old phone is <b>obsolete</b>.",jp:"時代遅れの"},
+  {w:"pragmatic",pos:"adj",e:"🔧",def:"dealing with things in a practical way",ex:"Take a <b>pragmatic</b> approach.",jp:"実用的な"},
+  {w:"redundant",pos:"adj",e:"♻️",def:"more than needed; repeated",ex:"Cut the <b>redundant</b> words.",jp:"余分な"},
+  {w:"resilient",pos:"adj",e:"🌳",def:"able to recover quickly from trouble",ex:"Children are <b>resilient</b>.",jp:"回復力のある"},
+  {w:"tangible",pos:"adj",e:"✋",def:"real; able to be touched or clearly seen",ex:"We need <b>tangible</b> results.",jp:"具体的な・実体のある"},
+  {w:"ubiquitous",pos:"adj",e:"📱",def:"found everywhere",ex:"Smartphones are <b>ubiquitous</b>.",jp:"どこにでもある"},
+  {w:"profound",pos:"adj",e:"🌊",def:"very deep, strong, or serious",ex:"It was a <b>profound</b> idea.",jp:"深い・重大な"}
+ ]},
+ {name:"ステージ5 イディオム",sub:"準1級 句動詞・熟語",stars:3,color:"var(--s2)",words:[
+  {w:"account for",pos:"idiom",e:"🧾",def:"to explain the reason for something",ex:"How do you <b>account for</b> the mistake?",jp:"説明する・占める"},
+  {w:"bring about",pos:"idiom",e:"🔄",def:"to make something happen",ex:"The law <b>brought about</b> big changes.",jp:"引き起こす"},
+  {w:"carry out",pos:"idiom",e:"🧪",def:"to do or complete a task or plan",ex:"They <b>carried out</b> the experiment.",jp:"実行する"},
+  {w:"come up with",pos:"idiom",e:"💡",def:"to think of an idea or answer",ex:"She <b>came up with</b> a great plan.",jp:"思いつく"},
+  {w:"cope with",pos:"idiom",e:"🧘",def:"to deal with a hard situation",ex:"He learned to <b>cope with</b> stress.",jp:"対処する"},
+  {w:"figure out",pos:"idiom",e:"🔎",def:"to understand or solve something",ex:"I can't <b>figure out</b> this puzzle.",jp:"解き明かす"},
+  {w:"give in",pos:"idiom",e:"🏳️",def:"to stop fighting and agree",ex:"He finally <b>gave in</b> and said yes.",jp:"屈する"},
+  {w:"look into",pos:"idiom",e:"🕵️",def:"to examine or investigate",ex:"The police will <b>look into</b> it.",jp:"調べる"},
+  {w:"put off",pos:"idiom",e:"📅",def:"to move something to a later time",ex:"They <b>put off</b> the meeting.",jp:"延期する"},
+  {w:"resort to",pos:"idiom",e:"🆘",def:"to use something because nothing else works",ex:"Don't <b>resort to</b> cheating.",jp:"頼る・訴える"},
+  {w:"run out of",pos:"idiom",e:"🔋",def:"to use all of something and have none left",ex:"We <b>ran out of</b> milk.",jp:"切らす"},
+  {w:"stand out",pos:"idiom",e:"🌟",def:"to be easy to see or notice",ex:"Her art really <b>stands out</b>.",jp:"目立つ"},
+  {w:"take over",pos:"idiom",e:"🪑",def:"to take control of something",ex:"She will <b>take over</b> the team.",jp:"引き継ぐ"},
+  {w:"turn down",pos:"idiom",e:"🙅",def:"to say no to an offer",ex:"He <b>turned down</b> the job.",jp:"断る"}
+ ]}
+];
+
+const TOTAL=STAGES.reduce(function(n,s){return n+s.words.length;},0);
+const GOAL=1900;
+var known=loadKnown();
+var si=0, order=[], idx=0, flipped=false, filterOn=false;
+
+function loadKnown(){try{return JSON.parse(localStorage.getItem('vocab_known')||'{}')||{};}catch(e){return {};}}
+function learnedCount(){return STAGES.reduce(function(n,s){return n+stageKnown(s);},0);}
+function writeStats(){try{localStorage.setItem('vocab_stats',JSON.stringify({learned:learnedCount(),deckSize:TOTAL,goal:GOAL,updated:Date.now()}));}catch(e){}}
+function saveKnown(){try{localStorage.setItem('vocab_known',JSON.stringify(known));}catch(e){}writeStats();}
+function stageKnown(s){return s.words.filter(function(c){return known[c.w];}).length;}
+
+function renderHome(){
+  var kc=learnedCount();
+  document.getElementById('ovCount').textContent=kc;
+  document.getElementById('ovFill').style.width=Math.min(100,kc/GOAL*100)+'%';
+  document.getElementById('ovPct').textContent=Math.round(kc/GOAL*100)+'%';
+  document.getElementById('ovDeck').textContent=TOTAL;
+  writeStats();
+  var html=STAGES.map(function(s,i){
+    var k=stageKnown(s), t=s.words.length, pct=Math.round(k/t*100), clear=(k===t);
+    var stars='★'.repeat(s.stars)+'☆'.repeat(5-s.stars);
+    return '<button class="stage-card" style="--sc:'+s.color+'" onclick="openStage('+i+')">'
+      +'<div class="sc-top"><span class="sc-name">'+s.name+'</span><span class="sc-stars">'+stars+'</span></div>'
+      +'<div class="sc-sub">'+s.sub+' ・ '+t+'語</div>'
+      +'<div class="sc-prog"><span>覚えた '+k+' / '+t+'</span><div class="sc-bar"><div class="sc-fill" style="width:'+pct+'%"></div></div>'
+      +(clear?'<span class="sc-clear">クリア！⭐</span>':'<span>'+pct+'%</span>')+'</div>'
+      +'</button>';
+  }).join('');
+  document.getElementById('stageList').innerHTML=html;
+}
+
+function openStage(i){si=i;order=STAGES[i].words.map(function(_,n){return n;});idx=0;filterOn=false;
+  document.getElementById('home').hidden=true;document.getElementById('study').hidden=false;
+  var s=STAGES[i];document.getElementById('study').style.setProperty('--sc',s.color);
+  document.getElementById('studyName').textContent=s.name;
+  document.getElementById('studyStars').textContent='★'.repeat(s.stars)+'☆'.repeat(5-s.stars);
+  render();window.scrollTo(0,0);
+}
+function showHome(){document.getElementById('study').hidden=true;document.getElementById('home').hidden=false;renderHome();window.scrollTo(0,0);}
+
+function activeOrder(){if(!filterOn)return order;var w=STAGES[si].words;var f=order.filter(function(n){return !known[w[n].w];});return f.length?f:order;}
+function curCard(){var o=activeOrder();if(idx>=o.length)idx=0;return STAGES[si].words[o[idx]];}
+
+function render(){
+  var w=STAGES[si].words,o=activeOrder();if(idx>=o.length)idx=o.length-1;if(idx<0)idx=0;
+  var c=w[o[idx]];
+  flipped=false;document.getElementById('inner').classList.remove('flip');
+  document.getElementById('fEmoji').textContent=c.e;
+  document.getElementById('fWord').textContent=c.w;
+  document.getElementById('fPos').textContent=c.pos;
+  document.getElementById('bWord').textContent=c.w;
+  document.getElementById('bDef').textContent=c.def;
+  document.getElementById('bEx').innerHTML=c.ex;
+  document.getElementById('jpBtn').outerHTML='<button id="jpBtn" onclick="toggleJp(event)">日本語でヒント</button>';
+  document.getElementById('posLabel').textContent=(idx+1)+' / '+o.length;
+  var k=stageKnown(STAGES[si]);
+  document.getElementById('knownLabel').textContent='覚えた '+k;
+  document.getElementById('fill').style.width=(k/w.length*100)+'%';
+  var kb=document.getElementById('knowBtn');
+  if(known[c.w]){kb.classList.add('on');kb.textContent='✓ 覚えた！';}else{kb.classList.remove('on');kb.textContent='覚えた！';}
+  document.getElementById('filterBtn').style.outline=filterOn?'2px solid '+STAGES[si].color:'none';
+}
+function flip(){flipped=!flipped;document.getElementById('inner').classList.toggle('flip',flipped);}
+function next(){var o=activeOrder();idx=(idx+1)%o.length;render();}
+function prev(){var o=activeOrder();idx=(idx-1+o.length)%o.length;render();}
+function toggleKnow(){var c=curCard();known[c.w]=!known[c.w];saveKnown();
+  var allNow=STAGES[si].words.every(function(d){return known[d.w];});
+  render();if(allNow)setTimeout(function(){showDone(STAGES[si].name);},250);}
+function toggleFilter(){filterOn=!filterOn;idx=0;render();}
+function shuffle(){for(var i=order.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=order[i];order[i]=order[j];order[j]=t;}idx=0;render();}
+function toggleJp(ev){ev.stopPropagation();var c=curCard();document.getElementById('jpBtn').outerHTML='<span class="word-jp" id="jpBtn">🇯🇵 '+c.jp+'</span>';}
+function speakWord(ev){ev.stopPropagation();var c=curCard();try{if('speechSynthesis'in window){var u=new SpeechSynthesisUtterance(c.w);u.lang='en-US';u.rate=.9;window.speechSynthesis.cancel();window.speechSynthesis.speak(u);}}catch(e){}}
+function showDone(name){var st=document.getElementById('study');if(document.getElementById('doneMsg'))return;var d=document.createElement('div');d.className='done-msg';d.id='doneMsg';d.textContent='🎉 '+name+' クリア！全部覚えたね！';st.insertBefore(d,st.querySelector('.card3d'));setTimeout(function(){if(d)d.remove();},4000);}
+
+renderHome();
+</script>
