@@ -325,7 +325,7 @@ function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
-const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null};
+const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null,astatRef:null,astatRemote:null,astatSent:''};
 try{SYNC.creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}try{if(S&&S.prog&&(S.prog.clears>0||(S.history&&Object.keys(S.history).length)||(S.rewards&&S.rewards.length))){localStorage.setItem('qb_backup',JSON.stringify({t:Date.now(),s:S}));}}catch(e){}}
 function rollover(){if(S.day.date!==today())S.day={date:today(),picks:[],me:{},pa:{}};}
@@ -572,7 +572,7 @@ function startSync(){
   SYNC.creds={fb:cfg,room:room};localStorage.setItem('qb_sync',JSON.stringify(SYNC.creds));
   initSync();
 }
-function stopSync(){try{if(SYNC.ref)SYNC.ref.off();}catch(e){}try{if(SYNC.pref)SYNC.pref.off();}catch(e){}SYNC.on=false;SYNC.ref=null;SYNC.pref=null;localStorage.removeItem('qb_sync');SYNC.creds=null;syncStatus('停止しました');}
+function stopSync(){try{if(SYNC.ref)SYNC.ref.off();}catch(e){}try{if(SYNC.pref)SYNC.pref.off();}catch(e){}try{if(SYNC.astatRef)SYNC.astatRef.off();}catch(e){}SYNC.on=false;SYNC.ref=null;SYNC.pref=null;SYNC.astatRef=null;localStorage.removeItem('qb_sync');SYNC.creds=null;syncStatus('停止しました');}
 function initSync(){
   if(!SYNC.creds)return;
   if(!window.firebase){syncStatus('（オフライン中：接続できたら同期します）');return;}
@@ -593,8 +593,54 @@ function initSync(){
       save();render();syncStatus('同期中 ✓（更新を受信）');
     },function(err){syncStatus('接続エラー: '+((err&&err.message)||''));});
     try{SYNC.pref=firebase.database().ref('rooms/'+SYNC.creds.room+'/photos');SYNC.pref.on('child_added',handlePhoto);SYNC.pref.on('child_changed',handlePhoto);}catch(e){}
+    try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;appStatsSync();});}catch(e){}
   }catch(e){syncStatus('初期化エラー: '+e.message);}
 }
+
+/* ---- app progress (vocab/keisan) cross-device sync + same-device refresh ----
+   Progress lives in its own localStorage keys (vocab_stats / keisan_stats) written
+   by vocab.html / keisan.html. It is synced on a SEPARATE Firebase node with a
+   monotonic merge (numbers only ever move up / best times only down), so an empty
+   device can never overwrite the real progress. Cards also re-read on return. */
+function _lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+function _lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function _num(x){x=+x;return isFinite(x)?x:0;}
+function _dnum(d){if(!d)return 0;var p=(''+d).split('-');return _num(p[0])*10000+_num(p[1])*100+_num(p[2]);}
+function mergeVocab(a,b){
+  if(!a)return b||null; if(!b)return a;
+  if(_num(a.learned)!==_num(b.learned))return _num(a.learned)>_num(b.learned)?a:b;
+  return _num(a.updated)>=_num(b.updated)?a:b;
+}
+function mergeKeisan(a,b){
+  if(!a)return b||null; if(!b)return a;
+  var best={},ab=a.best||{},bb=b.best||{},k;
+  for(k in ab)best[k]=ab[k];
+  for(k in bb)best[k]=(best[k]==null)?bb[k]:Math.min(best[k],bb[k]);
+  var res={best:best},da=_dnum(a.date),db=_dnum(b.date);
+  if(da===db){res.date=a.date||b.date;res.today=Math.max(_num(a.today),_num(b.today));res.lastAcc=Math.max(_num(a.lastAcc),_num(b.lastAcc));}
+  else if(da>db){res.date=a.date;res.today=_num(a.today);res.lastAcc=a.lastAcc;}
+  else{res.date=b.date;res.today=_num(b.today);res.lastAcc=b.lastAcc;}
+  return res;
+}
+function appStatsSync(){
+  if(!SYNC.on||!SYNC.astatRef)return;
+  var lv=_lsGet('vocab_stats'),lk=_lsGet('keisan_stats');
+  var rv=(SYNC.astatRemote&&SYNC.astatRemote.vocab)||null,rk=(SYNC.astatRemote&&SYNC.astatRemote.keisan)||null;
+  var mv=mergeVocab(lv,rv),mk=mergeKeisan(lk,rk);
+  if(JSON.stringify(mv)!==JSON.stringify(lv))_lsSet('vocab_stats',mv);
+  if(JSON.stringify(mk)!==JSON.stringify(lk))_lsSet('keisan_stats',mk);
+  renderVocab();renderCalc();
+  var beatsRemote=(JSON.stringify(mv)!==JSON.stringify(rv))||(JSON.stringify(mk)!==JSON.stringify(rk));
+  var js=JSON.stringify({v:mv,k:mk});
+  if(beatsRemote&&js!==SYNC.astatSent){
+    SYNC.astatSent=js;
+    SYNC.astatRef.set({vocab:mv||null,keisan:mk||null,updatedAt:Date.now(),updatedBy:DEVICE}).catch(function(){});
+  }
+}
+function refreshAppCards(){try{renderVocab();renderCalc();}catch(e){}if(SYNC.on)appStatsSync();}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshAppCards();});
+window.addEventListener('pageshow',refreshAppCards);
+window.addEventListener('focus',refreshAppCards);
 
 render();
 if(SYNC.creds)initSync();
