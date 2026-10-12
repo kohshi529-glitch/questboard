@@ -140,7 +140,7 @@
   #dad{display:none;position:fixed;inset:0;background:var(--paper);z-index:80;overflow:auto;padding:16px}
   #dad .inner{max-width:520px;margin:0 auto}
   label{display:block;font-size:.8rem;font-weight:700;margin:10px 0 3px;color:var(--soft)}
-  input,textarea{width:100%;font-family:inherit;font-size:.9rem;padding:8px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  input,textarea,select{width:100%;font-family:inherit;font-size:.9rem;padding:8px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
   textarea{min-height:70px;resize:vertical}
   /* 宿題は随時書き替えるため、編集欄を約3倍の高さに広げる */
   #d_homework{min-height:210px;font-size:.95rem;line-height:1.6}
@@ -269,6 +269,17 @@
   </div>
 
   <div class="sec">
+    <h3>🗑️ 計算ベストの削除（まちがえた記録の修正）</h3>
+    <p class="hint">まちがえて記録されたベストタイムを1つ消せます。対象・演算・難易度を選んで削除。同期中なら全端末・クラウドに反映され、復活しません（別の新しい記録を出せばまた表示されます）。</p>
+    <div class="two">
+      <div><label>対象</label><select id="del_role"><option value="child">👧 娘</option><option value="papa">🧔 パパ</option></select></div>
+      <div><label>演算</label><select id="del_mode"><option value="add">たし算</option><option value="sub">ひき算</option><option value="mul">かけ算</option><option value="div">わり算</option><option value="mix" selected>ミックス</option></select></div>
+    </div>
+    <label>難易度</label><select id="del_diff"><option value="0">やさしい</option><option value="1" selected>ふつう</option><option value="2">むずかしい</option></select>
+    <button class="btn gray" style="margin-top:8px" onclick="deleteBestUI()">🗑️ このマスのベストを削除</button>
+  </div>
+
+  <div class="sec">
     <h3>🔄 二台同期（Firebase・任意）</h3>
     <p class="hint">父と娘の端末を同じ「ルームID」でつなぐと、進捗がリアルタイムで共有されます。設定すると引き継ぎコードは不要になります（端末ごとに1回だけ）。</p>
     <label>Firebase設定（コンソールの firebaseConfig を貼り付け）</label>
@@ -345,7 +356,7 @@ function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
-const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null,astatRef:null,astatRemote:null,astatSent:''};
+const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null,astatRef:null,astatRemote:null,astatSent:'',pendDel:null};
 try{SYNC.creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}try{if(S&&S.prog&&(S.prog.clears>0||(S.history&&Object.keys(S.history).length)||(S.rewards&&S.rewards.length))){localStorage.setItem('qb_backup',JSON.stringify({t:Date.now(),s:S}));}}catch(e){}}
 /* 毎日選ぶクエストの初期値：英語の1つ目・国語の1つ目を自動選択（えらび直しは従来どおり可） */
@@ -440,7 +451,7 @@ function renderCalc(){
     +'<div class="c-cap">'+cap+'</div>'+grid
     +'<a class="c-open" href="./keisan.html">▶ 計算をはじめる</a></div>';
 }
-function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var learned=st.learned||0;var pct=Math.min(100,Math.round(learned/goal*100));el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+learned+' 語</span></div><div class="v-bar"><div class="v-fill" style="width:'+pct+'%"></div></div><div class="v-sub">合格までの目標 約'+goal.toLocaleString()+'語 ／ 覚えた '+learned+'語（'+pct+'%）</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
+function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var learned=st.learned||0;var deck=st.deckSize||0;var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
 function hwResetAll(){if(!S.homework||!S.homework.length){alert('宿題がまだありません');return;}if(!confirm('宿題のチェックを全部リセットしますか？'))return;S.homework.forEach(function(h){h.done=false;});save();maybeSync();renderHomework();alert('宿題のチェックをリセットしました');}
 function copyText(t,msg){try{navigator.clipboard.writeText(t);}catch(e){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}try{showCheer(msg||'コピーしたよ📋');}catch(e){}}
 function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','🎊','👑','💛','🥳']:['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<N;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=((big?2:1.5)+Math.random()*1.5)+'s';s.style.fontSize=((big?1.5:1)+Math.random()*(big?1.6:1.4))+'rem';document.body.appendChild(s);setTimeout(function(){s.remove();},4200);}}
@@ -682,6 +693,13 @@ function mergeKeisan(a,b){
   else{res.date=b.date;res.today=_num(b.today);res.lastAcc=b.lastAcc;}
   return res;
 }
+function mergeDel(a,b){var o={},k;for(k in (a||{}))o[k]=a[k];for(k in (b||{}))o[k]=b[k];return o;}
+function applyDel(best,del){ // del={key:秒}。best[key]がその値と一致したら消す（別の新記録なら残す＝自動復活）
+  if(!best||!del)return best;var out={},any=false,k;
+  for(k in best){if(del[k]!=null&&best[k]===del[k]){any=true;continue;}out[k]=best[k];}
+  return any?out:best;
+}
+function withBest(ks,best){if(!ks)return best?{best:best}:null;var o={},k;for(k in ks)o[k]=ks[k];o.best=best||{};return o;}
 function appStatsSync(){
   if(!SYNC.on||!SYNC.astatRef)return;
   var role=calcOwner();
@@ -690,32 +708,69 @@ function appStatsSync(){
   var rv=rem.vocab||null;
   var childRem=(rem.child&&rem.child.keisan)||rem.keisan/*旧形式→child扱い*/||null;
   var papaRem=(rem.papa&&rem.papa.keisan)||null;
+  var remCd=(rem.child&&rem.child.del)||{},remPd=(rem.papa&&rem.papa.del)||{};
+  var pend=SYNC.pendDel||{child:{},papa:{}};
+  var childDel=mergeDel(remCd,pend.child),papaDel=mergeDel(remPd,pend.papa);
+  var myDel=(role==='papa')?papaDel:childDel;
+  // 自分の役割の削除指定を端末ローカルにも適用（復活防止）
+  if(lk&&lk.best){var nb=applyDel(lk.best,myDel);if(nb!==lk.best)lk=withBest(lk,nb);}
   var mv=mergeVocab(lv,rv);
   var myRem=(role==='papa')?papaRem:childRem;
   var myMerged=mergeKeisan(lk,myRem);
-  // 自分の役割のベストと単語を端末に書き戻す
+  if(myMerged&&myMerged.best)myMerged=withBest(myMerged,applyDel(myMerged.best,myDel));
+  // 書き戻し
   if(JSON.stringify(mv)!==JSON.stringify(lv))_lsSet('vocab_stats',mv);
-  if(JSON.stringify(myMerged)!==JSON.stringify(lk))_lsSet('keisan_stats',myMerged);
+  if(JSON.stringify(myMerged)!==JSON.stringify(_lsGet('keisan_stats')))_lsSet('keisan_stats',myMerged);
   var childFinal=(role==='child')?myMerged:childRem;
   var papaFinal=(role==='papa')?myMerged:papaRem;
-  // 画面に即時反映できるよう手元の同期像も更新
-  SYNC.astatRemote={vocab:mv||null,child:{keisan:childFinal||null},papa:{keisan:papaFinal||null}};
+  if(childFinal&&childFinal.best)childFinal=withBest(childFinal,applyDel(childFinal.best,childDel));
+  if(papaFinal&&papaFinal.best)papaFinal=withBest(papaFinal,applyDel(papaFinal.best,papaDel));
+  // 即時反映
+  SYNC.astatRemote={vocab:mv||null,child:{keisan:childFinal||null,del:childDel},papa:{keisan:papaFinal||null,del:papaDel}};
   renderVocab();renderCalc();
-  var oldFmt=(rem.keisan!==undefined&&!rem.child); // 旧形式ノードは新形式へ移行
+  var oldFmt=(rem.keisan!==undefined&&!rem.child);
   var beats=oldFmt
           ||(JSON.stringify(mv)!==JSON.stringify(rv))
           ||(JSON.stringify(childFinal)!==JSON.stringify(childRem))
-          ||(JSON.stringify(papaFinal)!==JSON.stringify(papaRem));
-  var js=JSON.stringify({v:mv,c:childFinal,p:papaFinal});
+          ||(JSON.stringify(papaFinal)!==JSON.stringify(papaRem))
+          ||(JSON.stringify(childDel)!==JSON.stringify(remCd))
+          ||(JSON.stringify(papaDel)!==JSON.stringify(remPd));
+  var js=JSON.stringify({v:mv,c:childFinal,p:papaFinal,cd:childDel,pd:papaDel});
   if(beats&&js!==SYNC.astatSent){
     SYNC.astatSent=js;
-    SYNC.astatRef.set({vocab:mv||null,child:{keisan:childFinal||null},papa:{keisan:papaFinal||null},updatedAt:Date.now(),updatedBy:DEVICE}).catch(function(){});
+    SYNC.astatRef.set({vocab:mv||null,child:{keisan:childFinal||null,del:childDel},papa:{keisan:papaFinal||null,del:papaDel},updatedAt:Date.now(),updatedBy:DEVICE}).catch(function(){});
   }
+}
+function deleteBest(role,key){
+  role=role==='papa'?'papa':'child';
+  var rem=SYNC.astatRemote||{};
+  var bucket=(role==='papa')?(rem.papa&&rem.papa.keisan):((rem.child&&rem.child.keisan)||rem.keisan);
+  var lk=_lsGet('keisan_stats');
+  var val=(bucket&&bucket.best&&bucket.best[key]!=null)?bucket.best[key]:((calcOwner()===role&&lk&&lk.best)?lk.best[key]:null);
+  if(val==null){return false;}
+  SYNC.pendDel=SYNC.pendDel||{child:{},papa:{}};SYNC.pendDel[role][key]=val;
+  if(calcOwner()===role&&lk&&lk.best&&lk.best[key]===val){delete lk.best[key];_lsSet('keisan_stats',lk);}
+  SYNC.astatSent='';
+  if(SYNC.on)appStatsSync();else renderCalc();
+  return true;
 }
 function paintCalcOwner(){var c=document.getElementById('own_child'),p=document.getElementById('own_papa');if(!c||!p)return;var o=calcOwner();
   function sel(b,on){b.style.background=on?'#3b6fe0':'';b.style.color=on?'#fff':'';b.style.fontWeight=on?'900':'';}
   sel(c,o==='child');sel(p,o==='papa');}
 function setCalcOwner(o){try{localStorage.setItem('qb_calc_owner',o==='papa'?'papa':'child');}catch(e){}paintCalcOwner();renderCalc();if(SYNC.on){SYNC.astatSent='';appStatsSync();}}
+function deleteBestUI(){
+  var role=document.getElementById('del_role').value,mode=document.getElementById('del_mode').value,diff=document.getElementById('del_diff').value,key=mode+diff;
+  var RN={child:'娘',papa:'パパ'},MN={add:'たし算',sub:'ひき算',mul:'かけ算',div:'わり算',mix:'ミックス'},DN={'0':'やさしい','1':'ふつう','2':'むずかしい'};
+  var rem=SYNC.astatRemote||{};
+  var bucket=(role==='papa')?(rem.papa&&rem.papa.keisan):((rem.child&&rem.child.keisan)||rem.keisan);
+  var lk=_lsGet('keisan_stats');
+  var val=(bucket&&bucket.best&&bucket.best[key]!=null)?bucket.best[key]:((calcOwner()===role&&lk&&lk.best)?lk.best[key]:null);
+  if(val==null){alert('その記録はまだありません（'+RN[role]+' ／ '+MN[mode]+' ／ '+DN[diff]+'）');return;}
+  var t=Math.floor(val/60)+':'+String(val%60).padStart(2,'0');
+  if(!confirm(RN[role]+'の '+MN[mode]+'（'+DN[diff]+'）のベスト '+t+' を削除します。よろしいですか？\n同期中なら全端末に反映されます。'))return;
+  if(deleteBest(role,key))alert('削除しました（'+RN[role]+' ／ '+MN[mode]+' ／ '+DN[diff]+'）');
+  else alert('削除できませんでした');
+}
 function refreshAppCards(){try{renderVocab();renderCalc();}catch(e){}if(SYNC.on)appStatsSync();}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshAppCards();});
 window.addEventListener('pageshow',refreshAppCards);
