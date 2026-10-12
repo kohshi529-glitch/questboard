@@ -62,6 +62,13 @@
   .c-sub{font-size:.82rem;color:#4a5a7e;font-weight:700;margin-top:6px}
   .c-open{display:block;text-align:center;background:#3b6fe0;color:#fff;padding:12px;border-radius:14px;text-decoration:none;font-weight:800;margin-top:10px;font-size:1.02rem;box-shadow:0 3px 0 #2f5bc0}
   .c-open:active{transform:translateY(2px);box-shadow:0 1px 0 #2f5bc0}
+  .c-cap{font-size:.72rem;color:#6a77a0;font-weight:800;margin:8px 0 5px}
+  .c-grid{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:5px 6px;align-items:center}
+  .c-grid .gh{font-size:.68rem;color:#8591ad;font-weight:800;text-align:center}
+  .c-grid .rl{font-size:.8rem;color:#2f5bc0;font-weight:800;white-space:nowrap;display:flex;align-items:center;gap:3px}
+  .c-grid .rl-t{font-size:.72rem}
+  .c-grid .gv{font-size:.84rem;font-weight:800;text-align:center;color:#2f5bc0;background:#fff;border:1.5px solid #cfdcff;border-radius:8px;padding:4px 2px;font-variant-numeric:tabular-nums}
+  .c-grid .gv.empty{color:#b3bcce;background:transparent;border-color:#e2e8f5}
   .badge{display:inline-block;background:var(--sun);color:#5a4300;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700;margin:2px 4px 2px 0}
   .player{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px;position:relative}
   .player.flvl-2{border-color:var(--teal)}
@@ -328,7 +335,18 @@ let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random(
 const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null,astatRef:null,astatRemote:null,astatSent:''};
 try{SYNC.creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}try{if(S&&S.prog&&(S.prog.clears>0||(S.history&&Object.keys(S.history).length)||(S.rewards&&S.rewards.length))){localStorage.setItem('qb_backup',JSON.stringify({t:Date.now(),s:S}));}}catch(e){}}
-function rollover(){if(S.day.date!==today())S.day={date:today(),picks:[],me:{},pa:{}};}
+/* 毎日選ぶクエストの初期値：英語の1つ目・国語の1つ目を自動選択（えらび直しは従来どおり可） */
+function defaultPicks(){
+  var ch=S.cfg.choice||[],cnt=(S.cfg.count==null?2:S.cfg.count),res=[],seen={};
+  ['英語','国語'].forEach(function(pfx){
+    for(var i=0;i<ch.length;i++){var q=ch[i]||'';if(q.charAt(0)==='#')continue;if(q.indexOf(pfx)===0){if(!seen[i]&&res.length<cnt){seen[i]=1;res.push(i);}break;}}
+  });
+  return res;
+}
+function rollover(){
+  if(S.day.date!==today()){S.day={date:today(),picks:defaultPicks(),me:{},pa:{},seeded:true};return;}
+  if(!S.day.seeded&&(!S.day.picks||S.day.picks.length===0)){S.day.picks=defaultPicks();S.day.seeded=true;}
+}
 
 /* sound */
 let actx;
@@ -379,7 +397,25 @@ function showCheer(t){const c=document.getElementById('cheer');document.getEleme
 function renderHomework(){var el=document.getElementById('hwCard');if(!el)return;var hw=S.homework||[];if(!hw.length){el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span></div><div class="hw-empty">宿題はまだないよ📝（先生から出たら設定から登録されます）</div></div>';return;}var done=hw.filter(function(h){return h.done;}).length;var all=done===hw.length;var items=hw.map(function(h,i){return '<div class="hw-item'+(h.done?' done':'')+'" onclick="hwToggle('+i+')"><div class="hw-box">'+(h.done?'✓':'')+'</div><div class="hw-txt">'+esc(h.t)+'</div></div>';}).join('');el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span><span class="hw-count">'+done+' / '+hw.length+(all?' 🎉':'')+'</span></div><div class="hw-list">'+items+'</div></div>';}
 function hwToggle(i){if(!S.homework||!S.homework[i])return;S.homework[i].done=!S.homework[i].done;save();maybeSync();renderHomework();if(S.homework[i].done){sWin&&sWin();if(S.homework.every(function(h){return h.done;})){showCheer('📒 宿題ぜんぶ終わったね！よくがんばりました🎉');burst&&burst();}}}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-function renderCalc(){var el=document.getElementById('calcCard');if(!el)return;var today=0,best=null;try{var s=JSON.parse(localStorage.getItem('keisan_stats')||'null');if(s){var ds=new Date();var ts=ds.getFullYear()+'-'+(ds.getMonth()+1)+'-'+ds.getDate();if(s.date===ts)today=s.today||0;if(s.best){var vals=Object.keys(s.best).map(function(k){return s.best[k];});if(vals.length)best=Math.min.apply(null,vals);}}}catch(e){}var bestTxt=best!=null?('⏱️ ベスト '+Math.floor(best/60)+':'+String(best%60).padStart(2,'0')):'タイムアタックに挑戦しよう！';el.innerHTML='<div class="card ccard"><div class="c-h"><span>⚡ 計算クエスト</span><span class="c-count">今日 '+today+' 問</span></div><div class="c-sub">'+bestTxt+'</div><a class="c-open" href="./keisan.html">▶ 計算をはじめる</a></div>';}
+function renderCalc(){
+  var el=document.getElementById('calcCard');if(!el)return;
+  var today=0,best={},any=false;
+  try{var s=JSON.parse(localStorage.getItem('keisan_stats')||'null');
+    if(s){var ds=new Date();var ts=ds.getFullYear()+'-'+(ds.getMonth()+1)+'-'+ds.getDate();if(s.date===ts)today=s.today||0;best=s.best||{};}
+  }catch(e){}
+  function ft(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');}
+  var rows=[['add','➕','たし'],['sub','➖','ひき'],['mul','✖️','かけ'],['div','➗','わり'],['mix','🎲','ミックス']];
+  var grid='<div class="c-grid"><div class="gh"></div><div class="gh">やさ</div><div class="gh">ふつう</div><div class="gh">むず</div>';
+  rows.forEach(function(r){
+    grid+='<div class="rl">'+r[1]+'<span class="rl-t">'+r[2]+'</span></div>';
+    [0,1,2].forEach(function(d){var v=best[r[0]+d];if(v!=null)any=true;grid+='<div class="gv'+(v!=null?'':' empty')+'">'+(v!=null?ft(v):'–')+'</div>';});
+  });
+  grid+='</div>';
+  var cap=any?'⏱️ ベストタイム（1セット全問正解）':'まだ記録なし — 全問正解でベストが載るよ！';
+  el.innerHTML='<div class="card ccard"><div class="c-h"><span>⚡ 計算クエスト</span><span class="c-count">今日 '+today+' 問</span></div>'
+    +'<div class="c-cap">'+cap+'</div>'+grid
+    +'<a class="c-open" href="./keisan.html">▶ 計算をはじめる</a></div>';
+}
 function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var learned=st.learned||0;var pct=Math.min(100,Math.round(learned/goal*100));el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+learned+' 語</span></div><div class="v-bar"><div class="v-fill" style="width:'+pct+'%"></div></div><div class="v-sub">合格までの目標 約'+goal.toLocaleString()+'語 ／ 覚えた '+learned+'語（'+pct+'%）</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
 function hwResetAll(){if(!S.homework||!S.homework.length){alert('宿題がまだありません');return;}if(!confirm('宿題のチェックを全部リセットしますか？'))return;S.homework.forEach(function(h){h.done=false;});save();maybeSync();renderHomework();alert('宿題のチェックをリセットしました');}
 function copyText(t,msg){try{navigator.clipboard.writeText(t);}catch(e){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}try{showCheer(msg||'コピーしたよ📋');}catch(e){}}
