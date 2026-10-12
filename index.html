@@ -86,6 +86,15 @@
   .orn.crown{top:-15px;left:50%;transform:translateX(-50%);font-size:16px}
   .lvlbadge{display:inline-block;background:#eee4cf;border-radius:10px;padding:1px 8px;font-weight:800;font-size:.72rem;color:var(--soft)}
   .flvl-5 .lvlbadge,.flvl-6 .lvlbadge{background:linear-gradient(90deg,#ffe08a,#ffc24d);color:#6b4b00}
+  /* レベル7以上の上位フレーム */
+  .player.flvl-7{border-color:#8a5cd6;border-width:3px;background:linear-gradient(180deg,#fbf7ff,#efe6ff);box-shadow:0 0 0 2px #e4d4ff,0 0 12px rgba(138,92,214,.45);animation:glow7 2.2s ease-in-out infinite alternate}
+  .player.flvl-8{border-color:#6f3fc0;border-width:3px;background:linear-gradient(180deg,#f6efff,#e7d8ff);box-shadow:0 0 0 3px #d9c2ff,0 0 16px rgba(111,63,192,.5);animation:glow7 2s ease-in-out infinite alternate}
+  .player.flvl-9{border:3px solid transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,#ff6b6b,#ffd93b,#6bcb77,#4d9fff,#b36bff) border-box;box-shadow:0 0 14px rgba(179,107,255,.45)}
+  .player.flvl-10{border:4px solid transparent;background:linear-gradient(#fffdf7,#fffdf7) padding-box,linear-gradient(120deg,#ff6b6b,#ffb14d,#ffd93b,#6bcb77,#4d9fff,#b36bff) border-box;box-shadow:0 0 0 2px #fff0b0,0 0 20px rgba(255,180,60,.55);animation:glow10 1.8s ease-in-out infinite alternate}
+  @keyframes glow7{from{box-shadow:0 0 0 2px #e4d4ff,0 0 8px rgba(138,92,214,.3)}to{box-shadow:0 0 0 2px #e4d4ff,0 0 18px rgba(138,92,214,.6)}}
+  @keyframes glow10{from{box-shadow:0 0 0 2px #fff0b0,0 0 10px rgba(255,180,60,.4)}to{box-shadow:0 0 0 2px #fff0b0,0 0 26px rgba(255,180,60,.75)}}
+  .flvl-7 .lvlbadge,.flvl-8 .lvlbadge{background:linear-gradient(90deg,#c9a8ff,#9a6bff);color:#fff}
+  .flvl-9 .lvlbadge,.flvl-10 .lvlbadge{background:linear-gradient(90deg,#ff8a8a,#ffd93b,#6bcb77,#6ba8ff);color:#3a2a00}
   .ava{width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:-6px;display:inline-block;border:1px solid var(--line)}
   .player h3{margin:0 0 6px;font-size:1rem;display:flex;align-items:center;gap:6px}
   .lvl{font-size:.72rem;color:var(--soft)}
@@ -456,8 +465,8 @@ function hwResetAll(){if(!S.homework||!S.homework.length){alert('宿題がまだ
 function copyText(t,msg){try{navigator.clipboard.writeText(t);}catch(e){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}try{showCheer(msg||'コピーしたよ📋');}catch(e){}}
 function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','🎊','👑','💛','🥳']:['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<N;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=((big?2:1.5)+Math.random()*1.5)+'s';s.style.fontSize=((big?1.5:1)+Math.random()*(big?1.6:1.4))+'rem';document.body.appendChild(s);setTimeout(function(){s.remove();},4200);}}
 const lv=xp=>Math.floor(xp/100)+1;
-function frameClass(level){return 'flvl-'+Math.min(6,Math.max(1,level));}
-function frameOrn(level){var t=Math.min(6,level),o='';if(t>=3)o+='<span class="orn tl">⭐</span><span class="orn tr">⭐</span>';if(t>=6)o+='<span class="orn bl">✨</span><span class="orn br">✨</span>';return o;}
+function frameClass(level){return 'flvl-'+Math.min(10,Math.max(1,level));}
+function frameOrn(level){var t=Math.min(10,level),o='';var topE=t>=9?'🌟':'⭐',botE=t>=9?'💎':'✨';if(t>=3)o+='<span class="orn tl">'+topE+'</span><span class="orn tr">'+topE+'</span>';if(t>=6)o+='<span class="orn bl">'+botE+'</span><span class="orn br">'+botE+'</span>';if(t>=7)o+='<span class="orn crown">👑</span>';return o;}
 function calHTML(){
   const N=16,base=new Date(),tk=today();let cells='';
   for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const on=!!(S.history&&S.history[k]);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);cells+='<div class="hcell'+(on?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')"></div>';}
