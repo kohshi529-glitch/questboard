@@ -185,6 +185,8 @@
     <div id="freezeArea"></div>
   </div>
 
+  <div id="stageTop"></div>
+
   <div class="card zoomcard">
     <div class="zoom-h">🎥 ゆうや先生の授業</div>
     <div class="zoom-when">毎週 月曜日・金曜日　16:00〜</div>
@@ -531,25 +533,26 @@ function render(){
   renderHomework();
   renderVocab();
   renderCalc();
+  const stageTop=document.getElementById('stageTop');
   const stage=document.getElementById('stage');
   if(!S.season.reward){
-    stage.innerHTML=`<div class="card chooser"><h2>このシーズン、がんばったら…<br>どのごほうびをめざす？🎯</h2>${S.cfg.rewards.map((r,i)=>`<button class="rwd" onclick="chooseReward(${i})"><span class="g">🎁</span>${r}</button>`).join('')}</div>`;
+    stage.innerHTML='';stageTop.innerHTML=`<div class="card chooser"><h2>このシーズン、がんばったら…<br>どのごほうびをめざす？🎯</h2>${S.cfg.rewards.map((r,i)=>`<button class="rwd" onclick="chooseReward(${i})"><span class="g">🎁</span>${r}</button>`).join('')}</div>`;
   }else if(S.day.picks.length<S.cfg.count){
     const need=S.cfg.count-S.day.picks.length;
     const chips=S.cfg.choice.map((q,i)=>{if(q.charAt(0)==='#')return '<div class="cathead">'+q.slice(1).trim()+'</div>';return '<div class="chip '+(S.day.picks.includes(i)?'sel':'')+'" onclick="togglePick('+i+')">'+q+'</div>';}).join('');
-    stage.innerHTML=`<div class="card chooser"><h2>今日のクエストをえらぼう！<br><span style="font-size:.85rem;color:var(--soft)">あと ${need} つ えらんでね</span></h2><div class="chips">${chips}</div></div>`;
+    stage.innerHTML='';stageTop.innerHTML=`<div class="card chooser"><h2>今日のクエストをえらぼう！<br><span style="font-size:.85rem;color:var(--soft)">あと ${need} つ えらんでね</span></h2><div class="chips">${chips}</div></div>`;
   }else{
     const mq=meQuests();
     const rc=(S.reactions&&S.reactions[today()])?('<div class="card" style="text-align:center;background:#fff0ea;border-color:#f2c3b2"><div style="font-weight:800">💌 パパからの応援</div><div style="font-size:1.7rem;margin:4px 0">'+S.reactions[today()].e+'</div><div>'+S.reactions[today()].m+'</div></div>'):'';
-    stage.innerHTML=rc+`<div class="row">
+    stageTop.innerHTML=rc+`<div class="row">
       <div class="player ${frameClass(lv(S.me.xp))}">${frameOrn(lv(S.me.xp))}<h3>${avatarHTML(S.me)} ${S.me.name}</h3><div class="lvl"><span class="lvlbadge">Lv.${lv(S.me.xp)}</span></div><div class="xpbar"><div class="xpfill" style="width:${S.me.xp%100}%"></div></div>
         ${mq.map(q=>`<div class="quest ${S.day.me[q.key]?'done':''}" onclick="toggle('me','${q.key}')"><div class="chk">${S.day.me[q.key]?'✓':''}</div><div>${q.label}</div></div>`).join('')}
         ${mq.some(q=>S.day.me[q.key])?'':`<div class="mini" style="cursor:pointer;text-decoration:underline" onclick="repick()">えらび直す</div>`}
       </div>
       <div class="player ${frameClass(lv(S.pa.xp))}">${frameOrn(lv(S.pa.xp))}<h3>${avatarHTML(S.pa)} ${S.pa.name}</h3><div class="lvl"><span class="lvlbadge">Lv.${lv(S.pa.xp)}</span></div><div class="xpbar"><div class="xpfill" style="width:${S.pa.xp%100}%"></div></div>
         ${S.cfg.pa.map((q,i)=>`<div class="quest ${S.day.pa['p'+i]?'done':''}" onclick="toggle('pa','p'+${i})"><div class="chk">${S.day.pa['p'+i]?'✓':''}</div><div>${q}</div></div>`).join('')}
-      </div></div>
-      <div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：${S.prog.gacha}回）</div></div>
+      </div></div>`;
+    stage.innerHTML=`<div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：${S.prog.gacha}回）</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
         <div class="calwrap">${calHTML()}</div>
         <div class="legend"><span><i class="l-on"></i>クリア</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span><span>📷=写真あり</span></div>
