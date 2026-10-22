@@ -109,14 +109,15 @@
   .tiphint{font-size:15px;color:var(--ink-faint);font-weight:700}
   .listen{position:absolute;top:14px;right:14px;border:none;background:var(--accent-soft);color:var(--accent-d);width:52px;height:52px;border-radius:50%;font-size:23px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
   .listen:active{transform:scale(.92)}
-  .b-label{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+  .b-read{font-family:var(--jp);font-size:16px;font-weight:700;color:var(--ink-soft);margin-bottom:2px}
   .b-word{font-family:var(--jp);font-weight:700;font-size:clamp(24px,7vw,32px);color:var(--sc);margin-bottom:16px}
   .def{font-family:var(--jp);font-size:clamp(20px,5.6vw,27px);line-height:1.5;color:var(--ink);font-weight:700;max-width:22ch}
   .ex{margin-top:16px;font-family:var(--jp);font-size:clamp(16px,4.6vw,20px);line-height:1.6;color:var(--ink-soft);font-style:normal;max-width:24ch}
   .ex b{color:var(--warm);font-style:normal;font-weight:800}
   .jp{margin-top:16px}
   .jp button{border:1px dashed var(--line2);background:transparent;color:var(--ink-faint);font-family:var(--jp);font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 14px;cursor:pointer}
-  .jp .word-jp{font-family:var(--jp);font-weight:700;color:var(--ink-soft);font-size:15px}
+  .jp .word-jp{display:inline-block;font-family:var(--jp);font-weight:700;color:var(--ink-soft);font-size:15px}
+  .jp .word-en{display:block;font-family:var(--body);font-weight:700;font-style:italic;color:var(--ink-faint);font-size:14px;margin-top:5px}
 
   .controls{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:16px}
   .nav{border:1px solid var(--line2);background:var(--card);color:var(--ink);width:54px;height:54px;border-radius:16px;font-size:22px;cursor:pointer;box-shadow:var(--shadow);font-weight:800}
@@ -175,7 +176,7 @@
         </div>
         <div class="face back">
           <button class="listen" onclick="speakWord(event)" aria-label="listen">🔊</button>
-          <div class="b-label">いみ</div>
+          <div class="b-read" id="bRead">よみ</div>
           <div class="b-word" id="bWord">word</div>
           <div class="def" id="bDef">definition</div>
           <div class="ex" id="bEx"></div>
@@ -413,6 +414,13 @@ const STAGES=[
 
 const TOTAL=STAGES.reduce(function(n,s){return n+s.words.length;},0);
 const GOAL=1400;
+const EN={
+"我慢":"patience; endure","油断":"carelessness; off guard","得意":"good at; proud","苦手":"weak at; not good at","単純":"simple","複雑":"complex; complicated","丁寧":"polite; careful","平気":"unbothered; calm","真剣":"serious; earnest","夢中":"absorbed; crazy about","感心":"admiration; be impressed","感動":"be moved; touched","工夫":"ingenuity; device","努力":"effort","用心":"caution; care","判断":"judgment; decide","想像":"imagination","創造":"creation","比較":"comparison; compare","増加":"increase","減少":"decrease","共通":"common; shared","発達":"development; growth","発展":"development; progress","解決":"solution; solve","原因":"cause","結果":"result","目的":"purpose; aim","手段":"means; method","具体":"concrete; specific","抽象":"abstract","共感":"sympathy; empathy","反省":"reflection; self-review","覚悟":"resolve; readiness","貴重":"precious; valuable","平凡":"ordinary; plain","立派":"splendid; fine","慎重":"careful; cautious","積極":"active; positive","消極":"passive; negative",
+"冷静":"calm; cool-headed","興奮":"excitement","率直":"frank; straightforward","誠実":"sincere; honest","寛容":"tolerant; generous","謙虚":"humble; modest","強情":"stubborn; obstinate","頑固":"stubborn","臆病":"cowardly; timid","勇敢":"brave","緊張":"tension; nervous","安心":"relief; at ease","不安":"anxiety; uneasy","退屈":"boring; dull","満足":"satisfaction","不満":"dissatisfaction","期待":"expectation; hope","失望":"disappointment","困難":"difficulty; hardship","容易":"easy","豊富":"abundant; rich","乏しい":"scarce; lacking","貧弱":"poor; meager","膨大":"enormous; vast","微妙":"subtle; delicate","鮮明":"vivid; clear","曖昧":"vague; ambiguous","明確":"clear; definite","妥当":"proper; valid","適切":"appropriate; suitable","必然":"inevitable; necessity","偶然":"chance; coincidence","独特":"unique; distinctive","共存":"coexistence","対立":"conflict; opposition","協調":"cooperation; harmony","批判":"criticism","賛成":"agreement; approval","反対":"opposition; against","尊重":"respect",
+"普遍":"universal","特殊":"special; particular","客観":"objective","主観":"subjective","矛盾":"contradiction","本質":"essence; nature","象徴":"symbol","概念":"concept; idea","抽出":"extraction; extract","傾向":"tendency; trend","典型":"typical; model","要素":"element; factor","根拠":"basis; grounds","前提":"premise; precondition","仮説":"hypothesis","検証":"verification; verify","考察":"consideration; study","把握":"grasp; understand","認識":"recognition; perception","意識":"consciousness; awareness","配慮":"consideration; care","促進":"promotion; boost","抑制":"suppression; restraint","緩和":"easing; relief","克服":"overcoming","貢献":"contribution","普及":"spread; popularization","衰退":"decline","繁栄":"prosperity","顕著":"remarkable; notable","深刻":"serious; grave","潜在":"potential; latent","柔軟":"flexible","厳密":"strict; precise","普段":"usual; everyday","独創":"originality; creative","洞察":"insight","誇張":"exaggeration","謙遜":"modesty; humility","葛藤":"inner conflict; struggle",
+"示唆":"suggestion; hint","払拭":"wipe out; dispel","踏襲":"follow; inherit","進捗":"progress","吟味":"close examination","遂行":"carry out; accomplish","顧みる":"look back; reflect","培う":"cultivate; foster","携わる":"be involved in; engage","賄う":"cover; provide for","滞る":"be delayed; stagnate","煩雑":"complicated; troublesome","懸念":"concern; worry","是正":"correction; rectify","妥協":"compromise","相応":"suitable; befitting","顕在":"apparent; manifest","累積":"accumulation","逸脱":"deviation; departure","錯覚":"illusion; misperception","愛着":"attachment; fondness","郷愁":"nostalgia; homesickness","憂慮":"concern; apprehension","卓越":"excellence; superiority","潤沢":"abundant; ample","欠乏":"shortage; deficiency","寛大":"generous; lenient","悠然":"calm; composed","果敢":"bold; resolute","頑健":"robust; sturdy","怠慢":"negligence; laziness","緻密":"detailed; precise","繊細":"delicate; sensitive","大胆":"bold; daring","厳粛":"solemn","寡黙":"quiet; reticent","雄弁":"eloquent","冗長":"redundant; verbose","簡潔":"concise; brief","老練":"veteran; experienced",
+"骨が折れる":"be hard work; laborious","水に流す":"let bygones be bygones","馬が合う":"get along well","油を売る":"loaf; waste time chatting","気が置けない":"easy to be with; relaxed","猫の手も借りたい":"so busy you need any help","棚に上げる":"ignore one's own faults","腑に落ちない":"not convinced","手を焼く":"have trouble with; struggle","目を疑う":"can't believe one's eyes","二の足を踏む":"hesitate","襟を正す":"straighten up; brace oneself","板につく":"become natural at it","匙を投げる":"give up","図に乗る":"get carried away","的を射る":"hit the mark; be to the point","水を差す":"spoil the mood; interfere","気が気でない":"be on edge; uneasy","口が堅い":"tight-lipped; discreet","根も葉もない":"groundless; baseless","耳が痛い":"hits a sore spot","立て板に水":"speak fluently","竹を割ったよう":"frank and open","鶴の一声":"the final word of authority","焼け石に水":"a drop in the bucket","他山の石":"a lesson from others' mistakes","五十歩百歩":"much the same; little difference","杞憂":"needless worry","推敲":"polishing one's writing","矢面に立つ":"bear the brunt","胸を借りる":"train with a stronger opponent","高をくくる":"underestimate","釘を刺す":"give a firm warning","顔が広い":"have many connections","肩を持つ":"take someone's side","手塩にかける":"raise with great care","青天の霹靂":"a bolt from the blue","急がば回れ":"slow and steady wins","覆水盆に返らず":"what's done can't be undone","枚挙にいとまがない":"too many to count"
+};
 var known=loadKnown();
 var si=0, order=[], idx=0, flipped=false, filterOn=false;
 
@@ -461,6 +469,7 @@ function render(){
   document.getElementById('fEmoji').textContent=c.e;
   document.getElementById('fWord').textContent=c.w;
   document.getElementById('fPos').textContent=c.pos;
+  document.getElementById('bRead').textContent=c.pos;
   document.getElementById('bWord').textContent=c.w;
   document.getElementById('bDef').textContent=c.def;
   document.getElementById('bEx').innerHTML=c.ex;
@@ -481,7 +490,8 @@ function toggleKnow(){var c=curCard();known[c.w]=!known[c.w];saveKnown();
   render();if(allNow)setTimeout(function(){showDone(STAGES[si].name);},250);}
 function toggleFilter(){filterOn=!filterOn;idx=0;render();}
 function shuffle(){for(var i=order.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=order[i];order[i]=order[j];order[j]=t;}idx=0;render();}
-function toggleJp(ev){ev.stopPropagation();var c=curCard();document.getElementById('jpBtn').outerHTML='<span class="word-jp" id="jpBtn">💡 '+c.jp+'</span>';}
+function fmtHint(j){return /^(対義|意味|類似|同義|反対)/.test(j)?j:'類似：'+j;}
+function toggleJp(ev){ev.stopPropagation();var c=curCard();var en=EN[c.w]?'<span class="word-en">'+EN[c.w]+'</span>':'';document.getElementById('jpBtn').outerHTML='<span class="word-jp" id="jpBtn">💡 '+fmtHint(c.jp)+en+'</span>';}
 var enVoice=null;
 function pickVoice(){try{if(!('speechSynthesis'in window))return;var vs=window.speechSynthesis.getVoices()||[];if(!vs.length)return;
   enVoice=vs.filter(function(v){return /ja[-_]JP/i.test(v.lang);})[0]
