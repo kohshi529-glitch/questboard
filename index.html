@@ -56,6 +56,12 @@
   .v-sub{font-size:.8rem;color:#4b6b64;font-weight:700;margin-top:6px}
   .v-open{display:block;text-align:center;background:#1f9e8e;color:#fff;padding:12px;border-radius:14px;text-decoration:none;font-weight:800;margin-top:10px;font-size:1.02rem;box-shadow:0 3px 0 #17867a}
   .v-open:active{transform:translateY(2px);box-shadow:0 1px 0 #17867a}
+  .jvcard{border:2px solid #8a5cd6;background:#f3eefb}
+  .jvcard .v-count{color:#6a4b97}
+  .jvcard .v-fill{background:linear-gradient(90deg,#9a6bff,#c08adf)}
+  .jvcard .v-sub{color:#5a4b73}
+  .jvcard .v-open{background:#8a5cd6;box-shadow:0 3px 0 #6f3fc0}
+  .jvcard .v-open:active{box-shadow:0 1px 0 #6f3fc0}
   .ccard{border:2px solid #3b6fe0;background:#e9effc}
   .c-h{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:6px;justify-content:space-between}
   .c-count{font-size:.82rem;color:#2f5bc0;font-weight:800}
@@ -200,6 +206,8 @@
   <div id="hwCard"></div>
 
   <div id="vocabCard"></div>
+
+  <div id="jvocabCard"></div>
 
   <div id="calcCard"></div>
 
@@ -463,6 +471,7 @@ function renderCalc(){
     +'<a class="c-open" href="./keisan.html">▶ 計算をはじめる</a></div>';
 }
 function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var learned=st.learned||0;var deck=st.deckSize||0;var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
+function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var learned=st.learned||0;var deck=st.deckSize||0;var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';}
 function hwResetAll(){if(!S.homework||!S.homework.length){alert('宿題がまだありません');return;}if(!confirm('宿題のチェックを全部リセットしますか？'))return;S.homework.forEach(function(h){h.done=false;});save();maybeSync();renderHomework();alert('宿題のチェックをリセットしました');}
 function copyText(t,msg){try{navigator.clipboard.writeText(t);}catch(e){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}try{showCheer(msg||'コピーしたよ📋');}catch(e){}}
 function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','🎊','👑','💛','🥳']:['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<N;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=((big?2:1.5)+Math.random()*1.5)+'s';s.style.fontSize=((big?1.5:1)+Math.random()*(big?1.6:1.4))+'rem';document.body.appendChild(s);setTimeout(function(){s.remove();},4200);}}
@@ -532,6 +541,7 @@ function render(){
 
   renderHomework();
   renderVocab();
+  renderJvocab();
   renderCalc();
   const stageTop=document.getElementById('stageTop');
   const stage=document.getElementById('stage');
@@ -715,9 +725,9 @@ function withBest(ks,best){if(!ks)return best?{best:best}:null;var o={},k;for(k 
 function appStatsSync(){
   if(!SYNC.on||!SYNC.astatRef)return;
   var role=calcOwner();
-  var lv=_lsGet('vocab_stats'),lk=_lsGet('keisan_stats');
+  var lv=_lsGet('vocab_stats'),lk=_lsGet('keisan_stats'),ljv=_lsGet('jvocab_stats');
   var rem=SYNC.astatRemote||{};
-  var rv=rem.vocab||null;
+  var rv=rem.vocab||null,rjv=rem.jvocab||null;
   var childRem=(rem.child&&rem.child.keisan)||rem.keisan/*旧形式→child扱い*/||null;
   var papaRem=(rem.papa&&rem.papa.keisan)||null;
   var remCd=(rem.child&&rem.child.del)||{},remPd=(rem.papa&&rem.papa.del)||{};
@@ -726,31 +736,33 @@ function appStatsSync(){
   var myDel=(role==='papa')?papaDel:childDel;
   // 自分の役割の削除指定を端末ローカルにも適用（復活防止）
   if(lk&&lk.best){var nb=applyDel(lk.best,myDel);if(nb!==lk.best)lk=withBest(lk,nb);}
-  var mv=mergeVocab(lv,rv);
+  var mv=mergeVocab(lv,rv),mjv=mergeVocab(ljv,rjv);
   var myRem=(role==='papa')?papaRem:childRem;
   var myMerged=mergeKeisan(lk,myRem);
   if(myMerged&&myMerged.best)myMerged=withBest(myMerged,applyDel(myMerged.best,myDel));
   // 書き戻し
   if(JSON.stringify(mv)!==JSON.stringify(lv))_lsSet('vocab_stats',mv);
+  if(JSON.stringify(mjv)!==JSON.stringify(ljv))_lsSet('jvocab_stats',mjv);
   if(JSON.stringify(myMerged)!==JSON.stringify(_lsGet('keisan_stats')))_lsSet('keisan_stats',myMerged);
   var childFinal=(role==='child')?myMerged:childRem;
   var papaFinal=(role==='papa')?myMerged:papaRem;
   if(childFinal&&childFinal.best)childFinal=withBest(childFinal,applyDel(childFinal.best,childDel));
   if(papaFinal&&papaFinal.best)papaFinal=withBest(papaFinal,applyDel(papaFinal.best,papaDel));
   // 即時反映
-  SYNC.astatRemote={vocab:mv||null,child:{keisan:childFinal||null,del:childDel},papa:{keisan:papaFinal||null,del:papaDel}};
-  renderVocab();renderCalc();
+  SYNC.astatRemote={vocab:mv||null,jvocab:mjv||null,child:{keisan:childFinal||null,del:childDel},papa:{keisan:papaFinal||null,del:papaDel}};
+  renderVocab();renderJvocab();renderCalc();
   var oldFmt=(rem.keisan!==undefined&&!rem.child);
   var beats=oldFmt
           ||(JSON.stringify(mv)!==JSON.stringify(rv))
           ||(JSON.stringify(childFinal)!==JSON.stringify(childRem))
           ||(JSON.stringify(papaFinal)!==JSON.stringify(papaRem))
           ||(JSON.stringify(childDel)!==JSON.stringify(remCd))
-          ||(JSON.stringify(papaDel)!==JSON.stringify(remPd));
-  var js=JSON.stringify({v:mv,c:childFinal,p:papaFinal,cd:childDel,pd:papaDel});
+          ||(JSON.stringify(papaDel)!==JSON.stringify(remPd))
+          ||(JSON.stringify(mjv)!==JSON.stringify(rjv));
+  var js=JSON.stringify({v:mv,jv:mjv,c:childFinal,p:papaFinal,cd:childDel,pd:papaDel});
   if(beats&&js!==SYNC.astatSent){
     SYNC.astatSent=js;
-    SYNC.astatRef.set({vocab:mv||null,child:{keisan:childFinal||null,del:childDel},papa:{keisan:papaFinal||null,del:papaDel},updatedAt:Date.now(),updatedBy:DEVICE}).catch(function(){});
+    SYNC.astatRef.set({vocab:mv||null,jvocab:mjv||null,child:{keisan:childFinal||null,del:childDel},papa:{keisan:papaFinal||null,del:papaDel},updatedAt:Date.now(),updatedBy:DEVICE}).catch(function(){});
   }
 }
 function deleteBest(role,key){
@@ -783,7 +795,7 @@ function deleteBestUI(){
   if(deleteBest(role,key))alert('削除しました（'+RN[role]+' ／ '+MN[mode]+' ／ '+DN[diff]+'）');
   else alert('削除できませんでした');
 }
-function refreshAppCards(){try{renderVocab();renderCalc();}catch(e){}if(SYNC.on)appStatsSync();}
+function refreshAppCards(){try{renderVocab();renderJvocab();renderCalc();}catch(e){}if(SYNC.on)appStatsSync();}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshAppCards();});
 window.addEventListener('pageshow',refreshAppCards);
 window.addEventListener('focus',refreshAppCards);

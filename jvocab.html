@@ -1,0 +1,505 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>中学入試 語彙クエスト</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Noto+Sans+JP:wght@500;700&display=swap">
+<style>
+  :root{
+    --bg:#f4f1e8; --card:#ffffff; --card2:#fbf9f3;
+    --ink:#283042; --ink-soft:#5a6475; --ink-faint:#8b94a4;
+    --line:#e6e1d4; --line2:#d8d2c2;
+    --accent:#1f9e8e; --accent-d:#17867a; --accent-soft:#e3f4f1;
+    --warm:#f4a23b; --warm-soft:#fcecd6;
+    --good:#2f9e5e; --good-soft:#e4f3e9;
+    --s1:#2f9e5e; --s2:#1f9e8e; --s3:#e0892a; --s4:#d6504e;
+    --shadow:0 2px 4px rgba(40,48,66,.06),0 10px 26px rgba(40,48,66,.10);
+    --disp:"Fredoka","Nunito",system-ui,sans-serif;
+    --body:"Nunito",system-ui,-apple-system,sans-serif;
+    --jp:"Noto Sans JP",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#14171d; --card:#1f232c; --card2:#262b35;
+      --ink:#eef1f6; --ink-soft:#b9c0cc; --ink-faint:#8a93a2;
+      --line:#333945; --line2:#3e4552;
+      --accent:#49c9b7; --accent-d:#39b3a2; --accent-soft:#1d3330;
+      --warm:#f3b05f; --warm-soft:#33291a;
+      --good:#6fcf90; --good-soft:#1e3326;
+      --s1:#6fcf90; --s2:#49c9b7; --s3:#eab464; --s4:#f0807e;
+      --shadow:0 2px 4px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#14171d; --card:#1f232c; --card2:#262b35;
+    --ink:#eef1f6; --ink-soft:#b9c0cc; --ink-faint:#8a93a2;
+    --line:#333945; --line2:#3e4552;
+    --accent:#49c9b7; --accent-d:#39b3a2; --accent-soft:#1d3330;
+    --warm:#f3b05f; --warm-soft:#33291a;
+    --good:#6fcf90; --good-soft:#1e3326;
+    --s1:#6fcf90; --s2:#49c9b7; --s3:#eab464; --s4:#f0807e;
+    --shadow:0 2px 4px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:560px;margin:0 auto;padding-block:20px 30px;padding-left:18px;padding-right:18px;min-height:100%;display:flex;flex-direction:column}
+  .toboard{align-self:flex-start;display:inline-flex;align-items:center;gap:5px;font-family:var(--jp);font-weight:800;font-size:13px;color:var(--accent-d);background:var(--card);border:1.5px solid var(--line2);border-radius:999px;padding:7px 14px;text-decoration:none;box-shadow:var(--shadow);margin-bottom:4px}
+  .toboard:active{transform:translateY(1px)}
+  #home{flex:1;display:flex;flex-direction:column}
+  header{text-align:center;margin-bottom:8px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-d);font-weight:800;margin:0}
+  h1{font-family:var(--disp);font-weight:700;font-size:26px;margin:2px 0 0;color:var(--ink)}
+  .bar{flex:1;height:9px;background:var(--line);border-radius:999px;overflow:hidden}
+  .fill{height:100%;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3),var(--s4));width:0%;transition:width .4s}
+  .goalbox{margin:14px auto 20px;max-width:420px;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;box-shadow:var(--shadow);padding:16px 18px}
+  .goal-top{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:800;color:var(--ink-soft)}
+  .goal-top .goal-v{color:var(--accent-d)}
+  .goal-main{font-family:var(--disp);font-weight:700;font-size:30px;color:var(--ink);margin:6px 0 10px}
+  .goal-main .goal-unit{font-size:15px;color:var(--ink-faint);font-weight:700}
+  .goalbox .bar{height:11px;margin:0}
+  .goal-sub{margin-top:8px;font-size:12px;color:var(--ink-faint);font-weight:700}
+
+  /* home: stage list — cards sized to content, bigger text (NOT stretched) */
+  .stages{display:grid;gap:12px;margin:14px 0}
+  .stage-card{background:var(--card);border:1px solid var(--line);border-left:7px solid var(--sc);border-radius:18px;
+    box-shadow:var(--shadow);padding:18px 20px;cursor:pointer;display:block;width:100%;text-align:left;font-family:var(--body)}
+  .stage-card:active{transform:translateY(1px)}
+  .sc-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .sc-name{font-family:var(--disp);font-weight:700;font-size:21px;color:var(--ink)}
+  .sc-stars{font-size:15px;color:var(--sc);font-weight:800;letter-spacing:1px}
+  .sc-sub{font-size:13.5px;color:var(--ink-faint);font-weight:700;margin-top:3px}
+  .sc-prog{margin-top:13px;display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-soft);font-weight:800}
+  .sc-bar{flex:1;height:9px;background:var(--line);border-radius:999px;overflow:hidden}
+  .sc-fill{height:100%;background:var(--sc);width:0%;transition:width .4s}
+  .sc-clear{font-size:13px;color:var(--good);font-weight:800}
+  .home-tip{text-align:center;font-size:13.5px;color:var(--ink-faint);margin-top:18px;line-height:1.6}
+
+  /* study */
+  .topbar{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .back{border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:12px;padding:9px 13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+  .back svg{display:block}
+  .study-name{font-family:var(--jp)!important}
+  .back:active{transform:translateY(1px)}
+  .study-name{font-family:var(--disp);font-weight:700;font-size:17px;color:var(--ink)}
+  .study-stars{font-size:12px;color:var(--sc);font-weight:800;margin-left:auto}
+  .prog{margin:10px 0 6px;display:flex;align-items:center;gap:10px;justify-content:center;font-size:13px;color:var(--ink-soft);font-weight:700}
+  .prog .bar{max-width:220px}
+  .prog .fill{background:var(--sc)}
+
+  #study{flex:1;display:flex;flex-direction:column;min-height:0}
+  .studymid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:0}
+  .card3d{width:100%;height:clamp(360px,56vh,520px);display:flex;flex-direction:column}
+  .inner{position:relative;width:100%;flex:1;cursor:pointer}
+  .face{position:absolute;inset:0;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 22px;overflow:hidden;opacity:0;pointer-events:none;transform:scale(.97);transition:opacity .22s ease,transform .22s ease}
+  .face::before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:var(--sc)}
+  .back{background:var(--card2)}
+  .front{justify-content:center;gap:clamp(16px,3.6vh,38px)}
+  /* front shown by default; flip swaps to back. Hidden face gets pointer-events:none so taps always hit the visible face's buttons. */
+  .inner .front{opacity:1;pointer-events:auto;transform:scale(1)}
+  .inner.flip .front{opacity:0;pointer-events:none;transform:scale(.97)}
+  .inner.flip .back{opacity:1;pointer-events:auto;transform:scale(1)}
+  .emoji{font-size:clamp(96px,16vh,176px);line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.12))}
+  .word{font-family:var(--jp);font-weight:700;font-size:clamp(26px,7vw,42px);color:var(--ink);line-height:1.25;max-width:100%;overflow-wrap:anywhere;padding:0 6px}
+  .pos{margin-top:2px;font-size:16px;font-weight:700;color:var(--ink-soft);font-family:var(--jp)}
+  .tiphint{font-size:15px;color:var(--ink-faint);font-weight:700}
+  .listen{position:absolute;top:14px;right:14px;border:none;background:var(--accent-soft);color:var(--accent-d);width:52px;height:52px;border-radius:50%;font-size:23px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+  .listen:active{transform:scale(.92)}
+  .b-label{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+  .b-word{font-family:var(--jp);font-weight:700;font-size:clamp(24px,7vw,32px);color:var(--sc);margin-bottom:16px}
+  .def{font-family:var(--jp);font-size:clamp(20px,5.6vw,27px);line-height:1.5;color:var(--ink);font-weight:700;max-width:22ch}
+  .ex{margin-top:16px;font-family:var(--jp);font-size:clamp(16px,4.6vw,20px);line-height:1.6;color:var(--ink-soft);font-style:normal;max-width:24ch}
+  .ex b{color:var(--warm);font-style:normal;font-weight:800}
+  .jp{margin-top:16px}
+  .jp button{border:1px dashed var(--line2);background:transparent;color:var(--ink-faint);font-family:var(--jp);font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 14px;cursor:pointer}
+  .jp .word-jp{font-family:var(--jp);font-weight:700;color:var(--ink-soft);font-size:15px}
+
+  .controls{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:16px}
+  .nav{border:1px solid var(--line2);background:var(--card);color:var(--ink);width:54px;height:54px;border-radius:16px;font-size:22px;cursor:pointer;box-shadow:var(--shadow);font-weight:800}
+  .nav:active{transform:translateY(2px)}
+  .know{flex:1;max-width:220px;border:none;border-radius:16px;padding:16px;font-family:var(--body);font-weight:800;font-size:15px;cursor:pointer;box-shadow:var(--shadow);background:var(--sc);color:#fff}
+  .know.on{background:var(--good)}
+  .know:active{transform:translateY(2px)}
+  .row2{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .mini{border:1px solid var(--line2);background:var(--card);color:var(--ink-soft);border-radius:12px;padding:9px 14px;font-family:var(--body);font-weight:700;font-size:13px;cursor:pointer}
+  .mini:active{transform:translateY(1px)}
+  .hint-line{text-align:center;font-size:12.5px;color:var(--ink-faint);margin-top:12px;line-height:1.6}
+  .done-msg{text-align:center;background:var(--good-soft);border:1px solid var(--good);border-radius:16px;padding:14px;color:var(--good);font-weight:800;margin-top:12px}
+  @media (max-width:380px){.emoji{font-size:clamp(54px,9vh,80px)}}
+</style>
+
+<div class="wrap">
+  <a href="./index.html" class="toboard">← クエストボード</a>
+  <header>
+    <p class="eyebrow">Chugaku Vocab · 語彙カード</p>
+    <h1 id="h1">語彙カード 📖</h1>
+  </header>
+
+  <!-- HOME -->
+  <div id="home">
+    <div class="goalbox">
+      <div class="goal-top"><span>🎯 めざす目標</span><span class="goal-v">約1,400語</span></div>
+      <div class="goal-main"><span id="ovCount">0</span> <span class="goal-unit">語 覚えた</span></div>
+      <div class="bar"><div class="fill" id="ovFill"></div></div>
+      <div class="goal-sub"><span id="ovPct">0%</span> ・ いま収録 <span id="ovDeck">200</span>語（順次ふやします）</div>
+    </div>
+    <div class="stages" id="stageList"></div>
+    <div class="home-tip">やさしいステージから、少しずつ上へ。⭐が多いほど難しい単語です。<br>全部覚えたステージには「クリア！」がつきます。</div>
+  </div>
+
+  <!-- STUDY -->
+  <div id="study" hidden>
+    <div class="topbar">
+      <button class="back" onclick="showHome()" aria-label="ステージ一覧へもどる" title="ステージ一覧へもどる"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg></button>
+      <span class="study-name" id="studyName"></span>
+      <span class="study-stars" id="studyStars"></span>
+    </div>
+    <div class="studymid">
+    <div class="prog">
+      <span id="posLabel">1 / 14</span>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <span id="knownLabel">覚えた 0</span>
+    </div>
+    <div class="card3d">
+      <div class="inner" id="inner" onclick="flip()">
+        <div class="face front">
+          <button class="listen" onclick="speakWord(event)" aria-label="listen">🔊</button>
+          <div class="emoji" id="fEmoji">🙂</div>
+          <div class="word" id="fWord">word</div>
+          <div class="pos" id="fPos">adj</div>
+          <div class="tiphint">タップで いみを見る 👆</div>
+        </div>
+        <div class="face back">
+          <button class="listen" onclick="speakWord(event)" aria-label="listen">🔊</button>
+          <div class="b-label">いみ</div>
+          <div class="b-word" id="bWord">word</div>
+          <div class="def" id="bDef">definition</div>
+          <div class="ex" id="bEx"></div>
+          <div class="jp"><button id="jpBtn" onclick="toggleJp(event)">ヒントを見る</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="nav" onclick="prev()" aria-label="まえ">◀</button>
+      <button class="know" id="knowBtn" onclick="toggleKnow()">覚えた！</button>
+      <button class="nav" onclick="next()" aria-label="つぎ">▶</button>
+    </div>
+    <div class="row2">
+      <button class="mini" onclick="shuffle()">🔀 シャッフル</button>
+      <button class="mini" id="filterBtn" onclick="toggleFilter()">🔁 まだのカードだけ</button>
+    </div>
+    <div class="hint-line">カードをタップで意味を見る／🔊で読み方／「覚えた！」でチェック。<br>まずは言葉から意味を考えてみよう。</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STAGES=[
+ {name:"ステージ1 基礎",sub:"中学入試 基礎語彙",stars:2,color:"var(--s1)",words:[
+  {w:"我慢",pos:"がまん",e:"😤",def:"じっとこらえること",ex:"苦しくても<b>我慢</b>した",jp:"こらえる"},
+  {w:"油断",pos:"ゆだん",e:"😮‍💨",def:"気をゆるめて注意を忘れること",ex:"<b>油断</b>して失敗した",jp:"対義：用心"},
+  {w:"得意",pos:"とくい",e:"😎",def:"上手で自信があること",ex:"歌が<b>得意</b>だ",jp:"対義：苦手"},
+  {w:"苦手",pos:"にがて",e:"😣",def:"うまくできない・きらいなこと",ex:"虫が<b>苦手</b>だ",jp:"対義：得意"},
+  {w:"単純",pos:"たんじゅん",e:"🟢",def:"こみ入っていないこと",ex:"<b>単純</b>な問題",jp:"対義：複雑"},
+  {w:"複雑",pos:"ふくざつ",e:"🧩",def:"こみ入っていること",ex:"<b>複雑</b>な気持ち",jp:"対義：単純"},
+  {w:"丁寧",pos:"ていねい",e:"🙇",def:"心をこめてきちんとすること",ex:"<b>丁寧</b>に書く",jp:"対義：乱暴"},
+  {w:"平気",pos:"へいき",e:"😌",def:"気にしない・大丈夫なこと",ex:"寒くても<b>平気</b>だ",jp:"へっちゃら"},
+  {w:"真剣",pos:"しんけん",e:"🔥",def:"本気で取り組むこと",ex:"<b>真剣</b>に考える",jp:"本気"},
+  {w:"夢中",pos:"むちゅう",e:"🤩",def:"一つのことに心をうばわれること",ex:"ゲームに<b>夢中</b>だ",jp:"没頭"},
+  {w:"感心",pos:"かんしん",e:"👏",def:"りっぱだと思って心を動かすこと",ex:"努力に<b>感心</b>した",jp:"ほめる気持ち"},
+  {w:"感動",pos:"かんどう",e:"🥹",def:"強く心を動かされること",ex:"映画に<b>感動</b>した",jp:"心を打たれる"},
+  {w:"工夫",pos:"くふう",e:"💡",def:"うまくいくように考えること",ex:"使いやすく<b>工夫</b>する",jp:"アイデア"},
+  {w:"努力",pos:"どりょく",e:"💪",def:"がんばって力をつくすこと",ex:"毎日<b>努力</b>する",jp:"がんばり"},
+  {w:"用心",pos:"ようじん",e:"🛡️",def:"悪いことが起きないよう気をつけること",ex:"火に<b>用心</b>する",jp:"対義：油断"},
+  {w:"判断",pos:"はんだん",e:"⚖️",def:"どうするか決めること",ex:"すぐに<b>判断</b>した",jp:"見きわめる"},
+  {w:"想像",pos:"そうぞう",e:"🌈",def:"頭の中で思いえがくこと",ex:"未来を<b>想像</b>する",jp:"思いえがく"},
+  {w:"創造",pos:"そうぞう",e:"🎨",def:"新しく生み出すこと",ex:"作品を<b>創造</b>する",jp:"生み出す"},
+  {w:"比較",pos:"ひかく",e:"🆚",def:"くらべること",ex:"二つを<b>比較</b>する",jp:"くらべる"},
+  {w:"増加",pos:"ぞうか",e:"📈",def:"数や量がふえること",ex:"人口が<b>増加</b>する",jp:"対義：減少"},
+  {w:"減少",pos:"げんしょう",e:"📉",def:"数や量がへること",ex:"売上が<b>減少</b>する",jp:"対義：増加"},
+  {w:"共通",pos:"きょうつう",e:"🔗",def:"みんなに当てはまること",ex:"<b>共通</b>の趣味",jp:"対義：個別"},
+  {w:"発達",pos:"はったつ",e:"🌱",def:"だんだん育って伸びること",ex:"技術が<b>発達</b>する",jp:"発展"},
+  {w:"発展",pos:"はってん",e:"🚀",def:"さらに大きく進むこと",ex:"町が<b>発展</b>する",jp:"発達"},
+  {w:"解決",pos:"かいけつ",e:"✅",def:"問題をうまくおさめること",ex:"事件が<b>解決</b>した",jp:"かたづく"},
+  {w:"原因",pos:"げんいん",e:"🔎",def:"物事が起こるもと",ex:"事故の<b>原因</b>を調べる",jp:"対義：結果"},
+  {w:"結果",pos:"けっか",e:"🏁",def:"物事の終わりに出てくること",ex:"努力の<b>結果</b>",jp:"対義：原因"},
+  {w:"目的",pos:"もくてき",e:"🎯",def:"めざすねらい",ex:"旅行の<b>目的</b>",jp:"ねらい"},
+  {w:"手段",pos:"しゅだん",e:"🛠️",def:"目的を果たすための方法",ex:"連絡の<b>手段</b>",jp:"方法"},
+  {w:"具体",pos:"ぐたい",e:"📦",def:"はっきりした形があること",ex:"<b>具体</b>的な例",jp:"対義：抽象"},
+  {w:"抽象",pos:"ちゅうしょう",e:"🌀",def:"形のない考えだけのこと",ex:"<b>抽象</b>的な話",jp:"対義：具体"},
+  {w:"共感",pos:"きょうかん",e:"🤝",def:"相手と同じ気持ちになること",ex:"話に<b>共感</b>する",jp:"同感"},
+  {w:"反省",pos:"はんせい",e:"🪞",def:"自分の行いをふり返ること",ex:"失敗を<b>反省</b>する",jp:"ふり返る"},
+  {w:"覚悟",pos:"かくご",e:"😤",def:"つらいことを受け入れる心がまえ",ex:"<b>覚悟</b>を決める",jp:"心がまえ"},
+  {w:"貴重",pos:"きちょう",e:"💎",def:"とても大切でまれなこと",ex:"<b>貴重</b>な体験",jp:"大切"},
+  {w:"平凡",pos:"へいぼん",e:"😐",def:"ふつうで目立たないこと",ex:"<b>平凡</b>な毎日",jp:"対義：非凡"},
+  {w:"立派",pos:"りっぱ",e:"🏆",def:"すぐれていてみごとなこと",ex:"<b>立派</b>な態度",jp:"みごと"},
+  {w:"慎重",pos:"しんちょう",e:"🐢",def:"注意ぶかく行うこと",ex:"<b>慎重</b>に進める",jp:"対義：軽率"},
+  {w:"積極",pos:"せっきょく",e:"🙋",def:"自分から進んでやること",ex:"<b>積極</b>的に発言する",jp:"対義：消極"},
+  {w:"消極",pos:"しょうきょく",e:"🙇",def:"自分からはやらないこと",ex:"<b>消極</b>的な態度",jp:"対義：積極"}
+ ]},
+ {name:"ステージ2 標準",sub:"中学入試 標準",stars:3,color:"var(--s2)",words:[
+  {w:"冷静",pos:"れいせい",e:"🧊",def:"落ち着いていること",ex:"<b>冷静</b>に対応する",jp:"対義：興奮"},
+  {w:"興奮",pos:"こうふん",e:"🤯",def:"気持ちが高ぶること",ex:"試合に<b>興奮</b>する",jp:"対義：冷静"},
+  {w:"率直",pos:"そっちょく",e:"💬",def:"かざらずありのままなこと",ex:"<b>率直</b>な意見",jp:"ストレート"},
+  {w:"誠実",pos:"せいじつ",e:"🤲",def:"まじめで真心があること",ex:"<b>誠実</b>な人",jp:"まじめ"},
+  {w:"寛容",pos:"かんよう",e:"🫶",def:"心が広くゆるすこと",ex:"<b>寛容</b>な態度",jp:"対義：厳格"},
+  {w:"謙虚",pos:"けんきょ",e:"🙇",def:"えらぶらずへりくだること",ex:"<b>謙虚</b>な姿勢",jp:"対義：傲慢"},
+  {w:"強情",pos:"ごうじょう",e:"😠",def:"意地をはって譲らないこと",ex:"<b>強情</b>をはる",jp:"頑固"},
+  {w:"頑固",pos:"がんこ",e:"🪨",def:"考えを変えないこと",ex:"<b>頑固</b>な父",jp:"強情"},
+  {w:"臆病",pos:"おくびょう",e:"🫣",def:"こわがりで気が小さいこと",ex:"<b>臆病</b>な性格",jp:"対義：勇敢"},
+  {w:"勇敢",pos:"ゆうかん",e:"🦁",def:"勇気があって強いこと",ex:"<b>勇敢</b>に立ち向かう",jp:"対義：臆病"},
+  {w:"緊張",pos:"きんちょう",e:"😬",def:"気が張りつめること",ex:"本番で<b>緊張</b>する",jp:"対義：リラックス"},
+  {w:"安心",pos:"あんしん",e:"😌",def:"心配がなくなること",ex:"無事で<b>安心</b>した",jp:"対義：不安"},
+  {w:"不安",pos:"ふあん",e:"😟",def:"心配でおちつかないこと",ex:"結果が<b>不安</b>だ",jp:"対義：安心"},
+  {w:"退屈",pos:"たいくつ",e:"😑",def:"することがなくつまらないこと",ex:"話が<b>退屈</b>だ",jp:"つまらない"},
+  {w:"満足",pos:"まんぞく",e:"😊",def:"十分で心がみたされること",ex:"結果に<b>満足</b>する",jp:"対義：不満"},
+  {w:"不満",pos:"ふまん",e:"😤",def:"もの足りず納得できないこと",ex:"判定に<b>不満</b>だ",jp:"対義：満足"},
+  {w:"期待",pos:"きたい",e:"🌟",def:"よい結果を待ち望むこと",ex:"活躍を<b>期待</b>する",jp:"待ち望む"},
+  {w:"失望",pos:"しつぼう",e:"😞",def:"望みがやぶれてがっかりすること",ex:"結果に<b>失望</b>した",jp:"がっかり"},
+  {w:"困難",pos:"こんなん",e:"⛰️",def:"とてもむずかしいこと",ex:"<b>困難</b>を乗りこえる",jp:"対義：容易"},
+  {w:"容易",pos:"ようい",e:"🟢",def:"たやすいこと",ex:"<b>容易</b>な問題",jp:"対義：困難"},
+  {w:"豊富",pos:"ほうふ",e:"🌾",def:"たっぷりあること",ex:"知識が<b>豊富</b>だ",jp:"対義：乏しい"},
+  {w:"乏しい",pos:"とぼしい",e:"🏜️",def:"少なくて足りないこと",ex:"経験に<b>乏しい</b>",jp:"対義：豊富"},
+  {w:"貧弱",pos:"ひんじゃく",e:"🥀",def:"弱々しくみすぼらしいこと",ex:"<b>貧弱</b>な設備",jp:"対義：立派"},
+  {w:"膨大",pos:"ぼうだい",e:"📚",def:"ひじょうに多いこと",ex:"<b>膨大</b>な資料",jp:"ばくだい"},
+  {w:"微妙",pos:"びみょう",e:"😶",def:"ほんの少しで言い表しにくいこと",ex:"<b>微妙</b>な違い",jp:"わずか"},
+  {w:"鮮明",pos:"せんめい",e:"📷",def:"はっきりしていること",ex:"<b>鮮明</b>な映像",jp:"対義：曖昧"},
+  {w:"曖昧",pos:"あいまい",e:"🌫️",def:"はっきりしないこと",ex:"<b>曖昧</b>な返事",jp:"対義：明確"},
+  {w:"明確",pos:"めいかく",e:"✔️",def:"はっきりしていること",ex:"<b>明確</b>な答え",jp:"対義：曖昧"},
+  {w:"妥当",pos:"だとう",e:"⚖️",def:"ちょうどよく無理がないこと",ex:"<b>妥当</b>な判断",jp:"適切"},
+  {w:"適切",pos:"てきせつ",e:"👌",def:"その場にぴったり合うこと",ex:"<b>適切</b>な処置",jp:"対義：不適切"},
+  {w:"必然",pos:"ひつぜん",e:"🔗",def:"かならずそうなること",ex:"<b>必然</b>の結果",jp:"対義：偶然"},
+  {w:"偶然",pos:"ぐうぜん",e:"🎲",def:"たまたま起こること",ex:"<b>偶然</b>に出会う",jp:"対義：必然"},
+  {w:"独特",pos:"どくとく",e:"🦄",def:"そのものだけの特別なようす",ex:"<b>独特</b>な味",jp:"ユニーク"},
+  {w:"共存",pos:"きょうぞん",e:"🤝",def:"一緒にやっていくこと",ex:"自然と<b>共存</b>する",jp:"共に生きる"},
+  {w:"対立",pos:"たいりつ",e:"⚔️",def:"たがいに反対して争うこと",ex:"意見が<b>対立</b>する",jp:"対義：協調"},
+  {w:"協調",pos:"きょうちょう",e:"🫱",def:"力を合わせてうまくやること",ex:"<b>協調</b>して進める",jp:"対義：対立"},
+  {w:"批判",pos:"ひはん",e:"🗯️",def:"よくない点を取り上げて論じること",ex:"政策を<b>批判</b>する",jp:"批評"},
+  {w:"賛成",pos:"さんせい",e:"🙆",def:"よいと認めて同意すること",ex:"提案に<b>賛成</b>する",jp:"対義：反対"},
+  {w:"反対",pos:"はんたい",e:"🙅",def:"逆の立場をとること",ex:"計画に<b>反対</b>する",jp:"対義：賛成"},
+  {w:"尊重",pos:"そんちょう",e:"🙏",def:"大切にしてうやまうこと",ex:"意見を<b>尊重</b>する",jp:"重んじる"}
+ ]},
+ {name:"ステージ3 発展",sub:"中学入試 発展（差がつく）",stars:4,color:"var(--s3)",words:[
+  {w:"普遍",pos:"ふへん",e:"🌍",def:"どこでも当てはまること",ex:"<b>普遍</b>的な価値",jp:"対義：特殊"},
+  {w:"特殊",pos:"とくしゅ",e:"🔧",def:"特別でふつうと違うこと",ex:"<b>特殊</b>な例",jp:"対義：普遍"},
+  {w:"客観",pos:"きゃっかん",e:"👓",def:"自分の気持ちをまじえず見ること",ex:"<b>客観</b>的に見る",jp:"対義：主観"},
+  {w:"主観",pos:"しゅかん",e:"🫵",def:"自分の見方・感じ方",ex:"<b>主観</b>が強い",jp:"対義：客観"},
+  {w:"矛盾",pos:"むじゅん",e:"🔀",def:"つじつまが合わないこと",ex:"話が<b>矛盾</b>する",jp:"つじつまが合わない"},
+  {w:"本質",pos:"ほんしつ",e:"🎯",def:"そのものの一番大事な中身",ex:"問題の<b>本質</b>",jp:"核心"},
+  {w:"象徴",pos:"しょうちょう",e:"🕊️",def:"目に見えない事を形で表すもの",ex:"平和の<b>象徴</b>",jp:"シンボル"},
+  {w:"概念",pos:"がいねん",e:"🧠",def:"物事についての大まかな考え",ex:"自由の<b>概念</b>",jp:"とらえ方"},
+  {w:"抽出",pos:"ちゅうしゅつ",e:"🧪",def:"多くの中から取り出すこと",ex:"要点を<b>抽出</b>する",jp:"取り出す"},
+  {w:"傾向",pos:"けいこう",e:"📊",def:"だいたいそうなりやすい流れ",ex:"増える<b>傾向</b>にある",jp:"流れ"},
+  {w:"典型",pos:"てんけい",e:"🧱",def:"もっともそれらしい例",ex:"<b>典型</b>的な失敗",jp:"代表例"},
+  {w:"要素",pos:"ようそ",e:"🧩",def:"全体をつくるもとの部分",ex:"大事な<b>要素</b>",jp:"成分"},
+  {w:"根拠",pos:"こんきょ",e:"📑",def:"判断のよりどころ",ex:"主張の<b>根拠</b>",jp:"よりどころ"},
+  {w:"前提",pos:"ぜんてい",e:"🪜",def:"話の土台となる条件",ex:"<b>前提</b>が違う",jp:"土台"},
+  {w:"仮説",pos:"かせつ",e:"💭",def:"とりあえず立てた考え",ex:"<b>仮説</b>を立てる",jp:"かりの考え"},
+  {w:"検証",pos:"けんしょう",e:"🔬",def:"本当か確かめること",ex:"結果を<b>検証</b>する",jp:"確かめる"},
+  {w:"考察",pos:"こうさつ",e:"🧐",def:"よく考えて調べること",ex:"原因を<b>考察</b>する",jp:"深く考える"},
+  {w:"把握",pos:"はあく",e:"🫳",def:"しっかりつかんで理解すること",ex:"状況を<b>把握</b>する",jp:"つかむ"},
+  {w:"認識",pos:"にんしき",e:"👁️",def:"物事を見きわめて知ること",ex:"危険を<b>認識</b>する",jp:"とらえる"},
+  {w:"意識",pos:"いしき",e:"🧭",def:"気づいて心に留めること",ex:"時間を<b>意識</b>する",jp:"気にする"},
+  {w:"配慮",pos:"はいりょ",e:"🫶",def:"相手の事情を思いやること",ex:"体調に<b>配慮</b>する",jp:"気くばり"},
+  {w:"促進",pos:"そくしん",e:"⏩",def:"進み方を早めること",ex:"成長を<b>促進</b>する",jp:"対義：抑制"},
+  {w:"抑制",pos:"よくせい",e:"🛑",def:"おさえてひかえること",ex:"感情を<b>抑制</b>する",jp:"対義：促進"},
+  {w:"緩和",pos:"かんわ",e:"🌤️",def:"きびしさをやわらげること",ex:"痛みを<b>緩和</b>する",jp:"やわらげる"},
+  {w:"克服",pos:"こくふく",e:"🧗",def:"こまったことを乗りこえること",ex:"弱点を<b>克服</b>する",jp:"乗りこえる"},
+  {w:"貢献",pos:"こうけん",e:"🤝",def:"役に立つように力をつくすこと",ex:"社会に<b>貢献</b>する",jp:"役立つ"},
+  {w:"普及",pos:"ふきゅう",e:"📡",def:"広く行きわたること",ex:"スマホが<b>普及</b>する",jp:"広まる"},
+  {w:"衰退",pos:"すいたい",e:"📉",def:"おとろえて勢いを失うこと",ex:"産業が<b>衰退</b>する",jp:"対義：繁栄"},
+  {w:"繁栄",pos:"はんえい",e:"🌟",def:"大いに栄えること",ex:"国が<b>繁栄</b>する",jp:"対義：衰退"},
+  {w:"顕著",pos:"けんちょ",e:"🔎",def:"はっきり目立つこと",ex:"<b>顕著</b>な変化",jp:"いちじるしい"},
+  {w:"深刻",pos:"しんこく",e:"😰",def:"重大で見のがせないこと",ex:"<b>深刻</b>な問題",jp:"重大"},
+  {w:"潜在",pos:"せんざい",e:"🫧",def:"表に出ずかくれていること",ex:"<b>潜在</b>する力",jp:"対義：顕在"},
+  {w:"柔軟",pos:"じゅうなん",e:"🧘",def:"その場に応じて変えられること",ex:"<b>柔軟</b>に考える",jp:"対義：かたくな"},
+  {w:"厳密",pos:"げんみつ",e:"📐",def:"細かくきびしく正確なこと",ex:"<b>厳密</b>に調べる",jp:"きっちり"},
+  {w:"普段",pos:"ふだん",e:"🗓️",def:"いつもの時・日ごろ",ex:"<b>普段</b>の生活",jp:"日ごろ"},
+  {w:"独創",pos:"どくそう",e:"🎨",def:"自分だけの新しい工夫",ex:"<b>独創</b>的な作品",jp:"オリジナル"},
+  {w:"洞察",pos:"どうさつ",e:"🔭",def:"奥まで見ぬくこと",ex:"鋭い<b>洞察</b>",jp:"見ぬく"},
+  {w:"誇張",pos:"こちょう",e:"🐘",def:"大げさに言うこと",ex:"話を<b>誇張</b>する",jp:"大げさ"},
+  {w:"謙遜",pos:"けんそん",e:"🙇",def:"自分を低く言うこと",ex:"<b>謙遜</b>して断る",jp:"へりくだる"},
+  {w:"葛藤",pos:"かっとう",e:"😣",def:"心の中で迷い争うこと",ex:"心の<b>葛藤</b>",jp:"板ばさみ"}
+ ]},
+ {name:"ステージ4 最難",sub:"中学入試 最難語",stars:5,color:"var(--s4)",words:[
+  {w:"示唆",pos:"しさ",e:"💡",def:"それとなく示すこと",ex:"解決を<b>示唆</b>する",jp:"ほのめかす"},
+  {w:"払拭",pos:"ふっしょく",e:"🧹",def:"すっかり取り除くこと",ex:"不安を<b>払拭</b>する",jp:"ぬぐい去る"},
+  {w:"踏襲",pos:"とうしゅう",e:"👣",def:"前のやり方を受けつぐこと",ex:"方針を<b>踏襲</b>する",jp:"受けつぐ"},
+  {w:"進捗",pos:"しんちょく",e:"📶",def:"物事の進み具合",ex:"工事の<b>進捗</b>",jp:"はかどり"},
+  {w:"吟味",pos:"ぎんみ",e:"🧐",def:"よく調べて選ぶこと",ex:"材料を<b>吟味</b>する",jp:"念入りに調べる"},
+  {w:"遂行",pos:"すいこう",e:"🏃",def:"やりとげること",ex:"任務を<b>遂行</b>する",jp:"やりとげる"},
+  {w:"顧みる",pos:"かえりみる",e:"🔙",def:"ふり返って考えること",ex:"過去を<b>顧みる</b>",jp:"ふり返る"},
+  {w:"培う",pos:"つちかう",e:"🌱",def:"時間をかけて育てること",ex:"力を<b>培う</b>",jp:"養う"},
+  {w:"携わる",pos:"たずさわる",e:"🤝",def:"その仕事に関わること",ex:"研究に<b>携わる</b>",jp:"関わる"},
+  {w:"賄う",pos:"まかなう",e:"🍲",def:"やりくりして足りるようにすること",ex:"費用を<b>賄う</b>",jp:"やりくり"},
+  {w:"滞る",pos:"とどこおる",e:"🧱",def:"うまく進まず止まること",ex:"支払いが<b>滞る</b>",jp:"つかえる"},
+  {w:"煩雑",pos:"はんざつ",e:"🌀",def:"こみ入ってわずらわしいこと",ex:"<b>煩雑</b>な手続き",jp:"ややこしい"},
+  {w:"懸念",pos:"けねん",e:"😨",def:"悪くならないか心配すること",ex:"影響を<b>懸念</b>する",jp:"気がかり"},
+  {w:"是正",pos:"ぜせい",e:"🛠️",def:"悪いところを正しく直すこと",ex:"誤りを<b>是正</b>する",jp:"直す"},
+  {w:"妥協",pos:"だきょう",e:"🤝",def:"たがいにゆずり折り合うこと",ex:"<b>妥協</b>案を出す",jp:"折り合い"},
+  {w:"相応",pos:"そうおう",e:"⚖️",def:"つりあって似合うこと",ex:"実力<b>相応</b>の結果",jp:"ふさわしい"},
+  {w:"顕在",pos:"けんざい",e:"🔆",def:"はっきり表に出ていること",ex:"問題が<b>顕在</b>化する",jp:"対義：潜在"},
+  {w:"累積",pos:"るいせき",e:"🧮",def:"つもり重なること",ex:"赤字が<b>累積</b>する",jp:"積み重なる"},
+  {w:"逸脱",pos:"いつだつ",e:"🚧",def:"本来の道からそれること",ex:"ルールを<b>逸脱</b>する",jp:"外れる"},
+  {w:"錯覚",pos:"さっかく",e:"🌀",def:"実際とちがって感じること",ex:"目の<b>錯覚</b>",jp:"思いちがい"},
+  {w:"愛着",pos:"あいちゃく",e:"🧸",def:"なれ親しんで心がひかれること",ex:"古着に<b>愛着</b>がある",jp:"思い入れ"},
+  {w:"郷愁",pos:"きょうしゅう",e:"🏞️",def:"ふるさとを恋しく思うこと",ex:"<b>郷愁</b>にひたる",jp:"ノスタルジー"},
+  {w:"憂慮",pos:"ゆうりょ",e:"😟",def:"深く心配すること",ex:"事態を<b>憂慮</b>する",jp:"気づかう"},
+  {w:"卓越",pos:"たくえつ",e:"🥇",def:"とびぬけてすぐれること",ex:"<b>卓越</b>した技術",jp:"ずば抜ける"},
+  {w:"潤沢",pos:"じゅんたく",e:"💧",def:"たっぷりあって豊かなこと",ex:"<b>潤沢</b>な資金",jp:"対義：欠乏"},
+  {w:"欠乏",pos:"けつぼう",e:"🪫",def:"足りなくて欠けていること",ex:"栄養が<b>欠乏</b>する",jp:"対義：潤沢"},
+  {w:"寛大",pos:"かんだい",e:"🫶",def:"心が広くゆるやかなこと",ex:"<b>寛大</b>な処置",jp:"心が広い"},
+  {w:"悠然",pos:"ゆうぜん",e:"🐢",def:"ゆったり落ち着いているようす",ex:"<b>悠然</b>と構える",jp:"ゆったり"},
+  {w:"果敢",pos:"かかん",e:"⚔️",def:"思いきって行うこと",ex:"<b>果敢</b>に挑む",jp:"大胆"},
+  {w:"頑健",pos:"がんけん",e:"💪",def:"体ががんじょうで丈夫なこと",ex:"<b>頑健</b>な体",jp:"丈夫"},
+  {w:"怠慢",pos:"たいまん",e:"😴",def:"なまけておこたること",ex:"<b>怠慢</b>な態度",jp:"なまけ"},
+  {w:"緻密",pos:"ちみつ",e:"🧵",def:"細かくて行き届いていること",ex:"<b>緻密</b>な計画",jp:"きめ細かい"},
+  {w:"繊細",pos:"せんさい",e:"🪡",def:"細やかで感じやすいこと",ex:"<b>繊細</b>な心",jp:"対義：大ざっぱ"},
+  {w:"大胆",pos:"だいたん",e:"😎",def:"思いきりがよく恐れないこと",ex:"<b>大胆</b>な発想",jp:"対義：臆病"},
+  {w:"厳粛",pos:"げんしゅく",e:"🕯️",def:"おごそかで引きしまったようす",ex:"<b>厳粛</b>な式",jp:"おごそか"},
+  {w:"寡黙",pos:"かもく",e:"🤐",def:"口数が少ないこと",ex:"<b>寡黙</b>な人",jp:"対義：多弁"},
+  {w:"雄弁",pos:"ゆうべん",e:"🗣️",def:"よどみなく力強く話すこと",ex:"<b>雄弁</b>に語る",jp:"対義：寡黙"},
+  {w:"冗長",pos:"じょうちょう",e:"💤",def:"長くてむだが多いこと",ex:"<b>冗長</b>な文章",jp:"対義：簡潔"},
+  {w:"簡潔",pos:"かんけつ",e:"✂️",def:"短くまとまっていること",ex:"<b>簡潔</b>に話す",jp:"対義：冗長"},
+  {w:"老練",pos:"ろうれん",e:"🧓",def:"経験を積んで巧みなこと",ex:"<b>老練</b>な技",jp:"ベテラン"}
+ ]},
+ {name:"ステージ5 慣用句・ことわざ",sub:"慣用句・故事成語",stars:3,color:"var(--s2)",words:[
+  {w:"骨が折れる",pos:"ほねがおれる",e:"😓",def:"とても苦労する",ex:"この作業は<b>骨が折れる</b>",jp:"意味：苦労する"},
+  {w:"水に流す",pos:"みずにながす",e:"🌊",def:"過去のことをなかったことにする",ex:"けんかを<b>水に流す</b>",jp:"意味：忘れて仲直り"},
+  {w:"馬が合う",pos:"うまがあう",e:"🐴",def:"気が合う",ex:"彼とは<b>馬が合う</b>",jp:"意味：気が合う"},
+  {w:"油を売る",pos:"あぶらをうる",e:"🛢️",def:"むだ話をしてなまける",ex:"途中で<b>油を売る</b>",jp:"意味：なまける"},
+  {w:"気が置けない",pos:"きがおけない",e:"🤝",def:"遠慮がいらず気楽だ",ex:"<b>気が置けない</b>友",jp:"意味：気楽な"},
+  {w:"猫の手も借りたい",pos:"ねこのてもかりたい",e:"🐱",def:"とても忙しい",ex:"<b>猫の手も借りたい</b>ほど忙しい",jp:"意味：大忙し"},
+  {w:"棚に上げる",pos:"たなにあげる",e:"📦",def:"自分のことは置いておく",ex:"欠点を<b>棚に上げる</b>",jp:"意味：自分を棚上げ"},
+  {w:"腑に落ちない",pos:"ふにおちない",e:"🤔",def:"納得できない",ex:"説明が<b>腑に落ちない</b>",jp:"意味：納得いかない"},
+  {w:"手を焼く",pos:"てをやく",e:"🔥",def:"もてあまして苦労する",ex:"いたずらに<b>手を焼く</b>",jp:"意味：てこずる"},
+  {w:"目を疑う",pos:"めをうたがう",e:"😲",def:"信じられず驚く",ex:"結果に<b>目を疑う</b>",jp:"意味：驚く"},
+  {w:"二の足を踏む",pos:"にのあしをふむ",e:"🦶",def:"ためらう",ex:"値段に<b>二の足を踏む</b>",jp:"意味：ためらう"},
+  {w:"襟を正す",pos:"えりをただす",e:"🧥",def:"気を引きしめる",ex:"<b>襟を正す</b>思い",jp:"意味：気を引きしめる"},
+  {w:"板につく",pos:"いたにつく",e:"🎭",def:"動作がさまになる",ex:"司会が<b>板につく</b>",jp:"意味：慣れてうまい"},
+  {w:"匙を投げる",pos:"さじをなげる",e:"🥄",def:"見こみがなくあきらめる",ex:"治療に<b>匙を投げる</b>",jp:"意味：あきらめる"},
+  {w:"図に乗る",pos:"ずにのる",e:"😤",def:"調子にのる",ex:"ほめられて<b>図に乗る</b>",jp:"意味：つけあがる"},
+  {w:"的を射る",pos:"まとをいる",e:"🎯",def:"うまく要点をつく",ex:"<b>的を射た</b>意見",jp:"意味：要点をつく"},
+  {w:"水を差す",pos:"みずをさす",e:"💧",def:"じゃまをして気分をそぐ",ex:"盛り上がりに<b>水を差す</b>",jp:"意味：じゃまする"},
+  {w:"気が気でない",pos:"きがきでない",e:"😰",def:"心配でおちつかない",ex:"結果が<b>気が気でない</b>",jp:"意味：落ち着かない"},
+  {w:"口が堅い",pos:"くちがかたい",e:"🤐",def:"秘密をもらさない",ex:"彼は<b>口が堅い</b>",jp:"対義：口が軽い"},
+  {w:"根も葉もない",pos:"ねもはもない",e:"🚫",def:"まったく根拠がない",ex:"<b>根も葉もない</b>うわさ",jp:"意味：でたらめ"},
+  {w:"耳が痛い",pos:"みみがいたい",e:"👂",def:"弱点をつかれてつらい",ex:"注意が<b>耳が痛い</b>",jp:"意味：弱みをつかれる"},
+  {w:"立て板に水",pos:"たていたにみず",e:"💦",def:"すらすらとよく話す",ex:"<b>立て板に水</b>の説明",jp:"意味：よどみなく話す"},
+  {w:"竹を割ったよう",pos:"たけをわったよう",e:"🎍",def:"さっぱりした性格",ex:"<b>竹を割ったよう</b>な人",jp:"意味：さっぱり"},
+  {w:"鶴の一声",pos:"つるのひとこえ",e:"🕊️",def:"有力者の一言で決まる",ex:"<b>鶴の一声</b>で決定",jp:"意味：権力者の一言"},
+  {w:"焼け石に水",pos:"やけいしにみず",e:"🔥",def:"わずかで効き目がない",ex:"<b>焼け石に水</b>だ",jp:"意味：効果がない"},
+  {w:"他山の石",pos:"たざんのいし",e:"🪨",def:"他人の失敗を自分の戒めにする",ex:"<b>他山の石</b>とする",jp:"意味：教訓にする"},
+  {w:"五十歩百歩",pos:"ごじっぽひゃっぽ",e:"👣",def:"少しの違いで大差ない",ex:"どちらも<b>五十歩百歩</b>",jp:"意味：大差ない"},
+  {w:"杞憂",pos:"きゆう",e:"😧",def:"いらぬ心配",ex:"心配は<b>杞憂</b>に終わる",jp:"意味：とりこし苦労"},
+  {w:"推敲",pos:"すいこう",e:"✍️",def:"文章を練り直すこと",ex:"原稿を<b>推敲</b>する",jp:"意味：文を練る"},
+  {w:"矢面に立つ",pos:"やおもてにたつ",e:"🛡️",def:"非難を正面から受ける",ex:"責任者として<b>矢面に立つ</b>",jp:"意味：批判を受ける立場"},
+  {w:"胸を借りる",pos:"むねをかりる",e:"🤼",def:"強い相手に練習してもらう",ex:"先輩の<b>胸を借りる</b>",jp:"意味：実力者に相手してもらう"},
+  {w:"高をくくる",pos:"たかをくくる",e:"😏",def:"たいしたことないと甘く見る",ex:"相手を<b>高をくくる</b>",jp:"意味：甘く見る"},
+  {w:"釘を刺す",pos:"くぎをさす",e:"📌",def:"念をおして注意する",ex:"遅刻しないよう<b>釘を刺す</b>",jp:"意味：念を押す"},
+  {w:"顔が広い",pos:"かおがひろい",e:"🤝",def:"知り合いが多い",ex:"彼は<b>顔が広い</b>",jp:"意味：交友が広い"},
+  {w:"肩を持つ",pos:"かたをもつ",e:"🫱",def:"みかたをする",ex:"弟の<b>肩を持つ</b>",jp:"意味：味方する"},
+  {w:"手塩にかける",pos:"てしおにかける",e:"🌾",def:"大切に育てる",ex:"<b>手塩にかけた</b>作品",jp:"意味：大事に育てる"},
+  {w:"青天の霹靂",pos:"せいてんのへきれき",e:"⚡",def:"突然の大事件",ex:"まさに<b>青天の霹靂</b>だ",jp:"意味：突然の衝撃"},
+  {w:"急がば回れ",pos:"いそがばまわれ",e:"🔁",def:"急ぐなら安全な道を選べ",ex:"近道より<b>急がば回れ</b>",jp:"意味：確実が早道"},
+  {w:"覆水盆に返らず",pos:"ふくすいぼんにかえらず",e:"🪣",def:"一度したことは取り返せない",ex:"<b>覆水盆に返らず</b>だ",jp:"意味：取り返しがつかない"},
+  {w:"枚挙にいとまがない",pos:"まいきょにいとまがない",e:"🔢",def:"数えきれないほど多い",ex:"例は<b>枚挙にいとまがない</b>",jp:"意味：とても多い"}
+ ]}
+];
+
+const TOTAL=STAGES.reduce(function(n,s){return n+s.words.length;},0);
+const GOAL=1400;
+var known=loadKnown();
+var si=0, order=[], idx=0, flipped=false, filterOn=false;
+
+function loadKnown(){try{return JSON.parse(localStorage.getItem('jvocab_known')||'{}')||{};}catch(e){return {};}}
+function learnedCount(){return STAGES.reduce(function(n,s){return n+stageKnown(s);},0);}
+function writeStats(){try{localStorage.setItem('jvocab_stats',JSON.stringify({learned:learnedCount(),deckSize:TOTAL,goal:GOAL,updated:Date.now()}));}catch(e){}}
+function saveKnown(){try{localStorage.setItem('jvocab_known',JSON.stringify(known));}catch(e){}writeStats();}
+function stageKnown(s){return s.words.filter(function(c){return known[c.w];}).length;}
+
+function renderHome(){
+  var kc=learnedCount();
+  document.getElementById('ovCount').textContent=kc;
+  document.getElementById('ovFill').style.width=Math.min(100,kc/GOAL*100)+'%';
+  document.getElementById('ovPct').textContent=Math.round(kc/GOAL*100)+'%';
+  document.getElementById('ovDeck').textContent=TOTAL;
+  writeStats();
+  var html=STAGES.map(function(s,i){
+    var k=stageKnown(s), t=s.words.length, pct=Math.round(k/t*100), clear=(k===t);
+    var stars='★'.repeat(s.stars)+'☆'.repeat(5-s.stars);
+    return '<button class="stage-card" style="--sc:'+s.color+'" onclick="openStage('+i+')">'
+      +'<div class="sc-top"><span class="sc-name">'+s.name+'</span><span class="sc-stars">'+stars+'</span></div>'
+      +'<div class="sc-sub">'+s.sub+' ・ '+t+'語</div>'
+      +'<div class="sc-prog"><span>覚えた '+k+' / '+t+'</span><div class="sc-bar"><div class="sc-fill" style="width:'+pct+'%"></div></div>'
+      +(clear?'<span class="sc-clear">クリア！⭐</span>':'<span>'+pct+'%</span>')+'</div>'
+      +'</button>';
+  }).join('');
+  document.getElementById('stageList').innerHTML=html;
+}
+
+function openStage(i){si=i;order=STAGES[i].words.map(function(_,n){return n;});idx=0;filterOn=false;
+  document.getElementById('home').hidden=true;document.getElementById('study').hidden=false;
+  var s=STAGES[i];document.getElementById('study').style.setProperty('--sc',s.color);
+  document.getElementById('studyName').textContent=s.name;
+  document.getElementById('studyStars').textContent='★'.repeat(s.stars)+'☆'.repeat(5-s.stars);
+  render();window.scrollTo(0,0);
+}
+function showHome(){document.getElementById('study').hidden=true;document.getElementById('home').hidden=false;renderHome();window.scrollTo(0,0);}
+
+function activeOrder(){if(!filterOn)return order;var w=STAGES[si].words;var f=order.filter(function(n){return !known[w[n].w];});return f.length?f:order;}
+function curCard(){var o=activeOrder();if(idx>=o.length)idx=0;return STAGES[si].words[o[idx]];}
+
+function render(){
+  var w=STAGES[si].words,o=activeOrder();if(idx>=o.length)idx=o.length-1;if(idx<0)idx=0;
+  var c=w[o[idx]];
+  flipped=false;document.getElementById('inner').classList.remove('flip');
+  document.getElementById('fEmoji').textContent=c.e;
+  document.getElementById('fWord').textContent=c.w;
+  document.getElementById('fPos').textContent=c.pos;
+  document.getElementById('bWord').textContent=c.w;
+  document.getElementById('bDef').textContent=c.def;
+  document.getElementById('bEx').innerHTML=c.ex;
+  document.getElementById('jpBtn').outerHTML='<button id="jpBtn" onclick="toggleJp(event)">ヒントを見る</button>';
+  document.getElementById('posLabel').textContent=(idx+1)+' / '+o.length;
+  var k=stageKnown(STAGES[si]);
+  document.getElementById('knownLabel').textContent='覚えた '+k;
+  document.getElementById('fill').style.width=(k/w.length*100)+'%';
+  var kb=document.getElementById('knowBtn');
+  if(known[c.w]){kb.classList.add('on');kb.textContent='✓ 覚えた！';}else{kb.classList.remove('on');kb.textContent='覚えた！';}
+  document.getElementById('filterBtn').style.outline=filterOn?'2px solid '+STAGES[si].color:'none';
+}
+function flip(){flipped=!flipped;document.getElementById('inner').classList.toggle('flip',flipped);}
+function next(){var o=activeOrder();idx=(idx+1)%o.length;render();}
+function prev(){var o=activeOrder();idx=(idx-1+o.length)%o.length;render();}
+function toggleKnow(){var c=curCard();known[c.w]=!known[c.w];saveKnown();
+  var allNow=STAGES[si].words.every(function(d){return known[d.w];});
+  render();if(allNow)setTimeout(function(){showDone(STAGES[si].name);},250);}
+function toggleFilter(){filterOn=!filterOn;idx=0;render();}
+function shuffle(){for(var i=order.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=order[i];order[i]=order[j];order[j]=t;}idx=0;render();}
+function toggleJp(ev){ev.stopPropagation();var c=curCard();document.getElementById('jpBtn').outerHTML='<span class="word-jp" id="jpBtn">💡 '+c.jp+'</span>';}
+var enVoice=null;
+function pickVoice(){try{if(!('speechSynthesis'in window))return;var vs=window.speechSynthesis.getVoices()||[];if(!vs.length)return;
+  enVoice=vs.filter(function(v){return /ja[-_]JP/i.test(v.lang);})[0]
+    ||vs.filter(function(v){return /^ja/i.test(v.lang);})[0]
+    ||enVoice;}catch(e){}}
+try{if('speechSynthesis'in window){pickVoice();window.speechSynthesis.onvoiceschanged=pickVoice;}}catch(e){}
+function speakWord(ev){if(ev){ev.stopPropagation();}var c=curCard();
+  try{
+    if(!('speechSynthesis'in window)){alert('この端末は音声読み上げに対応していません');return;}
+    var ss=window.speechSynthesis;ss.cancel();if(ss.paused){try{ss.resume();}catch(e){}}
+    if(!enVoice)pickVoice();
+    var u=new SpeechSynthesisUtterance(c.pos||c.w);u.lang='ja-JP';u.rate=.95;u.pitch=1;
+    if(enVoice)u.voice=enVoice;
+    ss.speak(u);
+    // some mobile engines stall right after load; nudge with a resume on next tick
+    setTimeout(function(){try{if(ss.paused)ss.resume();}catch(e){}},80);
+  }catch(e){}}
+function showDone(name){var st=document.getElementById('study');if(document.getElementById('doneMsg'))return;var d=document.createElement('div');d.className='done-msg';d.id='doneMsg';d.textContent='🎉 '+name+' クリア！全部覚えたね！';st.insertBefore(d,st.querySelector('.card3d'));setTimeout(function(){if(d)d.remove();},4000);}
+
+renderHome();
+</script>
