@@ -4,6 +4,49 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Noto+Sans+JP:wght@500;700&display=swap">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* direct cloud sync (case A): push this drill's own progress to rooms/<room>/appstats */
+window.QB_APP='vocab';
+(function(){
+  window.qbSyncKick=function(){};
+  var creds=null;try{creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
+  if(!creds||!creds.fb||!creds.fb.databaseURL||!creds.room||!window.firebase)return;
+  var db,base;
+  try{if(!firebase.apps.length)firebase.initializeApp(creds.fb);db=firebase.database();base='rooms/'+creds.room+'/appstats';}catch(e){return;}
+  function num(x){x=+x;return isFinite(x)?x:0;}
+  function dnum(d){if(!d)return 0;var p=(''+d).split('-');return num(p[0])*10000+num(p[1])*100+num(p[2]);}
+  function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+  function role(){try{return localStorage.getItem('qb_calc_owner')==='papa'?'papa':'child';}catch(e){return 'child';}}
+  function pushVocab(key){var ls=lsGet(key+'_stats');if(!ls)return;
+    try{db.ref(base+'/'+key).transaction(function(cur){
+      if(!cur)return ls;
+      if(num(ls.learned)>num(cur.learned))return ls;
+      if(num(ls.learned)===num(cur.learned)&&num(ls.updated)>=num(cur.updated))return ls;
+      return cur;
+    },function(){},false);}catch(e){}}
+  function pushKeisan(){var ls=lsGet('keisan_stats');if(!ls)return;var r=role();
+    try{db.ref(base+'/'+r).transaction(function(cur){
+      cur=cur||{};var del=cur.del||{},ck=cur.keisan||{},best={},k,cb=ck.best||{},lb=ls.best||{};
+      for(k in cb)best[k]=cb[k];
+      for(k in lb)best[k]=(best[k]==null)?lb[k]:Math.min(best[k],lb[k]);
+      var dc=dnum(ck.date),dl=dnum(ls.date),m={best:best};
+      if(dc===dl){m.date=ck.date||ls.date;m.today=Math.max(num(ck.today),num(ls.today));m.lastAcc=Math.max(num(ck.lastAcc),num(ls.lastAcc));}
+      else if(dc>dl){m.date=ck.date;m.today=num(ck.today);m.lastAcc=ck.lastAcc;}
+      else{m.date=ls.date;m.today=num(ls.today);m.lastAcc=ls.lastAcc;}
+      m.ts=Math.max(num(ck.ts),num(ls.ts));
+      var fb={};for(k in m.best){if(del[k]!=null&&m.best[k]===del[k])continue;fb[k]=m.best[k];}m.best=fb;
+      cur.keisan=m;return cur;
+    },function(){},false);}catch(e){}}
+  function doPush(){if(window.QB_APP==='keisan')pushKeisan();else pushVocab(window.QB_APP);}
+  var t=null;
+  window.qbSyncKick=function(){clearTimeout(t);t=setTimeout(doPush,700);};
+  document.addEventListener('visibilitychange',function(){if(document.hidden)doPush();});
+  window.addEventListener('pagehide',doPush);
+  doPush();
+})();
+</script>
 <style>
   :root{
     --bg:#f4f1e8; --card:#ffffff; --card2:#fbf9f3;
@@ -418,8 +461,8 @@ var si=0, order=[], idx=0, flipped=false, filterOn=false;
 
 function loadKnown(){try{return JSON.parse(localStorage.getItem('vocab_known')||'{}')||{};}catch(e){return {};}}
 function learnedCount(){return STAGES.reduce(function(n,s){return n+stageKnown(s);},0);}
-function writeStats(){try{localStorage.setItem('vocab_stats',JSON.stringify({learned:learnedCount(),deckSize:TOTAL,goal:GOAL,updated:Date.now()}));}catch(e){}}
-function saveKnown(){try{localStorage.setItem('vocab_known',JSON.stringify(known));}catch(e){}writeStats();}
+function writeStats(){try{var o={};try{o=JSON.parse(localStorage.getItem('vocab_stats')||'{}')||{};}catch(_){}o.learned=learnedCount();o.deckSize=TOTAL;o.goal=GOAL;o.updated=Date.now();localStorage.setItem('vocab_stats',JSON.stringify(o));}catch(e){}}
+function saveKnown(){try{localStorage.setItem('vocab_known',JSON.stringify(known));}catch(e){}writeStats();try{var o=JSON.parse(localStorage.getItem('vocab_stats')||'{}');o.studiedAt=Date.now();localStorage.setItem('vocab_stats',JSON.stringify(o));}catch(e){}if(window.qbSyncKick)qbSyncKick();}
 function stageKnown(s){return s.words.filter(function(c){return known[c.w];}).length;}
 
 function renderHome(){

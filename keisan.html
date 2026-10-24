@@ -4,6 +4,49 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&family=Noto+Sans+JP:wght@500;700&display=swap">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* direct cloud sync (case A): push this drill's own progress to rooms/<room>/appstats */
+window.QB_APP='keisan';
+(function(){
+  window.qbSyncKick=function(){};
+  var creds=null;try{creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
+  if(!creds||!creds.fb||!creds.fb.databaseURL||!creds.room||!window.firebase)return;
+  var db,base;
+  try{if(!firebase.apps.length)firebase.initializeApp(creds.fb);db=firebase.database();base='rooms/'+creds.room+'/appstats';}catch(e){return;}
+  function num(x){x=+x;return isFinite(x)?x:0;}
+  function dnum(d){if(!d)return 0;var p=(''+d).split('-');return num(p[0])*10000+num(p[1])*100+num(p[2]);}
+  function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+  function role(){try{return localStorage.getItem('qb_calc_owner')==='papa'?'papa':'child';}catch(e){return 'child';}}
+  function pushVocab(key){var ls=lsGet(key+'_stats');if(!ls)return;
+    try{db.ref(base+'/'+key).transaction(function(cur){
+      if(!cur)return ls;
+      if(num(ls.learned)>num(cur.learned))return ls;
+      if(num(ls.learned)===num(cur.learned)&&num(ls.updated)>=num(cur.updated))return ls;
+      return cur;
+    },function(){},false);}catch(e){}}
+  function pushKeisan(){var ls=lsGet('keisan_stats');if(!ls)return;var r=role();
+    try{db.ref(base+'/'+r).transaction(function(cur){
+      cur=cur||{};var del=cur.del||{},ck=cur.keisan||{},best={},k,cb=ck.best||{},lb=ls.best||{};
+      for(k in cb)best[k]=cb[k];
+      for(k in lb)best[k]=(best[k]==null)?lb[k]:Math.min(best[k],lb[k]);
+      var dc=dnum(ck.date),dl=dnum(ls.date),m={best:best};
+      if(dc===dl){m.date=ck.date||ls.date;m.today=Math.max(num(ck.today),num(ls.today));m.lastAcc=Math.max(num(ck.lastAcc),num(ls.lastAcc));}
+      else if(dc>dl){m.date=ck.date;m.today=num(ck.today);m.lastAcc=ck.lastAcc;}
+      else{m.date=ls.date;m.today=num(ls.today);m.lastAcc=ls.lastAcc;}
+      m.ts=Math.max(num(ck.ts),num(ls.ts));
+      var fb={};for(k in m.best){if(del[k]!=null&&m.best[k]===del[k])continue;fb[k]=m.best[k];}m.best=fb;
+      cur.keisan=m;return cur;
+    },function(){},false);}catch(e){}}
+  function doPush(){if(window.QB_APP==='keisan')pushKeisan();else pushVocab(window.QB_APP);}
+  var t=null;
+  window.qbSyncKick=function(){clearTimeout(t);t=setTimeout(doPush,700);};
+  document.addEventListener('visibilitychange',function(){if(document.hidden)doPush();});
+  window.addEventListener('pagehide',doPush);
+  doPush();
+})();
+</script>
 <style>
   :root{
     --bg:#eef2f8; --card:#ffffff; --card2:#f7f9fc;
@@ -192,7 +235,7 @@ var stats=loadStats();
 
 function todayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 function loadStats(){var s;try{s=JSON.parse(localStorage.getItem('keisan_stats')||'null');}catch(e){}if(!s||typeof s!=='object')s={};if(s.date!==todayStr()){s.date=todayStr();s.today=0;}s.best=s.best||{};return s;}
-function saveStats(){try{localStorage.setItem('keisan_stats',JSON.stringify(stats));}catch(e){}}
+function saveStats(){stats.ts=Date.now();try{localStorage.setItem('keisan_stats',JSON.stringify(stats));}catch(e){}if(window.qbSyncKick)qbSyncKick();}
 
 function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
 function genOne(m){
