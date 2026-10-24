@@ -467,7 +467,8 @@ function renderCalc(){
   grid+='<div class="rl papa">'+paEmoji+'<span class="rl-t">'+esc(paName)+'🎲</span></div>'+cell(pb,'mix0',' papa')+cell(pb,'mix1',' papa')+cell(pb,'mix2',' papa');
   grid+='</div>';
   var cap=any?'⏱️ ベストタイム（1セット全問正解）':'まだ記録なし — 全問正解でベストが載るよ！';
-  var _clast=fmtLast(childK&&childK.ts),_clh=_clast?'<div style="font-size:12px;color:var(--ink-faint);font-weight:700;margin-top:8px;text-align:center">娘の最終学習：'+_clast+'</div>':'';
+  var _cday=(function(d){if(!d)return '';var p=(''+d).split('-');return p.length>=3?(p[1]+'/'+p[2]):'';})(childK&&childK.date);
+  var _clast=(childK&&childK.ts)?fmtLast(childK.ts):_cday,_clh=_clast?'<div style="font-size:12px;color:var(--ink-faint);font-weight:700;margin-top:8px;text-align:center">娘の最終学習：'+_clast+'</div>':'';
   el.innerHTML='<div class="card ccard"><div class="c-h"><span>⚡ 計算クエスト</span><span class="c-count">今日 '+today+' 問</span></div>'
     +'<div class="c-cap">'+cap+'</div>'+grid+_clh
     +'<a class="c-open" href="./keisan.html">▶ 計算をはじめる</a></div>';
