@@ -375,7 +375,7 @@ function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
-const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null,astatRef:null,astatRemote:null,astatSent:'',pendDel:null};
+const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null,astatRef:null,astatRemote:null,astatSent:'',pendDel:null,astatReady:false};
 try{SYNC.creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}try{if(S&&S.prog&&(S.prog.clears>0||(S.history&&Object.keys(S.history).length)||(S.rewards&&S.rewards.length))){localStorage.setItem('qb_backup',JSON.stringify({t:Date.now(),s:S}));}}catch(e){}}
 /* 毎日選ぶクエストの初期値：英語の1つ目・国語の1つ目を自動選択（えらび直しは従来どおり可） */
@@ -448,7 +448,7 @@ function renderCalc(){
   try{local=JSON.parse(localStorage.getItem('keisan_stats')||'null');
     if(local){var ds=new Date();var ts=ds.getFullYear()+'-'+(ds.getMonth()+1)+'-'+ds.getDate();if(local.date===ts)today=local.today||0;}
   }catch(e){}
-  var role=calcOwner(),rem=SYNC.astatRemote||null;
+  var role=calcOwner(),rem=SYNC.astatRemote||_lsGet('qb_appstats')||null;
   var childK=(rem&&rem.child&&rem.child.keisan)||(rem&&rem.keisan)/*旧形式*/||null;
   var papaK=(rem&&rem.papa&&rem.papa.keisan)||null;
   if(!childK&&role==='child')childK=local;
@@ -668,7 +668,7 @@ function startSync(){
   SYNC.creds={fb:cfg,room:room};localStorage.setItem('qb_sync',JSON.stringify(SYNC.creds));
   initSync();
 }
-function stopSync(){try{if(SYNC.ref)SYNC.ref.off();}catch(e){}try{if(SYNC.pref)SYNC.pref.off();}catch(e){}try{if(SYNC.astatRef)SYNC.astatRef.off();}catch(e){}SYNC.on=false;SYNC.ref=null;SYNC.pref=null;SYNC.astatRef=null;localStorage.removeItem('qb_sync');SYNC.creds=null;syncStatus('停止しました');}
+function stopSync(){try{if(SYNC.ref)SYNC.ref.off();}catch(e){}try{if(SYNC.pref)SYNC.pref.off();}catch(e){}try{if(SYNC.astatRef)SYNC.astatRef.off();}catch(e){}SYNC.on=false;SYNC.ref=null;SYNC.pref=null;SYNC.astatRef=null;SYNC.astatReady=false;localStorage.removeItem('qb_sync');SYNC.creds=null;syncStatus('停止しました');}
 function initSync(){
   if(!SYNC.creds)return;
   if(!window.firebase){syncStatus('（オフライン中：接続できたら同期します）');return;}
@@ -689,7 +689,7 @@ function initSync(){
       save();render();syncStatus('同期中 ✓（更新を受信）');
     },function(err){syncStatus('接続エラー: '+((err&&err.message)||''));});
     try{SYNC.pref=firebase.database().ref('rooms/'+SYNC.creds.room+'/photos');SYNC.pref.on('child_added',handlePhoto);SYNC.pref.on('child_changed',handlePhoto);}catch(e){}
-    try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;appStatsSync();});}catch(e){}
+    try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;SYNC.astatReady=true;if(SYNC.astatRemote)_lsSet('qb_appstats',SYNC.astatRemote);appStatsSync();});}catch(e){}
   }catch(e){syncStatus('初期化エラー: '+e.message);}
 }
 
@@ -728,6 +728,7 @@ function applyDel(best,del){ // del={key:秒}。best[key]がその値と一致�
 function withBest(ks,best){if(!ks)return best?{best:best}:null;var o={},k;for(k in ks)o[k]=ks[k];o.best=best||{};return o;}
 function appStatsSync(){
   if(!SYNC.on||!SYNC.astatRef)return;
+  if(!SYNC.astatReady){renderVocab();renderJvocab();renderCalc();return;} // サーバ未受信：キャッシュから表示のみ（astatRemote/cacheもサーバも触らない）
   var role=calcOwner();
   var lv=_lsGet('vocab_stats'),lk=_lsGet('keisan_stats'),ljv=_lsGet('jvocab_stats');
   var rem=SYNC.astatRemote||{};
@@ -752,9 +753,12 @@ function appStatsSync(){
   var papaFinal=(role==='papa')?myMerged:papaRem;
   if(childFinal&&childFinal.best)childFinal=withBest(childFinal,applyDel(childFinal.best,childDel));
   if(papaFinal&&papaFinal.best)papaFinal=withBest(papaFinal,applyDel(papaFinal.best,papaDel));
-  // 即時反映
+  // 即時反映（メモリ＋ローカルキャッシュ：再表示・一時オフラインでも消えないように）
   SYNC.astatRemote={vocab:mv||null,jvocab:mjv||null,child:{keisan:childFinal||null,del:childDel},papa:{keisan:papaFinal||null,del:papaDel}};
+  _lsSet('qb_appstats',SYNC.astatRemote);
   renderVocab();renderJvocab();renderCalc();
+  // サーバの現状を一度も受信していない間は書き込まない（空で他ロールのバケットを消さないため）
+  if(!SYNC.astatReady)return;
   var oldFmt=(rem.keisan!==undefined&&!rem.child);
   var beats=oldFmt
           ||(JSON.stringify(mv)!==JSON.stringify(rv))
@@ -766,7 +770,13 @@ function appStatsSync(){
   var js=JSON.stringify({v:mv,jv:mjv,c:childFinal,p:papaFinal,cd:childDel,pd:papaDel});
   if(beats&&js!==SYNC.astatSent){
     SYNC.astatSent=js;
-    SYNC.astatRef.set({vocab:mv||null,jvocab:mjv||null,child:{keisan:childFinal||null,del:childDel},papa:{keisan:papaFinal||null,del:papaDel},updatedAt:Date.now(),updatedBy:DEVICE}).catch(function(){});
+    // 把握しているバケットだけを update で書く。null の他ロールは payload から除外し、サーバ側を温存（消さない）
+    var _bk=function(fin,del){return (fin!=null||(del&&Object.keys(del).length))?{keisan:fin||null,del:del||{}}:null;};
+    var _pl={updatedAt:Date.now(),updatedBy:DEVICE};
+    if(mv!=null)_pl.vocab=mv; if(mjv!=null)_pl.jvocab=mjv;
+    var _cb=_bk(childFinal,childDel),_pb=_bk(papaFinal,papaDel);
+    if(_cb)_pl.child=_cb; if(_pb)_pl.papa=_pb;
+    SYNC.astatRef.update(_pl).catch(function(){});
   }
 }
 function deleteBest(role,key){
