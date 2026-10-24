@@ -85,7 +85,7 @@ window.QB_APP='keisan';
     --bad:#f0837c; --bad-soft:#3a211f;
     --shadow:0 2px 4px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.35);
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;touch-action:manipulation}
   [hidden]{display:none!important}
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
@@ -130,7 +130,7 @@ window.QB_APP='keisan';
   .ans.ng{border-color:var(--bad);background:var(--bad-soft)}
   .ngmsg{min-height:22px;font-size:15px;font-weight:800;color:var(--bad)}
   .pad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,clamp(62px,10.5vh,92px));gap:12px}
-  .key{border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:38px;cursor:pointer;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+  .key{border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:38px;cursor:pointer;box-shadow:var(--shadow);font-variant-numeric:tabular-nums;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
   .key:active{transform:translateY(2px)}
   .key.del{color:var(--bad);font-size:22px;font-family:var(--body);font-weight:800}
   .key.go{background:var(--accent);color:#fff;font-size:22px;font-family:var(--body);font-weight:800;border-color:var(--accent)}
