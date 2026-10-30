@@ -448,9 +448,14 @@ function renderCalc(){
   try{local=JSON.parse(localStorage.getItem('keisan_stats')||'null');
     if(local){var ds=new Date();var ts=ds.getFullYear()+'-'+(ds.getMonth()+1)+'-'+ds.getDate();if(local.date===ts)today=local.today||0;}
   }catch(e){}
-  var role=calcOwner(),rem=SYNC.astatRemote||_lsGet('qb_appstats')||null;
-  var childK=(rem&&rem.child&&rem.child.keisan)||(rem&&rem.keisan)/*旧形式*/||null;
-  var papaK=(rem&&rem.papa&&rem.papa.keisan)||null;
+  var role=calcOwner(),rem=SYNC.astatRemote||{},cache=_lsGet('qb_appstats')||{};
+  function _pickK(r){var a=rem[r]&&rem[r].keisan;if(a)return a;var b=cache[r]&&cache[r].keisan;if(b)return b;return null;}
+  var childK=_pickK('child')||rem.keisan||cache.keisan||null; // 旧形式フォールバックも
+  var papaK=_pickK('papa');
+  var _cDel=(rem.child&&rem.child.del)||(cache.child&&cache.child.del)||{};
+  var _pDel=(rem.papa&&rem.papa.del)||(cache.papa&&cache.papa.del)||{};
+  if(childK&&childK.best)childK=withBest(childK,applyDel(childK.best,_cDel));
+  if(papaK&&papaK.best)papaK=withBest(papaK,applyDel(papaK.best,_pDel));
   if(!childK&&role==='child')childK=local;
   if(!papaK&&role==='papa')papaK=local;
   var cb=(childK&&childK.best)||{},pb=(papaK&&papaK.best)||{};
@@ -689,7 +694,7 @@ function initSync(){
       save();render();syncStatus('同期中 ✓（更新を受信）');
     },function(err){syncStatus('接続エラー: '+((err&&err.message)||''));});
     try{SYNC.pref=firebase.database().ref('rooms/'+SYNC.creds.room+'/photos');SYNC.pref.on('child_added',handlePhoto);SYNC.pref.on('child_changed',handlePhoto);}catch(e){}
-    try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;SYNC.astatReady=true;if(SYNC.astatRemote)_lsSet('qb_appstats',SYNC.astatRemote);appStatsSync();});}catch(e){}
+    try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;SYNC.astatReady=true;if(SYNC.astatRemote)cacheAppstats(SYNC.astatRemote);appStatsSync();});}catch(e){}
   }catch(e){syncStatus('初期化エラー: '+e.message);}
 }
 
@@ -726,6 +731,14 @@ function applyDel(best,del){ // del={key:秒}。best[key]がその値と一致�
   return any?out:best;
 }
 function withBest(ks,best){if(!ks)return best?{best:best}:null;var o={},k;for(k in ks)o[k]=ks[k];o.best=best||{};return o;}
+/* 表示キャッシュ：ロールごとに「最後の非null keisan」を保持する。
+   一時的に null/欠落のスナップショットが来ても、良い値を上書きしないので表示が消えない。 */
+function cacheAppstats(a){try{if(!a)return;var c=_lsGet('qb_appstats')||{};
+  if(a.vocab)c.vocab=a.vocab; if(a.jvocab)c.jvocab=a.jvocab;
+  ['child','papa'].forEach(function(r){var nb=a[r];if(!nb)return;
+    if(nb.keisan){c[r]={keisan:nb.keisan,del:nb.del||((c[r]&&c[r].del)||{})};}
+    else if(nb.del&&Object.keys(nb.del).length){c[r]=c[r]||{};c[r].del=nb.del;}});
+  _lsSet('qb_appstats',c);}catch(e){}}
 function appStatsSync(){
   if(!SYNC.on||!SYNC.astatRef)return;
   if(!SYNC.astatReady){renderVocab();renderJvocab();renderCalc();return;} // サーバ未受信：キャッシュから表示のみ（astatRemote/cacheもサーバも触らない）
@@ -753,41 +766,41 @@ function appStatsSync(){
   var papaFinal=(role==='papa')?myMerged:papaRem;
   if(childFinal&&childFinal.best)childFinal=withBest(childFinal,applyDel(childFinal.best,childDel));
   if(papaFinal&&papaFinal.best)papaFinal=withBest(papaFinal,applyDel(papaFinal.best,papaDel));
-  // 即時反映（メモリ＋ローカルキャッシュ：再表示・一時オフラインでも消えないように）
-  SYNC.astatRemote={vocab:mv||null,jvocab:mjv||null,child:{keisan:childFinal||null,del:childDel},papa:{keisan:papaFinal||null,del:papaDel}};
-  _lsSet('qb_appstats',SYNC.astatRemote);
+  // 即時反映：自ロールは merged、他ロールはサーバ値(keisan)＋del のみ（null で潰さない）。
+  SYNC.astatRemote={
+    vocab:mv||null, jvocab:mjv||null,
+    child:(role==='child')?{keisan:childFinal||null,del:childDel}:{keisan:childRem||null,del:childDel},
+    papa:(role==='papa')?{keisan:papaFinal||null,del:papaDel}:{keisan:papaRem||null,del:papaDel}
+  };
+  cacheAppstats(SYNC.astatRemote);
   renderVocab();renderJvocab();renderCalc();
-  // サーバの現状を一度も受信していない間は書き込まない（空で他ロールのバケットを消さないため）
-  if(!SYNC.astatReady)return;
-  var oldFmt=(rem.keisan!==undefined&&!rem.child);
-  var beats=oldFmt
-          ||(JSON.stringify(mv)!==JSON.stringify(rv))
-          ||(JSON.stringify(childFinal)!==JSON.stringify(childRem))
-          ||(JSON.stringify(papaFinal)!==JSON.stringify(papaRem))
-          ||(JSON.stringify(childDel)!==JSON.stringify(remCd))
-          ||(JSON.stringify(papaDel)!==JSON.stringify(remPd))
-          ||(JSON.stringify(mjv)!==JSON.stringify(rjv));
-  var js=JSON.stringify({v:mv,jv:mjv,c:childFinal,p:papaFinal,cd:childDel,pd:papaDel});
+  // 書き込みは「自分のロールのバケット＋共有(vocab/jvocab)」だけ。他ロールの keisan は絶対に書かない（競合・消失の根絶）。
+  var mineFin=(role==='papa')?papaFinal:childFinal, mineDel=(role==='papa')?papaDel:childDel;
+  var mineRem=(role==='papa')?papaRem:childRem, mineRemDel=(role==='papa')?remPd:remCd;
+  var beats=(JSON.stringify(mv)!==JSON.stringify(rv))
+          ||(JSON.stringify(mjv)!==JSON.stringify(rjv))
+          ||(JSON.stringify(mineFin)!==JSON.stringify(mineRem))
+          ||(JSON.stringify(mineDel)!==JSON.stringify(mineRemDel));
+  var js=JSON.stringify({v:mv,jv:mjv,m:mineFin,md:mineDel,role:role});
   if(beats&&js!==SYNC.astatSent){
     SYNC.astatSent=js;
-    // 把握しているバケットだけを update で書く。null の他ロールは payload から除外し、サーバ側を温存（消さない）
-    var _bk=function(fin,del){return (fin!=null||(del&&Object.keys(del).length))?{keisan:fin||null,del:del||{}}:null;};
     var _pl={updatedAt:Date.now(),updatedBy:DEVICE};
     if(mv!=null)_pl.vocab=mv; if(mjv!=null)_pl.jvocab=mjv;
-    var _cb=_bk(childFinal,childDel),_pb=_bk(papaFinal,papaDel);
-    if(_cb)_pl.child=_cb; if(_pb)_pl.papa=_pb;
+    if(mineFin!=null||(mineDel&&Object.keys(mineDel).length))_pl[role]={keisan:mineFin||null,del:mineDel||{}};
     SYNC.astatRef.update(_pl).catch(function(){});
   }
 }
 function deleteBest(role,key){
   role=role==='papa'?'papa':'child';
-  var rem=SYNC.astatRemote||{};
+  var rem=SYNC.astatRemote||_lsGet('qb_appstats')||{};
   var bucket=(role==='papa')?(rem.papa&&rem.papa.keisan):((rem.child&&rem.child.keisan)||rem.keisan);
   var lk=_lsGet('keisan_stats');
   var val=(bucket&&bucket.best&&bucket.best[key]!=null)?bucket.best[key]:((calcOwner()===role&&lk&&lk.best)?lk.best[key]:null);
   if(val==null){return false;}
   SYNC.pendDel=SYNC.pendDel||{child:{},papa:{}};SYNC.pendDel[role][key]=val;
   if(calcOwner()===role&&lk&&lk.best&&lk.best[key]===val){delete lk.best[key];_lsSet('keisan_stats',lk);}
+  // 他ロールの削除は対象バケットの del にだけ直接トンボストーンを書く（keisan本体は所有端末が掃除。表示はrenderCalcがdelを適用して即反映）
+  if(SYNC.on&&SYNC.astatRef&&role!==calcOwner()){try{var _t={};_t[key]=val;SYNC.astatRef.child(role).child('del').update(_t);}catch(e){}}
   SYNC.astatSent='';
   if(SYNC.on)appStatsSync();else renderCalc();
   return true;
