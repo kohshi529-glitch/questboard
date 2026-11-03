@@ -173,6 +173,34 @@ window.QB_APP='vocab';
   .hint-line{text-align:center;font-size:12.5px;color:var(--ink-faint);margin-top:12px;line-height:1.6}
   .done-msg{text-align:center;background:var(--good-soft);border:1px solid var(--good);border-radius:16px;padding:14px;color:var(--good);font-weight:800;margin-top:12px}
   @media (max-width:380px){.emoji{font-size:clamp(54px,9vh,80px)}}
+
+  /* --- 今日カウンタ＆検問(テスト) --- */
+  .quizbox{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px 16px;margin:0 auto 14px;max-width:420px;text-align:center}
+  .quiz-start{width:100%;border:none;border-radius:14px;padding:13px;font-family:var(--body);font-weight:800;font-size:15px;color:#fff;background:var(--accent);box-shadow:0 3px 0 var(--accent-d);cursor:pointer}
+  .quiz-start:active{transform:translateY(2px);box-shadow:0 1px 0 var(--accent-d)}
+  .quiz-rec{margin-top:8px;font-size:12.5px;color:var(--ink-faint);font-weight:700;line-height:1.5}
+  #quiz{flex:1;display:flex;flex-direction:column;min-height:0}
+  #quiz .fill{background:var(--accent)}
+  .qcard{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;overflow:hidden}
+  .qcard::before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:var(--accent)}
+  .q-prompt{font-family:var(--jp);font-weight:700;font-size:clamp(26px,7vw,40px);color:var(--ink);text-align:center;overflow-wrap:anywhere;line-height:1.25}
+  .q-sub{font-size:15px;color:var(--ink-soft);font-weight:700;font-family:var(--jp)}
+  .q-choices{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:4px}
+  .q-choice{width:100%;border:1.5px solid var(--line2);background:var(--card2);color:var(--ink);border-radius:14px;padding:14px 12px;font-family:var(--jp);font-weight:700;font-size:16px;cursor:pointer;text-align:center;line-height:1.4}
+  .q-choice:active{transform:translateY(1px)}
+  .q-choice:disabled{cursor:default}
+  .q-choice.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+  .q-choice.ng{background:#fde8e8;border-color:#e2574f;color:#c0392b}
+  .q-fb{min-height:22px;font-weight:800;font-size:15px;color:var(--ink-soft);font-family:var(--jp);text-align:center}
+  .qresult{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:26px 18px;text-align:center}
+  .qr-score{font-family:var(--disp);font-weight:700;font-size:44px;color:var(--accent-d)}
+  .qr-msg{font-family:var(--jp);font-weight:800;font-size:18px;color:var(--ink);margin:8px 0}
+  .qr-rec{font-size:13px;color:var(--ink-faint);font-weight:700;margin-bottom:16px}
+  .qr-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .q-again,.q-home{border:none;border-radius:14px;padding:12px 18px;font-family:var(--body);font-weight:800;font-size:14px;cursor:pointer}
+  .q-again{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-d)}
+  .q-home{background:var(--card2);color:var(--ink-soft);border:1.5px solid var(--line2)}
+  .q-again:active,.q-home:active{transform:translateY(1px)}
 </style>
 
 <div class="wrap">
@@ -188,7 +216,11 @@ window.QB_APP='vocab';
       <div class="goal-top"><span>🎯 合格までの目標</span><span class="goal-v">約1,900語</span></div>
       <div class="goal-main"><span id="ovCount">0</span> <span class="goal-unit">語 覚えた</span></div>
       <div class="bar"><div class="fill" id="ovFill"></div></div>
-      <div class="goal-sub"><span id="ovPct">0%</span> ・ いま収録 <span id="ovDeck">70</span>語（順次ふやします）</div>
+      <div class="goal-sub"><span id="ovPct">0%</span> ・ いま収録 <span id="ovDeck">70</span>語（順次ふやします）<br>今日 覚えた <span id="ovToday">0</span>語</div>
+    </div>
+    <div class="quizbox">
+      <button class="quiz-start" onclick="startQuiz()">✏️ 検問に挑戦（4択・ランダム20問）</button>
+      <div class="quiz-rec" id="quizRec"></div>
     </div>
     <div class="stages" id="stageList"></div>
     <div class="home-tip">やさしいステージから、少しずつ上へ。⭐が多いほど難しい単語です。<br>全部覚えたステージには「クリア！」がつきます。</div>
@@ -236,6 +268,24 @@ window.QB_APP='vocab';
       <button class="mini" id="filterBtn" onclick="toggleFilter()">🔁 まだのカードだけ</button>
     </div>
     <div class="hint-line">カードをタップでめくる／🔊で発音／「覚えた！」でチェック。<br>日本語は最後の手段。まずは英語とヒントで考えよう。</div>
+    </div>
+  </div>
+
+  <!-- QUIZ(検問) -->
+  <div id="quiz" hidden>
+    <div class="topbar">
+      <button class="back" onclick="quizHome()" aria-label="ホームへもどる" title="ホームへもどる">✕</button>
+      <span class="study-name">📝 検問（テスト）</span>
+    </div>
+    <div class="studymid">
+      <div class="prog"><span id="qPos">1 / 20</span><div class="bar"><div class="fill" id="qFill"></div></div><span id="qRight">正解 0</span></div>
+      <div class="qcard" id="qCard">
+        <div class="q-sub" id="qSub"></div>
+        <div class="q-prompt" id="qWord">word</div>
+        <div class="q-choices" id="qChoices"></div>
+        <div class="q-fb" id="qFb"></div>
+      </div>
+      <div class="qresult" id="qResult" hidden></div>
     </div>
   </div>
 </div>
@@ -670,7 +720,7 @@ var si=0, order=[], idx=0, flipped=false, filterOn=false;
 
 function loadKnown(){try{return JSON.parse(localStorage.getItem('vocab_known')||'{}')||{};}catch(e){return {};}}
 function learnedCount(){return STAGES.reduce(function(n,s){return n+stageKnown(s);},0);}
-function writeStats(){try{var o={};try{o=JSON.parse(localStorage.getItem('vocab_stats')||'{}')||{};}catch(_){}o.learned=learnedCount();o.deckSize=TOTAL;o.goal=GOAL;o.updated=Date.now();localStorage.setItem('vocab_stats',JSON.stringify(o));}catch(e){}}
+function writeStats(){try{var o={};try{o=JSON.parse(localStorage.getItem('vocab_stats')||'{}')||{};}catch(_){}o.learned=learnedCount();o.deckSize=TOTAL;o.goal=GOAL;o.updated=Date.now();var _ts=(function(){var d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();})();if(o.tday&&o.tday!==_ts){o.today=0;o.tday=_ts;}localStorage.setItem('vocab_stats',JSON.stringify(o));}catch(e){}}
 function saveKnown(){try{localStorage.setItem('vocab_known',JSON.stringify(known));}catch(e){}writeStats();try{var o=JSON.parse(localStorage.getItem('vocab_stats')||'{}');o.studiedAt=Date.now();localStorage.setItem('vocab_stats',JSON.stringify(o));}catch(e){}if(window.qbSyncKick)qbSyncKick();}
 function stageKnown(s){return s.words.filter(function(c){return known[c.w];}).length;}
 
@@ -679,7 +729,7 @@ function renderHome(){
   document.getElementById('ovCount').textContent=kc;
   document.getElementById('ovFill').style.width=Math.min(100,kc/GOAL*100)+'%';
   document.getElementById('ovPct').textContent=Math.round(kc/GOAL*100)+'%';
-  document.getElementById('ovDeck').textContent=TOTAL;
+  document.getElementById('ovDeck').textContent=TOTAL;var _ot=document.getElementById('ovToday');if(_ot)_ot.textContent=qTodayCount();renderQuizRec();
   writeStats();
   var html=STAGES.map(function(s,i){
     var k=stageKnown(s), t=s.words.length, pct=Math.round(k/t*100), clear=(k===t);
@@ -728,7 +778,7 @@ function render(){
 function flip(){flipped=!flipped;document.getElementById('inner').classList.toggle('flip',flipped);}
 function next(){var o=activeOrder();idx=(idx+1)%o.length;render();}
 function prev(){var o=activeOrder();idx=(idx-1+o.length)%o.length;render();}
-function toggleKnow(){var c=curCard();known[c.w]=!known[c.w];saveKnown();
+function toggleKnow(){var c=curCard();var _was=!!known[c.w];known[c.w]=!known[c.w];bumpToday((known[c.w]&&!_was)?1:((!known[c.w]&&_was)?-1:0));saveKnown();
   var allNow=STAGES[si].words.every(function(d){return known[d.w];});
   render();if(allNow)setTimeout(function(){showDone(STAGES[si].name);},250);}
 function toggleFilter(){filterOn=!filterOn;idx=0;render();}
@@ -752,6 +802,66 @@ function speakWord(ev){if(ev){ev.stopPropagation();}var c=curCard();
     setTimeout(function(){try{if(ss.paused)ss.resume();}catch(e){}},80);
   }catch(e){}}
 function showDone(name){var st=document.getElementById('study');if(document.getElementById('doneMsg'))return;var d=document.createElement('div');d.className='done-msg';d.id='doneMsg';d.textContent='🎉 '+name+' クリア！全部覚えたね！';st.insertBefore(d,st.querySelector('.card3d'));setTimeout(function(){if(d)d.remove();},4000);}
+
+
+/* ===== 今日カウンタ（今日覚えた語） ===== */
+function qTodayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function _qs(){try{return JSON.parse(localStorage.getItem('vocab_stats')||'{}')||{};}catch(e){return {};}}
+function _qsSave(o){try{localStorage.setItem('vocab_stats',JSON.stringify(o));}catch(e){}}
+function bumpToday(delta){if(!delta)return;var o=_qs();var ts=qTodayStr();if(o.tday!==ts){o.today=0;}o.today=Math.max(0,(o.today||0)+delta);o.tday=ts;_qsSave(o);}
+function qTodayCount(){var o=_qs();return (o.tday===qTodayStr())?(o.today||0):0;}
+/* ===== 検問（テスト） ===== */
+var ALLW=[];STAGES.forEach(function(s){s.words.forEach(function(w){ALLW.push(w);});});
+function QANS(c){return c.jp;}
+function loadQuiz(){var o=_qs();return o.quiz||{tests:0,perfects:0,bestPct:0,last:null};}
+function saveQuizRec(q){var o=_qs();o.quiz=q;_qsSave(o);if(window.qbSyncKick)qbSyncKick();}
+function renderQuizRec(){var el=document.getElementById('quizRec');if(!el)return;var q=loadQuiz();var learned=learnedCount();
+  if(learned<4){el.textContent='覚えた語から4択クイズ。あと'+(4-learned)+'語覚えると挑戦できるよ';return;}
+  el.innerHTML='受けた '+(q.tests||0)+'回 ・ 満点 '+(q.perfects||0)+'回'+(q.bestPct?' ・ 自己ベスト '+q.bestPct+'%':'')+(q.last?'（前回 '+q.last.s+'/'+q.last.t+'）':'');}
+var QZ=null;
+function qshuf(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function startQuiz(){
+  var pool=ALLW.filter(function(c){return known[c.w];});
+  if(pool.length<4){alert('覚えた語が4つ以上になったら挑戦できるよ！');return;}
+  var n=Math.min(20,pool.length);
+  QZ={qs:qshuf(pool.slice()).slice(0,n),i:0,right:0,answered:false};
+  document.getElementById('home').hidden=true;document.getElementById('study').hidden=true;document.getElementById('quiz').hidden=false;
+  document.getElementById('qResult').hidden=true;document.getElementById('qCard').hidden=false;
+  renderQ();window.scrollTo(0,0);}
+function quizHome(){document.getElementById('quiz').hidden=true;document.getElementById('home').hidden=false;renderHome();window.scrollTo(0,0);}
+function renderQ(){
+  var c=QZ.qs[QZ.i];QZ.answered=false;
+  document.getElementById('qWord').textContent=c.w;
+  var sub=document.getElementById('qSub');if(sub)sub.textContent='';
+  var correct=QANS(c),seen={};seen[correct]=1;var dis=[];
+  var others=qshuf(ALLW.slice());
+  for(var k=0;k<others.length&&dis.length<3;k++){var a=QANS(others[k]);if(a&&!seen[a]){seen[a]=1;dis.push(a);}}
+  var choices=qshuf([correct].concat(dis));
+  var ch=document.getElementById('qChoices');ch.innerHTML='';
+  choices.forEach(function(t){var b=document.createElement('button');b.className='q-choice';b.textContent=t;b.onclick=function(){answerQ(t,b);};ch.appendChild(b);});
+  document.getElementById('qFb').textContent='';
+  document.getElementById('qPos').textContent=(QZ.i+1)+' / '+QZ.qs.length;
+  document.getElementById('qRight').textContent='正解 '+QZ.right;
+  document.getElementById('qFill').style.width=(QZ.i/QZ.qs.length*100)+'%';}
+function answerQ(t,btn){
+  if(QZ.answered)return;QZ.answered=true;
+  var c=QZ.qs[QZ.i],correct=QANS(c);
+  var btns=document.querySelectorAll('#qChoices .q-choice');
+  for(var k=0;k<btns.length;k++){btns[k].disabled=true;if(btns[k].textContent===correct)btns[k].classList.add('ok');}
+  if(t===correct){QZ.right++;document.getElementById('qFb').textContent='⭕ 正解！';}
+  else{btn.classList.add('ng');document.getElementById('qFb').innerHTML='❌ 正解は「'+correct+'」';}
+  document.getElementById('qRight').textContent='正解 '+QZ.right;
+  setTimeout(function(){QZ.i++;if(QZ.i<QZ.qs.length)renderQ();else finishQuiz();},1000);}
+function finishQuiz(){
+  var n=QZ.qs.length,r=QZ.right,pct=Math.round(r/n*100);
+  var q=loadQuiz();q.tests=(q.tests||0)+1;if(r===n)q.perfects=(q.perfects||0)+1;q.bestPct=Math.max(q.bestPct||0,pct);q.last={s:r,t:n};q.updated=Date.now();saveQuizRec(q);
+  document.getElementById('qCard').hidden=true;
+  var res=document.getElementById('qResult');res.hidden=false;
+  var msg=(r===n)?'🏆 満点！すごい！':(pct>=80?'👏 よくできました！':(pct>=50?'🙂 その調子！':'💪 もう一度やってみよう'));
+  res.innerHTML='<div class="qr-score">'+r+' / '+n+'</div><div class="qr-msg">'+msg+'</div>'
+    +'<div class="qr-rec">受けた '+q.tests+'回 ・ 満点 '+q.perfects+'回 ・ 自己ベスト '+q.bestPct+'%</div>'
+    +'<div class="qr-btns"><button class="q-again" onclick="startQuiz()">🔁 もう一度</button><button class="q-home" onclick="quizHome()">🏠 ホームへ</button></div>';
+  document.getElementById('qFill').style.width='100%';window.scrollTo(0,0);}
 
 renderHome();
 </script>
