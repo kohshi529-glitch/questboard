@@ -297,6 +297,51 @@ footer{color:#8fb3ad;font-size:12px;text-align:center;margin-top:30px}
 .aiwave{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0;border:1px solid #1d3a40;background:#12292e;color:#8fb3ad}
 .aiwave.on{color:#0d1b1e;background:#48e0b0;border-color:#48e0b0}
 .aisig{display:inline-block;font-size:10.5px;font-weight:700;color:#e6f4f1;background:#2a3f5a;border:1px solid #3d5a80;border-radius:5px;padding:1px 6px;margin-right:3px}
+/* D20: 熟成ステージチップ（①-S3 v1.1 の ai_scan_today.json status.stage）。表示のみ */
+.stg{display:inline-block;font-size:11px;font-weight:700;border-radius:5px;padding:1px 7px;margin:1px 4px 1px 0;border:1px solid #3a4a5a;background:#1b2630;color:#c9d6e2}
+.stg.s-trend{color:#0d1b1e;background:#48e0b0;border-color:#48e0b0}
+.stg.s-ign{color:#1a0f00;background:#ffb347;border-color:#ffb347}
+.stg.s-ripe{color:#0f1f12;background:#9be37a;border-color:#9be37a}
+.stg.s-base{color:#dfefff;background:#1f3a55;border-color:#2f5a80}
+.stg.s-fall{color:#ffd9d9;background:#5a1f1f;border-color:#8a3030}
+.stg.s-ipo{color:#f0e6ff;background:#3a2a5a;border-color:#5a4a80}
+.stg.s-na{color:#99a;background:#222;border-color:#444}
+.stg .hist{font-weight:500;opacity:.85;margin-left:3px;font-size:10px}
+.stgrow{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;padding:4px 6px;border-bottom:1px dashed #223;font-size:12px}
+.stgrow.tr{background:#15202b}
+.stgrow .cd{font-weight:700;min-width:46px}.stgrow .nm{min-width:110px}.stgrow .m{color:#9fb3c8;font-size:11px}
+.stgrow .rsp{color:#9be37a}.stgrow .rsm{color:#ff9a9a}
+.ripen{border:1px solid #ffb347;border-radius:8px;padding:6px 8px;margin:6px 0;background:#2a1f10}
+/* D21: ローテーション計（内需−AI）。数字と推移だけ。判定語は出さない */
+.rot{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;padding:6px 8px;border:1px solid #2b3d4f;border-radius:8px;background:#121c26;margin:6px 0}
+.rot .big{font-size:22px;font-weight:800}.rot .pos{color:#9be37a}.rot .neg{color:#ff9a9a}.rot .lbl{font-size:11px;color:#9fb3c8}
+.rotbars{display:flex;align-items:flex-end;gap:2px;height:46px;margin:4px 0 2px;padding:0 4px;border-bottom:1px solid #2b3d4f}
+.rotbars i{display:block;width:6px;background:#48e0b0;border-radius:1px 1px 0 0}.rotbars i.n{background:#ff8c8c;border-radius:0 0 1px 1px}
+.dmchip{display:inline-block;font-size:10.5px;font-weight:600;border-radius:5px;padding:1px 6px;margin-right:3px;border:1px solid #3a4a5a;background:#1b2630;color:#d7e3ee}
+.dmchip.na{color:#778;border-style:dashed}
+/* D23: スキャン銘柄カード（scard 共通）。ステージチップを s2 行頭に、遷移の矢印を添える */
+.scard .stg{font-size:12px;padding:2px 8px}
+.scard .stgfrom{font-size:11px;color:#9fb3c8}
+.stgd>summary{padding:8px 4px;border-bottom:1px solid #1d3a40}
+.stgd .scard{padding-left:14px}
+/* D22: スキャン鮮度チップ（①-S3／①-S4）。base_day が直近営業日なら緑、1 営業日前は黄、2 日以上は赤、無ければ灰 */
+ /* D25: アンソロ 🔔・🪜・🇺🇸 */
+.trg{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.trg .t{display:inline-flex;gap:6px;align-items:baseline;font-size:12px;border-radius:8px;padding:5px 9px;border:1px solid #e8c766;background:#2a2410;color:#f3dd93;max-width:100%}
+.trg .t b{color:#ffe08a;white-space:nowrap}.trg .t small{color:#c9b36a}
+.steps{display:flex;flex-direction:column;gap:0;margin:6px 0;border-left:2px solid #2b3d4f;padding-left:10px}
+.step{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline;padding:5px 0;font-size:12.5px;position:relative;border-bottom:1px dashed #1d3a40}.step .l{white-space:nowrap}.step .st{white-space:nowrap}
+.step::before{content:'';position:absolute;left:-15px;top:9px;width:8px;height:8px;border-radius:50%;background:#2b3d4f;border:1px solid #3a4a5a}
+.step.done::before{background:#48e0b0;border-color:#48e0b0}.step.next::before{background:#e8c766;border-color:#e8c766;box-shadow:0 0 0 3px rgba(232,199,102,.25)}
+.step .d{color:#9fb3c8;font-variant-numeric:tabular-nums;min-width:86px}.step .st{font-size:10.5px;border-radius:5px;padding:1px 6px;border:1px solid #3a4a5a;color:#d7e3ee}
+.step .st.confirmed{border-color:#48e0b0;color:#48e0b0}.step .st.reported{border-color:#e8c766;color:#e8c766}.step .st.pending{border-color:#555;color:#889}
+.step.next .l{color:#ffe08a;font-weight:700}.step .n{color:#9fb3c8;font-size:11.5px;flex-basis:100%;padding-left:94px}
+.ustab{width:100%;border-collapse:collapse;font-size:12px;margin:4px 0}.ustab th,.ustab td{padding:4px 6px;border-bottom:1px solid #1d3a40;text-align:right;white-space:nowrap}.ustab th{color:#9fb3c8;font-weight:600}.ustab td:first-child,.ustab th:first-child{text-align:left}
+.ustab .g{color:#9fb3c8;font-size:11px}
+.frchip{display:inline-flex;gap:6px;align-items:baseline;font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 9px;margin:2px 6px 6px 0;border:1px solid #3a4a5a;background:#1b2630;color:#d7e3ee}
+.frchip.f0{border-color:#48e0b0;color:#48e0b0}.frchip.f1{border-color:#e8c766;color:#e8c766}.frchip.f2{border-color:#ff8c8c;color:#ff8c8c}.frchip.fx{border-color:#555;color:#889}
+.frchip small{font-weight:500;color:#9fb3c8}
+details.stgd summary{cursor:pointer;font-weight:700;padding:4px 0}
 .ixchip.in{color:#b8f0c8;background:#163a22;border-color:#2a6b3c}
 .rightschip.unk{color:#c9d1e0;background:#26304a;border-color:#3a4763;font-weight:500}
 .perchip{display:inline-block;font-size:10px;font-weight:500;color:#8fb3ad;background:#0f2429;border:1px solid #1d3a40;border-radius:5px;padding:1px 6px;white-space:nowrap;vertical-align:middle}
@@ -330,6 +375,8 @@ footer{color:#8fb3ad;font-size:12px;text-align:center;margin-top:30px}
 <button id='tab-nightgate' class='active' onclick="switchTab('nightgate')">🚪ゲート</button>
 <button id='tab-watch' onclick="switchTab('watch')">👀ウォッチ</button>
 <button id='tab-ai' onclick="switchTab('ai')">🤖AI特需</button>
+<button id='tab-dm' onclick="switchTab('dm')">🏠内需</button>
+<button id='tab-an' onclick="switchTab('an')">🧬アンソロ</button>
 <button id='tab-hold' onclick="switchTab('hold')">🧳保有</button>
 <button id='tab-changepoint' onclick="switchTab('changepoint')">🔔変化点</button>
 <button id='tab-methods' onclick="switchTab('methods')">📋5手法</button>
@@ -345,12 +392,14 @@ footer{color:#8fb3ad;font-size:12px;text-align:center;margin-top:30px}
 <div id='panel-nightgate' class='panel active'></div>
 <div id='panel-watch' class='panel'></div>
 <div id='panel-ai' class='panel'></div>
+<div id='panel-dm' class='panel'></div>
+<div id='panel-an' class='panel'></div>
 <div id='panel-hold' class='panel'></div>
 <div id='panel-changepoint' class='panel'></div>
 <div id='panel-methods' class='panel'></div>
 <div id='panel-granville' class='panel'></div>
 <div id='panel-legend' class='panel'></div>
-<footer>board.html（D3 2026-09-15 ＋ D4 2026-09-23 ＋ D5 2026-09-26 ＋ D9/D10/D11 2026-10-07 ＋ D12 2026-10-08）／ 唯一の正 master.json から描画（grades.json・pool_bars.json は表示補助）。候補は各手法ルーティンのPRマージで更新される。🤷🏦・4色・熟成は表示であり判定・順位は変えない。</footer>
+<footer>board.html（D3 2026-09-15 ＋ D4 2026-09-23 ＋ D5 2026-09-26 ＋ D9/D10/D11 2026-10-07 ＋ D12 2026-10-08 ＋ D17〜D20 2026-10-24/25 ＋ D21〜D23 2026-10-28 ＋ D24/D25 2026-10-31 ＋ D26 2026-11-01 ＋ D27 2026-11-05）／ 唯一の正 master.json から描画（grades.json・pool_bars.json は表示補助）。候補は各手法ルーティンのPRマージで更新される。🤷🏦・4色・熟成は表示であり判定・順位は変えない。</footer>
 </div>
 <button class='fab' id='backtab' onclick='scrollToTabbar()' aria-label='タブバーへ戻る'>▲タブへ戻る</button>
 <script>
@@ -431,6 +480,15 @@ const BARS_URL = "https://kohshi529-glitch.github.io/asset_operation/pool_bars.j
 const GRADES_URL = "https://kohshi529-glitch.github.io/asset_operation/grades.json";
 // D4: 4色トリアージの前夜比に使うゲート履歴（青＝FAIL_INSEN∧文脈不一致 の前夜件数）。取れなければ前夜比は出さない。
 const HISTORY_BASE = "./gate_history/";
+// D20: ①-S3 v1.1 が毎夜全置換する公開ファイル（全 74 銘柄の熟成ステータス・遷移・焼き入れ）。取得失敗しても描画は続く（ステータス節が「未取得」になるだけ）。
+const AI_TODAY_URL = "https://kohshi529-glitch.github.io/asset_operation/ai_scan_today.json";
+let AI_TODAY = null; // ai_scan_today.json 全体（v1.0 形式なら status 無し）
+// D21: ①-S4 内需スキャン v1.0 が毎夜全置換する公開ファイル（全 109 銘柄のステータス・遷移・焼き入れ・ローテーション計の推移）。取得失敗しても描画は続く。
+const DM_TODAY_URL = "https://kohshi529-glitch.github.io/asset_operation/dm_scan_today.json";
+let DM_TODAY = null;
+// D24: ①-S5 アンソロスキャン v1.0（期間限定 2026-11-02〜12-18）が毎夜全置換する公開ファイル（15 銘柄・3 層のステータス・イベント計の推移）。取得失敗しても描画は続く。
+const AN_TODAY_URL = "https://kohshi529-glitch.github.io/asset_operation/an_scan_today.json";
+let AN_TODAY = null;
 let BARS = {};      // code -> [[d,o,h,l,c],...]
 let GRADES = {};    // grades.json の stocks（code -> {per,spm,vg,nc,eqr,sec,...}）
 let SPM = {};       // grades.json の meta.sector_per_median（業種 -> [中央値PER, 母数n]）
@@ -793,7 +851,7 @@ function scrollToTabbar(){
   scrollToY(absTop(tb)-TAB_OFFSET);
 }
 function switchTab(which){
-  ['nightgate','changepoint','methods','granville','ai','watch','hold','legend'].forEach(t=>{
+  ['nightgate','changepoint','methods','granville','ai','dm','an','watch','hold','legend'].forEach(t=>{
     const p=document.getElementById('panel-'+t), b=document.getElementById('tab-'+t);
     if(!p||!b)return;
     const on=(t===which);
@@ -919,7 +977,8 @@ function pxdChip(code){
   const g=gradesOf(code); if(!g||!g.pxd||!/^\d{4}-\d{2}-\d{2}$/.test(String(g.pxd))) return '';
   if(g.nx){ const n=earnDaysFromNx(g.nx); if(n!=null&&n>=-1) return ''; }   // 次回日が生きている（当日〜将来、または反応日）なら出さない
   const dm=String(g.pxd).slice(5).replace('-','/');
-  return `<span class='earnchip unknown' title='前年同期の発表日（実績）。今期の日程は未発表＝会社 IR で確認'>📅前年同期 ${esc(dm)} 発表・今期未発表</span>`;
+  const lx=g.lx&&/^\d{4}-\d{2}-\d{2}$/.test(String(g.lx))?String(g.lx).slice(5).replace('-','/'):null;
+  return `<span class='earnchip unknown' title='D19: 直近の発表日と、前年に次回を発表した日（どちらも実績）。今期の日程は未発表＝会社 IR で確認'>📅${lx?`直近 ${esc(lx)} 発表・`:''}前年は次回 ${esc(dm)}・今期未発表</span>`;
 }
 // D16: 進捗チップ。grades.json の pg（計画比の乖離%・経常ベースの試算。null なら出さない）
 function pgChip(code){
@@ -941,6 +1000,23 @@ function earnBand(code,earnHtml){
   if(n===-1) return `<div class='earnband react'>📉 本日は決算反応日（発表${dt}）— 引けまでに撤収するか、持ち越す理由を決める（教訓⑲）</div>`;
   return '';
 }
+// D19（2026-10-24）: 次回決算日が未発表の銘柄の説明文。grades.json の lx（直近の発表日・実績）と pxd（①-8 v1.47: 次回の前年同期の発表日・実績）から組む。
+// 戻り値 {text, near}: near=true は pxd（前年の実績日）が今日から 10 営業日以内＝「前年実績では近い・会社の日程は未確認」。推定ではなく前年の事実。
+function unkEarnInfo(code){
+  const g=gradesOf(code)||{};
+  const ok=(d)=>d&&/^\d{4}-\d{2}-\d{2}$/.test(String(d));
+  const md=(d)=>String(d).slice(5).replace('-','/');
+  const lx=ok(g.lx)?g.lx:null, px=ok(g.pxd)?g.pxd:null;
+  let near=false;
+  if(px){ const y=new Date().getFullYear(); // 前年実績日を今年の暦に写し、残営業日を数える（±45日の窓で今年／来年を選ぶ）
+    const cands=[px.replace(/^\d{4}/,String(y)), px.replace(/^\d{4}/,String(y+1))];
+    for(const c of cands){ const n=earnDaysFromNx(c); if(n!=null&&n>=0&&n<=10){ near=true; break; } } }
+  const parts=[];
+  if(lx) parts.push(`直近 ${md(lx)} 発表済み`);
+  if(px) parts.push(`前年は次回を ${md(px)} に発表`);
+  const text=parts.length?parts.join('・'):'発表実績も無し';
+  return {text,near,lx,px};
+}
 // 🧳保有タブ上部の一覧（保有銘柄の決算を名指しで。候補カードより先に目に入る位置）
 function holdEarnSummary(codes){
   const crit=[], warn=[], react=[], unk=[]; let nearest=null;
@@ -948,7 +1024,7 @@ function holdEarnSummary(codes){
     const g=gradesOf(c); const nx=g&&g.nx; const n=nx?earnDaysFromNx(nx):null;
     const nm=holdNameOf(c,null,{})||''; const lab=`<b>${esc(c)}</b>${nm?' '+esc(nm):''}`;
     const dm=nx?String(nx).slice(5).replace('-','/'):'';
-    if(n==null){ const px=g&&g.pxd&&/^\d{4}-\d{2}-\d{2}$/.test(String(g.pxd))?String(g.pxd).slice(5).replace('-','/'):null; unk.push(px?`${lab}（前年同期 ${esc(px)} 発表）`:lab); return; }
+    if(n==null){ const u=unkEarnInfo(c); unk.push(`${u.near?'⏰':''}${lab}（${esc(u.text)}${u.near?'・前年実績では近い':''}）`); return; }
     if(n===0)      crit.push(`${lab} 本日決算 ${esc(dm)}`);
     else if(n===1) crit.push(`${lab} 明日決算 ${esc(dm)}`);
     else if(n<=5&&n>=2) warn.push(`${lab} 決算 ${esc(dm)} あと${esc(n)}営業日`);
@@ -961,7 +1037,7 @@ function holdEarnSummary(codes){
     if(crit.length)  parts.push(`🚨 ${crit.join('／')}`);
     if(react.length) parts.push(`📉 ${react.join('／')}`);
     if(warn.length)  parts.push(`⏰ ${warn.join('／')}`);
-    if(unk.length)   parts.push(`❓ 次回決算日 未発表: ${unk.join('／')}（今期の日程は会社 IR で確認。不明は安全ではない）`);
+    if(unk.length)   parts.push(`❓ 次回決算日 未発表: ${unk.join('／')}（今期の日程は会社 IR で確認。⏰は前年の実績日が 10 営業日以内＝近いが未確認）`);
     return `<div class='holdearn'>${parts.join('<br>')}${rule}</div>`;
   }
   return `<div class='holdearn ok'>決算跨ぎ: 該当なし${nearest?`（最短 ${nearest.lab} ${esc(nearest.dm)} あと${esc(nearest.n)}営業日）`:'（次回決算日 未取得）'}</div>`;
@@ -973,9 +1049,9 @@ function holdEarnSummary(codes){
 //  ・押し目枠と急落枠（リバ/ちょる子）の同時指名は -2.4%/38%（単独 +1.1%/64%）
 //  ・ちょる子の当日大陽線（実体が値幅の60%超）は伸びしろが無い（-1.4%/31%）
 //  ・弱気/軟調の朝に逆張りを実行した群は勝率0%（n4/n7）。モードは選定に入れず表示で扱う（実行順序上、夜の選定時に当日モードは無い）
-const FWD_BRANCHES = ['kenmo_momentum','kenmo_newhigh','granville_tenkan','stf_kakuhen','ai_momentum'];
-const REV_BRANCHES = ['choruko_reversal','granville_rebound','ai_reversal'];
-const CONTRA_BRANCHES = ['choruko_reversal','granville_rebound','granville_oshime','changepoint','ai_reversal'];
+const FWD_BRANCHES = ['kenmo_momentum','kenmo_newhigh','granville_tenkan','stf_kakuhen','ai_momentum','dm_momentum'];
+const REV_BRANCHES = ['choruko_reversal','granville_rebound','ai_reversal','dm_reversal'];
+const CONTRA_BRANCHES = ['choruko_reversal','granville_rebound','granville_oshime','changepoint','ai_reversal','dm_reversal'];
 function normBranches(x){
   if(!x) return [];
   const arr=Array.isArray(x)?x:[x];
@@ -1136,8 +1212,10 @@ function cautionChips(code,branches,opts){
 // 統一5行カード。v = {code,name,close,methodHtml,cautionHtml,earnHtml,judgeHtml,propHtml,bodyHtml,dim,bad}
 function card5(v){
   let r0=''; try{ r0=earnBand(v.code,v.earnHtml); }catch(e){ r0=''; }
-  if(!r0&&v.unkBand){ let px=null; try{ const g=gradesOf(v.code); px=g&&g.pxd&&/^\d{4}-\d{2}-\d{2}$/.test(String(g.pxd))?String(g.pxd).slice(5).replace('-','/'):null; }catch(e){ px=null; }
-    r0=`<div class='earnband unk'>❓ 次回決算日 未発表${px?`（前年同期 ${esc(px)} 発表）`:''} — 今期の日程は会社 IR で確認（不明は安全ではない）</div>`;
+  if(!r0&&v.unkBand){ let u={text:'発表実績も無し',near:false}; try{ u=unkEarnInfo(v.code); }catch(e){}
+    r0=u.near
+      ?`<div class='earnband warn'>⏰❓ 次回決算日 未発表 — ${esc(u.text)}。前年実績では近い・会社の日程は未確認（IR で確認。不明は安全ではない）</div>`
+      :`<div class='earnband unk'>❓ 次回決算日 未発表 — ${esc(u.text)}（今期の日程は会社 IR で確認。不明は安全ではない）</div>`;
     if(v.earnHtml&&/earnchip unknown/.test(String(v.earnHtml))) v=Object.assign({},v,{earnHtml:''}); }
   if(r0&&v.earnHtml&&String(v.earnHtml).indexOf('earnchip warn')>=0) v=Object.assign({},v,{earnHtml:''});
   if(!r0){ let pc=''; try{ pc=pxdChip(v.code); }catch(e){ pc=''; }
@@ -1447,6 +1525,8 @@ const BRANCH_LABEL = Object.assign({}, METHOD_SHORT, {
   granville_rebound:"📐リバーサル",
   ai_momentum:"🤖AI順張り",
   ai_reversal:"🤖AI逆張り",
+  dm_momentum:"🏠内需順張り",
+  dm_reversal:"🏠内需逆張り",
 });
 function branchLabel(k){ return BRANCH_LABEL[k]||k; }
 function branchChip(k){
@@ -1455,7 +1535,7 @@ function branchChip(k){
 }
 // ===== エントリ型判定（改修3。branch/branch_type → method/granville/changepoint/unknown） =====
 // 5手法キーの集合（master.json candidates 配下のキー）。
-const METHOD_KEYS={kenmo_momentum:1,kenmo_newhigh:1,choruko_reversal:1,stf_kakuhen:1,tenbagger_x:1,watch_bottoming:1,ai_momentum:1,ai_reversal:1};
+const METHOD_KEYS={kenmo_momentum:1,kenmo_newhigh:1,choruko_reversal:1,stf_kakuhen:1,tenbagger_x:1,watch_bottoming:1,ai_momentum:1,ai_reversal:1,dm_momentum:1,dm_reversal:1};
 // 単一 branch キー→型。granville_* / 変化点(🔔) / 5手法キー を判定。未知は unknown。
 function branchKeyType(k){
   const s=String(k==null?'':k);
@@ -1765,22 +1845,85 @@ function cpCard(c){
     bodyHtml:body});
 }
 // ===== タブ: 🤖AI特需（D11）。①-S3 AI特需スキャン v1.0 が書く master.json の ai_scan（セクター別の波）と candidates.ai_momentum／ai_reversal を描く。判定・順位は変えない =====
+// D20: 熟成ステージ（①-S3 v1.1）。ai_scan_today.json の status 行からチップを作る。候補カードにも同じチップを添える（判定・順位は変えない）
+const STG_ORDER=['🔥初動','🍖熟成中','🥩底練り','🍽食べ時','🕸閑散','🗑期限切れ','🐄上場直後','❔取得不可'];
+const STG_CLASS={'🍽食べ時':'s-trend','🔥初動':'s-ign','🍖熟成中':'s-ripe','🥩底練り':'s-base','🗑期限切れ':'s-fall','🕸閑散':'','🐄上場直後':'s-ipo','❔取得不可':'s-na'};
+const STG_DESC={'🔥初動':'寝ていた所から動き出した直後（25MA 上・20日 +5% 以上・長期線上抜けか20日高値ブレイクが直近10本に有る）','🍖熟成中':'ケース別の静かな日数を満たし、値幅（ATR・20日レンジ）が収縮している。次に動けば 🔥 へ','🥩底練り':'長期線の下で横ばい、または静かだが熟成の閾値に未達','🍽食べ時':'25>75 の上で 52週位置 60% 以上・60日高値から −10% 以内。既に動いている','🕸閑散':'どれにも当たらない','🗑期限切れ':'25<75 で下向き・20日 −8% 以下、または 60日高値から −25% 以下。底を付けてから 40 営業日で再熟成の対象（ケース C）','🐄上場直後':'日足 60 本未満。判定は保留し指標だけ記録（60 本から短履歴として判定）','❔取得不可':'当夜も前夜も日足が取れていない'};
+function aiStatusMap(){ const m={}; const st=(AI_TODAY&&Array.isArray(AI_TODAY.status))?AI_TODAY.status:[]; st.forEach(s=>{ if(s&&s.code!=null) m[String(s.code)]=s; }); return m; }
+function stageChip(s,withSince){
+  if(!s||!s.stage) return '';
+  const cls=STG_CLASS[s.stage]||''; const hist=s.hist_tag?`<span class='hist'>${esc(s.hist_tag)}${s.long_ma_kind?'・'+esc(s.long_ma_kind):''}</span>`:'';
+  const tip=`${STG_DESC[s.stage]||''}｜ケース ${s.case||'—'}（閾値 ${s.th!=null?s.th:'—'}日）・静か ${s.sleep_days!=null?s.sleep_days:'—'}日・RS20 ${s.rs20!=null?(s.rs20>0?'+':'')+num1(s.rs20):'—'}%・このステージ ${s.stage_since||'—'} から${s.days_in_stage!=null?'（'+s.days_in_stage+'営業日）':''}${s.fetched===false?'・⚠日足未取得 '+(s.stale_since||''):''}`;
+  return `<span class='stg ${cls}' title='${esc(tip)}'>${esc(s.stage)}${hist}${withSince&&s.days_in_stage!=null?` <span class='hist'>${esc(s.days_in_stage)}日</span>`:''}${s.fetched===false?' ⚠':''}</span>`;
+}
+// ===== D23: スキャン銘柄カード（AI特需・内需の全銘柄・候補・焼き入れ・遷移に共通）。ウォッチタブと同じ card5（scard）の 6 行構成 =====
+// 1 行目 コード・銘柄名・終値 ／ 決算帯（grades の nx から自動）／ 2 行目 ステージ（← 前ステージ）・ブランチ・score・業態・信号・静か n日/閾値・ステージ n日目
+// 2 行目b 📈文脈🕯形態（pool_bars にある銘柄のみ）・手法チップ・🚪ゲート（内需）／ 4 行目 RS20 / ゲート / 業績 / 値頃感 ／ 5 行目 チャート数値 ／ 末尾 ステージ開始日・履歴
+function scanCard(s,o){
+  o=o||{}; const code=String(s.code); const sep=`<span class='ssep'>/</span>`;
+  const secChip=`<span class='memochip'>${esc(s.sector_label||s.sector||'')}${s.proc?'/'+esc(s.proc):''}${s.wave?' '+esc(s.wave)+'波':''}</span>`;
+  const brName=o.branch||s.in_candidates||null; const br=brName?branchChip(brName):'';
+  const score=(o.score!=null)?`<span class='memochip' title='スキャンのスコア（並び順専用・手法間で比較しない）'>score ${esc(o.score)}</span>`:'';
+  const sig=(s.signals||[]).map(x=>`<span class='aisig'>${esc(x)}</span>`).join('');
+  const sleep=(s.sleep_days!=null)?`<span class='memochip' title='静かな営業日の連続数／🍖熟成中に要る閾値（ケース ${esc(s.case||'—')}）'>静か ${esc(s.sleep_days)}日${s.th!=null?'／'+esc(s.th):''}</span>`:'';
+  const since=(s.days_in_stage!=null)?`<span class='memochip' title='このステージになった日 ${esc(s.stage_since||'—')}'>ステージ ${esc(s.days_in_stage)}日目</span>`:'';
+  const from=(o.tr&&s.prev_stage&&s.prev_stage!==s.stage)?`<span class='stgfrom'>← ${esc(s.prev_stage)}</span>`:'';
+  const methodHtml=stageChip(s,false)+from+br+score+secChip+sig+sleep+since;
+  let caution=''; try{ caution=cautionChips(code,[brName||'ai_momentum']); }catch(e){ caution=''; }
+  let crossHtml=''; if(o.an){ if(s.cross_ai) crossHtml+=`<span class='dmchip' title='同じ銘柄の 🤖AI特需ユニバースでの熟成ステージ（①-S3）'>🤖 ${esc(s.cross_ai)}</span>`; if(s.cross_dm) crossHtml+=`<span class='dmchip' title='同じ銘柄の 🏠内需ユニバースでの熟成ステージ（①-S4）'>🏠 ${esc(s.cross_dm)}</span>`; if(s.basis) crossHtml+=`<span class='dmchip na' title='関連の根拠（公開情報・anthropic_universe.json）'>${esc(s.basis)}</span>`; }
+  const cautionHtml=caution+(o.dm?dmMethodChips(s):'')+crossHtml;
+  const rs=(s.rs20!=null)?`<span class='vtxt' title='20日リターン − ユニバース中央値（相対強弱）'>RS20 <b class='hl'>${s.rs20>0?'+':''}${esc(num1(s.rs20))}%</b></span>`:`<span class='vtxt'>RS20 —</span>`;
+  const gateHtml=s.gate?`<span class='vchip' title='当夜の ①-8 ゲート結果'>🚪${esc(s.gate)}</span>`:`<span class='vtxt' title='当夜のゲート判定なし（pool外／未評価）'>—</span>`;
+  const judgeHtml=`<div class='srow s4'>${rs}${sep}${gateHtml}${sep}${gyosekiChip(code)}${sep}${valuationChip(code)}${vgChip(code)}</div>`;
+  const parts=[]; const put=(l,x,u)=>{ if(x!=null) parts.push(`<span class='vtxt'>${l} ${esc(x)}${u||''}</span>`); };
+  if(o.an&&s.ret1_pct!=null) parts.push(`<span class='vtxt' title='前日比'>前日 <b class='${s.ret1_pct>=0?'pos':'neg'}'>${s.ret1_pct>0?'+':''}${esc(num1(s.ret1_pct))}%</b></span>`);
+  if(o.an&&s.ret_since_ref_pct!=null){ parts.push(`<span class='vtxt' title='基準日（S-1 公開 2026-10-26 の東京終値）比${s.hi_since_ref_pct!=null?'・期間中の最高終値 '+(s.hi_since_ref_pct>0?'+':'')+esc(num1(s.hi_since_ref_pct))+'%':''}${s.ret_since_ref_vs_1321!=null?'・日経ETF比 '+(s.ret_since_ref_vs_1321>0?'+':'')+esc(num1(s.ret_since_ref_vs_1321))+'pt':''}'>基準10/26比 <b class='${s.ret_since_ref_pct>=0?'pos':'neg'}'>${s.ret_since_ref_pct>0?'+':''}${esc(num1(s.ret_since_ref_pct))}%</b>${s.hi_since_ref_pct!=null?' <small>高 '+(s.hi_since_ref_pct>0?'+':'')+esc(num1(s.hi_since_ref_pct))+'%</small>':''}</span>`); }
+  put('25MA',num1(s.dev25),'%'); put(esc(s.long_ma_kind||'長期'),num1(s.dev_long),'%'); put('20日',num1(s.ret20_pct),'%'); put('レンジ20',num1(s.range20_pct),'%'); put('ATR比',num1(s.atr_contract)); put('52週',(s.pos52w!=null?Math.round(s.pos52w):null),'%'); put('出来高',num1(s.vol_ratio20),'倍'); if(s.hist_tag&&s.bars_n!=null) put('足',s.bars_n,'本');
+  const propHtml=parts.join(sep);
+  const hist=(Array.isArray(s.history)?s.history:[]).slice(-3).map(h=>`${esc(h.d)} ${esc(h.from||'—')}→${esc(h.to)}`).join('、');
+  const bodyHtml=`<div class='smeta'>ステージ開始 ${esc(s.stage_since||'—')}${hist?'　履歴 '+hist:''}${s.fetched===false?'　⚠日足未取得（'+esc(s.stale_since||'')+' の値）':''}</div>`;
+  return card5({code:code,name:s.name,close:s.close,methodHtml:methodHtml,cautionHtml:cautionHtml,earnHtml:'',judgeHtml:judgeHtml,propHtml:propHtml,bodyHtml:bodyHtml,bad:false});
+}
+function stgRow(s,isTr){ return scanCard(s,{tr:isTr}); }
+function stgRowLegacy(s,isTr){
+  const rs=s.rs20!=null?`<span class='${s.rs20>=0?'rsp':'rsm'}'>RS20 ${s.rs20>0?'+':''}${esc(num1(s.rs20))}%</span>`:'';
+  const tr=isTr&&s.prev_stage?`<span class='m'>${esc(s.prev_stage)}→</span>`:'';
+  const inC=s.in_candidates?`<span class='brchip'>${esc(branchLabel(s.in_candidates))}</span>`:'';
+  const sig=(s.signals||[]).map(x=>`<span class='aisig'>${esc(x)}</span>`).join('');
+  return `<div class='stgrow${isTr?' tr':''}'><span class='cd'>${esc(s.code)}</span><span class='nm'>${esc(s.name||'')}</span>${tr}${stageChip(s,true)}${inC}${sig}<span class='m'>${esc(s.sector_label||s.sector||'')}${s.proc?'/'+esc(s.proc):''}</span><span class='m'>静か ${s.sleep_days!=null?esc(s.sleep_days):'—'}日</span>${rs}<span class='m'>終値 ${esc(fmtPrice(s.close))}・25MA ${esc(num1(s.dev25))}%・${esc(s.long_ma_kind||'長期')} ${esc(num1(s.dev_long))}%・20日レンジ ${esc(num1(s.range20_pct))}%・ATR比 ${esc(num1(s.atr_contract))}・52週 ${s.pos52w!=null?Math.round(s.pos52w):'—'}%${s.bars_n!=null?'・足 '+esc(s.bars_n)+'本':''}</span>${s.fetched===false?`<span class='m'>⚠日足未取得（${esc(s.stale_since||'')} の値）</span>`:''}</div>`;
+}
+function renderAiStages(){
+  const a=AI_TODAY; const title=`<h3>🥩 熟成ステータス（全銘柄・①-S3 v1.1）</h3>`;
+  if(!a||!Array.isArray(a.status)) return `<div class='cpsec'>${title}<div class='empty'>ai_scan_today.json に status がありません（①-S3 v1.1 の初回実行前、または取得失敗）。</div></div>`;
+  const st=a.status.slice(); const cnt={}; st.forEach(s=>{ cnt[s.stage||'❔取得不可']=(cnt[s.stage||'❔取得不可']||0)+1; });
+  const head=`<div class='meta'>base_day ${esc(a.base_day||'—')}・${esc(st.length)} 銘柄・ユニバース中央値 20日 ${esc(num1(a.median_ret20_univ))}%｜`+STG_ORDER.filter(k=>cnt[k]).map(k=>`<span class='stg ${STG_CLASS[k]||''}'>${esc(k)} ${esc(cnt[k])}</span>`).join('')+`</div>`;
+  const rip=Array.isArray(a.ripen)?a.ripen:[]; const smap={}; st.forEach(s=>{ smap[String(s.code)]=s; });
+  let ripHtml='';
+  if(rip.length){ ripHtml=`<div class='ripen'><b>🍖→🔥 焼き入れ（記録のみ・候補ではない・①-8 に渡していない）</b> ${rip.length}件`+rip.map(r=>{ const s=smap[String(r.code)]||r; return stgRow(Object.assign({},s,{prev_stage:r.from||s.prev_stage}),true); }).join('')+`</div>`; }
+  const trs=st.filter(s=>s.transition).sort((x,y)=>STG_ORDER.indexOf(x.stage)-STG_ORDER.indexOf(y.stage)||String(x.code).localeCompare(String(y.code)));
+  const trHtml=`<div class='cpsec'><h3>🔁 当夜の遷移（${trs.length}件）</h3>${trs.length?trs.map(s=>stgRow(s,true)).join(''):`<div class='empty'>${a.prev_missing||(a.sectors&&false)?'初回実行（前夜の状態なし）':'当夜の遷移なし'}</div>`}</div>`;
+  const groups=STG_ORDER.map(k=>{ const g=st.filter(s=>(s.stage||'❔取得不可')===k).sort((x,y)=>(y.sleep_days||0)-(x.sleep_days||0)||String(x.code).localeCompare(String(y.code))); if(!g.length) return ''; const open=(k==='🔥初動'||k==='🍖熟成中')?' open':''; return `<details class='stgd'${open}><summary><span class='stg ${STG_CLASS[k]||''}'>${esc(k)}</span> ${esc(g.length)}件 <span class='meta'>${esc(STG_DESC[k]||'')}</span></summary>${g.map(s=>stgRow(s,false)).join('')}</details>`; }).join('');
+  return `<div class='cpsec'>${title}${head}${ripHtml}</div>${trHtml}<div class='cpsec'><h3>📚 ステージ別一覧（静かな日数の多い順）</h3><div class='meta'>各カードはウォッチタブと同じ構成（1 行目 コード・銘柄・終値／決算帯／2 行目 ステージ・業態・信号・静かな日数／4 行目 RS20・ゲート・業績・値頃感／5 行目 チャート数値）。短履歴＝日足 235 本未満で 200MA の代わりに 75MA（60〜74 本は 25MA）で判定。一年足が無いことを理由に除外・保留はしない（保留は 60 本未満の 🐄 のみ）。</div>${groups}</div>`;
+}
 function renderAiScan(d){
   const sc=d.ai_scan||null; const cm=(d.candidates&&d.candidates.ai_momentum)||[]; const cr=(d.candidates&&d.candidates.ai_reversal)||[];
+  const SMAP=aiStatusMap();
   const NG={}; (((d.night_gate&&d.night_gate.results)||[])).forEach(r=>{ if(r&&r.code!=null) NG[String(r.code)]=r; });
-  const note=`<div class='cpnote'>①-S3 AI特需スキャン（平日 18:15）が固定ユニバース 74 銘柄（ai_universe.json＝エネマネ・冷却空調・光通信・基板素材の 2 波・3 波）をチャート条件だけで順張り（M1 新高値ブレイク／M2 転換初動／M3 再上昇）と逆張り（R1 押し目／R2 リバウンド／R3 深押し反発）に分け、①-8（20:30）が別ブランチ ai_momentum／ai_reversal として同じゲート・鮮度・提案で扱う。「波」はセクター内で 25MA を上回る銘柄の割合と 20 日リターン中央値から点灯させる表示で、抽出条件には使わない。業績条件は入れていないので、業績グレード（🔻⚠）と値頃感は別軸として横に出す。全て候補であり最終判断はユーザー。</div>`;
-  if(!sc&&!cm.length&&!cr.length) return note+`<div class='empty'>①-S3 AI特需スキャンの実行記録がありません（ai_scan 未作成）。</div>`;
+  const note=`<div class='cpnote'>①-S3 AI特需スキャン（平日 18:15）が固定ユニバース 103 銘柄（ai_universe.json v2＝エネマネ・冷却空調・光通信・基板素材の 2 波・3 波 74 ＋ 🏢大型・指数寄与 29。大型は AI 相場の激動で指数と一緒に売られた日をちょる子式の逆張り R2/R3 で拾う対象）をチャート条件だけで順張り（M1 新高値ブレイク／M2 転換初動／M3 再上昇）と逆張り（R1 押し目／R2 リバウンド／R3 深押し反発）に分け、①-8（20:30）が別ブランチ ai_momentum／ai_reversal として同じゲート・鮮度・提案で扱う。「波」はセクター内で 25MA を上回る銘柄の割合と 20 日リターン中央値から点灯させる表示で、抽出条件には使わない。業績条件は入れていないので、業績グレード（🔻⚠）と値頃感は別軸として横に出す。D20: ①-S3 v1.1 が全 74 銘柄に付ける熟成ステージ（🔥初動／🍖熟成中／🥩底練り／🍽食べ時／🕸閑散／🗑期限切れ／🐄上場直後）と当夜の遷移・🍖→🔥 の焼き入れを ai_scan_today.json から描く。焼き入れは記録のみで候補ではない。全て候補・記録であり最終判断はユーザー。</div>`;
+  const runsA=(d.pipeline&&d.pipeline.runs)||{};
+  const freshA=scanFreshChip('🤖①-S3',AI_TODAY||(sc?{base_day:sc.base_day}:null),runsA.ai_scan,(AI_TODAY&&Array.isArray(AI_TODAY.status))?`status ${AI_TODAY.status.length}件`:'status なし');
+  if(!sc&&!cm.length&&!cr.length) return note+freshA+`<div class='empty'>①-S3 AI特需スキャンの実行記録がありません（ai_scan 未作成）。</div>`;
   let waves='';
   if(sc&&sc.sectors){
-    const order=['energy_mgmt','cooling','optical','substrate'];
+    const order=['energy_mgmt','cooling','optical','substrate','large_cap'];
     waves=`<div class='cpsec'><h3>波の点灯（base_day ${esc(sc.base_day||'—')}・ユニバース ${esc(sc.universe_n||'—')}・取得 ${esc(sc.fetched_n||'—')}）</h3>`+
-      order.filter(k=>sc.sectors[k]).map(k=>{ const s=sc.sectors[k]; return `<span class='aiwave${s.wave_on?' on':''}' title='25MA 上回り率 ${esc(num1(s.above25_pct))}%・75MA ${esc(num1(s.above75_pct))}%・25MA 乖離中央値 ${esc(num1(s.median_dev25))}%・20日リターン中央値 ${esc(num1(s.median_ret20))}%・当夜の該当 順張り${esc(s.signals_m)}／逆張り${esc(s.signals_r)}'>${esc(s.label||k)}${s.wave&&s.wave!=='—'?` ${esc(s.wave)}波`:''} ${s.wave_on?'● 点灯':'○'} ${esc(num1(s.above25_pct))}%</span>`; }).join('')+
+      order.filter(k=>sc.sectors[k]).concat(Object.keys(sc.sectors).filter(k=>order.indexOf(k)<0)).map(k=>{ const s=sc.sectors[k]; return `<span class='aiwave${s.wave_on?' on':''}' title='25MA 上回り率 ${esc(num1(s.above25_pct))}%・75MA ${esc(num1(s.above75_pct))}%・25MA 乖離中央値 ${esc(num1(s.median_dev25))}%・20日リターン中央値 ${esc(num1(s.median_ret20))}%・当夜の該当 順張り${esc(s.signals_m)}／逆張り${esc(s.signals_r)}'>${esc(s.label||k)}${s.wave&&s.wave!=='—'?` ${esc(s.wave)}波`:''} ${s.wave_on?'● 点灯':'○'} ${esc(num1(s.above25_pct))}%</span>`; }).join('')+
       `<div class='meta'>● 点灯＝25MA 上回り率 50% 以上かつ 20 日リターン中央値がプラス。数字は 25MA 上回り率。</div></div>`;
   }
   const row=(c)=>{
     const code=String(c.code); const r=NG[code];
     const sig=(c.signals||[]).map(s=>`<span class='aisig'>${esc(s)}</span>`).join('');
-    const aiInfo=`<span class='memochip'>${esc(c.sector_label||c.sector||'')}/${esc(c.proc||'')}${c.wave?` ${esc(c.wave)}波`:''}</span>${sig}<span class='memochip' title='①-S3 のスコア（並び順専用・手法間で比較しない）'>score ${esc(c.score)}</span>`;
+    const aiInfo=`<span class='memochip'>${esc(c.sector_label||c.sector||'')}/${esc(c.proc||'')}${c.wave?` ${esc(c.wave)}波`:''}</span>${sig}<span class='memochip' title='①-S3 のスコア（並び順専用・手法間で比較しない）'>score ${esc(c.score)}</span>${stageChip(SMAP[code]||(c.stage?c:null),true)}`;
     const aiHtml=`<span class='brchip'>${esc(branchLabel(c.branch||''))}</span>`+aiInfo; // 未評価カード用（ブランチチップ＋業態・信号・score）
     const stat=`<div class='smeta'>終値 ${esc(fmtPrice(c.close))}円・25MA乖離 ${esc(num1(c.dev25))}%・75MA乖離 ${esc(num1(c.dev75))}%・出来高 ${esc(num1(c.vol_ratio20))}倍・RSI ${esc(num1(c.rsi14))}・52週位置 ${esc(c.pos52w!=null?Math.round(c.pos52w):'—')}%・5日 ${esc(num1(c.ret5_pct))}%／20日 ${esc(num1(c.ret20_pct))}%${c.perfect_order?'・PO':''}</div>`;
     if(r){
@@ -1807,7 +1950,186 @@ function renderAiScan(d){
   const sortS=(a)=>[...a].sort((x,y)=>(y.score||0)-(x.score||0)||String(x.code).localeCompare(String(y.code)));
   const secM=`<div class='cpsec'><h3>🤖 順張り候補 ai_momentum（${cm.length}件）</h3>${cm.length?sortS(cm).map(row).join(''):`<div class='empty'>当夜の該当なし</div>`}</div>`;
   const secR=`<div class='cpsec'><h3>🤖 逆張り候補 ai_reversal（${cr.length}件）</h3>${cr.length?sortS(cr).map(row).join(''):`<div class='empty'>当夜の該当なし</div>`}</div>`;
-  return note+waves+secM+secR;
+  let stages=''; try{ stages=renderAiStages(); }catch(e){ stages=`<div class='empty'>熟成ステータスの描画エラー: ${esc((e&&e.message)||e)}</div>`; }
+  return note+freshA+waves+stages+secM+secR;
+}
+// ===== タブ: 🏠内需（D21）。①-S4 内需スキャン v1.0 が書く master.json の dm_scan と dm_scan_today.json（全 109 銘柄のステータス・ローテーション計）。判定・順位は変えない =====
+function dmGyChips(s){
+  // grades.json の射影（①-S4 が status に写した gy/val/per/vg/vgs）。無ければ「未評価」＝プール外（候補になって ①-8 のプールに入るまで ①-9 は評価しない）
+  if(!s) return '';
+  const na=(s.gy==null&&s.val==null&&s.per==null);
+  if(na) return `<span class='dmchip na' title='grades.json に無い＝①-8 のプール外。候補になってプールに入ると ①-9 が評価する'>業績・値頃感 未評価</span>`;
+  let h='';
+  if(s.gy!=null) h+=`<span class='dmchip' title='業績グレード（13点）${s.gys!=null?' '+esc(s.gys)+'点':''}'>${esc(s.gy)}</span>`;
+  if(s.val!=null) h+=`<span class='dmchip' title='値頃感（7点）${s.vals!=null?' '+esc(s.vals)+'点':''}'>${esc(s.val)}</span>`;
+  if(s.per!=null) h+=`<span class='dmchip'>PER ${esc(num1(s.per))}${s.pbr!=null?'・PBR '+esc(num1(s.pbr)):''}</span>`;
+  h+=vgChip(String(s.code));
+  if(s.dva!=null) h+=`<span class='dmchip' title='年間配当（予想）'>💴${esc(s.dva)}</span>`;
+  return h;
+}
+function dmMethodChips(s){
+  const m=Array.isArray(s&&s.methods)?s.methods:[]; let h=m.map(k=>branchChip(k)).join('');
+  if(s&&s.gate) h+=`<span class='dmchip' title='当夜の ①-8 ゲート結果'>🚪${esc(s.gate)}</span>`;
+  return h;
+}
+function dmRow(s,isTr){ return scanCard(s,{tr:isTr,dm:true}); }
+// ===== D22: スキャン鮮度（①-S3 AI特需／①-S4 内需）。today の端末時刻と JPX 休業日表から「期待される base_day」を出し、実際の base_day との営業日差で色分け。通信なし・判定は変えない =====
+function scanExpectedDay(){
+  // 平日 20:00 JST 以降なら今日、それより前（または休場）は直近の前営業日が「今夜あるべき base_day」
+  const now=new Date(); const t=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  if(MKTCAL.isBiz(t)&&(now.getHours()>=20)) return t;
+  return MKTCAL.isBiz(t)?MKTCAL.prevBiz(t):MKTCAL.prevBiz(t);
+}
+function scanFreshChip(label,today,runRec,extra){
+  // today: {base_day,generated_at,version} ／ runRec: pipeline.runs.*（run_at・base_day）
+  const bd=(today&&today.base_day)||(runRec&&runRec.base_day)||null;
+  if(!bd) return `<span class='frchip fx' title='${esc(label)}: 実行記録なし'>${esc(label)} ⚪未実行</span>`;
+  const exp=scanExpectedDay(); let age=0; try{ let x=exp; const s=String(bd); let n=0; while(MKTCAL.iso(x)>s&&n<60){ x=MKTCAL.prevBiz(x); n++; } age=(MKTCAL.iso(x)===s)?n:(n>=60?60:n); }catch(e){ age=0; }
+  const cls=age<=0?'f0':(age===1?'f1':'f2'); const mark=age<=0?'🟢最新':(age===1?'🟡1営業日前':`🔴${age}営業日前`);
+  const gen=(today&&today.generated_at)?String(today.generated_at).replace('T',' ').slice(5,16):null;
+  const ran=(runRec&&runRec.run_at)?String(runRec.run_at).replace('T',' ').slice(5,16):null;
+  const ver=(today&&today.version)||(runRec&&runRec.version)||null;
+  const tip=`${label}: base_day ${bd}（期待 ${MKTCAL.iso(exp)}）${gen?'・生成 '+gen:''}${ran?'・実行 '+ran:''}${ver?'・'+ver:''}。base_day は日足の最終日。期待日は平日 20:00 以降は当日、それ以前は前営業日`;
+  return `<span class='frchip ${cls}' title='${esc(tip)}'>${esc(label)} ${mark} <small>base ${esc(bd)}${gen?'・生成 '+esc(gen):''}${ver?'・'+esc(ver):''}${extra?'・'+esc(extra):''}</small></span>`;
+}
+function renderDmRotation(a){
+  const r=(a&&a.rotation)||null; const log=(a&&Array.isArray(a.rotation_log))?a.rotation_log:[];
+  const sign=(v,unit)=>v==null?'—':`<span class='${v>=0?'pos':'neg'}'>${v>0?'+':''}${esc(num1(v))}${unit||''}</span>`;
+  if(!r) return `<div class='cpsec'><h3>🔄 ローテーション計（内需 − AI）</h3><div class='empty'>rotation がありません（①-S4 の初回実行前、または取得失敗）。</div></div>`;
+  const bars=log.slice(-40).map(x=>{ const v=x.rot20; if(v==null) return `<i style='height:1px;background:#444' title='${esc(x.base_day)} —'></i>`; const h=Math.min(44,Math.max(2,Math.abs(v)*3)); return `<i class='${v<0?'n':''}' style='height:${h}px' title='${esc(x.base_day)} rot20 ${v>0?'+':''}${esc(num1(v))}pt（内需 ${esc(num1(x.dm_med20))}％／AI ${esc(num1(x.ai_med20))}％）'></i>`; }).join('');
+  return `<div class='cpsec'><h3>🔄 ローテーション計（内需 − AI・20日リターン中央値の差）</h3>
+    <div class='rot'><span class='big'>${sign(r.rot20,'pt')}</span><span class='lbl'>内需−AI 20日${r.rot20_chg5!=null?'（5日前比 '+(r.rot20_chg5>0?'+':'')+esc(num1(r.rot20_chg5))+'）':''}</span>
+      <span>${sign(r.rot5,'pt')}<span class='lbl'> 5日</span></span>
+      <span>${sign(r.dm_vs_topix,'pt')}<span class='lbl'> 内需 vs TOPIX(1306)</span></span>
+      <span>${sign(r.ai_vs_nk,'pt')}<span class='lbl'> AI vs 日経(1321)</span></span>
+      <span class='lbl'>内需 中央値 20日 ${esc(num1(r.dm_med20))}％・25MA上 ${esc(num1(r.dm_above25_pct))}％｜AI 中央値 ${esc(num1(r.ai_med20))}％${r.ai_base_day?'（AI 側 '+esc(r.ai_base_day)+'）':''}</span></div>
+    ${log.length?`<div class='rotbars'>${bars}</div><div class='meta'>直近 ${esc(Math.min(40,log.length))} 営業日の rot20（緑＝内需が相対的に強い・赤＝AI が強い）。数字と推移だけで「ローテーション入り」の判定はしない。</div>`:`<div class='meta'>推移は 2 夜目から。</div>`}
+  </div>`;
+}
+function renderDmScan(d){
+  const sc=d.dm_scan||null; const cm=(d.candidates&&d.candidates.dm_momentum)||[]; const cr=(d.candidates&&d.candidates.dm_reversal)||[];
+  const a=DM_TODAY; const st=(a&&Array.isArray(a.status))?a.status:[]; const smap={}; st.forEach(s=>{ smap[String(s.code)]=s; });
+  const note=`<div class='cpnote'>①-S4 内需スキャン（平日 18:55）が内需 固定ユニバース 109 銘柄（domestic_universe.json＝総合小売・食品スーパー・ドラッグ・専門店・外食・食品日用品・レジャー・住宅不動産・鉄道通信公益の 9 業態）を ①-S3 と同じチャート条件で順張り（M1〜M3）・逆張り（R1〜R3）に分け、全銘柄に熟成ステージを付ける。ローテーション計は内需と AI（ai_scan_today.json）の 20 日リターン中央値の差で、数字と推移だけを出す。業績・値頃感は grades.json（プール外は未評価）、手法チップは当夜の各手法候補にその銘柄が居るか。候補は当面 ①-8 に渡さず記録と表示のみ。全て候補・記録であり最終判断はユーザー。</div>`;
+  const runsD=(d.pipeline&&d.pipeline.runs)||{};
+  const freshD=scanFreshChip('🏠①-S4',a||(sc?{base_day:sc.base_day}:null),runsD.dm_scan,st.length?`status ${st.length}件`:'status なし')+scanFreshChip('🤖①-S3（AI 側）',AI_TODAY||null,runsD.ai_scan,null);
+  if(!sc&&!a&&!cm.length&&!cr.length) return note+freshD+`<div class='empty'>①-S4 内需スキャンの実行記録がありません（dm_scan 未作成）。</div>`;
+  const rot=renderDmRotation(a);
+  let waves='';
+  const secs=(sc&&sc.sectors)||(a&&a.sectors)||null;
+  if(secs){
+    const order=['retail_general','supermarket','drug','specialty','restaurant','food','leisure','housing','infra'];
+    waves=`<div class='cpsec'><h3>業態の波（base_day ${esc((sc&&sc.base_day)||(a&&a.base_day)||'—')}・ユニバース ${esc((sc&&sc.universe_n)||st.length||'—')}・取得 ${esc((sc&&sc.fetched_n)||'—')}）</h3>`+
+      order.filter(k=>secs[k]).concat(Object.keys(secs).filter(k=>order.indexOf(k)<0)).map(k=>{ const s=secs[k]; const sc8=s.stage_counts||{}; return `<span class='aiwave${s.wave_on?' on':''}' title='25MA 上回り率 ${esc(num1(s.above25_pct))}%・75MA ${esc(num1(s.above75_pct))}%・25MA 乖離中央値 ${esc(num1(s.median_dev25))}%・20日リターン中央値 ${esc(num1(s.median_ret20))}%・当夜の該当 順張り${esc(s.signals_m)}／逆張り${esc(s.signals_r)}・ステージ 🔥${esc(sc8['🔥']||0)} 🍖${esc(sc8['🍖']||0)} 🥩${esc(sc8['🥩']||0)}${s.role?'｜'+esc(s.role):''}'>${esc(s.label||k)} ${s.wave_on?'● 点灯':'○'} ${esc(num1(s.above25_pct))}%</span>`; }).join('')+
+      `<div class='meta'>● 点灯＝25MA 上回り率 50% 以上かつ 20 日リターン中央値がプラス。数字は 25MA 上回り率。</div></div>`;
+  }
+  // 焼き入れ・遷移・ステージ別一覧（AI タブと同じ部品。行に業績・値頃感・手法を足す）
+  let stages='';
+  if(a&&st.length){
+    const cnt={}; st.forEach(s=>{ cnt[s.stage||'❔取得不可']=(cnt[s.stage||'❔取得不可']||0)+1; });
+    const head=`<div class='meta'>base_day ${esc(a.base_day||'—')}・${esc(st.length)} 銘柄・ユニバース中央値 20日 ${esc(num1(a.median_ret20_univ))}%｜`+STG_ORDER.filter(k=>cnt[k]).map(k=>`<span class='stg ${STG_CLASS[k]||''}'>${esc(k)} ${esc(cnt[k])}</span>`).join('')+`</div>`;
+    const rip=Array.isArray(a.ripen)?a.ripen:[];
+    const ripHtml=rip.length?`<div class='ripen'><b>🍖→🔥 焼き入れ（記録のみ・候補ではない・①-8 に渡していない）</b> ${rip.length}件`+rip.map(r=>{ const s=smap[String(r.code)]||r; return dmRow(Object.assign({},s,{prev_stage:r.from||s.prev_stage}),true); }).join('')+`</div>`:'';
+    const trs=st.filter(s=>s.transition).sort((x,y)=>STG_ORDER.indexOf(x.stage)-STG_ORDER.indexOf(y.stage)||String(x.code).localeCompare(String(y.code)));
+    const trHtml=`<div class='cpsec'><h3>🔁 当夜の遷移（${trs.length}件）</h3>${trs.length?trs.map(s=>dmRow(s,true)).join(''):`<div class='empty'>当夜の遷移なし（初回は 0）</div>`}</div>`;
+    const groups=STG_ORDER.map(k=>{ const g=st.filter(s=>(s.stage||'❔取得不可')===k).sort((x,y)=>(y.sleep_days||0)-(x.sleep_days||0)||String(x.code).localeCompare(String(y.code))); if(!g.length) return ''; const open=(k==='🔥初動'||k==='🍖熟成中')?' open':''; return `<details class='stgd'${open}><summary><span class='stg ${STG_CLASS[k]||''}'>${esc(k)}</span> ${esc(g.length)}件 <span class='meta'>${esc(STG_DESC[k]||'')}</span></summary>${g.map(s=>dmRow(s,false)).join('')}</details>`; }).join('');
+    stages=`<div class='cpsec'><h3>🥩 熟成ステータス（全銘柄・①-S4 v1.0）</h3>${head}${ripHtml}</div>${trHtml}`;
+    // 候補（当夜の M/R）。status 行から描く（master.json の candidates と一致・V2）
+    const candSec=(title,arr,br)=>{ const rows=arr.length?[...arr].sort((x,y)=>(y.score||0)-(x.score||0)||String(x.code).localeCompare(String(y.code))).map(c=>{ const s=smap[String(c.code)]||c; return scanCard(Object.assign({},s,{signals:c.signals||s.signals}),{dm:true,branch:br,score:c.score}); }).join(''):`<div class='empty'>当夜の該当なし</div>`; return `<div class='cpsec'><h3>${title}（${arr.length}件）</h3>${rows}</div>`; };
+    stages+=candSec('🏠 順張り候補 dm_momentum',cm,'dm_momentum')+candSec('🏠 逆張り候補 dm_reversal',cr,'dm_reversal');
+    stages+=`<div class='cpsec'><h3>📚 ステージ別一覧（静かな日数の多い順・全 ${esc(st.length)} 銘柄）</h3><div class='meta'>各カードはウォッチタブと同じ構成。4 行目に RS20・🚪ゲート・業績・値頃感、2 行目b に 📈文脈🕯形態（プール在籍の銘柄のみ）と当夜の手法チップ。プール外の銘柄は業績・値頃感が「未評価」（候補になってプールに入ると ①-9 が評価）。</div>${groups}</div>`;
+  } else {
+    stages=`<div class='cpsec'><h3>🥩 熟成ステータス（全銘柄・①-S4 v1.0）</h3><div class='empty'>dm_scan_today.json に status がありません（初回実行前、または取得失敗）。</div></div>`;
+  }
+  return note+freshD+rot+waves+stages;
+}
+// ===== D24: 🧬アンソロ タブ（①-S5 アンソロスキャン・期間限定）。内需タブと同じ部品＋イベント計 =====
+const AN_ORDER=['l1_beta','l2_partner','l3_direct'];
+function renderAnEvent(a){
+  const e=(a&&a.event)||null; const log=(a&&Array.isArray(a.event_log))?a.event_log:[]; const p=(a&&a.period)||{};
+  const sign=(v,unit)=>v==null?'—':`<span class='${v>=0?'pos':'neg'}'>${v>0?'+':''}${esc(num1(v))}${unit||''}</span>`;
+  const phaseLabel={pre:'上場前（報道ベース）',post:'上場後（ANT 日足あり）',unknown:'上場日未確認（ANT 未取得）'};
+  if(!e) return `<div class='cpsec'><h3>📅 イベント計（基準日 10/26 比）</h3><div class='empty'>event がありません（①-S5 の初回実行前、または取得失敗）。</div></div>`;
+  const L=e.layers||{}; const l1=L.l1_beta||{}, l2=L.l2_partner||{}, l3=L.l3_direct||{};
+  const layerRow=(k,x,label)=>`<span>${sign(x.med_since_ref,'%')}<span class='lbl'> ${esc(label)}（n${esc(x.n!=null?x.n:'—')}）${x.best?'・最良 '+esc(x.best.code)+' '+(x.best.ret_since_ref_pct>0?'+':'')+esc(num1(x.best.ret_since_ref_pct))+'%':''}${x.worst?'・最弱 '+esc(x.worst.code)+' '+(x.worst.ret_since_ref_pct>0?'+':'')+esc(num1(x.worst.ret_since_ref_pct))+'%':''}</span></span>`;
+  const ant=e.ant?`<span>ANT ${esc(e.ant.close)}<span class='lbl'> 上場初日終値比 </span>${sign(e.ant.ret_since_first_pct,'%')}<span class='lbl'>（${esc(e.ant.day||'')}・${esc(e.ant.bars_n||0)} 本）</span></span>`:`<span class='lbl'>ANT: 未取得（${esc(phaseLabel[e.phase]||e.phase||'—')}）</span>`;
+  const bars=log.slice(-40).map(x=>{ const v=x.l1_vs_nk; if(v==null) return `<i style='height:1px;background:#444' title='${esc(x.base_day)} —'></i>`; const h=Math.min(44,Math.max(2,Math.abs(v)*3)); return `<i class='${v<0?'n':''}' style='height:${h}px' title='${esc(x.base_day)} ①ベータ vs 日経ETF ${v>0?'+':''}${esc(num1(v))}pt（① ${esc(num1(x.l1_med_since))}％／② ${esc(num1(x.l2_med_since))}％／③ ${esc(num1(x.l3_med_since))}％／日経ETF ${esc(num1(x.b1321_since))}％${x.ant_close!=null?'／ANT '+esc(x.ant_close):''}）'></i>`; }).join('');
+  return `<div class='cpsec'><h3>📅 イベント計（基準日 2026-10-26＝公開版 S-1 提出日の東京終値 比）</h3>
+    <div class='meta'>期間 ${esc(p.start_day||'—')}〜${esc(p.end_day||'—')}（残り ${esc(e.days_left!=null?e.days_left:'—')} 営業日・基準日から ${esc(e.days_since_ref!=null?e.days_since_ref:'—')} 営業日）・局面 <b>${esc(phaseLabel[e.phase]||e.phase||'—')}</b>・上場見込み ${esc(p.listing_expected||'—')}（報道・確定日ではない）・ticker ${esc(p.ticker||'ANT')}</div>
+    <div class='rot'><span class='big'>${sign(e.l1_vs_nk,'pt')}</span><span class='lbl'>①ベータ − 日経ETF(1321)</span>
+      <span>${sign(e.l2_vs_topix,'pt')}<span class='lbl'> ②提携 − TOPIX ETF(1306)</span></span>
+      <span>${sign(e.l1_vs_ai20,'pt')}<span class='lbl'> ①ベータ 20日 − AI宇宙 20日${e.ai_base_day?'（AI 側 '+esc(e.ai_base_day)+'）':''}</span></span>
+      <span style='flex-basis:100%'></span>
+      ${layerRow('l1_beta',l1,'①ベータ')}${layerRow('l2_partner',l2,'②提携・採用')}${layerRow('l3_direct',l3,'③直接保有')}
+      <span style='flex-basis:100%'></span>
+      <span>${sign(e.bench_1321_since_ref,'%')}<span class='lbl'> 日経ETF 1321</span></span><span>${sign(e.bench_1306_since_ref,'%')}<span class='lbl'> TOPIX ETF 1306</span></span>${ant}</div>
+    ${log.length?`<div class='rotbars'>${bars}</div><div class='meta'>直近 ${esc(Math.min(40,log.length))} 営業日の「①ベータ − 日経ETF」（基準日比の差・緑＝関連株が指数より強い・赤＝弱い）。数字と推移だけで「期待で上がった／出尽くし」の判定はしない。</div>`:`<div class='meta'>推移は 2 夜目から。</div>`}
+  </div>`;
+}
+function renderAnTriggers(a){
+  const tr=(a&&Array.isArray(a.triggers))?a.triggers:[]; const log=(a&&Array.isArray(a.trigger_log))?a.trigger_log:[];
+  const KIND={T1:'🇺🇸米株',T2:'🧬ANT',T3:'層',T4:'銘柄',T5:'🪜ステップ',T6:'信号'};
+  const kindOf=x=>{ const id=String(x.id||x.kind||''); const k=Object.keys(KIND).find(k=>id.startsWith(k)); return k?KIND[k]:(x.kind||''); };
+  const body=tr.length?`<div class='trg'>${tr.map(x=>`<span class='t' title='${esc(x.id||'')}${x.th!=null?' 閾値 '+esc(x.th):''}'><b>${esc(kindOf(x))}</b> ${esc(x.name||x.code_or_ticker||'')}${x.code_or_ticker&&x.name?` <small>${esc(x.code_or_ticker)}</small>`:''} ${esc(x.text||'')}</span>`).join('')}</div>`:`<div class='meta'>🔔 なし（閾値に当たった事実なし）</div>`;
+  const recent=log.slice(-10).reverse().filter(l=>l&&l.n).map(l=>`<div class='meta'>${esc(l.base_day)}: ${esc(l.n)}件 — ${esc((l.texts||[]).slice(0,4).join('／'))}${(l.texts||[]).length>4?' …':''}</div>`).join('');
+  return `<div class='cpsec'><h3>🔔 カタリスト（当夜 ${tr.length}件・数値閾値の転記のみ）</h3>${body}${recent?`<details class='cfold'><summary>直近の 🔔 ログ（${log.filter(l=>l&&l.n).length} 夜）</summary>${recent}</details>`:''}<div class='meta'>T1 米株 ±4%／出来高2倍・T2 ANT 初取得／±8%・T3 層中央値 ±3%／ベンチ比 ±5pt クロス・T4 銘柄 ±5%／出来高2.5倍・T5 ステップ予定日 3 営業日前〜翌日・T6 M1／焼き入れ／🗑遷移。評価の言葉は付けない。</div></div>`;
+}
+function renderAnSteps(a){
+  const st=(a&&Array.isArray(a.ipo_steps))?a.ipo_steps:[]; const nx=(a&&a.next_step)||null;
+  if(!st.length) return `<div class='cpsec'><h3>🪜 IPO 進捗ステップ</h3><div class='empty'>ipo_steps がありません（①-S5 v1.1 の初回前、または取得失敗）。</div></div>`;
+  const SL={confirmed:'確定',reported:'報道',pending:'未定'};
+  const rows=st.map(s=>{ const isNext=nx&&nx.id===s.id; const cls=s.reached?'done':(isNext?'next':''); const dt=(s.days_to!=null)?(s.days_to>0?`あと ${s.days_to} 営業日`:(s.days_to===0?'当日':`${-s.days_to} 営業日前`)):''; return `<div class='step ${cls}'><span class='d'>${esc(s.date||'—')}</span><span class='l'>${esc(s.label||s.id)}</span><span class='st ${esc(s.status||'pending')}'>${esc(SL[s.status]||s.status||'—')}</span>${s.observed?`<span class='st confirmed' title='ANT の日足が取れた実測'>実測 ${esc(s.observed_day||'')}</span>`:''}<span class='n'>${esc(dt)}${s.note?'・'+esc(s.note):''}</span></div>`; }).join('');
+  return `<div class='cpsec'><h3>🪜 IPO 進捗ステップ（日付の到来を数えるだけ・status は JSON の転記）</h3><div class='steps'>${rows}</div><div class='meta'>● 緑＝到達・黄＝次のステップ。確定（公式）／報道（見込み）／未定（日付は仮）。日付・status の更新はメンテナンス PR。ルーティンは報道を見に行かない。</div></div>`;
+}
+function renderAnUs(a){
+  const us=(a&&a.us)||null; if(!us||!Array.isArray(us.rows)||!us.rows.length) return `<div class='cpsec'><h3>🇺🇸 米関連株ウォッチ</h3><div class='empty'>us がありません（①-S5 v1.1 の初回前、または取得失敗）。</div></div>`;
+  const sign=(v,unit)=>v==null?'—':`<span class='${v>=0?'pos':'neg'}'>${v>0?'+':''}${esc(num1(v))}${unit||''}</span>`;
+  const G=us.groups||{}; const gi=G.infra||{}, gv=G.investor||{};
+  const order={infra:0,investor:1,ipo:2};
+  const rows=[...us.rows].sort((x,y)=>(order[x.group]||0)-(order[y.group]||0)||((y.since_ref_pct==null?-1e9:y.since_ref_pct)-(x.since_ref_pct==null?-1e9:x.since_ref_pct))).map(r=>`<tr title='${esc(r.basis||'')}'><td><b>${esc(r.t)}</b> <span class='g'>${esc(r.name||'')}</span>${r.fetched===false?' <span class=\'g\'>⚠未取得</span>':''}</td><td>${r.close!=null?esc(r.close):'—'}</td><td>${sign(r.ret1_pct,'%')}</td><td>${sign(r.ret5_pct,'%')}</td><td>${sign(r.since_ref_pct,'%')}</td><td>${r.hi_since_ref_pct!=null?sign(r.hi_since_ref_pct,'%'):'—'}</td><td>${r.vol_ratio20!=null?esc(num1(r.vol_ratio20))+'倍':'—'}</td></tr>`).join('');
+  const log=(a&&Array.isArray(a.event_log))?a.event_log:[]; const bars=log.slice(-40).map(x=>{ const v=x.us_infra_vs_l1; if(v==null) return `<i style='height:1px;background:#444' title='${esc(x.base_day)} —'></i>`; const h=Math.min(44,Math.max(2,Math.abs(v)*3)); return `<i class='${v<0?'n':''}' style='height:${h}px' title='${esc(x.base_day)} 米インフラ − 日本①ベータ ${v>0?'+':''}${esc(num1(v))}pt'></i>`; }).join('');
+  return `<div class='cpsec'><h3>🇺🇸 米関連株ウォッチ（${esc(us.us_day||'—')} 終値・基準 ${esc(us.us_ref_day||'10/23')} 比・指標のみ）</h3>
+    <div class='rot'><span class='big'>${sign(us.us_infra_vs_l1,'pt')}</span><span class='lbl'>米インフラ中央値 − 日本①ベータ中央値（基準日比の差・日付は 1 日ずれる）</span>
+      <span>${sign(gi.med_since_ref,'%')}<span class='lbl'> 🧱インフラ 基準比（前日 ${gi.med_ret1!=null?(gi.med_ret1>0?'+':'')+esc(num1(gi.med_ret1))+'%':'—'}）</span></span>
+      <span>${sign(gv.med_since_ref,'%')}<span class='lbl'> 🏦大株主 基準比（前日 ${gv.med_ret1!=null?(gv.med_ret1>0?'+':'')+esc(num1(gv.med_ret1))+'%':'—'}）</span></span></div>
+    <div style='overflow-x:auto'><table class='ustab'><thead><tr><th>銘柄</th><th>終値</th><th>前日</th><th>5日</th><th>基準比</th><th>高値</th><th>出来高</th></tr></thead><tbody>${rows}</tbody></table></div>
+    ${log.some(x=>x.us_infra_vs_l1!=null)?`<div class='rotbars'>${bars}</div><div class='meta'>直近 ${esc(Math.min(40,log.length))} 営業日の「米インフラ − 日本①ベータ」（緑＝米側が強い・赤＝日本側が強い）。</div>`:''}
+    <div class='meta'>🧱 NVDA・AMD・INTC・MU・DELL・MSFT（10/26 の S-1 提出日に上昇）・🏦 AMZN・GOOGL（大株主・クラウド供給元）。候補・ステージ判定の対象ではなく、日本株ユニバースの指標。</div></div>`;
+}
+function renderAnScan(d){
+  const sc=d.an_scan||null; const cm=(d.candidates&&d.candidates.an_momentum)||[]; const cr=(d.candidates&&d.candidates.an_reversal)||[];
+  const a=AN_TODAY; const st=(a&&Array.isArray(a.status))?a.status:[]; const smap={}; st.forEach(s=>{ smap[String(s.code)]=s; });
+  const note=`<div class='cpnote'>①-S5 アンソロスキャン（平日 19:20・<b>期間限定 2026-11-02〜12-18</b>）が Anthropic IPO 関連 固定ユニバース 15 銘柄（anthropic_universe.json＝🧬①ベータ層 4: 10/27 に指数を押し上げた AI・半導体大型／🤝②提携・採用層 10: 提携・採用・アクセス権が報道で名指しされた企業（出資関係なし）／🎯③直接保有層 1: Anthropic 優先株 0.47% 組入 ETF）を ①-S3／S4 と同じチャート条件で順張り（M1〜M3）・逆張り（R1〜R3）に分け、全銘柄に熟成ステージを付ける。イベント計は基準日（S-1 公開 2026-10-26）比の層別中央値とベンチ比・上場後は ANT 初日比で、数字と推移だけを出す。v1.1 から 🔔 カタリスト（数値閾値 T1〜T6）・🪜 IPO 進捗ステップ（日付の到来）・🇺🇸 米関連株 8 本（前夜の米国終値・基準 10/23 比）を併記。候補は ①-8 に渡さず記録と表示のみ。全て候補・記録であり最終判断はユーザー。終了日後は ①-S5 は PR を出さず停止通知だけ。</div>`;
+  const runs=(d.pipeline&&d.pipeline.runs)||{};
+  const fresh=scanFreshChip('🧬①-S5',a||(sc?{base_day:sc.base_day}:null),runs.an_scan,st.length?`status ${st.length}件`:'status なし')+scanFreshChip('🤖①-S3（AI 側）',AI_TODAY||null,runs.ai_scan,null);
+  if(!sc&&!a&&!cm.length&&!cr.length) return note+fresh+`<div class='empty'>①-S5 アンソロスキャンの実行記録がありません（an_scan 未作成。初回は 2026-11-02（月）19:20 の予定）。</div>`;
+  const ev=renderAnTriggers(a)+renderAnSteps(a)+renderAnEvent(a)+renderAnUs(a);
+  let waves='';
+  const secs=(sc&&sc.sectors)||(a&&a.sectors)||null;
+  if(secs){
+    waves=`<div class='cpsec'><h3>層別の波（base_day ${esc((sc&&sc.base_day)||(a&&a.base_day)||'—')}・ユニバース ${esc((sc&&sc.universe_n)||st.length||'—')}・取得 ${esc((sc&&sc.fetched_n)||'—')}）</h3>`+
+      AN_ORDER.filter(k=>secs[k]).concat(Object.keys(secs).filter(k=>AN_ORDER.indexOf(k)<0)).map(k=>{ const s=secs[k]; const sc8=s.stage_counts||{}; return `<span class='aiwave${s.wave_on?' on':''}' title='25MA 上回り率 ${esc(num1(s.above25_pct))}%・75MA ${esc(num1(s.above75_pct))}%・25MA 乖離中央値 ${esc(num1(s.median_dev25))}%・20日リターン中央値 ${esc(num1(s.median_ret20))}%・当夜の該当 順張り${esc(s.signals_m)}／逆張り${esc(s.signals_r)}・ステージ 🔥${esc(sc8['🔥']||0)} 🍖${esc(sc8['🍖']||0)} 🥩${esc(sc8['🥩']||0)}${s.role?'｜'+esc(s.role):''}'>${esc(s.label||k)} ${s.wave_on?'● 点灯':'○'} ${esc(num1(s.above25_pct))}%</span>`; }).join('')+
+      `<div class='meta'>● 点灯＝25MA 上回り率 50% 以上かつ 20 日リターン中央値がプラス。数字は 25MA 上回り率（n は 4／10／1 で統計的な意味は薄い。推移を見る用途）。</div></div>`;
+  }
+  let stages='';
+  const row=(s,tr,extra)=>scanCard(s,Object.assign({tr:tr,dm:true,an:true},extra||{}));
+  if(a&&st.length){
+    const cnt={}; st.forEach(s=>{ cnt[s.stage||'❔取得不可']=(cnt[s.stage||'❔取得不可']||0)+1; });
+    const head=`<div class='meta'>base_day ${esc(a.base_day||'—')}・${esc(st.length)} 銘柄・ユニバース中央値 20日 ${esc(num1(a.median_ret20_univ))}%｜`+STG_ORDER.filter(k=>cnt[k]).map(k=>`<span class='stg ${STG_CLASS[k]||''}'>${esc(k)} ${esc(cnt[k])}</span>`).join('')+`</div>`;
+    const rip=Array.isArray(a.ripen)?a.ripen:[];
+    const ripHtml=rip.length?`<div class='ripen'><b>🍖→🔥 焼き入れ（記録のみ・候補ではない・①-8 に渡していない）</b> ${rip.length}件`+rip.map(r=>{ const s=smap[String(r.code)]||r; return row(Object.assign({},s,{prev_stage:r.from||s.prev_stage}),true); }).join('')+`</div>`:'';
+    const trs=st.filter(s=>s.transition).sort((x,y)=>STG_ORDER.indexOf(x.stage)-STG_ORDER.indexOf(y.stage)||String(x.code).localeCompare(String(y.code)));
+    const trHtml=`<div class='cpsec'><h3>🔁 当夜の遷移（${trs.length}件）</h3>${trs.length?trs.map(s=>row(s,true)).join(''):`<div class='empty'>当夜の遷移なし（初回は 0）</div>`}</div>`;
+    stages=`<div class='cpsec'><h3>🥩 熟成ステータス（全銘柄・①-S5 v1.0）</h3>${head}${ripHtml}</div>${trHtml}`;
+    const candSec=(title,arr,br)=>{ const rows=arr.length?[...arr].sort((x,y)=>(y.score||0)-(x.score||0)||String(x.code).localeCompare(String(y.code))).map(c=>{ const s=smap[String(c.code)]||c; return row(Object.assign({},s,{signals:c.signals||s.signals}),false,{branch:br,score:c.score}); }).join(''):`<div class='empty'>当夜の該当なし</div>`; return `<div class='cpsec'><h3>${title}（${arr.length}件）</h3>${rows}</div>`; };
+    stages+=candSec('🧬 順張り候補 an_momentum',cm,'an_momentum')+candSec('🧬 逆張り候補 an_reversal',cr,'an_reversal');
+    // 層別一覧（基準日比の高い順）。層ごとに details・①は既定で開く
+    const secsMeta=secs||{};
+    const groups=AN_ORDER.concat(Object.keys(secsMeta).filter(k=>AN_ORDER.indexOf(k)<0)).map((k,i)=>{ const g=st.filter(s=>s.sector===k).sort((x,y)=>((y.ret_since_ref_pct==null?-1e9:y.ret_since_ref_pct)-(x.ret_since_ref_pct==null?-1e9:x.ret_since_ref_pct))||String(x.code).localeCompare(String(y.code))); if(!g.length) return ''; const m=secsMeta[k]||{}; const med=(m.median_ret20!=null)?`・20日中央値 ${esc(num1(m.median_ret20))}%`:''; return `<details class='stgd'${i===0?' open':''}><summary>${esc(m.label||(g[0]&&g[0].sector_label)||k)} ${esc(g.length)}件 <span class='meta'>${esc(m.role||(g[0]&&g[0].role)||'')}${med}</span></summary>${g.map(s=>row(s,false)).join('')}</details>`; }).join('');
+    stages+=`<div class='cpsec'><h3>📚 層別一覧（基準日比の高い順・全 ${esc(st.length)} 銘柄）</h3><div class='meta'>各カードはウォッチタブと同じ構成。5 行目の先頭に「基準10/26比」（期間中の最高終値・日経ETF比は hover）。2 行目b に関連の根拠と、同じ銘柄が 🤖AI特需／🏠内需ユニバースに居る場合はそのステージ（4062・6752）。プール外の銘柄は業績・値頃感が「未評価」。408A は ETF のため常に未評価。</div>${groups}</div>`;
+  } else {
+    stages=`<div class='cpsec'><h3>🥩 熟成ステータス（全銘柄・①-S5 v1.0）</h3><div class='empty'>an_scan_today.json に status がありません（初回実行前、または取得失敗）。</div></div>`;
+  }
+  return note+fresh+ev+waves+stages;
 }
 function renderChangepoint(d,runs){
   return safeSection('sec-cp','🔔 変化点ウォッチ',()=>{
@@ -2126,6 +2448,20 @@ function renderLegend(){
     ${tr.map(row).join('')}
     <h3>💴 配当・🎁優待・📆権利対象（D8）</h3>
     <div class='note'>💴チップ＝①-8 v1.38 が kabutan の既読ページから読んだ予想配当（年間または中間／期末）と、minkabu の優待ページで確かめた優待の有無・優待権利月（grades.json の fy/rm/dvi/dvf/dva/yt/ym）。未取得の銘柄には出ない（初回は保有・PASS から順に埋まる）。<br>📆権利対象チップ＝今日〜次の営業日に権利付き最終日／権利落ち日があり、かつその月がこの銘柄の権利月（配当または優待）に含まれるときだけ出る。「現在値→落ち後目安（−x円・−y%）」は該当する配当を現在値から引いたもので、公表値からの計算（推定ではない）。優待分は含まないので、🎁付きの銘柄は目安より大きく落ちうる。「直近5日 ±z%」は権利取り前に上がってきた幅（pool_bars の直近5本）で、落ち後に剥落しうる分の目安。SL との比較は出さない（stop の反映は実弾ボード側の運用に依存するため）。権利月が未取得の銘柄は「📆権利月不明」。権利月が違う銘柄には何も出ない（＝今回の権利落ちの影響は限定的）。</div>
+    <h3>🏢 AI特需ユニバース v2（D26）</h3>
+    <div class='note'>ai_universe.json v2 で 🏢大型・指数寄与 29 銘柄（装置 6857・8035・6146・6920・7735・6525／電機SI 6501・6702・6701・6503・6758／素材部品 3436・6723・6762・6971・6988・7741／電線光 5803・5801・5802／投資通信 9984・9433・9434／電力重電 7011・9501・9503／FA 6861・6954・6594）を追加。狙いは AI 界隈の激動で指数と一緒に売られた大型を、ちょる子式（プライム・時価総額 1000 億↑・RSI≤30・乖離 ≤−10%）に近い ①-S3 の逆張り R2（25MA 乖離 ≤−8%・RSI≤35・200MA 上向き）／R3（乖離 ≤−15%・52 週下位・反発陽線）で拾うこと。順張り・熟成ステージも同じ器で付く。AI 特需タブの「波の点灯」に 🏢 が 1 枠増える。判定・順位は変えない。</div>
+    <h3>🔔🪜🇺🇸 アンソロタブの追加表示（D25）</h3>
+    <div class='note'>①-S5 v1.1 の 3 つの追加を表示。🔔 カタリスト＝数値閾値（T1 米株 ±4%／出来高2倍・T2 ANT 初取得／±8%・T3 層中央値 ±3%／ベンチ比 ±5pt クロス・T4 銘柄 ±5%／出来高2.5倍・T5 IPO ステップの予定日 3 営業日前〜翌日・T6 M1／焼き入れ／🗑遷移）に当たった事実の転記で、評価の言葉は付けない。🪜 IPO ステップ＝anthropic_universe.json の 9 段（S-1 機密提出→取引所→公開 S-1→ロードショー→公開価格→上場→1 週間→クワイエット期間終了→観測終了）を日付の到来で緑（到達）／黄（次）に塗る。status の確定（公式）／報道／未定は JSON の転記で、更新はメンテナンス PR。🇺🇸 米関連株＝NVDA・AMD・INTC・MU・DELL・MSFT（S-1 提出日に上昇）と AMZN・GOOGL（大株主）の前夜終値・前日比・基準 10/23 比。棒は「米インフラ − 日本①ベータ」。いずれも指標であり候補・判定の対象ではない。</div>
+    <h3>🧬 アンソロタブ（D24・期間限定）</h3>
+    <div class='note'>①-S5 アンソロスキャン（平日 19:20・2026-11-02〜12-18）の記録を表示。ユニバースは Anthropic IPO 関連で報道に名指しされた 15 銘柄を 3 層に分けたもの（①ベータ層＝10/27 に指数を押し上げた AI・半導体大型 6857・8035・9984・4062／②提携・採用層＝提携・採用・アクセス権の報道 6701・6702・6501・8306・8316・8411・4704・6752・4307・4755／③直接保有層＝Anthropic 優先株 0.47% 組入 ETF 408A）。イベント計＝基準日（公開版 S-1 提出 2026-10-26 の東京終値）比の層別中央値・日経ETF(1321)／TOPIX ETF(1306) 比・上場後は ANT の初日終値比。棒グラフは「①ベータ − 日経ETF」の推移。「期待で上がった／出尽くし」の判定はしない（数字と推移だけ）。ステージ・候補・カードは AI特需／内需タブと同じ器。終了日後はタスクを削除し、タブは最終日の記録を表示したまま残る。</div>
+    <h3>🧩 スキャン銘柄カードの統一（D23）</h3>
+    <div class='note'>AI特需・内需タブの全銘柄一覧・候補・焼き入れ・遷移を、ウォッチタブと同じカード（1 行目 コード・銘柄名・終値／決算帯／2 行目 ステージチップ（遷移は「← 前ステージ」）・ブランチ・score・業態・信号・静か n日／閾値・ステージ n日目／2 行目b 📈文脈🕯形態（pool_bars にある銘柄のみ）と内需の手法チップ・🚪ゲート／4 行目 RS20・ゲート・業績・値頃感・🤷／5 行目 25MA・長期線・20日・レンジ・ATR比・52週・出来高／末尾 ステージ開始日と直近 3 回の履歴）に統一。業績・値頃感チップは他タブと同じ ①-9 のキャッシュから出すので、プール外の銘柄は「未評価」。表示であり判定・順位は変えない。</div>
+    <h3>🕒 スキャン鮮度チップ（D22）</h3>
+    <div class='note'>①-S3 AI特需／①-S4 内需の鮮度。<b>base_day</b>（日足の最終日）と「今夜あるべき base_day」（端末の時刻が平日 20:00 以降なら当日、それ以前・休場なら前営業日。JPX 休業日表で数える・通信なし）の営業日差で色分け: <b>🟢最新</b>＝差 0、<b>🟡1営業日前</b>、<b>🔴n営業日前</b>＝2 日以上（スキャンが止まっている・PR 未マージ・取得失敗が続いている等。原因はこのボードでは判定しない）、<b>⚪未実行</b>＝記録なし。小さく「生成」（ai_scan_today／dm_scan_today の generated_at）・版・status 件数。ページ最上部にも同じチップを 2 つ出す。表示であり判定・順位は変えない。</div>
+    <h3>🏠 内需タブ・ローテーション計（D21）</h3>
+    <div class='note'>①-S4 内需スキャン v1.0（平日 18:55）が内需 固定ユニバース 109 銘柄（domestic_universe.json・9 業態）に ①-S3 と同じ器（順張り M1〜M3／逆張り R1〜R3・熟成ステージ 8 区分・焼き入れ記録）を当て、master.json の dm_scan と dm_scan_today.json に書く。<b>🔄 ローテーション計</b>＝内需ユニバースの 20 日リターン中央値 − AI ユニバース（ai_scan_today.json）の同中央値（rot20・pt）。プラス＝内需が相対的に強い。5 日版（rot5）、内需 vs TOPIX ETF（1306）、AI vs 日経 ETF（1321）も同じ夜の同じ計算。棒グラフは直近 40 営業日の rot20。数字と推移だけを出し「ローテーション入り／終了」の判定語は出さない（読むのはユーザー）。各行 2 段目＝業績・値頃感（grades.json の gy/val/PER/🤷/💴。プール外の銘柄は「未評価」で、候補になって ①-8 のプールに入ると ①-9 が評価する）と、当夜の各手法候補（ケンモメ・新高値・ちょる子・グランビル・STF・変化点）にその銘柄が居るかの手法チップ、ゲート結果 🚪。内需候補は当面 ①-8 に渡さない（記録と表示。①-8 v1.48 で dm_* ブランチを受けてから）。判定・提案・順位は変えない。</div>
+    <h3>🥩 熟成ステータス・焼き入れ（D20）</h3>
+    <div class='note'>①-S3 AI特需スキャン v1.1 が固定ユニバース全 74 銘柄に毎夜付けるチャートだけの機械判定（ai_scan_today.json の status）。<b>🔥初動</b>＝25MA 上・25MA 上向き・20日 +5% 以上で、直近 10 本に長期線の上抜けか出来高を伴う 20 日高値更新が有る。<b>🍖熟成中</b>＝「静かな日」（75MA 乖離 ±10%・20日レンジ 20% 以内・5日騰落 ±8%）が<b>ケース別の閾値</b>以上続き、ATR が 40 本前の 0.85 倍以下か 20日レンジ 12% 以内に収縮。閾値＝A 業績あり（grades の gys 3 以上）20 日／B チャートのみ 40 日／C 崩れ後の再熟成 20 日＋底から 40 営業日／D 短履歴 max(10, min(20, 本数−75))。<b>🥩底練り</b>＝長期線の下の横ばいか閾値未達。<b>🍽食べ時</b>＝既に動いている（食べ頃）。<b>🗑期限切れ</b>＝25<75 下向き・20日 −8% 以下か 60日高値 −25% 以下。<b>🐄上場直後</b>＝日足 60 本未満で判定保留（指標は記録）。<b>短履歴</b>＝235 本未満は 200MA の代わりに 75MA で判定し、一年足不足を理由に除外しない。<b>RS20</b>＝20日リターンからユニバース中央値を引いた相対強弱。<b>🍖→🔥 焼き入れ</b>＝🍖（または 10 日以上の 🥩）から 🔥 に変わった夜。v1.1 では記録だけで candidates に入れず ①-8 にも渡さない（4 週分の記録と ①-11 の成績を見て採用を判断）。ステージは候補の順位・件数・ゲート判定を変えない。</div>
     <h3>🤖 AI特需タブ（D11）</h3>
     <div class='note'>①-S3 AI特需スキャン v1.0 が master.json に書く ai_scan（セクター別: 25MA 上回り率・20日リターン中央値・wave_on）と candidates.ai_momentum／ai_reversal を描く。順張り M1＝60日高値ブレイク＋出来高1.5倍、M2＝25MA 上抜け初動、M3＝押し後の10日高値更新。逆張り R1＝パーフェクトオーダーの 25MA 押し目、R2＝25MA 乖離 −8% 以下＋RSI35 以下＋200MA 上向き、R3＝−15% 以下の深押しからの反発。ユニバースは固定 74 銘柄（ai_universe.json）。ゲート判定・提案は ①-8 の既存の器（別ブランチ）。表示であり判定・順位は変えない。</div>
     <h3>📑 指数イベント（D10）</h3>
@@ -2137,6 +2473,8 @@ function renderLegend(){
     <div class='note'>grades.json の <b>pg</b>（①-9 の進捗モデル: 今期の累計を前年・前々年の同時点進捗率で割り戻した着地試算と、会社計画の乖離%。経常ベース・無ければ売上）。<b>橙＝遅れ（−10% 以下）</b>、<b>緑＝上振れ（+10% 以上）</b>、灰＝計画圏。試算であり予想ではない。上場 2 年未満・決算期変更直後は履歴不足で出ない。判定・提案・順位は変えない。</div>
     <h3>🤷 売上圧縮チップ（D17）</h3>
     <div class='note'>🤷PER圧縮（D4）の売上版。①-9 v5.5 が valuation_cache の <b>value_gap_sales</b>（grades.json では <b>vgs</b>）に書く: 通期予想の売上成長 ≥15% ∧ 株価が26週で±10%以内・レンジ25%以内 ∧ <b>PSR</b>（時価総額÷売上）が1年前の 0.8 倍以下。利益の代わりに売上で測るので、利益率が動いても壊れず、<b>PER が出ない赤字期の成長企業</b>でも判定できる（PER圧縮はこの型を拾えない）。PER が算出できない銘柄で立ったときは「<b>売上圧縮・赤字期</b>」と橙枠で強調する。両方立てば「PER＋売上圧縮」。1年前の PSR は「1年前の終値×発行済株式数÷前期売上」で、売上は会社予想（今）と実績（前期）を使う。①-9 が前期売上を取り直した銘柄から順に埋まる（未取得は出ない）。候補の型であり推奨ではない。判定・提案・順位は変えない。</div>
+    <h3>❓ 次回決算日が未発表の銘柄（D19）</h3>
+    <div class='note'>①-8 v1.47 が grades.json に書く <b>lx</b>（直近の発表日・実績）と <b>pxd</b>（<b>次回</b>の前年同期の発表日・実績。v1.46 までは「今日の 1 年前」に最も近い実績日で、決算直後の銘柄では終わった決算の前年を指していた）から、「直近 MM/DD 発表済み・前年は次回を MM/DD に発表」と書く。前年の実績日が今日から 10 営業日以内なら <b>⏰❓橙</b>＝「前年実績では近い・会社の日程は未確認」。会社が日程を公表して nx が入れば従来の 🚨/⏰/📉 帯に切り替わる。前年の日付は事実であって今期の予定ではない（推定しない）。決算直後の銘柄（lx が最近）に ❓が出るのは正常で、次回まで時間がある合図。判定・提案・順位は変えない。</div>
     <h3>🚨 決算カウントダウン帯（D13・D14）</h3>
     <div class='note'>各カードの「コード・銘柄名・現在値」の行の直後に出る枠付きの色帯（D14 で最上段から移動: 上下どちらのカードの帯か読み取りにくかったため）。grades.json の次回決算日（nx）と端末の今日から JPX 休業日表で残営業日を数える（通信なし）。<b>🚨赤</b>＝本日／明日が決算（引け後発表の可能性）、<b>⏰橙</b>＝決算まで 2〜5 営業日、<b>📉紫</b>＝本日が決算反応日（前営業日の引け後に発表）、<b>❓灰</b>＝次回決算日が取れていない（🧳保有タブのみ。不明は安全ではない）。D15: 次回決算日が未発表の銘柄には、前年同期の発表日（実績。grades.json の pxd）を「📅前年同期 MM/DD 発表・今期未発表」の灰チップで添える（予定ではない。今期の日程は会社 IR で確認）。📈文脈・🕯形態のチップとは別の段・別の色にしてあるのは、2026-10-15〜16 に保有銘柄の決算カウントダウンが同系色のチップに埋もれて流し読みされ、決算跨ぎのストップ安（−20.7%）を止められなかったため。帯は rulebook 教訓⑲「決算は天井。決算反応日の引けまでに撤収・持ち越さない」の提示であり、判定・提案・順位は変えない。🧳保有タブでは登録銘柄の決算を一覧で先頭に出す。</div>
     <h3>既存の凡例</h3>
@@ -2254,6 +2592,8 @@ function render(d){
   PROF=(d&&d.profile_cache&&typeof d.profile_cache==='object')?d.profile_cache:{};
   try{ MODE=(d.market&&d.market.latest&&d.market.latest.market_mode)||null; }catch(e){ MODE=null; }
   document.getElementById('src').innerHTML="<span class='live'>● LIVE</span> GitHubの最新 master.json を表示中";
+  if(MASTER_FIXED>0){ try{ document.getElementById('src').innerHTML+=`<div style='margin-top:4px'><span class='frchip f1' title='master.json に JSON 規格外の NaN／Infinity があり null として読んだ。書いたルーティン側の不具合（validator が次回から止める）'>⚠ 規格外の値 ${MASTER_FIXED} 件を null として読み込み</span></div>`; }catch(e){} }
+  try{ const rr=(d.pipeline&&d.pipeline.runs)||{}; document.getElementById('src').innerHTML+=`<div style='margin-top:4px'>${scanFreshChip('🤖S3',AI_TODAY||((d.ai_scan&&d.ai_scan.base_day)?{base_day:d.ai_scan.base_day}:null),rr.ai_scan,null)}${scanFreshChip('🏠S4',DM_TODAY||((d.dm_scan&&d.dm_scan.base_day)?{base_day:d.dm_scan.base_day}:null),rr.dm_scan,null)}${(d.an_scan||AN_TODAY)?scanFreshChip('🧬S5',AN_TODAY||((d.an_scan&&d.an_scan.base_day)?{base_day:d.an_scan.base_day}:null),rr.an_scan,null):''}</div>`; }catch(e){}
 
   // 市場モードバッジ（date付き）
   try{
@@ -2349,6 +2689,8 @@ function render(d){
   // ===== タブ②: 🔔変化点ウォッチ =====
   document.getElementById('panel-changepoint').innerHTML=renderChangepoint(d,runs);
   try{ document.getElementById('panel-ai').innerHTML=renderAiScan(d); }catch(e){ document.getElementById('panel-ai').innerHTML=`<div class='empty'>🤖AI特需タブの描画エラー: ${esc((e&&e.message)||e)}</div>`; }
+  try{ document.getElementById('panel-dm').innerHTML=renderDmScan(d); }catch(e){ document.getElementById('panel-dm').innerHTML=`<div class='empty'>🏠内需タブの描画エラー: ${esc((e&&e.message)||e)}</div>`; }
+  try{ document.getElementById('panel-an').innerHTML=renderAnScan(d); }catch(e){ document.getElementById('panel-an').innerHTML=`<div class='empty'>🧬アンソロタブの描画エラー: ${esc((e&&e.message)||e)}</div>`; }
 
   // ===== タブ③: 📋5手法銘柄（既存「手法別ボード」を移設・ロジック不変） =====
   const jump1=`<div class='jump'>
@@ -2403,11 +2745,21 @@ function normalizeGrades(j){
   }catch(e){}
   return out;
 }
+// D27: python の json.dumps が書く NaN／Infinity（JSON 規格外）で JSON.parse が落ち、「取得失敗」と表示された（2026-11-05 ①-8 の adx14=NaN）。
+// 取得と解析を分け、規格外の定数は null に読み替えてから解析する（値の意味は「取れていない」＝null と同じ）。読み替えた件数は src 行に出す。
+let MASTER_FIXED=0;
+function parseMasterText(t){
+  try{ return JSON.parse(t); }
+  catch(e){ const t2=t.replace(/:\s*(-?Infinity|NaN)(?=\s*[,}\]])/g,m=>{ MASTER_FIXED++; return ': null'; }); if(MASTER_FIXED>0){ try{ return JSON.parse(t2); }catch(e2){ throw new Error('JSON 解析失敗（規格外の定数 '+MASTER_FIXED+' 件を null にしても不可）: '+e2.message.slice(0,120)); } } throw new Error('JSON 解析失敗: '+String(e.message).slice(0,160)); }
+}
 Promise.all([
-  fetch(RAW_URL,{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject(r.status)),
+  fetch(RAW_URL,{cache:"no-store"}).then(r=>r.ok?r.text():Promise.reject('HTTP '+r.status)).then(parseMasterText),
   fetch(BARS_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>(j&&j.bars&&typeof j.bars==='object')?j.bars:{}).catch(()=>({})),
-  fetch(GRADES_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null).then(normalizeGrades).catch(()=>normalizeGrades(null))
-]).then(([d,bars,g])=>{ BARS=bars||{}; GRADES=(g&&g.stocks)||{}; SPM=(g&&g.spm)||{}; GRADES_DAY=(g&&g.day)||null; IXMETA=(g&&g.ixmeta)||null; render(d); })
-.catch(e=>{document.getElementById('src').innerHTML="<span class='snap'>● 取得失敗</span> master.jsonを取得できませんでした。再読み込みしてください。("+esc(e)+")";});
+  fetch(GRADES_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null).then(normalizeGrades).catch(()=>normalizeGrades(null)),
+  fetch(AI_TODAY_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null),
+  fetch(DM_TODAY_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null),
+  fetch(AN_TODAY_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)
+]).then(([d,bars,g,ai,dm,an])=>{ BARS=bars||{}; GRADES=(g&&g.stocks)||{}; SPM=(g&&g.spm)||{}; GRADES_DAY=(g&&g.day)||null; IXMETA=(g&&g.ixmeta)||null; AI_TODAY=(ai&&typeof ai==='object')?ai:null; DM_TODAY=(dm&&typeof dm==='object')?dm:null; AN_TODAY=(an&&typeof an==='object')?an:null; render(d); })
+.catch(e=>{document.getElementById('src').innerHTML="<span class='snap'>● 取得失敗</span> master.json の取得または描画に失敗しました。再読み込みしてください。("+esc((e&&e.stack)||e).slice(0,400)+")";});
 </script>
 </body></html>
