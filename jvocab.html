@@ -27,9 +27,12 @@ window.QB_APP='jvocab';
   function pushVocab(key){var ls=lsGet(key+'_stats');if(!ls)return;
     try{db.ref(base+'/'+key).transaction(function(cur){
       if(!cur)return ls;
-      if(num(ls.learned)>num(cur.learned))return ls;
-      if(num(ls.learned)===num(cur.learned)&&num(ls.updated)>=num(cur.updated))return ls;
-      return cur;
+      var w=cur;
+      if(num(ls.learned)>num(cur.learned))w=ls;
+      else if(num(ls.learned)===num(cur.learned)&&num(ls.updated)>=num(cur.updated))w=ls;
+      var qa=num(ls.quiz&&ls.quiz.updated),qb=num(cur.quiz&&cur.quiz.updated),q=(qa>=qb)?ls.quiz:cur.quiz; /* 検問記録は新しい方を残す */
+      if(q&&w.quiz!==q){w=JSON.parse(JSON.stringify(w));w.quiz=q;}
+      return w;
     },function(){},false);}catch(e){}}
   function pushKeisan(){var ls=lsGet('keisan_stats');if(!ls)return;var r=role();
     try{db.ref(base+'/'+r).transaction(function(cur){
@@ -1038,6 +1041,8 @@ function qTodayCount(){var k=window.qbKEnsure?qbKEnsure('jvocab'):{},n=new Date(
 /* ===== 検問（テスト） ===== */
 var ALLW=[];STAGES.forEach(function(s){s.words.forEach(function(w){ALLW.push(w);});});
 function QANS(c){return c.def;}
+/* 合格ライン：クエストボードの保護者メニューで設定（同じ端末の設定を読む） */
+function qPassCfg(){var c={};try{c=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}return {pct:+c.passPct||100,min:+c.passMin||10};}
 function loadQuiz(){var o=_qs();return o.quiz||{tests:0,perfects:0,bestPct:0,last:null};}
 function saveQuizRec(q){var o=_qs();o.quiz=q;_qsSave(o);if(window.qbSyncKick)qbSyncKick();}
 function renderQuizRec(){var el=document.getElementById('quizRec');if(!el)return;var q=loadQuiz();var learned=learnedCount();
@@ -1079,11 +1084,12 @@ function answerQ(t,btn){
   setTimeout(function(){QZ.i++;if(QZ.i<QZ.qs.length)renderQ();else finishQuiz();},1000);}
 function finishQuiz(){
   var n=QZ.qs.length,r=QZ.right,pct=Math.round(r/n*100);
-  var q=loadQuiz();q.tests=(q.tests||0)+1;if(r===n)q.perfects=(q.perfects||0)+1;q.bestPct=Math.max(q.bestPct||0,pct);q.last={s:r,t:n};q.updated=Date.now();saveQuizRec(q);
+  var q=loadQuiz();q.tests=(q.tests||0)+1;if(r===n)q.perfects=(q.perfects||0)+1;q.bestPct=Math.max(q.bestPct||0,pct);q.last={s:r,t:n};q.updated=Date.now();var _hd=qTodayStr();if(!q.hist||q.hist.d!==_hd)q.hist={d:_hd,r:[]};q.hist.r.push([r,n,q.updated]);if(q.hist.r.length>30)q.hist.r=q.hist.r.slice(-30);saveQuizRec(q);var _pc=qPassCfg(),_pass=(n>=_pc.min&&pct>=_pc.pct);
   document.getElementById('qCard').hidden=true;
   var res=document.getElementById('qResult');res.hidden=false;
   var msg=(r===n)?'🏆 満点！すごい！':(pct>=80?'👏 よくできました！':(pct>=50?'🙂 その調子！':'💪 もう一度やってみよう'));
   res.innerHTML='<div class="qr-score">'+r+' / '+n+'</div><div class="qr-msg">'+msg+'</div>'
+    +(_pass?'<div style="font-weight:800;color:#b7791f;margin:2px 0 10px">🏅 合格ライン突破！クエストボードを見てみよう</div>':'<div class="qr-rec">合格ライン：'+(_pc.pct>=100?'満点':_pc.pct+'%以上')+'・'+_pc.min+'問以上</div>')
     +'<div class="qr-rec">受けた '+q.tests+'回 ・ 満点 '+q.perfects+'回 ・ 自己ベスト '+q.bestPct+'%</div>'
     +'<div class="qr-btns"><button class="q-again" onclick="startQuiz()">🔁 もう一度</button><button class="q-home" onclick="quizHome()">🏠 ホームへ</button></div>';
   document.getElementById('qFill').style.width='100%';window.scrollTo(0,0);}

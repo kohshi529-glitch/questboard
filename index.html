@@ -62,6 +62,19 @@
   .jvcard .v-sub{color:#5a4b73}
   .jvcard .v-open{background:#8a5cd6;box-shadow:0 3px 0 #6f3fc0}
   .jvcard .v-open:active{box-shadow:0 1px 0 #6f3fc0}
+  .pscard{border:2px solid #d9a521;background:#fff8e6}
+  .pscard.on{background:linear-gradient(180deg,#fff6d6,#ffefb8);box-shadow:0 0 0 2px #ffe08a,3px 4px 0 rgba(0,0,0,.05)}
+  .ps-line{font-size:.78rem;color:#9a6b00;font-weight:800;margin-top:2px}
+  .ps-row{display:flex;justify-content:space-between;gap:8px;align-items:center;background:#fff;border:1.5px solid #f0dca8;border-radius:10px;padding:8px 10px;margin-top:8px;font-size:.88rem;font-weight:700;flex-wrap:wrap}
+  .ps-row.ok{border-color:#4caf6a;background:#eef9f0;color:#2f7d45}
+  .pscard .v-count{color:#9a6b00}
+  .ps-q{font-weight:800}
+  .ps-chips{display:flex;flex-wrap:wrap;gap:5px;width:100%}
+  .ps-chip{font-size:.78rem;font-weight:800;padding:3px 8px;border-radius:999px;background:#f6f1e3;color:#8a7a55;border:1px solid #eadfbf}
+  .ps-chip.ok{background:#dff3e4;color:#2f7d45;border-color:#9fd5ae}
+  .ps-none{color:#a89a7c}
+  .ps-msg{margin-top:10px;font-weight:800;color:#a36a00;font-size:.92rem;text-align:center}
+  .ps-tip{margin-top:8px;font-size:.78rem;color:#9a8a62;text-align:center;font-weight:700}
   .ccard{border:2px solid #3b6fe0;background:#e9effc}
   .c-h{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:6px;justify-content:space-between}
   .c-count{font-size:.82rem;color:#2f5bc0;font-weight:800}
@@ -209,6 +222,8 @@
 
   <div id="jvocabCard"></div>
 
+  <div id="passCard"></div>
+
   <div id="calcCard"></div>
 
   <div id="stage"></div>
@@ -261,6 +276,19 @@
     <label>シーズン報酬の選択肢（娘が1つ選ぶ・1行1つ）</label><textarea id="d_rewards"></textarea>
     <label>ガチャの景品（1行1つ）</label><textarea id="d_gacha"></textarea>
     <label>シーズン名</label><input id="d_season">
+  </div>
+
+  <div class="sec">
+    <h3>🎯 1日のコミットライン</h3>
+    <p class="hint">英単語・語彙：その日に新しく覚えた語数＋検問の点数（その日の最高記録）。計算：たし・ひき・かけ・わり・ミックスを各1回以上 全問正解。3つ全部そろうとボードに「クリア」が出ます。</p>
+    <div class="two">
+      <div><label>新しく覚えた語（英単語・語彙それぞれ）</label><select id="d_newMin"><option value="5">＋5語</option><option value="10">＋10語</option><option value="15">＋15語</option><option value="20">＋20語</option></select></div>
+      <div><label>検問の点数</label><select id="d_passPct"><option value="50">50点以上</option><option value="60">60点以上</option><option value="70">70点以上</option><option value="80">80点以上</option><option value="90">90点以上</option><option value="100">満点のみ</option></select></div>
+    </div>
+    <div class="two">
+      <div><label>検問の問題数</label><select id="d_passMin"><option value="5">5問以上</option><option value="10">10問以上</option><option value="20">20問（フル）</option></select></div>
+      <div><label>計算の難易度</label><select id="d_calcDiff"><option value="0">どれでもOK</option><option value="1">ふつう以上</option><option value="2">むずかしい</option></select></div>
+    </div>
   </div>
 
   <div class="sec">
@@ -374,7 +402,7 @@ function def(){return{
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};return {t:(x&&x.t)||'',done:!!(x&&x.done)};}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};return {t:(x&&x.t)||'',done:!!(x&&x.done)};}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;}
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
@@ -491,6 +519,38 @@ function renderCalc(){
 }
 function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var deck=st.deckSize||0;var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
 function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var deck=st.deckSize||0;var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';}
+/* 1日のコミットライン：英単語・語彙＝新しく覚えた語数＋検問の点数（その日の最高記録）／計算＝全演算＋ミックスを全問正解 */
+function qbQuizToday(key){var st=_lsGet(key+'_stats')||{},q=st.quiz||null,td=qbTodayStr(),r=[];if(!q)return r;
+  if(q.hist&&q.hist.d===td&&q.hist.r)r=q.hist.r.slice();
+  else if(q.last&&q.updated){var d=new Date(+q.updated);if((d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate())===td)r=[[q.last.s,q.last.t,q.updated]];}
+  return r;}
+function qbNewToday(key){var ks=qbKStat(key);if(ks)return ks.today||0;var st=_lsGet(key+'_stats')||{};return (st.tday===qbTodayStr())?(st.today||0):0;}
+function qbCalcPerfToday(){var rem=SYNC.astatRemote||{},cache=_lsGet('qb_appstats')||{},p=null;
+  [rem.child&&rem.child.keisan,rem.keisan,cache.child&&cache.child.keisan,cache.keisan,(calcOwner()==='child')?_lsGet('keisan_stats'):null].forEach(function(k){if(k&&k.perf)p=mergePerf(p,k.perf);});
+  return (p&&p.d===qbTodayStr())?(p.m||{}):{};}
+function renderPass(){var el=document.getElementById('passCard');if(!el)return;
+  var pct=+S.cfg.passPct||50,min=+S.cfg.passMin||10,nmin=+S.cfg.newMin||10,cd=+S.cfg.calcDiff||0,isPapa=(calcOwner()==='papa');
+  var ptxt=(pct>=100?'満点':pct+'点以上');
+  function chip(ok,t){return '<span class="ps-chip'+(ok?' ok':'')+'">'+(ok?'✅ ':'⬜ ')+t+'</span>';}
+  function sc(a){return Math.round(a[0]/a[1]*100);}
+  var rows=[['vocab','🔤 英単語'],['jvocab','📖 語彙']].map(function(x){
+    var nw=qbNewToday(x[0]),nOk=nw>=nmin,r=qbQuizToday(x[0]);
+    var ok=r.filter(function(a){return a[1]>=min&&sc(a)>=pct;}),qOk=ok.length>0,qt;
+    if(qOk){var b=ok.slice().sort(function(p,q){return sc(q)-sc(p);})[0];qt='検問 '+sc(b)+'点';}
+    else if(r.length){var bb=r.slice().sort(function(p,q){return sc(q)-sc(p)||q[1]-p[1];})[0];qt='検問 '+ptxt+'（今日のベスト '+sc(bb)+'点・'+bb[1]+'問）';}
+    else qt='検問 '+ptxt;
+    var done=nOk&&qOk;
+    return {k:x[0],done:done,html:'<div class="ps-row'+(done?' ok':'')+'"><span class="ps-q">'+x[1]+(done?' クリア！':'')+'</span><div class="ps-chips">'+chip(nOk,'新しく覚えた '+nw+'/'+nmin+'語')+chip(qOk,qt)+'</div></div>'};});
+  var pm=qbCalcPerfToday(),cm=[['add','➕たし'],['sub','➖ひき'],['mul','✖️かけ'],['div','➗わり'],['mix','🎲ミックス']];
+  var cOk=cm.filter(function(m){return _num(pm[m[0]])>=cd+1;}).length,cDone=(cOk===cm.length);
+  rows.push({k:'keisan',done:cDone,html:'<div class="ps-row'+(cDone?' ok':'')+'"><span class="ps-q">⚡ 計算'+(cDone?' クリア！':' '+cOk+'/5')+'</span><div class="ps-chips">'+cm.map(function(m){return chip(_num(pm[m[0]])>=cd+1,m[1]);}).join('')+'</div></div>'});
+  var n=rows.filter(function(x){return x.done;}).length,all=(n===rows.length);
+  var line='英単語・語彙：新しく覚えた＋'+nmin+'語・検問'+ptxt+'（'+min+'問以上）／計算：全演算＋ミックスを全問正解'+(cd===1?'（ふつう以上）':cd===2?'（むずかしい）':'');
+  var msg=all?(isPapa?'<div class="ps-msg">👉 今日のコミットライン達成。承認してあげてね（iPhone：スクリーンタイムの延長依頼を承認／Galaxy：Family Linkでボーナス時間）</div>':'<div class="ps-msg">🎉 コミットライン達成！スマホの時間をパパにお願いしよう 📱</div>'):'<div class="ps-tip">3つ全部クリアすると、スマホの時間をパパにお願いできるよ（あと '+(rows.length-n)+'つ）</div>';
+  el.innerHTML='<div class="card pscard'+(all?' on':'')+'"><div class="v-h"><span>🎯 今日のコミットライン</span><span class="v-count">'+n+' / '+rows.length+'</span></div><div class="ps-line">'+line+'</div>'+rows.map(function(x){return x.html;}).join('')+msg+'</div>';
+  if(all&&!isPapa){try{var key='qb_passcheer',c=JSON.parse(localStorage.getItem(key)||'{}'),td=qbTodayStr();
+    if(!c[td+':all']){var o={};o[td+':all']=1;localStorage.setItem(key,JSON.stringify(o));showCheer('🎯 コミットライン達成！スマホの時間をパパにお願いしよう');sWin();burst();}}catch(e){}}
+}
 /* 宿題の入れ替え：完了済みは消し、未完了はそのまま残し、新しい宿題を後ろに追加（同じ文面は重複させない） */
 function hwParse(txt){return String(txt||'').split('\n').map(function(x){return x.replace(/[\s　]+/g,' ').trim();}).filter(function(x){return x&&!/^【[^】]*】/.test(x);});}
 function hwReplace(){var el=document.getElementById('d_hwnew');var nw=hwParse(el&&el.value);if(!nw.length){alert('新しい宿題を貼り付けてください');return;}
@@ -571,6 +631,7 @@ function render(){
   renderHomework();
   renderVocab();
   renderJvocab();
+  renderPass();
   renderCalc();
   const stageTop=document.getElementById('stageTop');
   const stage=document.getElementById('stage');
@@ -623,6 +684,7 @@ function dadOpen(){
   document.getElementById('d_count').value=S.cfg.count;document.getElementById('d_goal').value=S.cfg.goal;
   document.getElementById('d_pa').value=S.cfg.pa.join('\n');
   document.getElementById('d_season').value=S.cfg.season;
+  try{document.getElementById('d_passPct').value=String(S.cfg.passPct);document.getElementById('d_passMin').value=String(S.cfg.passMin);document.getElementById('d_newMin').value=String(S.cfg.newMin);document.getElementById('d_calcDiff').value=String(S.cfg.calcDiff);}catch(e){}
   document.getElementById('d_rewards').value=S.cfg.rewards.join('\n');
   document.getElementById('d_gacha').value=S.cfg.gacha.join('\n');
   document.getElementById('d_pin').value=S.cfg.pin;
@@ -646,6 +708,7 @@ function dadSave(){
   S.cfg.count=Math.max(0,parseInt(document.getElementById('d_count').value)||0);
   S.cfg.goal=Math.max(1,parseInt(document.getElementById('d_goal').value)||14);
   S.cfg.pa=lines('d_pa');S.cfg.season=document.getElementById('d_season').value||S.cfg.season;
+  S.cfg.passPct=parseInt(document.getElementById('d_passPct').value)||50;S.cfg.passMin=parseInt(document.getElementById('d_passMin').value)||10;S.cfg.newMin=parseInt(document.getElementById('d_newMin').value)||10;S.cfg.calcDiff=Math.max(0,Math.min(2,parseInt(document.getElementById('d_calcDiff').value)||0));
   S.cfg.rewards=lines('d_rewards');S.cfg.gacha=lines('d_gacha');
   const pin=document.getElementById('d_pin').value;if(/^\d{4}$/.test(pin))S.cfg.pin=pin;
   var _prev=S.homework||[];S.homework=lines('d_homework').map(function(t){var old=_prev.find(function(h){return h.t===t;});return {t:t,done:old?old.done:false};});
@@ -730,8 +793,10 @@ function _num(x){x=+x;return isFinite(x)?x:0;}
 function _dnum(d){if(!d)return 0;var p=(''+d).split('-');return _num(p[0])*10000+_num(p[1])*100+_num(p[2]);}
 function mergeVocab(a,b){
   if(!a)return b||null; if(!b)return a;
-  if(_num(a.learned)!==_num(b.learned))return _num(a.learned)>_num(b.learned)?a:b;
-  return _num(a.updated)>=_num(b.updated)?a:b;
+  var w=(_num(a.learned)!==_num(b.learned))?(_num(a.learned)>_num(b.learned)?a:b):(_num(a.updated)>=_num(b.updated)?a:b);
+  var qa=_num(a.quiz&&a.quiz.updated),qb=_num(b.quiz&&b.quiz.updated),q=(qa>=qb)?a.quiz:b.quiz; // 検問記録は新しい方を残す
+  if(q&&w.quiz!==q){var o={},k;for(k in w)o[k]=w[k];o.quiz=q;w=o;}
+  return w;
 }
 function mergeKeisan(a,b){
   if(!a)return b||null; if(!b)return a;
@@ -743,8 +808,11 @@ function mergeKeisan(a,b){
   else if(da>db){res.date=a.date;res.today=_num(a.today);res.lastAcc=a.lastAcc;}
   else{res.date=b.date;res.today=_num(b.today);res.lastAcc=b.lastAcc;}
   res.ts=Math.max(_num(a.ts),_num(b.ts));
+  var pf=mergePerf(a.perf,b.perf);if(pf)res.perf=pf;
   return res;
 }
+function mergePerf(a,b){if(!a)return b||null;if(!b)return a;var da=_dnum(a.d),db=_dnum(b.d);if(da!==db)return da>db?a:b;
+  var m={},k,am=a.m||{},bm=b.m||{};for(k in am)m[k]=am[k];for(k in bm)m[k]=Math.max(_num(m[k]),_num(bm[k]));return {d:a.d||b.d,m:m};}
 function mergeDel(a,b){var o={},k;for(k in (a||{}))o[k]=a[k];for(k in (b||{}))o[k]=b[k];return o;}
 function applyDel(best,del){ // del={key:秒}。best[key]がその値と一致したら消す（別の新記録なら残す＝自動復活）
   if(!best||!del)return best;var out={},any=false,k;
@@ -762,7 +830,7 @@ function cacheAppstats(a){try{if(!a)return;var c=_lsGet('qb_appstats')||{};
   _lsSet('qb_appstats',c);}catch(e){}}
 function appStatsSync(){
   if(!SYNC.on||!SYNC.astatRef)return;
-  if(!SYNC.astatReady){renderVocab();renderJvocab();renderCalc();return;} // サーバ未受信：キャッシュから表示のみ（astatRemote/cacheもサーバも触らない）
+  if(!SYNC.astatReady){renderVocab();renderJvocab();renderPass();renderCalc();return;} // サーバ未受信：キャッシュから表示のみ（astatRemote/cacheもサーバも触らない）
   var role=calcOwner();
   var lv=_lsGet('vocab_stats'),lk=_lsGet('keisan_stats'),ljv=_lsGet('jvocab_stats');
   var rem=SYNC.astatRemote||{};
@@ -794,7 +862,7 @@ function appStatsSync(){
     papa:(role==='papa')?{keisan:papaFinal||null,del:papaDel}:{keisan:papaRem||null,del:papaDel}
   };
   cacheAppstats(SYNC.astatRemote);
-  renderVocab();renderJvocab();renderCalc();
+  renderVocab();renderJvocab();renderPass();renderCalc();
   // 書き込みは「自分のロールのバケット＋共有(vocab/jvocab)」だけ。他ロールの keisan は絶対に書かない（競合・消失の根絶）。
   var mineFin=(role==='papa')?papaFinal:childFinal, mineDel=(role==='papa')?papaDel:childDel;
   var mineRem=(role==='papa')?papaRem:childRem, mineRemDel=(role==='papa')?remPd:remCd;
@@ -843,7 +911,7 @@ function deleteBestUI(){
   if(deleteBest(role,key))alert('削除しました（'+RN[role]+' ／ '+MN[mode]+' ／ '+DN[diff]+'）');
   else alert('削除できませんでした');
 }
-function refreshAppCards(){try{renderVocab();renderJvocab();renderCalc();}catch(e){}if(SYNC.on)appStatsSync();}
+function refreshAppCards(){try{renderVocab();renderJvocab();renderPass();renderCalc();}catch(e){}if(SYNC.on)appStatsSync();}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshAppCards();});
 window.addEventListener('pageshow',refreshAppCards);
 window.addEventListener('focus',refreshAppCards);

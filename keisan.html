@@ -36,6 +36,8 @@ window.QB_APP='keisan';
       else if(dc>dl){m.date=ck.date;m.today=num(ck.today);m.lastAcc=ck.lastAcc;}
       else{m.date=ls.date;m.today=num(ls.today);m.lastAcc=ls.lastAcc;}
       m.ts=Math.max(num(ck.ts),num(ls.ts));
+      var pc=ck.perf,pl=ls.perf,dpc=dnum(pc&&pc.d),dpl=dnum(pl&&pl.d);
+      if(pc||pl){if(dpc===dpl){var pm={},pk,a1=(pc&&pc.m)||{},a2=(pl&&pl.m)||{};for(pk in a1)pm[pk]=a1[pk];for(pk in a2)pm[pk]=Math.max(num(pm[pk]),num(a2[pk]));m.perf={d:(pc||pl).d,m:pm};}else m.perf=(dpc>dpl)?pc:pl;}
       var fb={};for(k in m.best){if(del[k]!=null&&m.best[k]===del[k])continue;fb[k]=m.best[k];}m.best=fb;
       cur.keisan=m;return cur;
     },function(){},false);}catch(e){}}
@@ -140,6 +142,7 @@ window.QB_APP='keisan';
   .r-emoji{font-size:64px}
   .r-title{font-family:var(--disp);font-weight:700;font-size:26px;color:var(--ink)}
   .r-best{font-size:14px;font-weight:800;color:var(--warm);margin-top:2px}
+  .r-commit{font-size:13px;font-weight:800;color:var(--good);margin-top:6px;line-height:1.5}
   .r-grid{display:flex;gap:12px;margin:18px 0 6px;flex-wrap:wrap;justify-content:center}
   .r-tile{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px 20px;min-width:110px}
   .r-tile .rk{font-size:12px;font-weight:800;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em}
@@ -168,6 +171,7 @@ window.QB_APP='keisan';
     <div class="stat-strip">
       <span class="pill">今日 <span id="todayN">0</span> 問</span>
       <span class="pill">1セット <span id="setN">20</span> 問</span>
+      <span class="pill">🎯 コミット <span id="commitN">0</span>/5</span>
     </div>
     <div class="modes">
       <button class="mode" style="--mc:#3b6fe0" onclick="start('add')"><div class="mi">➕</div><div class="mn">たし算</div><div class="mb" id="bestadd">ベスト —</div></button>
@@ -215,6 +219,7 @@ window.QB_APP='keisan';
     <div class="r-emoji" id="rEmoji">🎉</div>
     <div class="r-title" id="rTitle">クリア！</div>
     <div class="r-best" id="rBest"></div>
+    <div class="r-commit" id="rCommit"></div>
     <div class="r-grid">
       <div class="r-tile"><div class="rk">タイム</div><div class="rv" id="rTime">0:00</div></div>
       <div class="r-tile"><div class="rk">正かい</div><div class="rv" id="rScore">0/20</div></div>
@@ -237,6 +242,10 @@ function todayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)
 function loadStats(){var s;try{s=JSON.parse(localStorage.getItem('keisan_stats')||'null');}catch(e){}if(!s||typeof s!=='object')s={};if(s.date!==todayStr()){s.date=todayStr();s.today=0;}s.best=s.best||{};return s;}
 function saveStats(){stats.ts=Date.now();try{localStorage.setItem('keisan_stats',JSON.stringify(stats));}catch(e){}if(window.qbSyncKick)qbSyncKick();}
 
+/* 1日のコミットライン：たし・ひき・かけ・わり・ミックスを各1回以上 全問正解（難易度の条件はクエストボードの保護者メニュー） */
+function calcNeed(){var c={};try{c=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}var d=parseInt(c.calcDiff,10);return (d>=0&&d<=2)?d+1:1;}
+function perfToday(){return (stats.perf&&stats.perf.d===todayStr())?(stats.perf.m||{}):{};}
+function modeDone(m){return (perfToday()[m]||0)>=calcNeed();}
 function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
 function genOne(m){
   var a,b,op,ans;
@@ -262,7 +271,9 @@ function renderHome(){
     var key=m+diff;var bv=stats.best[key];
     if(m==='mix'){el.textContent=bv?('ベスト '+fmtBest(bv)):'ぜんぶまぜて タイムアタック！';}
     else el.textContent=bv?('ベスト '+fmtBest(bv)):'ベスト —';
+    if(modeDone(m))el.textContent='✅ '+el.textContent;
   });
+  var cn=document.getElementById('commitN');if(cn)cn.textContent=['add','sub','mul','div','mix'].filter(modeDone).length;
 }
 function show(id){['home','play','result'].forEach(function(v){document.getElementById(v).hidden=(v!==id);});}
 
@@ -301,6 +312,7 @@ function finish(){
   var ms=Date.now()-t0, sec=Math.round(ms/1000), acc=Math.round(correct/SETSIZE*100);
   var key=mode+diff, prevBest=stats.best[key], isBest=false;
   if(correct===SETSIZE){ if(!prevBest||sec<prevBest){stats.best[key]=sec;isBest=true;} }
+  if(correct===SETSIZE){var _td=todayStr();if(!stats.perf||stats.perf.d!==_td)stats.perf={d:_td,m:{}};stats.perf.m[mode]=Math.max(stats.perf.m[mode]||0,diff+1);}
   stats.lastAcc=acc;saveStats();
   show('result');document.getElementById('h1').textContent='けっか';
   document.getElementById('rTime').textContent=fmt(ms);
@@ -314,6 +326,8 @@ function finish(){
   if(isBest)bl.textContent='⭐ ベスト更新！（'+fmtBest(sec)+'）';
   else if(stats.best[key])bl.textContent='ベスト '+fmtBest(stats.best[key]);
   else bl.textContent='全問せいかいでベスト記録に挑戦！';
+  var cl=document.getElementById('rCommit');if(cl){var mm=['add','sub','mul','div','mix'],left=mm.filter(function(x){return !modeDone(x);});
+    cl.textContent=((correct===SETSIZE&&modeDone(mode))?('✅ 今日の'+MODE_NAME[mode]+' クリア！ '):'')+(left.length?('コミットライン：あと '+left.map(function(x){return MODE_NAME[x];}).join('・')):'🎯 計算のコミットライン 全部クリア！');}
 }
 function again(){start(mode);}
 function goHome(){show('home');document.getElementById('h1').textContent='計算クエスト ⚡';renderHome();window.scrollTo(0,0);}
