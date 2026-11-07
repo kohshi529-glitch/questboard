@@ -251,6 +251,9 @@
     <p class="hint">ゆうや先生の宿題を1行1つ入力すると、授業カードの下に表示され、娘がチェックできます。宿題を書き替えると、変わった項目のチェックはリセットされます。</p>
     <label>今週の宿題（1行1つ）</label><textarea id="d_homework"></textarea>
     <button class="btn gray" style="margin-top:6px" onclick="hwResetAll()">☑️ 宿題のチェックを全部リセット</button>
+    <label style="margin-top:12px">新しい宿題を貼り付け（先生の連絡をそのまま貼ってOK。【】の見出し行は自動で除きます）</label>
+    <textarea id="d_hwnew" placeholder="ここに新しい宿題を貼り付け"></textarea>
+    <button class="btn" style="margin-top:6px" onclick="hwReplace()">🔁 新しい宿題に入れ替え（未完了は残す）</button>
   </div>
 
   <div class="sec">
@@ -488,6 +491,16 @@ function renderCalc(){
 }
 function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var deck=st.deckSize||0;var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
 function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var deck=st.deckSize||0;var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';}
+/* 宿題の入れ替え：完了済みは消し、未完了はそのまま残し、新しい宿題を後ろに追加（同じ文面は重複させない） */
+function hwParse(txt){return String(txt||'').split('\n').map(function(x){return x.replace(/[\s　]+/g,' ').trim();}).filter(function(x){return x&&!/^【[^】]*】/.test(x);});}
+function hwReplace(){var el=document.getElementById('d_hwnew');var nw=hwParse(el&&el.value);if(!nw.length){alert('新しい宿題を貼り付けてください');return;}
+  var old=S.homework||[];var keep=old.filter(function(h){return !h.done&&nw.indexOf(h.t)<0;});
+  var add=nw.filter(function(t,i){return nw.indexOf(t)===i;}).map(function(t){var o=old.find(function(h){return h.t===t;});return {t:t,done:o?o.done:false};});
+  var removed=old.filter(function(h){return h.done&&nw.indexOf(h.t)<0;}).length;
+  if(!confirm('完了済み '+removed+'件を消し、未完了 '+keep.length+'件は残して、新しい宿題 '+add.length+'件を追加します。よろしいですか？'))return;
+  S.homework=keep.concat(add);save();maybeSync();
+  try{var _hw=document.getElementById('d_homework');if(_hw)_hw.value=S.homework.map(function(h){return h.t;}).join('\n');}catch(e){}
+  if(el)el.value='';renderHomework();alert('入れ替えました（未完了 '+keep.length+'件を残し、新しい宿題 '+add.length+'件）');}
 function hwResetAll(){if(!S.homework||!S.homework.length){alert('宿題がまだありません');return;}if(!confirm('宿題のチェックを全部リセットしますか？'))return;S.homework.forEach(function(h){h.done=false;});save();maybeSync();renderHomework();alert('宿題のチェックをリセットしました');}
 function copyText(t,msg){try{navigator.clipboard.writeText(t);}catch(e){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}try{showCheer(msg||'コピーしたよ📋');}catch(e){}}
 function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','🎊','👑','💛','🥳']:['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<N;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=((big?2:1.5)+Math.random()*1.5)+'s';s.style.fontSize=((big?1.5:1)+Math.random()*(big?1.6:1.4))+'rem';document.body.appendChild(s);setTimeout(function(){s.remove();},4200);}}
