@@ -546,10 +546,10 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
   rows.push({k:'keisan',done:cDone,html:'<div class="ps-row'+(cDone?' ok':'')+'"><span class="ps-q">⚡ 計算'+(cDone?' クリア！':' '+cOk+'/5')+'</span><div class="ps-chips">'+cm.map(function(m){return chip(_num(pm[m[0]])>=cd+1,m[1]);}).join('')+'</div></div>'});
   var n=rows.filter(function(x){return x.done;}).length,all=(n===rows.length);
   var line='英単語・語彙：新しく覚えた＋'+nmin+'語・検問'+ptxt+'（'+min+'問以上）／計算：全演算＋ミックスを全問正解'+(cd===1?'（ふつう以上）':cd===2?'（むずかしい）':'');
-  var msg=all?(isPapa?'<div class="ps-msg">👉 今日のコミットライン達成。承認してあげてね（iPhone：スクリーンタイムの延長依頼を承認／Galaxy：Family Linkでボーナス時間）</div>':'<div class="ps-msg">🎉 コミットライン達成！スマホの時間をパパにお願いしよう 📱</div>'):'<div class="ps-tip">3つ全部クリアすると、スマホの時間をパパにお願いできるよ（あと '+(rows.length-n)+'つ）</div>';
+  var msg=all?(isPapa?'<div class="ps-msg">👉 今日のコミットライン達成</div>':'<div class="ps-msg">🎉 コミットライン達成！今日もよくがんばったね</div>'):'<div class="ps-tip">あと '+(rows.length-n)+'つで 今日のコミットライン達成！</div>';
   el.innerHTML='<div class="card pscard'+(all?' on':'')+'"><div class="v-h"><span>🎯 今日のコミットライン</span><span class="v-count">'+n+' / '+rows.length+'</span></div><div class="ps-line">'+line+'</div>'+rows.map(function(x){return x.html;}).join('')+msg+'</div>';
   if(all&&!isPapa){try{var key='qb_passcheer',c=JSON.parse(localStorage.getItem(key)||'{}'),td=qbTodayStr();
-    if(!c[td+':all']){var o={};o[td+':all']=1;localStorage.setItem(key,JSON.stringify(o));showCheer('🎯 コミットライン達成！スマホの時間をパパにお願いしよう');sWin();burst();}}catch(e){}}
+    if(!c[td+':all']){var o={};o[td+':all']=1;localStorage.setItem(key,JSON.stringify(o));showCheer('🎯 コミットライン達成！よくがんばったね');sWin();burst();}}catch(e){}}
 }
 /* 宿題の入れ替え：完了済みは消し、未完了はそのまま残し、新しい宿題を後ろに追加（同じ文面は重複させない） */
 function hwParse(txt){return String(txt||'').split('\n').map(function(x){return x.replace(/[\s　]+/g,' ').trim();}).filter(function(x){return x&&!/^【[^】]*】/.test(x);});}
