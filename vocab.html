@@ -199,7 +199,7 @@ window.QB_APP='vocab';
   .q-prompt{font-family:var(--jp);font-weight:700;font-size:clamp(26px,7vw,40px);color:var(--ink);text-align:center;overflow-wrap:anywhere;line-height:1.25}
   .q-sub{font-size:15px;color:var(--ink-soft);font-weight:700;font-family:var(--jp)}
   .q-choices{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:4px}
-  .q-choice{width:100%;border:1.5px solid var(--line2);background:var(--card2);color:var(--ink);border-radius:14px;padding:14px 12px;font-family:var(--jp);font-weight:700;font-size:16px;cursor:pointer;text-align:center;line-height:1.4}
+  .q-choice{width:100%;border:1.5px solid var(--line2);background:var(--card2);color:var(--ink);border-radius:14px;padding:14px 12px;font-family:var(--body);font-weight:700;font-size:16px;cursor:pointer;text-align:center;line-height:1.4}
   .q-choice:active{transform:translateY(1px)}
   .q-choice:disabled{cursor:default}
   .q-choice.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
@@ -827,7 +827,7 @@ function qTodayCount(){var k=window.qbKEnsure?qbKEnsure('vocab'):{},n=new Date()
   ALLW.forEach(function(x){var t=k[x.w];if(t>1){var d=new Date(t);if(d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate())c++;}});return c;}
 /* ===== 検問（テスト） ===== */
 var ALLW=[];STAGES.forEach(function(s){s.words.forEach(function(w){ALLW.push(w);});});
-function QANS(c){return c.jp;}
+function QANS(c){return c.def;} /* 英語の意味（カード裏面と同じ）で答える */
 function loadQuiz(){var o=_qs();return o.quiz||{tests:0,perfects:0,bestPct:0,last:null};}
 function saveQuizRec(q){var o=_qs();o.quiz=q;_qsSave(o);if(window.qbSyncKick)qbSyncKick();}
 function renderQuizRec(){var el=document.getElementById('quizRec');if(!el)return;var q=loadQuiz();var learned=learnedCount();
@@ -850,7 +850,7 @@ function renderQ(){
   var sub=document.getElementById('qSub');if(sub)sub.textContent='';
   var correct=QANS(c),seen={};seen[correct]=1;var dis=[];
   var others=qshuf(ALLW.slice());
-  for(var k=0;k<others.length&&dis.length<3;k++){var a=QANS(others[k]);if(a&&!seen[a]){seen[a]=1;dis.push(a);}}
+  for(var k=0;k<others.length&&dis.length<3;k++){var a=QANS(others[k]);if(a&&!seen[a]&&others[k].jp!==c.jp){seen[a]=1;dis.push(a);}} // 同じ日本語訳の類義語は誤答に使わない（正解が2つに見えるのを防ぐ）
   var choices=qshuf([correct].concat(dis));
   var ch=document.getElementById('qChoices');ch.innerHTML='';
   choices.forEach(function(t){var b=document.createElement('button');b.className='q-choice';b.textContent=t;b.onclick=function(){answerQ(t,b);};ch.appendChild(b);});
