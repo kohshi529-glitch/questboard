@@ -48,6 +48,18 @@
   .hw-txt{font-size:.95rem;line-height:1.4}
   .hw-item.done .hw-txt{color:#7b8a7b;text-decoration:line-through}
   .hw-empty{margin-top:8px;font-size:.85rem;color:#7a6a93}
+  .hw-body{flex:1;min-width:0;text-align:left}
+  .hw-item.sub .hw-txt,.hw-item.ng .hw-txt{color:var(--ink)}
+  .hw-item.sub{background:#fff7e6;border-color:#f0c75e}
+  .hw-item.sub .hw-box{border-color:#f0a24a;background:#fff3dc}
+  .hw-item.ng{background:#fdeceb;border-color:#e8a29b}
+  .hw-st{font-size:.76rem;font-weight:800;color:#a36a00;margin-top:3px;text-decoration:none}
+  .hw-st.ng{color:#c0392b}.hw-st.ok{color:#2f7d45}
+  .hw-tip{font-size:.76rem;color:#6a4b97;font-weight:700;margin-top:4px}
+  .hw-act{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
+  .hw-th{width:60px;height:60px;object-fit:cover;border-radius:8px;border:1.5px solid #e0d4f2;background:#f3eefb}
+  .hw-ab{border:none;border-radius:10px;padding:8px 11px;font-weight:800;font-size:.82rem;color:#fff;background:#4caf6a}
+  .hw-ab.ng{background:#e2574f}
   .vcard{border:2px solid #1f9e8e;background:#e8f5f2}
   .v-h{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:6px;justify-content:space-between}
   .v-count{font-size:.82rem;color:#15766a;font-weight:800}
@@ -238,6 +250,7 @@
   <div class="mini" id="rewardLog" style="margin-top:4px"></div>
 </div>
 
+<input type="file" id="hwFile" accept="image/*" capture="environment" style="display:none" onchange="hwPhotoPicked(event)">
 <div class="cheer" id="cheer" onclick="this.style.display='none'"><div class="msg" id="cheerMsg"></div><div style="color:#fff;margin-top:14px;font-size:.9rem">タップで閉じる</div></div>
 <div class="cheer" id="photoView" onclick="this.style.display='none'"><img id="pvImg" style="max-width:90%;max-height:78%;border-radius:12px" alt=""><div style="color:#fff;margin-top:10px;font-size:.9rem">タップで閉じる</div></div>
 <div class="cheer" id="reactSend"><div class="msg" style="max-width:340px;text-align:left" onclick="event.stopPropagation()"><div style="font-weight:800;text-align:center;margin-bottom:8px">💌 娘への応援（今日の達成に）</div><div id="stampRow"></div><div id="phraseRow" style="margin-top:6px"></div><button class="btn" style="margin-top:10px" onclick="sendReaction()">💌 応援を送る</button><button class="btn gray" style="margin-top:8px" onclick="closeReactSend()">とじる</button><div class="hint" id="reactState" style="margin-top:6px;text-align:center"></div></div></div>
@@ -277,6 +290,9 @@
     <label style="margin-top:12px">新しい宿題を貼り付け（先生の連絡をそのまま貼ってOK。【】の見出し行は自動で除きます）</label>
     <textarea id="d_hwnew" placeholder="ここに新しい宿題を貼り付け"></textarea>
     <button class="btn" style="margin-top:6px" onclick="hwReplace()">🔁 新しい宿題に入れ替え（未完了は残す）</button>
+    <label style="margin-top:12px">✂️ ページ範囲の小分け（「p62~69」などを小さく分けてチェックしやすくする）</label>
+    <div class="two"><div><select id="d_hwChunk"><option value="0">小分けしない</option><option value="2">2ページずつ</option><option value="3">3ページずつ</option><option value="4">4ページずつ</option></select></div><div style="flex:0 0 auto"><button class="btn gray" style="width:auto;padding:8px 12px" onclick="hwSplitNow()">今の宿題を小分け</button></div></div>
+    <p class="hint">新しい宿題を貼り付けたときも、この設定で自動的に小分けされます。</p>
   </div>
 
   <div class="sec">
@@ -304,6 +320,10 @@
       <div><label>1つクリアごと</label><select id="d_bonusPer"><option value="5">＋5分</option><option value="10">＋10分</option><option value="15">＋15分</option><option value="20">＋20分</option></select></div>
     </div>
     <label>3つ全部クリアのおまけ</label><select id="d_bonusAll"><option value="0">なし</option><option value="10">＋10分</option><option value="20">＋20分</option><option value="30">＋30分</option></select>
+    <div class="two">
+      <div><label>宿題1つ（写真→パパOK）</label><select id="d_hwPer"><option value="5">＋5分</option><option value="10">＋10分</option><option value="15">＋15分</option><option value="20">＋20分</option></select></div>
+      <div><label>宿題ぜんぶ完了ボーナス</label><select id="d_hwAll"><option value="0">なし</option><option value="10">＋10分</option><option value="20">＋20分</option><option value="30">＋30分</option></select></div>
+    </div>
     <label style="margin-top:10px">🔔 申請をパパのスマホにプッシュ通知（ntfy アプリ）</label>
     <p class="hint">iPhone に無料アプリ「ntfy」を入れ、下の通知トピック名を購読すると、娘が申請した瞬間に通知が届きます。トピック名は合言葉なので「生成」で作った推測されにくい名前を使ってください。</p>
     <div class="two"><div><input id="d_ntfy" placeholder="例: qb-xxxxxxxx"></div><div style="flex:0 0 auto"><button class="btn gray" style="width:auto;padding:8px 12px" onclick="genNtfy()">生成</button></div></div>
@@ -421,7 +441,7 @@ function def(){return{
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};return {t:(x&&x.t)||'',done:!!(x&&x.done)};}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';S.bonusLog=S.bonusLog||{};}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};}
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
@@ -487,8 +507,57 @@ function celebrate(){showCheer(CHEERS[Math.floor(Math.random()*CHEERS.length)]);
 function bigCelebrate(t){showCheer(t);sBig();burst(60,true);}
 function sBig(){[523,659,784,1047,1319].forEach(function(f,i){tone(f,0.18,'triangle',i*0.08);});}
 function showCheer(t){const c=document.getElementById('cheer');document.getElementById('cheerMsg').textContent=t;c.style.display='flex';}
-function renderHomework(){var el=document.getElementById('hwCard');if(!el)return;var hw=S.homework||[];if(!hw.length){el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span></div><div class="hw-empty">宿題はまだないよ📝（先生から出たら設定から登録されます）</div></div>';return;}var done=hw.filter(function(h){return h.done;}).length;var all=done===hw.length;var items=hw.map(function(h,i){return '<div class="hw-item'+(h.done?' done':'')+'" onclick="hwToggle('+i+')"><div class="hw-box">'+(h.done?'✓':'')+'</div><div class="hw-txt">'+esc(h.t)+'</div></div>';}).join('');el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span><span class="hw-count">'+done+' / '+hw.length+(all?' 🎉':'')+'</span></div><div class="hw-list">'+items+'</div></div>';}
-function hwToggle(i){if(!S.homework||!S.homework[i])return;S.homework[i].done=!S.homework[i].done;save();maybeSync();renderHomework();if(S.homework[i].done){sWin&&sWin();if(S.homework.every(function(h){return h.done;})){showCheer('📒 宿題ぜんぶ終わったね！よくがんばりました🎉');burst&&burst();}}}
+function renderHomework(){var el=document.getElementById('hwCard');if(!el)return;var hw=S.homework||[];if(!hw.length){el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span></div><div class="hw-empty">宿題はまだないよ📝（先生から出たら設定から登録されます）</div></div>';return;}
+  var isPapa=(calcOwner()==='papa'),per=+S.cfg.hwPer||0,td=today();
+  var done=hw.filter(function(h){return h.st==='ok';}).length,pend=hw.filter(function(h){return h.st==='sub';}).length,all=done===hw.length;
+  var items=hw.map(function(h,i){var st=h.st||'',cls=st==='ok'?' done':st==='sub'?' sub':st==='ng'?' ng':'',box=st==='ok'?'✓':st==='sub'?'📷':st==='ng'?'↩':'',info='';
+    if(st==='sub'){if(isPapa){var src=HWPH[h.ph];info='<div class="hw-act">'+(src?'<img class="hw-th" src="'+src+'" onclick="event.stopPropagation();viewHwPhoto(\''+h.ph+'\')">':'<span class="hw-st">📷 写真を読み込み中…</span>')+'<button class="hw-ab" onclick="event.stopPropagation();hwOk('+i+')">✅ OK</button><button class="hw-ab ng" onclick="event.stopPropagation();hwNg('+i+')">↩ やり直し</button></div>';}
+      else info='<div class="hw-st">📷 パパの確認待ち（OKで +'+per+'分）</div>';}
+    else if(st==='ng')info='<div class="hw-st ng">↩ やり直し：'+esc(h.note||'写真を撮り直してね')+'</div>';
+    else if(st==='ok'&&h.okDate===td&&per&&S.cfg.bonusOn)info='<div class="hw-st ok">+'+per+'分 ゲット！</div>';
+    return '<div class="hw-item'+cls+'" onclick="hwTap('+i+')"><div class="hw-box">'+box+'</div><div class="hw-body"><div class="hw-txt">'+esc(h.t)+'</div>'+info+'</div></div>';}).join('');
+  var tip=isPapa?(pend?'<div class="hw-tip">🔔 確認待ちが '+pend+'件 あります。写真を見て OK／やり直し を押してください</div>':''):'<div class="hw-tip">📷 1つ終わったら タップして写真をとってパパに送ろう'+(S.cfg.bonusOn&&per?'（OKで +'+per+'分'+(+S.cfg.hwAll?'・ぜんぶ終わると さらに +'+S.cfg.hwAll+'分':'')+'）':'')+'</div>';
+  el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span><span class="hw-count">'+done+' / '+hw.length+(pend?' ・確認待ち '+pend:'')+(all?' 🎉':'')+'</span></div>'+tip+'<div class="hw-list">'+items+'</div></div>';
+  if(!isPapa&&all){try{var sg=hwSig();if(localStorage.getItem('qb_hwallseen')!==sg&&document.getElementById('cheer').style.display!=='flex'){localStorage.setItem('qb_hwallseen',sg);showCheer('📒 宿題ぜんぶ終わったね！よくがんばりました🎉');burst();}}catch(e){}}
+}
+/* 宿題：娘は写真を撮って提出 → パパが写真を見て OK／やり直し。OK になった宿題がボーナス時間になる */
+var HWPH={},_hwPick=-1;
+try{HWPH=JSON.parse(localStorage.getItem('qb_hwph')||'{}')||{};}catch(e){HWPH={};}
+function hwSig(){return (S.homework||[]).map(function(h){return h.t;}).join('|');}
+function hwPhSave(){try{var ks=Object.keys(HWPH);while(ks.length>12){delete HWPH[ks.shift()];}localStorage.setItem('qb_hwph',JSON.stringify(HWPH));}catch(e){}}
+function hwPhRef(){try{return (SYNC.on&&SYNC.creds&&window.firebase)?firebase.database().ref('rooms/'+SYNC.creds.room+'/hwphotos'):null;}catch(e){return null;}}
+function hwPhDel(id){if(!id)return;delete HWPH[id];hwPhSave();var r=hwPhRef();if(r){try{r.child(id).remove();}catch(e){}}}
+function hwTap(i){var h=S.homework&&S.homework[i];if(!h)return;
+  if(calcOwner()==='papa'){if(h.st==='sub')return;if(h.st==='ok'){if(confirm('「'+h.t+'」を未完了に戻しますか？'))hwUnok(i);}else if(confirm('写真なしで「'+h.t+'」を完了（OK）にしますか？'))hwOk(i);return;}
+  if(h.st==='ok')return;if(h.st==='sub'&&!confirm('写真を撮り直しますか？'))return;
+  _hwPick=i;var f=document.getElementById('hwFile');f.value='';f.click();}
+function hwPhotoPicked(ev){var f=ev.target.files&&ev.target.files[0],i=_hwPick;if(!f||i<0||!S.homework[i])return;var rd=new FileReader();
+  rd.onload=function(e){var img=new Image();img.onload=function(){var max=1000,w=img.width,h=img.height,sc=Math.min(1,max/Math.max(w,h)),cw=Math.round(w*sc),ch=Math.round(h*sc),cv=document.createElement('canvas');cv.width=cw;cv.height=ch;cv.getContext('2d').drawImage(img,0,0,cw,ch);var data;try{data=cv.toDataURL('image/jpeg',0.6);}catch(err){alert('写真を読み込めませんでした');return;}
+    hwSubmit(i,data);};img.src=e.target.result;};rd.readAsDataURL(f);}
+function hwSubmit(i,data){var it=S.homework[i];if(!it)return;var old=it.ph,id='h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  HWPH[id]=data;hwPhSave();var r=hwPhRef();if(r){try{r.child(id).set(data);}catch(e){}}if(old&&old!==id)hwPhDel(old);
+  it.st='sub';it.ph=id;it.at=Date.now();it.done=false;delete it.note;save();maybeSync();renderHomework();
+  var per=+S.cfg.hwPer||0;showCheer('📷 パパに送ったよ！'+(S.cfg.bonusOn&&per?'OKが出たら +'+per+'分':''));sTick();
+  var pend=S.homework.filter(function(h){return h.st==='sub';}).length;
+  qbNotify('📒 宿題の写真','「'+it.t+'」の写真が届きました（確認待ち '+pend+'件）。ボードで OK／やり直し を押してください。');}
+function hwOk(i){var it=S.homework[i];if(!it)return;rollover();if(it.ph)hwPhDel(it.ph);
+  it.st='ok';it.done=true;it.okDate=today();delete it.ph;delete it.note;S.day.hwOk=_num(S.day.hwOk)+1;
+  if(S.homework.every(function(h){return h.st==='ok';})){var sg=hwSig();if(S.hwAllSig!==sg){S.hwAllSig=sg;S.day.hwAll=1;}}
+  save();maybeSync();render();}
+function hwNg(i){var it=S.homework[i];if(!it)return;var note=prompt('やり直しの理由（娘に表示されます）','写真が見えにくいので撮り直してね');if(note===null)return;
+  if(it.ph)hwPhDel(it.ph);it.st='ng';it.done=false;delete it.ph;it.note=note||'もう一度やってみよう';save();maybeSync();renderHomework();}
+function hwUnok(i){var it=S.homework[i];if(!it)return;rollover();if(it.okDate===today()&&_num(S.day.hwOk)>0)S.day.hwOk=_num(S.day.hwOk)-1;
+  if(S.day.hwAll&&S.hwAllSig===hwSig()){S.day.hwAll=0;S.hwAllSig='';}
+  it.st='';it.done=false;delete it.okDate;save();maybeSync();render();}
+function viewHwPhoto(id){var d=HWPH[id];if(!d)return;document.getElementById('pvImg').src=d;document.getElementById('photoView').style.display='flex';}
+/* ページ範囲の小分け：「…p62~69…」→「…p62~63…」「…p64~65…」… */
+function hwSplitText(t,n){n=+n||0;if(!n)return [t];var m=String(t).match(/^(.*?)([pPｐ])\s*(\d+)\s*([~〜～\-－ー])\s*(\d+)(.*)$/);if(!m)return [t];var a=+m[3],b=+m[5];if(!(b>a)||b-a+1<=n)return [t];
+  var out=[];for(var x=a;x<=b;x+=n){var y=Math.min(b,x+n-1);out.push(m[1]+m[2]+(x===y?x:(x+m[4]+y))+m[6]);}return out;}
+function hwSplitNow(){var n=parseInt(document.getElementById('d_hwChunk').value)||0;if(!n){alert('小分けのページ数を選んでください');return;}
+  var res=[],add=0;(S.homework||[]).forEach(function(h){if(h.st==='ok'||h.st==='sub'){res.push(h);return;}var parts=hwSplitText(h.t,n);if(parts.length>1)add+=parts.length-1;parts.forEach(function(t,k){res.push(parts.length>1?{t:t,done:false,st:''}:h);});});
+  if(!add){alert('小分けできるページ範囲（例：p62~69）が見つかりませんでした');return;}
+  if(!confirm('宿題を小分けして '+res.length+'件にします（+'+add+'件）。よろしいですか？'))return;
+  S.homework=res;S.cfg.hwChunk=n;save();maybeSync();try{document.getElementById('d_homework').value=S.homework.map(function(h){return h.t;}).join('\n');}catch(e){}renderHomework();alert('小分けしました');}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function calcOwner(){try{return localStorage.getItem('qb_calc_owner')==='papa'?'papa':'child';}catch(e){return 'child';}}
 function fmtLast(ms){ms=+ms;if(!ms||!isFinite(ms))return '';var d=new Date(ms);function p(n){return String(n).padStart(2,'0');}return (d.getMonth()+1)+'/'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes());}
@@ -574,20 +643,22 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
 var _bonusN=0,_bonusAll=false;
 function bonusDay(){var b=(S.day&&S.day.date===today()&&S.day.bonus)||{};return {req:_num(b.req),reqAt:_num(b.reqAt),grant:_num(b.grant),grantAt:_num(b.grantAt)};}
-function bonusEarned(n,all){if(!S.cfg.bonusOn)return 0;return n*(+S.cfg.bonusPer||0)+(all?(+S.cfg.bonusAll||0):0);}
+function bonusHw(){var d=(S.day&&S.day.date===today())?S.day:{};return {n:_num(d.hwOk),all:!!d.hwAll};}
+function bonusEarned(n,all){if(!S.cfg.bonusOn)return 0;var w=bonusHw();return n*(+S.cfg.bonusPer||0)+(all?(+S.cfg.bonusAll||0):0)+w.n*(+S.cfg.hwPer||0)+(w.all?(+S.cfg.hwAll||0):0);}
+function bonusBreak(n,all){var w=bonusHw(),p=[];if(w.n)p.push('宿題 '+w.n+'つ +'+(w.n*(+S.cfg.hwPer||0))+'分');if(w.all&&+S.cfg.hwAll)p.push('宿題ぜんぶ +'+S.cfg.hwAll+'分');if(n)p.push('クエスト '+n+'つ +'+(n*(+S.cfg.bonusPer||0))+'分');if(all&&+S.cfg.bonusAll)p.push('3つ全部 +'+S.cfg.bonusAll+'分');return p.join('・');}
 function bonusLogSet(e,g){S.bonusLog=S.bonusLog||{};S.bonusLog[today()]={e:e,g:g};var ks=Object.keys(S.bonusLog).sort();while(ks.length>60)delete S.bonusLog[ks.shift()];}
 function bonusHTML(n,all,isPapa){_bonusN=n;_bonusAll=all;if(!S.cfg.bonusOn)return '';
   var e=bonusEarned(n,all),b=bonusDay(),left=Math.max(0,e-b.req-b.grant),per=+S.cfg.bonusPer||0,ab=+S.cfg.bonusAll||0,h='',cls='ps-bonus';
-  if(isPapa){
-    if(b.req>0){cls+=' req';h='<div class="ps-bh">🔔 娘から申請：+'+b.req+'分</div><div class="ps-bs">Family Link →「スクリーンタイム」→「ボーナス時間」で +'+b.req+'分 を追加してから押してください</div><button class="ps-btn ok" onclick="bonusGrant()">✅ +'+b.req+'分 付与した</button>';}
-    else if(left>0){h='<div class="ps-bh">📱 達成分 +'+left+'分（まだ申請なし）</div><button class="ps-btn ok" onclick="bonusGrant()">✅ +'+left+'分 付与した</button>';}
+  if(isPapa){var amt=Math.max(b.req,e-b.grant,0),brk=bonusBreak(n,all);
+    if(b.req>0&&amt>0){cls+=' req';h='<div class="ps-bh">🔔 娘から申請：+'+amt+'分</div><div class="ps-bs">'+(brk?'今日の内訳：'+brk+'<br>':'')+'Family Link →「スクリーンタイム」→「ボーナス時間」で +'+amt+'分 を追加してから押してください</div><button class="ps-btn ok" onclick="bonusGrant()">✅ +'+amt+'分 付与した</button>';}
+    else if(amt>0){h='<div class="ps-bh">📱 達成分 +'+amt+'分（まだ申請なし）</div>'+(brk?'<div class="ps-bs">今日の内訳：'+brk+'</div>':'')+'<button class="ps-btn ok" onclick="bonusGrant()">✅ +'+amt+'分 付与した</button>';}
     else h='<div class="ps-bh">📱 今日のボーナス：'+(e?('+'+e+'分 たまった'):'まだなし')+'</div>';
     if(b.grant>0)h+='<div class="ps-bs">今日 付与済み +'+b.grant+'分</div>';
     var ks=Object.keys(S.bonusLog||{}).sort().filter(function(k){return _num(S.bonusLog[k].g)>0;}).slice(-7);if(ks.length)h+='<div class="ps-log">直近：'+ks.map(function(k){var p=k.split('-');return (+p[1])+'/'+(+p[2])+' +'+_num(S.bonusLog[k].g)+'分';}).join('・')+'</div>';
   }else{
     if(left>0)h='<div class="ps-bh">📱 スマホ時間 +'+left+'分 たまったよ</div><button class="ps-btn" onclick="bonusRequest()">📱 パパにお願いする（+'+left+'分）</button>';
     else if(b.req>0){cls+=' req';h='<div class="ps-bh">⏳ +'+b.req+'分 パパの承認待ち</div>'+(_ntfyMsg?'<div class="ps-bs">'+_ntfyMsg+'</div>':'')+((S.cfg.ntfyTopic&&Date.now()-_ntfyLast>120000)?'<button class="ps-btn" style="background:#f0a24a;box-shadow:0 3px 0 #c97f2c" onclick="bonusRenotify()">🔔 もう一度パパに知らせる</button>':'');}
-    else if(e===0)h='<div class="ps-bh">📱 クエストを1つクリアするごとに スマホ時間 +'+per+'分</div>'+(ab?'<div class="ps-bs">3つ全部クリアで さらに +'+ab+'分</div>':'');
+    else if(e===0)h='<div class="ps-bh">📱 スマホ時間をためよう</div><div class="ps-bs">📒 宿題1つ（写真→パパOK）で +'+(+S.cfg.hwPer||0)+'分'+(+S.cfg.hwAll?'・ぜんぶ終わると +'+S.cfg.hwAll+'分':'')+'<br>🎯 クエスト1つで +'+per+'分'+(ab?'・3つ全部で さらに +'+ab+'分':'')+'</div>';
     if(b.grant>0)h+='<div class="ps-bs" style="color:#2f7d45">✅ 今日もらった時間 +'+b.grant+'分</div>';
     if(!h)h='<div class="ps-bh">📱 スマホ時間ボーナス</div>';
     if(e>0&&!all)h+='<div class="ps-bs">あと1つクリアで +'+(per+((n+1===3)?ab:0))+'分</div>';
@@ -607,21 +678,23 @@ function bonusRenotify(){var b=bonusDay();if(b.req>0)bonusNotify(b.req);}
 function genNtfy(){var r='';for(var i=0;i<3;i++)r+=Math.random().toString(36).slice(2,8);document.getElementById('d_ntfy').value='qb-'+r;}
 function testNtfy(){var t=(document.getElementById('d_ntfy').value||'').trim();if(!t){alert('先にトピック名を入れてください');return;}var keep=S.cfg.ntfyTopic;S.cfg.ntfyTopic=t;
   qbNotify('🔔 テスト通知','クエストボードからのテスト通知です。届いていれば設定完了！').then(function(ok){S.cfg.ntfyTopic=keep;alert(ok?'送信しました。スマホに通知が届いたか確認してください（届いたら「保存する」を押してください）':'送信できませんでした。通信状態を確認してください');});}
-function bonusGrant(){var e=bonusEarned(_bonusN,_bonusAll),b=bonusDay(),amt=b.req>0?b.req:Math.max(0,e-b.grant);if(amt<=0)return;
+function bonusGrant(){var e=bonusEarned(_bonusN,_bonusAll),b=bonusDay(),amt=Math.max(b.req,e-b.grant,0);if(amt<=0)return;
   if(!confirm('Family Link で +'+amt+'分 のボーナス時間を追加しましたか？'))return;
   rollover();S.day.bonus={req:0,reqAt:b.reqAt,grant:b.grant+amt,grantAt:Date.now()};bonusLogSet(e,b.grant+amt);save();maybeSync();render();}
 function bonusCheer(isPapa){if(isPapa)return;try{var b=bonusDay();if(!b.grantAt)return;var k='qb_bonusseen',v=localStorage.getItem(k);if(String(b.grantAt)===v)return;if(document.getElementById('cheer').style.display==='flex')return;localStorage.setItem(k,String(b.grantAt));showCheer('📱 スマホ時間 +'+b.grant+'分 もらえたよ！');sWin();burst();}catch(e){}}
 /* 宿題の入れ替え：完了済みは消し、未完了はそのまま残し、新しい宿題を後ろに追加（同じ文面は重複させない） */
 function hwParse(txt){return String(txt||'').split('\n').map(function(x){return x.replace(/[\s　]+/g,' ').trim();}).filter(function(x){return x&&!/^【[^】]*】/.test(x);});}
 function hwReplace(){var el=document.getElementById('d_hwnew');var nw=hwParse(el&&el.value);if(!nw.length){alert('新しい宿題を貼り付けてください');return;}
+  var _ch=+((document.getElementById('d_hwChunk')||{}).value||S.cfg.hwChunk||0);nw=[].concat.apply([],nw.map(function(t){return hwSplitText(t,_ch);}));
   var old=S.homework||[];var keep=old.filter(function(h){return !h.done&&nw.indexOf(h.t)<0;});
-  var add=nw.filter(function(t,i){return nw.indexOf(t)===i;}).map(function(t){var o=old.find(function(h){return h.t===t;});return {t:t,done:o?o.done:false};});
+  var add=nw.filter(function(t,i){return nw.indexOf(t)===i;}).map(function(t){var o=old.find(function(h){return h.t===t;});return o?o:{t:t,done:false};});
   var removed=old.filter(function(h){return h.done&&nw.indexOf(h.t)<0;}).length;
   if(!confirm('完了済み '+removed+'件を消し、未完了 '+keep.length+'件は残して、新しい宿題 '+add.length+'件を追加します。よろしいですか？'))return;
+  old.forEach(function(h){if(h.ph&&keep.indexOf(h)<0&&add.indexOf(h)<0)hwPhDel(h.ph);});
   S.homework=keep.concat(add);save();maybeSync();
   try{var _hw=document.getElementById('d_homework');if(_hw)_hw.value=S.homework.map(function(h){return h.t;}).join('\n');}catch(e){}
   if(el)el.value='';renderHomework();alert('入れ替えました（未完了 '+keep.length+'件を残し、新しい宿題 '+add.length+'件）');}
-function hwResetAll(){if(!S.homework||!S.homework.length){alert('宿題がまだありません');return;}if(!confirm('宿題のチェックを全部リセットしますか？'))return;S.homework.forEach(function(h){h.done=false;});save();maybeSync();renderHomework();alert('宿題のチェックをリセットしました');}
+function hwResetAll(){if(!S.homework||!S.homework.length){alert('宿題がまだありません');return;}if(!confirm('宿題のチェックを全部リセットしますか？'))return;S.homework.forEach(function(h){if(h.ph)hwPhDel(h.ph);h.done=false;h.st='';delete h.ph;delete h.okDate;delete h.note;});save();maybeSync();renderHomework();alert('宿題のチェックをリセットしました');}
 function copyText(t,msg){try{navigator.clipboard.writeText(t);}catch(e){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}try{showCheer(msg||'コピーしたよ📋');}catch(e){}}
 function burst(n,big){const N=n||26;const em=big?['🎉','🏆','⭐','✨','🎊','👑','💛','🥳']:['🎉','⭐','✨','🎊','🔥','💛'];for(let i=0;i<N;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=((big?2:1.5)+Math.random()*1.5)+'s';s.style.fontSize=((big?1.5:1)+Math.random()*(big?1.6:1.4))+'rem';document.body.appendChild(s);setTimeout(function(){s.remove();},4200);}}
 const lv=xp=>Math.floor(xp/100)+1;
@@ -744,7 +817,7 @@ function dadOpen(){
   document.getElementById('d_count').value=S.cfg.count;document.getElementById('d_goal').value=S.cfg.goal;
   document.getElementById('d_pa').value=S.cfg.pa.join('\n');
   document.getElementById('d_season').value=S.cfg.season;
-  try{document.getElementById('d_passPct').value=String(S.cfg.passPct);document.getElementById('d_passMin').value=String(S.cfg.passMin);document.getElementById('d_newMin').value=String(S.cfg.newMin);document.getElementById('d_calcDiff').value=String(S.cfg.calcDiff);document.getElementById('d_bonusOn').value=S.cfg.bonusOn?'1':'0';document.getElementById('d_bonusPer').value=String(S.cfg.bonusPer);document.getElementById('d_bonusAll').value=String(S.cfg.bonusAll);document.getElementById('d_ntfy').value=S.cfg.ntfyTopic||'';}catch(e){}
+  try{document.getElementById('d_passPct').value=String(S.cfg.passPct);document.getElementById('d_passMin').value=String(S.cfg.passMin);document.getElementById('d_newMin').value=String(S.cfg.newMin);document.getElementById('d_calcDiff').value=String(S.cfg.calcDiff);document.getElementById('d_bonusOn').value=S.cfg.bonusOn?'1':'0';document.getElementById('d_bonusPer').value=String(S.cfg.bonusPer);document.getElementById('d_bonusAll').value=String(S.cfg.bonusAll);document.getElementById('d_ntfy').value=S.cfg.ntfyTopic||'';document.getElementById('d_hwPer').value=String(S.cfg.hwPer);document.getElementById('d_hwAll').value=String(S.cfg.hwAll);document.getElementById('d_hwChunk').value=String(S.cfg.hwChunk);}catch(e){}
   document.getElementById('d_rewards').value=S.cfg.rewards.join('\n');
   document.getElementById('d_gacha').value=S.cfg.gacha.join('\n');
   document.getElementById('d_pin').value=S.cfg.pin;
@@ -768,10 +841,10 @@ function dadSave(){
   S.cfg.count=Math.max(0,parseInt(document.getElementById('d_count').value)||0);
   S.cfg.goal=Math.max(1,parseInt(document.getElementById('d_goal').value)||14);
   S.cfg.pa=lines('d_pa');S.cfg.season=document.getElementById('d_season').value||S.cfg.season;
-  S.cfg.passPct=parseInt(document.getElementById('d_passPct').value)||50;S.cfg.passMin=parseInt(document.getElementById('d_passMin').value)||10;S.cfg.newMin=parseInt(document.getElementById('d_newMin').value)||10;S.cfg.calcDiff=Math.max(0,Math.min(2,parseInt(document.getElementById('d_calcDiff').value)||0));S.cfg.bonusOn=document.getElementById('d_bonusOn').value==='1'?1:0;S.cfg.bonusPer=parseInt(document.getElementById('d_bonusPer').value)||10;S.cfg.bonusAll=parseInt(document.getElementById('d_bonusAll').value)||0;S.cfg.ntfyTopic=(document.getElementById('d_ntfy').value||'').trim();
+  S.cfg.passPct=parseInt(document.getElementById('d_passPct').value)||50;S.cfg.passMin=parseInt(document.getElementById('d_passMin').value)||10;S.cfg.newMin=parseInt(document.getElementById('d_newMin').value)||10;S.cfg.calcDiff=Math.max(0,Math.min(2,parseInt(document.getElementById('d_calcDiff').value)||0));S.cfg.bonusOn=document.getElementById('d_bonusOn').value==='1'?1:0;S.cfg.bonusPer=parseInt(document.getElementById('d_bonusPer').value)||10;S.cfg.bonusAll=parseInt(document.getElementById('d_bonusAll').value)||0;S.cfg.ntfyTopic=(document.getElementById('d_ntfy').value||'').trim();S.cfg.hwPer=parseInt(document.getElementById('d_hwPer').value)||0;S.cfg.hwAll=parseInt(document.getElementById('d_hwAll').value)||0;
   S.cfg.rewards=lines('d_rewards');S.cfg.gacha=lines('d_gacha');
   const pin=document.getElementById('d_pin').value;if(/^\d{4}$/.test(pin))S.cfg.pin=pin;
-  var _prev=S.homework||[];S.homework=lines('d_homework').map(function(t){var old=_prev.find(function(h){return h.t===t;});return {t:t,done:old?old.done:false};});
+  var _prev=S.homework||[];S.homework=lines('d_homework').map(function(t){var old=_prev.find(function(h){return h.t===t;});return old?old:{t:t,done:false};});S.cfg.hwChunk=parseInt(document.getElementById('d_hwChunk').value)||0;
   S.day.picks=S.day.picks.filter(i=>i<S.cfg.choice.length).slice(0,S.cfg.count);
   save();maybeSync();fillExport();alert('保存しました');
 }
@@ -797,7 +870,7 @@ function restoreAuto(){var b;try{b=JSON.parse(localStorage.getItem('qb_backup')|
 function restoreUndo(){var u;try{u=JSON.parse(localStorage.getItem('qb_undo')||'null');}catch(e){}if(!u||!u.s){alert('取り消せる操作がありません');return;}if(!confirm('直前の状態（'+_fmtTs(u.t)+'）に戻します。よろしいですか？'))return;if(restoreFrom(u.s)){alert('直前の状態に戻しました');dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,bonusLog:S.bonusLog,cfgVer:S.cfgVer};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,cfgVer:S.cfgVer};}
 function maybeSync(){
   if(!SYNC.on||SYNC.applying||!SYNC.ref)return;
   const snap=JSON.stringify(snapshotState());
@@ -817,7 +890,7 @@ function startSync(){
   SYNC.creds={fb:cfg,room:room};localStorage.setItem('qb_sync',JSON.stringify(SYNC.creds));
   initSync();
 }
-function stopSync(){try{if(SYNC.ref)SYNC.ref.off();}catch(e){}try{if(SYNC.pref)SYNC.pref.off();}catch(e){}try{if(SYNC.astatRef)SYNC.astatRef.off();}catch(e){}SYNC.on=false;SYNC.ref=null;SYNC.pref=null;SYNC.astatRef=null;SYNC.astatReady=false;localStorage.removeItem('qb_sync');SYNC.creds=null;syncStatus('停止しました');}
+function stopSync(){try{if(SYNC.ref)SYNC.ref.off();}catch(e){}try{if(SYNC.pref)SYNC.pref.off();}catch(e){}try{if(SYNC.astatRef)SYNC.astatRef.off();}catch(e){}try{if(SYNC.hwref)SYNC.hwref.off();}catch(e){}SYNC.on=false;SYNC.ref=null;SYNC.pref=null;SYNC.astatRef=null;SYNC.astatReady=false;localStorage.removeItem('qb_sync');SYNC.creds=null;syncStatus('停止しました');}
 function initSync(){
   if(!SYNC.creds)return;
   if(!window.firebase){syncStatus('（オフライン中：接続できたら同期します）');return;}
@@ -830,13 +903,14 @@ function initSync(){
       if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
       if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');return;}
       SYNC.applying=true;
-      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','bonusLog','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
+      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','hwAllSig','bonusLog','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
       normalize();
       var _mig=false;if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;_mig=true;}
       SYNC.applying=false;
       SYNC.lastSent=_mig?'':JSON.stringify(snapshotState());
       save();render();syncStatus('同期中 ✓（更新を受信）');
     },function(err){syncStatus('接続エラー: '+((err&&err.message)||''));});
+    try{SYNC.hwref=firebase.database().ref('rooms/'+SYNC.creds.room+'/hwphotos');var _hwOn=function(sn){if(typeof sn.val()==='string'){HWPH[sn.key]=sn.val();hwPhSave();renderHomework();}};SYNC.hwref.on('child_added',_hwOn);SYNC.hwref.on('child_changed',_hwOn);SYNC.hwref.on('child_removed',function(sn){delete HWPH[sn.key];hwPhSave();});}catch(e){}
     try{SYNC.pref=firebase.database().ref('rooms/'+SYNC.creds.room+'/photos');SYNC.pref.on('child_added',handlePhoto);SYNC.pref.on('child_changed',handlePhoto);}catch(e){}
     try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;SYNC.astatReady=true;if(SYNC.astatRemote){qbKMergeRemote('vocab',SYNC.astatRemote.vocab_k);qbKMergeRemote('jvocab',SYNC.astatRemote.jvocab_k);}if(SYNC.astatRemote)cacheAppstats(SYNC.astatRemote);appStatsSync();});}catch(e){}
   }catch(e){syncStatus('初期化エラー: '+e.message);}
