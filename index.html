@@ -203,6 +203,7 @@
   <h1 id="title">🗺️ クエスト</h1>
   <div class="sub" id="dateline"></div>
   <div class="toolbar"><span id="heartbtn" onclick="openReactSend()">💌</span><span id="spk" onclick="toggleMute()">🔊</span></div>
+  <div id="syncWarn"></div>
 
   <div class="card">
     <div class="row" style="align-items:center;justify-content:space-between">
@@ -331,6 +332,8 @@
     <p class="hint">iPhone に無料アプリ「ntfy」を入れ、下の通知トピック名を購読すると、娘が申請した瞬間に通知が届きます。トピック名は合言葉なので「生成」で作った推測されにくい名前を使ってください。</p>
     <div class="two"><div><input id="d_ntfy" placeholder="例: qb-xxxxxxxx"></div><div style="flex:0 0 auto"><button class="btn gray" style="width:auto;padding:8px 12px" onclick="genNtfy()">生成</button></div></div>
     <button class="btn gray" style="margin-top:6px" onclick="testNtfy()">🔔 テスト通知を送る</button>
+    <p class="hint" style="margin-top:10px">通知をタップすると、iPhone では Safari でボードが開きます（ホーム画面のアプリとは記録が別）。パパのiPhoneでこのボタンを押し、コピーしたリンクを Safari のアドレス欄に貼って1回開くと、Safari 側も同期・パパ表示になります。</p>
+    <button class="btn gray" style="margin-top:4px" onclick="copyJoinLink()">🔗 Safari用の設定リンクをコピー（1回だけ）</button>
   </div>
 
   <div class="sec">
@@ -448,6 +451,10 @@ function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
+/* 設定リンク（#qbjoin=…）で開いたら、このブラウザにも同期設定・役割・通知先を入れる */
+(function(){try{var m=location.hash.match(/^#qbjoin=(.+)$/);if(!m)return;var o=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));
+  if(o&&o.fb&&o.room){localStorage.setItem('qb_sync',JSON.stringify({fb:o.fb,room:o.room}));if(o.role)localStorage.setItem('qb_calc_owner',o.role==='papa'?'papa':'child');if(o.topic)localStorage.setItem('qb_ntfy',o.topic);window._qbJoined=1;}
+  history.replaceState(null,'',location.pathname);}catch(e){}})();
 const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null,astatRef:null,astatRemote:null,astatSent:'',pendDel:null,astatReady:false};
 try{SYNC.creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}try{if(S&&S.prog&&(S.prog.clears>0||(S.history&&Object.keys(S.history).length)||(S.rewards&&S.rewards.length))){localStorage.setItem('qb_backup',JSON.stringify({t:Date.now(),s:S}));}}catch(e){}}
@@ -680,7 +687,7 @@ function ntfyTopic(){var t=(S.cfg.ntfyTopic||'').trim();if(!t){try{t=(localStora
 function ntfyRef(){try{return (SYNC.on&&SYNC.creds&&window.firebase)?firebase.database().ref('rooms/'+SYNC.creds.room+'/notify/topic'):null;}catch(e){return null;}}
 function ntfyPush(t){var r=ntfyRef();if(r){try{r.set(t||'');}catch(e){}}}
 function qbNotify(title,msg){var t=ntfyTopic();_ntfyErr='';if(!t){_ntfyErr='通知先が未設定';return Promise.resolve(false);}if(!window.fetch){_ntfyErr='この端末は非対応';return Promise.resolve(false);}
-  var url='https://ntfy.sh/'+encodeURIComponent(t)+'?title='+encodeURIComponent(title)+'&priority=high&tags=iphone&click='+encodeURIComponent(location.href.split('#')[0]);
+  var url='https://ntfy.sh/'+encodeURIComponent(t)+'?title='+encodeURIComponent(title)+'&priority=high&tags=iphone&click='+encodeURIComponent(location.origin+location.pathname+'?src=ntfy');
   function go(){var o={method:'POST',body:msg};try{o.keepalive=true;}catch(e){}return fetch(url,o).then(function(r){if(r&&r.ok){_ntfyErr='';return true;}_ntfyErr='HTTP '+(r?r.status:'?');return false;}).catch(function(){_ntfyErr='通信エラー';return false;});}
   return go().then(function(ok){if(ok)return true;return new Promise(function(res){setTimeout(res,3000);}).then(go);});}
 function bonusNotify(min){_ntfyLast=Date.now();_ntfyMsg='📨 パパのスマホに知らせています…';renderPass();
@@ -689,6 +696,10 @@ function bonusNotify(min){_ntfyLast=Date.now();_ntfyMsg='📨 パパのスマホ
     if(S.day&&S.day.date===today()&&S.day.bonus&&S.day.bonus.req>0){S.day.bonus.nt=ok?1:_ntfyErr;save();maybeSync();}renderPass();});}
 function ntfyLine(nt){if(nt===undefined||nt===null||nt==='')return '';return '<br><span style="font-size:.72rem;color:'+(nt===1?'#2f7d45':nt===0?'#8a7a55':'#c0392b')+'">'+(nt===0?'📨 通知を送信中…':nt===1?'📨 パパのスマホへ通知 送信済み':'⚠️ 通知が送れませんでした（'+esc(nt)+'）')+'</span>';}
 function bonusRenotify(){var b=bonusDay();if(b.req>0)bonusNotify(b.req);}
+function copyJoinLink(){if(!SYNC.creds){alert('先にこの端末で「二台同期」を設定してください');return;}
+  var o={fb:SYNC.creds.fb,room:SYNC.creds.room,role:'papa',topic:ntfyTopic()};var u=location.origin+location.pathname+'#qbjoin='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(o)))));
+  var done=function(){alert('コピーしました。Safari を開き、アドレス欄に貼り付けて開いてください（1回だけでOK）。\n※同期の合言葉が入っているので、他の人には送らないでください');};
+  try{navigator.clipboard.writeText(u).then(done,function(){prompt('このリンクをコピーしてください',u);});}catch(e){prompt('このリンクをコピーしてください',u);}}
 function genNtfy(){var r='';for(var i=0;i<3;i++)r+=Math.random().toString(36).slice(2,8);document.getElementById('d_ntfy').value='qb-'+r;}
 function testNtfy(){var t=(document.getElementById('d_ntfy').value||'').trim();if(!t){alert('先にトピック名を入れてください');return;}var keep=S.cfg.ntfyTopic;S.cfg.ntfyTopic=t;
   qbNotify('🔔 テスト通知','クエストボードからのテスト通知です。届いていれば設定完了！').then(function(ok){if(ok){ntfyCache(t);ntfyPush(t);save();maybeSync();alert('送信しました。通知先も保存しました（娘の端末にも自動で反映されます）。スマホに通知が届いたか確認してください');}else{S.cfg.ntfyTopic=keep;alert('送信できませんでした（'+_ntfyErr+'）。通信状態を確認してください');}});}
@@ -775,6 +786,7 @@ function render(){
   const gap=S.prog.lastClear?daysBetween(S.prog.lastClear,today()):0;
   fa.innerHTML=(gap>=2&&S.prog.freeze>0)?`<button class="btn gray" style="margin-top:10px" onclick="useFreeze()">🎫 お休み券で連続を守る（残り ${S.prog.freeze}）</button>`:'';
 
+  var _sw=document.getElementById('syncWarn');if(_sw)_sw.innerHTML=(!SYNC.creds&&/[?&]src=ntfy/.test(location.search))?'<div class="card" style="border:2px solid #e2574f;background:#fdeceb;font-weight:800;font-size:.88rem;line-height:1.6">⚠️ このブラウザはクエストボードと同期していません（ここで押した OK などは記録されません）。<br>ホーム画面のアプリから開くか、保護者メニューの「Safari用の設定リンク」をこのブラウザで1回開いてください。</div>':'';
   renderHomework();
   renderVocab();
   renderJvocab();
@@ -1067,6 +1079,7 @@ window.addEventListener('focus',refreshAppCards);
 
 render();
 if(SYNC.creds)initSync();
+if(window._qbJoined){showCheer('✅ このブラウザも同期しました（パパ表示）');}
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
 </script>
 </body>
