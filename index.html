@@ -158,6 +158,8 @@
   .calgrid{display:grid;grid-template-columns:repeat(16,1fr);gap:4px}
   .hcell{width:100%;aspect-ratio:1/1;border-radius:4px;background:#eee4cf;border:1px solid var(--line)}
   .hcell.on{background:var(--teal);border-color:var(--teal)}
+  .hcell.star{background:var(--sun);border-color:#e0a800;box-shadow:inset 0 0 0 1.5px #fff6d0}
+  #stageTop>.row{margin-bottom:22px}
   .hcell.pa{background:var(--coral);border-color:var(--coral)}
   .pcell{display:flex;align-items:center;justify-content:center;font-size:8px;line-height:1;color:#fff;font-weight:800;overflow:hidden}
   .hcell.today{box-shadow:0 0 0 2px var(--sun)}
@@ -169,6 +171,7 @@
   .legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:.72rem;color:var(--soft)}
   .legend i{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:-2px;margin-right:4px;border:1px solid var(--line)}
   .legend .l-on{background:var(--teal);border-color:var(--teal)}
+  .legend .l-star{background:var(--sun);border-color:#e0a800}
   .legend .l-off{background:#eee4cf}
   .legend .l-today{background:#fff;box-shadow:0 0 0 2px var(--sun)}
   .toolbar{display:flex;justify-content:flex-end;gap:16px;margin:0 4px 8px;font-size:1.2rem}
@@ -451,7 +454,7 @@ function def(){return{
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;if(x.nt!==undefined)o.nt=x.nt;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;if(S.cfg.newMinJ===undefined)S.cfg.newMinJ=14;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};if(S.cfg.ntfyTopic)ntfyCache(S.cfg.ntfyTopic);}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;if(x.nt!==undefined)o.nt=x.nt;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;if(S.cfg.newMinJ===undefined)S.cfg.newMinJ=14;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};S.clog=S.clog||{};if(S.cfg.ntfyTopic)ntfyCache(S.cfg.ntfyTopic);}
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
@@ -632,6 +635,9 @@ function qbNewToday(key){var ks=qbKStat(key);if(ks)return ks.today||0;var st=_ls
 function qbCalcPerfToday(){var rem=SYNC.astatRemote||{},cache=_lsGet('qb_appstats')||{},p=null;
   [rem.child&&rem.child.keisan,rem.keisan,cache.child&&cache.child.keisan,cache.keisan,(calcOwner()==='child')?_lsGet('keisan_stats'):null].forEach(function(k){if(k&&k.perf)p=mergePerf(p,k.perf);});
   return (p&&p.d===qbTodayStr())?(p.m||{}):{};}
+/* がんばりカレンダー：その日のコミットライン結果を記録（1=ナイス〔合格〕・2=パーフェクト〔全部コンプ〕。上がる方向だけ更新） */
+function clRecord(l){S.clog=S.clog||{};var td=today();if(l>(+S.clog[td]||0)){S.clog[td]=l;var ks=Object.keys(S.clog).sort();while(ks.length>60)delete S.clog[ks.shift()];save();maybeSync();setTimeout(function(){try{render();}catch(e){}},0);}}
+function clLevel(k){return +((S.clog||{})[k])||0;}
 function renderPass(){var el=document.getElementById('passCard');if(!el)return;
   var pct=+S.cfg.passPct||50,min=+S.cfg.passMin||10,nmin=+S.cfg.newMin||10,nminJ=+S.cfg.newMinJ||14,cd=+S.cfg.calcDiff||0,isPapa=(calcOwner()==='papa');
   var ptxt=(pct>=100?'満点':pct+'点以上');
@@ -650,11 +656,15 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
   rows.push({k:'keisan',done:cDone,html:'<div class="ps-row'+(cDone?' ok':'')+'"><span class="ps-q">⚡ 計算'+(cDone?' クリア！':' '+cOk+'/5')+'</span><div class="ps-chips">'+cm.map(function(m){return chip(_num(pm[m[0]])>=cd+1,m[1]);}).join('')+'</div></div>'});
   var n=rows.filter(function(x){return x.done;}).length,all=(n===rows.length);
   var line='新しく覚えた語：英単語＋'+nmin+'・語彙＋'+nminJ+'／検問'+ptxt+'（'+min+'問以上）／計算：全演算＋ミックスを全問正解'+(cd===1?'（ふつう以上）':cd===2?'（むずかしい）':'');
-  var msg=all?(isPapa?'<div class="ps-msg">👉 今日のコミットライン達成</div>':'<div class="ps-msg">🎉 コミットライン達成！今日もよくがんばったね</div>'):'<div class="ps-tip">あと '+(rows.length-n)+'つで 今日のコミットライン達成！</div>';
+  var dn={};rows.forEach(function(x){dn[x.k]=x.done;});var lvl=all?2:((dn.keisan||(dn.vocab&&dn.jvocab))?1:0);clRecord(lvl);
+  var msg=lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト（3つぜんぶコンプ）</div>':'<div class="ps-msg">🌟 パーフェクト！今日はぜんぶできたね</div>')
+    :lvl===1?(isPapa?'<div class="ps-msg">👍 今日はナイス（合格）・あと '+(rows.length-n)+'つでパーフェクト</div>':'<div class="ps-msg">👍 ナイス！カレンダーに色がついたよ。あと '+(rows.length-n)+'つでパーフェクト🌟</div>')
+    :'<div class="ps-tip">👍 計算ぜんぶ か 英単語と語彙の両方で「ナイス」／3つぜんぶで「パーフェクト🌟」</div>';
   el.innerHTML='<div class="card pscard'+(all?' on':'')+'"><div class="v-h"><span>🎯 今日のコミットライン</span><span class="v-count">'+n+' / '+rows.length+'</span></div><div class="ps-line">'+line+'</div>'+rows.map(function(x){return x.html;}).join('')+msg+bonusHTML(n,all,isPapa)+'</div>';
   bonusCheer(isPapa);
-  if(all&&!isPapa){try{var key='qb_passcheer',c=JSON.parse(localStorage.getItem(key)||'{}'),td=qbTodayStr();
-    if(!c[td+':all']){var o={};o[td+':all']=1;localStorage.setItem(key,JSON.stringify(o));showCheer('🎯 コミットライン達成！よくがんばったね');sWin();burst();}}catch(e){}}
+  if(lvl&&!isPapa){try{var key='qb_passcheer',c=JSON.parse(localStorage.getItem(key)||'{}'),td=qbTodayStr(),ck=td+':'+(lvl===2?'all':'nice');
+    if(!c[ck]&&document.getElementById('cheer').style.display!=='flex'){var o={};for(var _k in c){if(_k.indexOf(td+':')===0)o[_k]=c[_k];}o[ck]=1;if(lvl===2)o[td+':nice']=1;localStorage.setItem(key,JSON.stringify(o));
+      if(lvl===2){showCheer('🌟 パーフェクト！今日はぜんぶできたね');sBig();burst(60,true);}else{showCheer('👍 ナイス！カレンダーに色がついたよ');sWin();burst();}}}catch(e){}}
 }
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
 var _bonusN=0,_bonusAll=false;
@@ -739,12 +749,12 @@ function frameClass(level){return 'flvl-'+Math.min(10,Math.max(1,level));}
 function frameOrn(level){var t=Math.min(10,level),o='';var topE=t>=9?'🌟':'⭐',botE=t>=9?'💎':'✨';if(t>=3)o+='<span class="orn tl">'+topE+'</span><span class="orn tr">'+topE+'</span>';if(t>=6)o+='<span class="orn bl">'+botE+'</span><span class="orn br">'+botE+'</span>';if(t>=7)o+='<span class="orn crown">👑</span>';return o;}
 function calHTML(){
   const N=16,base=new Date(),tk=today();let cells='';
-  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const on=!!(S.history&&S.history[k]);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);cells+='<div class="hcell'+(on?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')"></div>';}
+  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const lvl=clLevel(k);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);cells+='<div class="hcell'+(lvl===2?' star':lvl===1?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')"></div>';}
   const lab=(col,txt,al)=>'<span style="grid-column:'+col+(al?';justify-self:'+al:'')+'">'+txt+'</span>';
   const labels=lab(1,'15日前','start')+lab(6,'10日前')+lab(11,'5日前')+lab(16,'今日','end');
   return '<div class="callabels">'+labels+'</div><div class="calgrid">'+cells+'</div>';
 }
-function histCount(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.history&&S.history[dstr(d)])c++;}return c;}
+function histCount(min){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(clLevel(dstr(d))>=(min||1))c++;}return c;}
 var CAR='<svg viewBox="0 0 24 24" width="11" height="11" fill="#fff" style="display:inline-block;vertical-align:middle"><path d="M18.9 6.5A1.5 1.5 0 0 0 17.5 5.5h-11A1.5 1.5 0 0 0 5.1 6.5L3 12v6a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-6l-2.1-5.5zM6.5 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm11 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM5 11l1.4-3.8h11.2L19 11H5z"/></svg>';
 var CAPY_BASE='<ellipse cx="18" cy="31" rx="6.5" ry="7" fill="#b5875a" stroke="#6b4a2e" stroke-width="2.5"/><ellipse cx="46" cy="31" rx="6.5" ry="7" fill="#b5875a" stroke="#6b4a2e" stroke-width="2.5"/><path d="M14 42 C14 31 22 27 32 27 C42 27 50 31 50 42 C52 48 53 53 50 59 C46 68 39 71 32 71 C25 71 18 68 14 59 C11 53 12 48 14 42 Z" fill="#c99a68" stroke="#6b4a2e" stroke-width="2.5"/><ellipse cx="32" cy="60" rx="12" ry="9" fill="#bd9260"/><ellipse cx="15" cy="55" rx="4" ry="2.6" fill="#eaa0a0" opacity="0.75"/><ellipse cx="49" cy="55" rx="4" ry="2.6" fill="#eaa0a0" opacity="0.75"/><circle cx="23" cy="46" r="3.2" fill="#2f2318"/><circle cx="41" cy="46" r="3.2" fill="#2f2318"/><circle cx="24" cy="44.9" r="0.9" fill="#fff"/><circle cx="42" cy="44.9" r="0.9" fill="#fff"/><ellipse cx="28.5" cy="57.5" rx="1.6" ry="1.1" fill="#5a3d25"/><ellipse cx="35.5" cy="57.5" rx="1.6" ry="1.1" fill="#5a3d25"/><path d="M32 59 L32 63 M32 63 Q29.5 65.5 27.5 67.5 M32 63 Q34.5 65.5 36.5 67.5" stroke="#5a3d25" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
 var CAPY_ACC=['','<path d="M32 8 C20 10 16 22 25 26 C31 28 44 25 46 15 C47 9 40 6 32 8 Z" fill="#7bbf5a" stroke="#4e8f3a" stroke-width="2"/><path d="M27 24 L42 12" stroke="#4e8f3a" stroke-width="1.4" fill="none"/>','<path d="M32 6 l2.7 6.2 6.8 .5 -5.2 4.4 1.7 6.7 -6-3.5 -6 3.5 1.7-6.7 -5.2-4.4 6.8-.5 z" fill="#ffcf4d" stroke="#e0a800" stroke-width="1.4" stroke-linejoin="round"/>','<path d="M24 13 L32 20 L24 27 Z" fill="#ff9bb3" stroke="#d76b88" stroke-width="1.6"/><path d="M40 13 L32 20 L40 27 Z" fill="#ff9bb3" stroke="#d76b88" stroke-width="1.6"/><circle cx="32" cy="20" r="3" fill="#ff7fa3" stroke="#d76b88" stroke-width="1.6"/>','<path d="M19 25 L21 11 L28 19 L32 9 L36 19 L43 11 L45 25 Z" fill="#ffd24d" stroke="#e0a800" stroke-width="1.8" stroke-linejoin="round"/>','<path d="M19 25 L21 11 L28 19 L32 9 L36 19 L43 11 L45 25 Z" fill="#ffd24d" stroke="#e0a800" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 15 l1.3 2.7 2.7 1.3 -2.7 1.3 -1.3 2.7 -1.3-2.7 -2.7-1.3 2.7-1.3 z" fill="#ffe98a"/><path d="M55 15 l1.3 2.7 2.7 1.3 -2.7 1.3 -1.3 2.7 -1.3-2.7 -2.7-1.3 2.7-1.3 z" fill="#ffe98a"/>'];
@@ -826,8 +836,9 @@ function render(){
     stage.innerHTML=`<div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：${S.prog.gacha}回）</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
         <div class="calwrap">${calHTML()}</div>
-        <div class="legend"><span><i class="l-on"></i>クリア</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span><span>📷=写真あり</span></div>
-        <div class="mini">この16日で ${histCount()} 日 クリア！🔥</div></div>
+        <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
+        <div class="mini" style="font-size:.72rem;margin-top:4px">👍ナイス＝計算ぜんぶ か 英単語と語彙の両方 ／ 🌟パーフェクト＝3つぜんぶ</div>
+        <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日）</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span></div></div>
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 今日の記録</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読動画やドリルの写真を残そう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
   }
@@ -911,7 +922,7 @@ function restoreAuto(){var b;try{b=JSON.parse(localStorage.getItem('qb_backup')|
 function restoreUndo(){var u;try{u=JSON.parse(localStorage.getItem('qb_undo')||'null');}catch(e){}if(!u||!u.s){alert('取り消せる操作がありません');return;}if(!confirm('直前の状態（'+_fmtTs(u.t)+'）に戻します。よろしいですか？'))return;if(restoreFrom(u.s)){alert('直前の状態に戻しました');dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,cfgVer:S.cfgVer};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,cfgVer:S.cfgVer};}
 function maybeSync(){
   if(!SYNC.on||SYNC.applying||!SYNC.ref||!SYNC.stateReady)return;
   const snap=JSON.stringify(snapshotState());
@@ -944,7 +955,7 @@ function initSync(){
       if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
       if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');maybeSync();return;}
       SYNC.applying=true;
-      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','hwAllSig','bonusLog','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
+      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','hwAllSig','bonusLog','clog','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
       normalize();
       var _mig=false;if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;_mig=true;}
       SYNC.applying=false;
