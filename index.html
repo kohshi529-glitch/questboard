@@ -249,6 +249,7 @@
 
   <div id="stage"></div>
   <div class="mini" id="rewardLog" style="margin-top:4px"></div>
+  <div id="flJump"></div>
 </div>
 
 <input type="file" id="hwFile" accept="image/*" capture="environment" style="display:none" onchange="hwPhotoPicked(event)">
@@ -334,6 +335,9 @@
     <button class="btn gray" style="margin-top:6px" onclick="testNtfy()">🔔 テスト通知を送る</button>
     <p class="hint" style="margin-top:10px">通知をタップすると、iPhone では Safari でボードが開きます（ホーム画面のアプリとは記録が別）。パパのiPhoneでこのボタンを押し、コピーしたリンクを Safari のアドレス欄に貼って1回開くと、Safari 側も同期・パパ表示になります。</p>
     <button class="btn gray" style="margin-top:4px" onclick="copyJoinLink()">🔗 Safari用の設定リンクをコピー（1回だけ）</button>
+    <label style="margin-top:12px">📲 ボード下の「ファミリーリンクを開く」ボタン（パパ表示のときだけ出ます）</label>
+    <p class="hint">iPhone の「ショートカット」アプリで、＋ →「アクションを追加」→「Appを開く」→ Family Link を選び、名前を下と同じ（例：ファミリーリンク）にして保存してください。ボタンを押すとそのショートカット経由で Family Link が開きます（この設定は端末ごと）。</p>
+    <div class="two"><div><input id="d_flsc" placeholder="ファミリーリンク"></div><div style="flex:0 0 auto"><button class="btn gray" style="width:auto;padding:8px 12px" onclick="flSave();openFamilyLink()">試す</button></div></div>
   </div>
 
   <div class="sec">
@@ -700,6 +704,14 @@ function copyJoinLink(){if(!SYNC.creds){alert('先にこの端末で「二台同
   var o={fb:SYNC.creds.fb,room:SYNC.creds.room,role:'papa',topic:ntfyTopic()};var u=location.origin+location.pathname+'#qbjoin='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(o)))));
   var done=function(){alert('コピーしました。Safari を開き、アドレス欄に貼り付けて開いてください（1回だけでOK）。\n※同期の合言葉が入っているので、他の人には送らないでください');};
   try{navigator.clipboard.writeText(u).then(done,function(){prompt('このリンクをコピーしてください',u);});}catch(e){prompt('このリンクをコピーしてください',u);}}
+/* Family Link へジャンプ：iPhone はアプリを直接開くURLが無いため、ショートカット（Appを開く）経由で開く */
+function flName(){try{return (localStorage.getItem('qb_flsc')||'').trim()||'ファミリーリンク';}catch(e){return 'ファミリーリンク';}}
+function flSave(){try{var v=(document.getElementById('d_flsc').value||'').trim();if(v)localStorage.setItem('qb_flsc',v);else localStorage.removeItem('qb_flsc');}catch(e){}}
+function flUrl(){return 'shortcuts://run-shortcut?name='+encodeURIComponent(flName());}
+function openFamilyLink(){location.href=flUrl();}
+function renderFlJump(){var el=document.getElementById('flJump');if(!el)return;if(calcOwner()!=='papa'){el.innerHTML='';return;}
+  var b=bonusDay(),pend=(S.homework||[]).filter(function(h){return h.st==='sub';}).length,note=b.req>0?('🔔 申請 +'+b.req+'分 を確認したら'):(pend?('📒 確認待ちの宿題 '+pend+'件'):'');
+  el.innerHTML='<div class="card" style="text-align:center;border:2px solid #34a853;background:#eef8f0">'+(note?'<div style="font-weight:800;font-size:.85rem;color:#2f7d45;margin-bottom:6px">'+note+'</div>':'')+'<a class="btn" style="display:block;text-decoration:none;background:#34a853;box-shadow:0 4px 0 #2a8a44" href="'+esc(flUrl())+'">📲 ファミリーリンクを開く</a><div class="mini">うまく開かないときは保護者メニューでショートカットを設定</div></div>';}
 function genNtfy(){var r='';for(var i=0;i<3;i++)r+=Math.random().toString(36).slice(2,8);document.getElementById('d_ntfy').value='qb-'+r;}
 function testNtfy(){var t=(document.getElementById('d_ntfy').value||'').trim();if(!t){alert('先にトピック名を入れてください');return;}var keep=S.cfg.ntfyTopic;S.cfg.ntfyTopic=t;
   qbNotify('🔔 テスト通知','クエストボードからのテスト通知です。届いていれば設定完了！').then(function(ok){if(ok){ntfyCache(t);ntfyPush(t);save();maybeSync();alert('送信しました。通知先も保存しました（娘の端末にも自動で反映されます）。スマホに通知が届いたか確認してください');}else{S.cfg.ntfyTopic=keep;alert('送信できませんでした（'+_ntfyErr+'）。通信状態を確認してください');}});}
@@ -820,6 +832,7 @@ function render(){
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 今日の記録</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読動画やドリルの写真を残そう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=rewardCardHTML();
+  renderFlJump();
   checkNewReaction();
   save();maybeSync();
 }
@@ -851,6 +864,7 @@ function dadOpen(){
   document.getElementById('d_fb').value=SYNC.creds?JSON.stringify(SYNC.creds.fb):'';
   document.getElementById('d_room').value=SYNC.creds?SYNC.creds.room:'';
   syncStatus(SYNC.on?('同期中 ✓ ルーム: '+SYNC.creds.room):'未接続');
+  try{document.getElementById('d_flsc').value=(localStorage.getItem('qb_flsc')||'');}catch(e){}
   try{var _rt=localStorage.getItem('qb_rem');if(_rt&&document.getElementById('remTime'))document.getElementById('remTime').value=_rt;}catch(e){}
   try{var _hw=document.getElementById('d_homework');if(_hw)_hw.value=(S.homework||[]).map(function(h){return h.t;}).join('\n');}catch(e){}
   try{var _bk=document.getElementById('d_backup');if(_bk)_bk.value=backupExport();var _rs=document.getElementById('d_restore');if(_rs)_rs.value='';}catch(e){}
@@ -868,6 +882,7 @@ function dadSave(){
   S.cfg.goal=Math.max(1,parseInt(document.getElementById('d_goal').value)||14);
   S.cfg.pa=lines('d_pa');S.cfg.season=document.getElementById('d_season').value||S.cfg.season;
   S.cfg.passPct=parseInt(document.getElementById('d_passPct').value)||50;S.cfg.passMin=parseInt(document.getElementById('d_passMin').value)||10;S.cfg.newMin=parseInt(document.getElementById('d_newMin').value)||10;S.cfg.calcDiff=Math.max(0,Math.min(2,parseInt(document.getElementById('d_calcDiff').value)||0));S.cfg.bonusOn=document.getElementById('d_bonusOn').value==='1'?1:0;S.cfg.bonusPer=parseInt(document.getElementById('d_bonusPer').value)||10;S.cfg.bonusAll=parseInt(document.getElementById('d_bonusAll').value)||0;S.cfg.ntfyTopic=(document.getElementById('d_ntfy').value||'').trim();ntfyCache(S.cfg.ntfyTopic);ntfyPush(S.cfg.ntfyTopic);S.cfg.hwPer=parseInt(document.getElementById('d_hwPer').value)||0;S.cfg.hwAll=parseInt(document.getElementById('d_hwAll').value)||0;S.cfg.newMinJ=parseInt(document.getElementById('d_newMinJ').value)||14;
+  flSave();
   S.cfg.rewards=lines('d_rewards');S.cfg.gacha=lines('d_gacha');
   const pin=document.getElementById('d_pin').value;if(/^\d{4}$/.test(pin))S.cfg.pin=pin;
   var _prev=S.homework||[];S.homework=lines('d_homework').map(function(t){var old=_prev.find(function(h){return h.t===t;});return old?old:{t:t,done:false};});S.cfg.hwChunk=parseInt(document.getElementById('d_hwChunk').value)||0;
@@ -1058,7 +1073,7 @@ function deleteBest(role,key){
 function paintCalcOwner(){var c=document.getElementById('own_child'),p=document.getElementById('own_papa');if(!c||!p)return;var o=calcOwner();
   function sel(b,on){b.style.background=on?'#3b6fe0':'';b.style.color=on?'#fff':'';b.style.fontWeight=on?'900':'';}
   sel(c,o==='child');sel(p,o==='papa');}
-function setCalcOwner(o){try{localStorage.setItem('qb_calc_owner',o==='papa'?'papa':'child');}catch(e){}paintCalcOwner();renderCalc();if(SYNC.on){SYNC.astatSent='';appStatsSync();}}
+function setCalcOwner(o){try{localStorage.setItem('qb_calc_owner',o==='papa'?'papa':'child');}catch(e){}paintCalcOwner();renderCalc();renderFlJump();if(SYNC.on){SYNC.astatSent='';appStatsSync();}}
 function deleteBestUI(){
   var role=document.getElementById('del_role').value,mode=document.getElementById('del_mode').value,diff=document.getElementById('del_diff').value,key=mode+diff;
   var RN={child:'娘',papa:'パパ'},MN={add:'たし算',sub:'ひき算',mul:'かけ算',div:'わり算',mix:'ミックス'},DN={'0':'やさしい','1':'ふつう','2':'むずかしい'};
