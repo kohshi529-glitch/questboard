@@ -39,6 +39,7 @@ window.QB_APP='keisan';
       var pc=ck.perf,pl=ls.perf,dpc=dnum(pc&&pc.d),dpl=dnum(pl&&pl.d);
       if(pc||pl){if(dpc===dpl){var pm={},pk,a1=(pc&&pc.m)||{},a2=(pl&&pl.m)||{};for(pk in a1)pm[pk]=a1[pk];for(pk in a2)pm[pk]=Math.max(num(pm[pk]),num(a2[pk]));m.perf={d:(pc||pl).d,m:pm};}else m.perf=(dpc>dpl)?pc:pl;}
       var fb={};for(k in m.best){if(del[k]!=null&&m.best[k]===del[k])continue;fb[k]=m.best[k];}m.best=fb;
+      var bc=ck.pbs,bl2=ls.pbs,dbc=dnum(bc&&bc.d),dbl=dnum(bl2&&bl2.d);if(bc||bl2){m.pbs=(dbc===dbl)?{d:(bc||bl2).d,n:Math.max(num(bc&&bc.n),num(bl2&&bl2.n))}:((dbc>dbl)?bc:bl2);}
       cur.keisan=m;return cur;
     },function(){},false);}catch(e){}}
   function doPush(){if(window.QB_APP==='keisan')pushKeisan();else pushVocab(window.QB_APP);}
@@ -312,6 +313,7 @@ function finish(){
   var ms=Date.now()-t0, sec=Math.round(ms/1000), acc=Math.round(correct/SETSIZE*100);
   var key=mode+diff, prevBest=stats.best[key], isBest=false;
   if(correct===SETSIZE){ if(!prevBest||sec<prevBest){stats.best[key]=sec;isBest=true;} }
+  if(isBest){var _pd=todayStr();if(!stats.pbs||stats.pbs.d!==_pd)stats.pbs={d:_pd,n:0};stats.pbs.n=(stats.pbs.n||0)+1;}
   if(correct===SETSIZE){var _td=todayStr();if(!stats.perf||stats.perf.d!==_td)stats.perf={d:_td,m:{}};stats.perf.m[mode]=Math.max(stats.perf.m[mode]||0,diff+1);}
   stats.lastAcc=acc;saveStats();
   show('result');document.getElementById('h1').textContent='けっか';
@@ -323,7 +325,8 @@ function finish(){
   document.getElementById('rEmoji').textContent=em;
   document.getElementById('rTitle').textContent=ti;
   var bl=document.getElementById('rBest');
-  if(isBest)bl.textContent='⭐ ベスト更新！（'+fmtBest(sec)+'）';
+  if(isBest){var _qc={};try{_qc=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}var _pp=(_qc.pbPer===undefined)?5:(+_qc.pbPer||0);
+    bl.textContent='⭐ ベスト更新！（'+fmtBest(sec)+'）'+((_qc.bonusOn!==0&&_pp&&(localStorage.getItem('qb_calc_owner')!=='papa'))?' 📱+'+_pp+'分ゲット！':'');}
   else if(stats.best[key])bl.textContent='ベスト '+fmtBest(stats.best[key]);
   else bl.textContent='全問せいかいでベスト記録に挑戦！';
   var cl=document.getElementById('rCommit');if(cl){var mm=['add','sub','mul','div','mix'],left=mm.filter(function(x){return !modeDone(x);});
