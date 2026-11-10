@@ -336,7 +336,7 @@
     <p class="hint">iPhone に無料アプリ「ntfy」を入れ、下の通知トピック名を購読すると、娘が申請した瞬間に通知が届きます。トピック名は合言葉なので「生成」で作った推測されにくい名前を使ってください。</p>
     <div class="two"><div><input id="d_ntfy" placeholder="例: qb-xxxxxxxx"></div><div style="flex:0 0 auto"><button class="btn gray" style="width:auto;padding:8px 12px" onclick="genNtfy()">生成</button></div></div>
     <button class="btn gray" style="margin-top:6px" onclick="testNtfy()">🔔 テスト通知を送る</button>
-    <p class="hint" style="margin-top:10px">通知をタップすると、iPhone では Safari でボードが開きます（ホーム画面のアプリとは記録が別）。パパのiPhoneでこのボタンを押し、コピーしたリンクを Safari のアドレス欄に貼って1回開くと、Safari 側も同期・パパ表示になります。</p>
+    <p class="hint" style="margin-top:10px">通知をタップすると Safari などでボードが開きますが、通知のリンク自体に同期設定が入っているので、開いた画面は自動で同期・パパ表示になります（下のボタンは Safari を手動で設定したいとき用）。</p>
     <button class="btn gray" style="margin-top:4px" onclick="copyJoinLink()">🔗 Safari用の設定リンクをコピー（1回だけ）</button>
     <label style="margin-top:12px">📲 ボード下の「ファミリーリンクを開く」ボタン（パパ表示のときだけ出ます）</label>
     <p class="hint">iPhone の「ショートカット」アプリで、＋ →「アクションを追加」→「Appを開く」→ Family Link を選び、名前を下と同じ（例：ファミリーリンク）にして保存してください。ボタンを押すとそのショートカット経由で Family Link が開きます（この設定は端末ごと）。</p>
@@ -460,7 +460,7 @@ if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
 /* 設定リンク（#qbjoin=…）で開いたら、このブラウザにも同期設定・役割・通知先を入れる */
 (function(){try{var m=location.hash.match(/^#qbjoin=(.+)$/);if(!m)return;var o=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));
-  if(o&&o.fb&&o.room){localStorage.setItem('qb_sync',JSON.stringify({fb:o.fb,room:o.room}));if(o.role)localStorage.setItem('qb_calc_owner',o.role==='papa'?'papa':'child');if(o.topic)localStorage.setItem('qb_ntfy',o.topic);window._qbJoined=1;}
+  if(o&&o.fb&&o.room){var _ns=JSON.stringify({fb:o.fb,room:o.room}),_prev=localStorage.getItem('qb_sync');localStorage.setItem('qb_sync',_ns);if(o.role)localStorage.setItem('qb_calc_owner',o.role==='papa'?'papa':'child');if(o.topic)localStorage.setItem('qb_ntfy',o.topic);if(_prev!==_ns)window._qbJoined=1;}
   history.replaceState(null,'',location.pathname);}catch(e){}})();
 const SYNC={on:false,applying:false,ref:null,pref:null,lastSent:'',creds:null,astatRef:null,astatRemote:null,astatSent:'',pendDel:null,astatReady:false};
 try{SYNC.creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
@@ -701,7 +701,7 @@ function ntfyTopic(){var t=(S.cfg.ntfyTopic||'').trim();if(!t){try{t=(localStora
 function ntfyRef(){try{return (SYNC.on&&SYNC.creds&&window.firebase)?firebase.database().ref('rooms/'+SYNC.creds.room+'/notify/topic'):null;}catch(e){return null;}}
 function ntfyPush(t){var r=ntfyRef();if(r){try{r.set(t||'');}catch(e){}}}
 function qbNotify(title,msg){var t=ntfyTopic();_ntfyErr='';if(!t){_ntfyErr='通知先が未設定';return Promise.resolve(false);}if(!window.fetch){_ntfyErr='この端末は非対応';return Promise.resolve(false);}
-  var url='https://ntfy.sh/'+encodeURIComponent(t)+'?title='+encodeURIComponent(title)+'&priority=high&tags=iphone&click='+encodeURIComponent(location.origin+location.pathname+'?src=ntfy');
+  var url='https://ntfy.sh/'+encodeURIComponent(t)+'?title='+encodeURIComponent(title)+'&priority=high&tags=iphone&click='+encodeURIComponent(location.origin+location.pathname+'?src=ntfy'+(SYNC.creds?'#qbjoin='+joinCode('papa'):''));
   function go(){var o={method:'POST',body:msg};try{o.keepalive=true;}catch(e){}return fetch(url,o).then(function(r){if(r&&r.ok){_ntfyErr='';return true;}_ntfyErr='HTTP '+(r?r.status:'?');return false;}).catch(function(){_ntfyErr='通信エラー';return false;});}
   return go().then(function(ok){if(ok)return true;return new Promise(function(res){setTimeout(res,3000);}).then(go);});}
 function bonusNotify(min){_ntfyLast=Date.now();_ntfyMsg='📨 パパのスマホに知らせています…';renderPass();
@@ -710,8 +710,10 @@ function bonusNotify(min){_ntfyLast=Date.now();_ntfyMsg='📨 パパのスマホ
     if(S.day&&S.day.date===today()&&S.day.bonus&&S.day.bonus.req>0){S.day.bonus.nt=ok?1:_ntfyErr;save();maybeSync();}renderPass();});}
 function ntfyLine(nt){if(nt===undefined||nt===null||nt==='')return '';return '<br><span style="font-size:.72rem;color:'+(nt===1?'#2f7d45':nt===0?'#8a7a55':'#c0392b')+'">'+(nt===0?'📨 通知を送信中…':nt===1?'📨 パパのスマホへ通知 送信済み':'⚠️ 通知が送れませんでした（'+esc(nt)+'）')+'</span>';}
 function bonusRenotify(){var b=bonusDay();if(b.req>0)bonusNotify(b.req);}
+/* 同期設定を埋め込んだリンク用コード。通知のリンクにも付けるので、Safari・アプリ内ブラウザ・保存データが消えた後でも開いた瞬間に同期＆パパ表示になる */
+function joinCode(role){var o={fb:SYNC.creds.fb,room:SYNC.creds.room,role:role||'papa',topic:ntfyTopic()};return encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(o)))));}
 function copyJoinLink(){if(!SYNC.creds){alert('先にこの端末で「二台同期」を設定してください');return;}
-  var o={fb:SYNC.creds.fb,room:SYNC.creds.room,role:'papa',topic:ntfyTopic()};var u=location.origin+location.pathname+'#qbjoin='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(o)))));
+  var u=location.origin+location.pathname+'#qbjoin='+joinCode('papa');
   var done=function(){alert('コピーしました。Safari を開き、アドレス欄に貼り付けて開いてください（1回だけでOK）。\n※同期の合言葉が入っているので、他の人には送らないでください');};
   try{navigator.clipboard.writeText(u).then(done,function(){prompt('このリンクをコピーしてください',u);});}catch(e){prompt('このリンクをコピーしてください',u);}}
 /* Family Link へジャンプ：iPhone はアプリを直接開くURLが無いため、ショートカット（Appを開く）経由で開く */
