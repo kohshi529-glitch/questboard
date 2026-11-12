@@ -40,8 +40,15 @@ window.QB_APP='keisan';
       if(pc||pl){if(dpc===dpl){var pm={},pk,a1=(pc&&pc.m)||{},a2=(pl&&pl.m)||{};for(pk in a1)pm[pk]=a1[pk];for(pk in a2)pm[pk]=Math.max(num(pm[pk]),num(a2[pk]));m.perf={d:(pc||pl).d,m:pm};}else m.perf=(dpc>dpl)?pc:pl;}
       var fb={};for(k in m.best){if(del[k]!=null&&m.best[k]===del[k])continue;fb[k]=m.best[k];}m.best=fb;
       var bc=ck.pbs,bl2=ls.pbs,dbc=dnum(bc&&bc.d),dbl=dnum(bl2&&bl2.d);if(bc||bl2){m.pbs=(dbc===dbl)?{d:(bc||bl2).d,n:Math.max(num(bc&&bc.n),num(bl2&&bl2.n))}:((dbc>dbl)?bc:bl2);}
+      var hm=mergeHistK(ck.hist,ls.hist);if(hm)m.hist=hm;var pm2=mergePbl(ck.pbl,ls.pbl);if(pm2)m.pbl=pm2;
       cur.keisan=m;return cur;
     },function(){},false);}catch(e){}}
+  /* がんばり記録：日ごとの記録 hist={日付:{q:正解した問題数,s:セット数,f:全問正解セット,b:ベスト更新}}（項目ごとに大きい方）、ベスト更新の履歴 pbl={時刻:[種目,秒,前の秒]}（和集合） */
+  function mergeHistK(a,b){if(!a&&!b)return null;var o={},d,f;a=a||{};b=b||{};
+    for(d in a)o[d]=a[d];for(d in b){if(!o[d]){o[d]=b[d];continue;}var x=o[d]||{},y=b[d]||{},z={};for(f in x)z[f]=num(x[f]);for(f in y)z[f]=Math.max(num(z[f]),num(y[f]));o[d]=z;}
+    var ks=Object.keys(o).sort(function(p,q){return dnum(p)-dnum(q);});while(ks.length>400)delete o[ks.shift()];return o;}
+  function mergePbl(a,b){if(!a&&!b)return null;var o={},k;a=a||{};b=b||{};for(k in a)o[k]=a[k];for(k in b)o[k]=b[k];
+    var ks=Object.keys(o).sort(function(p,q){return num(p)-num(q);});while(ks.length>500)delete o[ks.shift()];return o;}
   function doPush(){if(window.QB_APP==='keisan')pushKeisan();else pushVocab(window.QB_APP);}
   var t=null;
   window.qbSyncKick=function(){clearTimeout(t);t=setTimeout(doPush,700);};
@@ -240,7 +247,11 @@ var diff=1, mode='add', problems=[], pi=0, correct=0, cur="", t0=0, timerId=null
 var stats=loadStats();
 
 function todayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
-function loadStats(){var s;try{s=JSON.parse(localStorage.getItem('keisan_stats')||'null');}catch(e){}if(!s||typeof s!=='object')s={};if(s.date!==todayStr()){s.date=todayStr();s.today=0;}s.best=s.best||{};return s;}
+function loadStats(){var s;try{s=JSON.parse(localStorage.getItem('keisan_stats')||'null');}catch(e){}if(!s||typeof s!=='object')s={};if(s.date!==todayStr()){s.date=todayStr();s.today=0;}s.best=s.best||{};s.hist=s.hist||{};
+  var _d=todayStr(),_h=s.hist[_d];if(s.today>0||(s.pbs&&s.pbs.d===_d)||(s.perf&&s.perf.d===_d)){_h=_h||{q:0,s:0,f:0,b:0};_h.q=Math.max(_h.q||0,s.today||0);if(s.pbs&&s.pbs.d===_d)_h.b=Math.max(_h.b||0,s.pbs.n||0);if(s.perf&&s.perf.d===_d){var _nf=Object.keys(s.perf.m||{}).length;_h.f=Math.max(_h.f||0,_nf);_h.s=Math.max(_h.s||0,_h.f);}s.hist[_d]=_h;}
+  return s;}
+/* がんばり記録（日ごと） */
+function histDay(){var d=todayStr();stats.hist=stats.hist||{};var h=stats.hist[d];if(!h){h=stats.hist[d]={q:0,s:0,f:0,b:0};var ks=Object.keys(stats.hist);if(ks.length>400){ks.sort(function(a,b){var p=a.split('-'),q=b.split('-');return (p[0]*1e4+p[1]*100+ +p[2])-(q[0]*1e4+q[1]*100+ +q[2]);});while(ks.length>400)delete stats.hist[ks.shift()];}}return h;}
 function saveStats(){stats.ts=Date.now();try{localStorage.setItem('keisan_stats',JSON.stringify(stats));}catch(e){}if(window.qbSyncKick)qbSyncKick();}
 
 /* 1日のコミットライン：たし・ひき・かけ・わり・ミックスを各1回以上 全問正解（難易度の条件はクエストボードの保護者メニュー） */
@@ -299,7 +310,7 @@ function submit(){
   if(locked||cur==="")return;locked=true;
   var a=document.getElementById('ans');
   if(parseInt(cur,10)===problems[pi].ans){
-    a.classList.add('ok');correct++;stats.today=(stats.today||0)+1;saveStats();
+    a.classList.add('ok');correct++;stats.today=(stats.today||0)+1;var _hq=histDay();_hq.q=Math.max((_hq.q||0)+1,stats.today);saveStats();
     setTimeout(nextProblem,320);
   }else{
     a.classList.add('ng');
@@ -315,6 +326,8 @@ function finish(){
   if(correct===SETSIZE){ if(!prevBest||sec<prevBest){stats.best[key]=sec;isBest=true;} }
   if(isBest){var _pd=todayStr();if(!stats.pbs||stats.pbs.d!==_pd)stats.pbs={d:_pd,n:0};stats.pbs.n=(stats.pbs.n||0)+1;}
   if(correct===SETSIZE){var _td=todayStr();if(!stats.perf||stats.perf.d!==_td)stats.perf={d:_td,m:{}};stats.perf.m[mode]=Math.max(stats.perf.m[mode]||0,diff+1);}
+  var _hh=histDay();_hh.s=(_hh.s||0)+1;if(correct===SETSIZE)_hh.f=(_hh.f||0)+1;
+  if(isBest){_hh.b=(_hh.b||0)+1;stats.pbl=stats.pbl||{};stats.pbl[Date.now()]=[key,sec,prevBest||0];var _pk=Object.keys(stats.pbl).sort(function(a,b){return a-b;});while(_pk.length>500)delete stats.pbl[_pk.shift()];}
   stats.lastAcc=acc;saveStats();
   show('result');document.getElementById('h1').textContent='けっか';
   document.getElementById('rTime').textContent=fmt(ms);

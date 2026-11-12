@@ -32,6 +32,10 @@ window.QB_APP='jvocab';
       else if(num(ls.learned)===num(cur.learned)&&num(ls.updated)>=num(cur.updated))w=ls;
       var qa=num(ls.quiz&&ls.quiz.updated),qb=num(cur.quiz&&cur.quiz.updated),q=(qa>=qb)?ls.quiz:cur.quiz; /* 検問記録は新しい方を残す */
       if(q&&w.quiz!==q){w=JSON.parse(JSON.stringify(w));w.quiz=q;}
+      var nw=(num(ls.updated)>=num(cur.updated))?ls:cur; /* 収録語数・目標は、いちばん新しく書いた端末（＝今のアプリ）の値を使う */
+      if(w!==nw&&(w.deckSize!==nw.deckSize||w.goal!==nw.goal)){w=JSON.parse(JSON.stringify(w));if(nw.deckSize!=null)w.deckSize=nw.deckSize;if(nw.goal!=null)w.goal=nw.goal;}
+      var dm=mergeQDays(ls.quiz&&ls.quiz.days,cur.quiz&&cur.quiz.days);
+      if(dm&&w.quiz&&JSON.stringify(dm)!==JSON.stringify(w.quiz.days||null)){w=JSON.parse(JSON.stringify(w));w.quiz.days=dm;}
       return w;
     },function(){},false);}catch(e){}}
   function pushKeisan(){var ls=lsGet('keisan_stats');if(!ls)return;var r=role();
@@ -47,6 +51,14 @@ window.QB_APP='jvocab';
       var fb={};for(k in m.best){if(del[k]!=null&&m.best[k]===del[k])continue;fb[k]=m.best[k];}m.best=fb;
       cur.keisan=m;return cur;
     },function(){},false);}catch(e){}}
+  /* がんばり記録：検問の日ごとの記録 days={日付:{t:受けた回数,p:満点,b:最高%}}（項目ごとに大きい方） */
+  function mergeQDays(a,b){if(!a&&!b)return null;var o={},d,f;a=a||{};b=b||{};
+    for(d in a)o[d]=a[d];for(d in b){if(!o[d]){o[d]=b[d];continue;}var x=o[d]||{},y=b[d]||{},z={};for(f in x)z[f]=num(x[f]);for(f in y)z[f]=Math.max(num(z[f]),num(y[f]));o[d]=z;}
+    var ks=Object.keys(o).sort(function(p,q){return dnum(p)-dnum(q);});while(ks.length>400)delete o[ks.shift()];return o;}
+  /* 収録語リスト（版 v つき）。新しい版だけがサーバの値を置きかえる */
+  function pushDeck(key){var d=null;try{d=localStorage.getItem(key+'_deck');}catch(e){}if(!d)return;var dv;try{dv=JSON.parse(d);}catch(e){return;}
+    try{if(localStorage.getItem(key+'_deckSent')===d)return;}catch(e){}
+    try{db.ref(base+'/'+key+'_deck').transaction(function(cur){var c=null;if(typeof cur==='string'){try{c=JSON.parse(cur);}catch(e){}}if(c&&num(c.v)>=num(dv.v))return;return d;},function(err){if(!err){try{localStorage.setItem(key+'_deckSent',d);}catch(e){}}},false);}catch(e){}}
   function pushKnown(key){var loc=window.qbKEnsure(key);
     try{db.ref(base+'/'+key+'_k').transaction(function(cur){
       var c={};if(typeof cur==='string'){try{c=JSON.parse(cur)||{};}catch(e){}}
@@ -55,7 +67,7 @@ window.QB_APP='jvocab';
       var now=window.qbKEnsure(key),m=window.qbKMerge(now,r);
       if(JSON.stringify(m)!==JSON.stringify(now)){try{localStorage.setItem(key+'_kts',JSON.stringify(m));}catch(e){}if(window.qbOnKnownSync)window.qbOnKnownSync();}
     },false);}catch(e){}}
-  function doPush(){if(window.QB_APP==='keisan')pushKeisan();else{pushKnown(window.QB_APP);pushVocab(window.QB_APP);}}
+  function doPush(){if(window.QB_APP==='keisan')pushKeisan();else{pushKnown(window.QB_APP);pushVocab(window.QB_APP);pushDeck(window.QB_APP);}}
   var t=null;
   window.qbSyncKick=function(){clearTimeout(t);t=setTimeout(doPush,700);};
   document.addEventListener('visibilitychange',function(){if(document.hidden)doPush();});
@@ -388,6 +400,110 @@ const STAGES=[
   {w:"悼む",pos:"いたむ",e:"🕯️",def:"人の死を悲しみ、なげく",ex:"亡くなった祖父を<b>悼む</b>",jp:"哀悼"},
   {w:"過信",pos:"かしん",e:"⚠️",def:"実際以上に信じて、たよりすぎること",ex:"自分の力を<b>過信</b>して失敗した",jp:"信じすぎ"},
   {w:"慈しむ",pos:"いつくしむ",e:"🤲",def:"かわいがって、大切に育てる",ex:"祖母は花を<b>慈しんで</b>育てている",jp:"かわいがる"}
+ ]},
+ {name:"ユニット6 天気・気象のことば",sub:"語彙トレーニング 天気・気象の言葉",stars:3,color:"var(--s2)",words:[
+  {w:"山背",pos:"やませ",e:"🌫️",def:"初夏から夏に、東北地方の太平洋側にふく、冷たくしめった北東の風。米の不作（冷害）の原因になる",ex:"<b>山背</b>がふいて、稲の育ちが悪くなった",jp:"冷たい北東風"},
+  {w:"おろし",pos:"おろし",e:"🏔️",def:"冬に、山から平地へふきおろす冷たく強い風",ex:"冬の朝、赤城<b>おろし</b>がふきつけた",jp:"例：赤城おろし・六甲おろし"},
+  {w:"空っ風",pos:"からっかぜ",e:"🍃",def:"冬にふく、雨や雪をともなわない、冷たく乾いた強い北風",ex:"関東の冬は<b>空っ風</b>が強い",jp:"乾いた北風"},
+  {w:"はやて",pos:"はやて",e:"💨",def:"急にはげしくふく風",ex:"<b>はやて</b>のように走り去った",jp:"疾風（しっぷう）"},
+  {w:"つむじ風",pos:"つむじかぜ",e:"🌀",def:"うずを巻くようにしてふき上がる風",ex:"校庭で<b>つむじ風</b>が砂をまき上げた",jp:"旋風（せんぷう）"},
+  {w:"霞",pos:"かすみ",e:"🌁",def:"春に、空気中の細かい水やちりで、遠くがぼんやりかすんで見えること",ex:"春の山に<b>霞</b>がかかっている",jp:"参考：春は「霞」、秋は「霧」"},
+  {w:"煙霧",pos:"えんむ",e:"🏭",def:"空気中のちりや煙のために、遠くがかすんで見えること",ex:"<b>煙霧</b>で町がかすんで見える",jp:"スモッグ"},
+  {w:"夕立",pos:"ゆうだち",e:"⛈️",def:"夏の午後から夕方に、急にはげしく降って、すぐにやむ雨",ex:"帰り道で<b>夕立</b>にあった",jp:"参考：夏の季語"},
+  {w:"にわか雨",pos:"にわかあめ",e:"☔",def:"急に降り出して、すぐにやむ雨",ex:"<b>にわか雨</b>なので、雨宿りして待とう",jp:"通り雨"},
+  {w:"五月雨",pos:"さみだれ",e:"🌧️",def:"昔のこよみの五月ごろ（今の六月ごろ）に降り続く長雨。つゆの雨",ex:"<b>五月雨</b>が何日も降り続いた",jp:"梅雨（つゆ）"},
+  {w:"霧雨",pos:"きりさめ",e:"🌫️",def:"霧のように細かい雨",ex:"<b>霧雨</b>なので、かさをささずに歩いた",jp:"小糠雨"},
+  {w:"村雨",pos:"むらさめ",e:"🌦️",def:"ひとしきり強く降って、すぐにやむ雨",ex:"<b>村雨</b>が通りすぎて、また日がさした",jp:"にわか雨"},
+  {w:"みぞれ",pos:"みぞれ",e:"🌨️",def:"雪がとけかけて、雨まじりに降るもの",ex:"夜になって雨が<b>みぞれ</b>に変わった",jp:"参考：雨と雪のあいだ"},
+  {w:"天気雨",pos:"てんきあめ",e:"🌤️",def:"日が照っているのに降る雨",ex:"晴れているのに<b>天気雨</b>が降ってきた",jp:"きつねの嫁入り"},
+  {w:"小糠雨",pos:"こぬかあめ",e:"💧",def:"米ぬかのように、とても細かい雨",ex:"<b>小糠雨</b>が静かに降っている",jp:"霧雨"},
+  {w:"通り雨",pos:"とおりあめ",e:"🚶",def:"さっと降って、すぐにやんでしまう雨",ex:"ただの<b>通り雨</b>だから、すぐやむよ",jp:"にわか雨"},
+  {w:"おぼろ雲",pos:"おぼろぐも",e:"☁️",def:"空一面をうすくおおう灰色の雲。月や太陽がぼんやり見え、雨が近いしるしになる",ex:"<b>おぼろ雲</b>が出て、月がかすんで見えた",jp:"高層雲"},
+  {w:"ひつじ雲",pos:"ひつじぐも",e:"🐑",def:"小さな雲のかたまりが、羊の群れのように並んだ雲",ex:"空に<b>ひつじ雲</b>が広がっている",jp:"高積雲"},
+  {w:"入道雲",pos:"にゅうどうぐも",e:"🌩️",def:"夏に、もくもくと高くわき上がる雲。夕立やかみなりをおこす",ex:"夏空に大きな<b>入道雲</b>がわいた",jp:"積乱雲"},
+  {w:"いわし雲",pos:"いわしぐも",e:"🐟",def:"小さな雲が、いわしの群れやうろこのように広がる雲。秋によく見られる",ex:"秋の空に<b>いわし雲</b>が広がった",jp:"うろこ雲"},
+  {w:"だし",pos:"だし",e:"⛵",def:"陸から海に向かってふく風。船出に都合がよい",ex:"<b>だし</b>の風に乗って、船が港を出た",jp:"参考：「出し風」とも書く"},
+  {w:"なぎ",pos:"なぎ",e:"🌊",def:"風がやんで、波がおだやかになること",ex:"夕方になると、海は<b>なぎ</b>になった",jp:"対義：しけ（海があれること）"}
+ ]},
+ {name:"ユニット7 行動・動作のことば",sub:"語彙トレーニング 行動・動作の言葉",stars:3,color:"var(--s3)",words:[
+  {w:"もったいぶる",pos:"もったいぶる",e:"🎩",def:"わざと大げさにして、なかなか見せたり言ったりしない",ex:"<b>もったいぶらず</b>に早く教えてよ",jp:"気取る"},
+  {w:"はにかむ",pos:"はにかむ",e:"☺️",def:"はずかしそうな表情やしぐさをする",ex:"ほめられて<b>はにかんだ</b>",jp:"恥じらう"},
+  {w:"つぐなう",pos:"つぐなう",e:"🙇",def:"自分のあやまちや、相手にあたえた損のうめあわせをする",ex:"割った窓ガラスの代金を<b>つぐなう</b>",jp:"弁償する・罪をつぐなう"},
+  {w:"うなだれる",pos:"うなだれる",e:"😔",def:"がっかりしたり、はずかしかったりして、首を前にたれる",ex:"試合に負けて<b>うなだれた</b>",jp:"しょんぼりする"},
+  {w:"あっけにとられる",pos:"あっけにとられる",e:"😲",def:"思いがけないことに驚きあきれて、ぼんやりする",ex:"見事な早わざに<b>あっけにとられた</b>",jp:"あぜんとする"},
+  {w:"うろたえる",pos:"うろたえる",e:"😰",def:"思いがけないことにあわてて、どうしてよいかわからなくなる",ex:"急に指名されて<b>うろたえた</b>",jp:"狼狽（ろうばい）する"},
+  {w:"もてあます",pos:"もてあます",e:"🤷",def:"どうあつかえばよいかわからず、困る",ex:"雨の日、ひまを<b>もてあました</b>",jp:"持て余す"},
+  {w:"諭す",pos:"さとす",e:"👨‍🏫",def:"目上の人が、よくわかるように言い聞かせる",ex:"先生が、けんかした二人をやさしく<b>諭した</b>",jp:"言い聞かせる"},
+  {w:"つけあがる",pos:"つけあがる",e:"😤",def:"相手がやさしいのをいいことに、いい気になってわがままになる",ex:"あまやかすと<b>つけあがる</b>",jp:"増長する"},
+  {w:"もてあそぶ",pos:"もてあそぶ",e:"🪀",def:"手でいじって遊ぶ。人の気持ちなどを、いいかげんにあつかう",ex:"人の気持ちを<b>もてあそぶ</b>のはよくない",jp:"弄ぶ"},
+  {w:"とがめる",pos:"とがめる",e:"☝️",def:"悪い点を取り上げて、責める",ex:"遅刻を先生に<b>とがめられた</b>",jp:"参考：「気がとがめる」＝うしろめたい"},
+  {w:"そそのかす",pos:"そそのかす",e:"😈",def:"その気にさせて、悪いことをするようにさそう",ex:"友だちに<b>そそのかされて</b>いたずらをした",jp:"けしかける"},
+  {w:"とまどう",pos:"とまどう",e:"😕",def:"どうしたらよいかわからず、迷う",ex:"初めてのルールに<b>とまどった</b>",jp:"困惑する"},
+  {w:"みなぎる",pos:"みなぎる",e:"💪",def:"力や気持ちが、あふれるほどいっぱいになる",ex:"体じゅうにやる気が<b>みなぎる</b>",jp:"満ちあふれる"}
+ ]},
+ {name:"ユニット8 行動・動作のことば②",sub:"語彙トレーニング 行動・動作の言葉",stars:3,color:"var(--s4)",words:[
+  {w:"ふてくされる",pos:"ふてくされる",e:"😒",def:"不満があって、なげやりな態度をとる",ex:"しかられて<b>ふてくされて</b>いる",jp:"すねる"},
+  {w:"ひるむ",pos:"ひるむ",e:"😨",def:"相手の勢いにおされて、気持ちがくじける",ex:"大きな相手にも<b>ひるまず</b>立ち向かった",jp:"たじろぐ・おじけづく"},
+  {w:"取りつくろう",pos:"とりつくろう",e:"🩹",def:"失敗などを、うわべだけごまかして、よく見せる",ex:"その場を笑って<b>取りつくろった</b>",jp:"ごまかす"},
+  {w:"わきまえる",pos:"わきまえる",e:"📏",def:"物事のよしあしや、その場にふさわしいふるまいを、よく知っている",ex:"場所を<b>わきまえて</b>静かにする",jp:"弁える"},
+  {w:"こびる",pos:"こびる",e:"🙏",def:"気に入られようとして、きげんをとる",ex:"えらい人に<b>こびる</b>のはやめよう",jp:"へつらう"},
+  {w:"あがく",pos:"あがく",e:"🏊",def:"苦しい状態からぬけ出そうとして、もがく",ex:"最後まで<b>あがいて</b>みる",jp:"もがく"},
+  {w:"まくしたてる",pos:"まくしたてる",e:"🗣️",def:"相手に口をはさませないほど、勢いよく続けて話す",ex:"早口で<b>まくしたてた</b>",jp:"しゃべりたてる"},
+  {w:"さげすむ",pos:"さげすむ",e:"👎",def:"人を自分より劣ったものとして見下す",ex:"人を<b>さげすむ</b>ような目つきをする",jp:"見下す"},
+  {w:"こわばる",pos:"こわばる",e:"🧊",def:"やわらかいものがかたくなる。緊張で表情や体がかたくなる",ex:"緊張で顔が<b>こわばった</b>",jp:"かたくなる"},
+  {w:"悪びれる",pos:"わるびれる",e:"🙅",def:"悪いことをしたと思って、おどおどする。「悪びれずに」の形でよく使う",ex:"少しも<b>悪びれず</b>に答えた",jp:"参考：「悪びれない」＝平気な顔"},
+  {w:"おじけづく",pos:"おじけづく",e:"😱",def:"こわくなって、しりごみする",ex:"本番前に<b>おじけづいた</b>",jp:"怖気づく"},
+  {w:"かえりみる",pos:"かえりみる",e:"🔙",def:"過ぎたことをふり返る。自分の行いを反省する",ex:"この一年を<b>かえりみる</b>",jp:"顧みる・省みる"},
+  {w:"へりくだる",pos:"へりくだる",e:"🙇‍♀️",def:"相手をうやまい、自分を低くしてひかえめにふるまう",ex:"<b>へりくだった</b>言い方をする",jp:"謙遜する"},
+  {w:"もてはやす",pos:"もてはやす",e:"🎉",def:"多くの人が、さかんにほめたり話題にしたりする",ex:"天才少女と<b>もてはやされた</b>",jp:"ちやほやする"}
+ ]},
+ {name:"ユニット9 行動・動作のことば③",sub:"語彙トレーニング 行動・動作の言葉",stars:3,color:"var(--s1)",words:[
+  {w:"しのばせる",pos:"しのばせる",e:"🤫",def:"人に気づかれないように、こっそり隠し持つ。音などを目立たないようにする",ex:"足音を<b>しのばせて</b>部屋に入った",jp:"忍ばせる"},
+  {w:"ほのめかす",pos:"ほのめかす",e:"💬",def:"はっきり言わずに、それとなく知らせる",ex:"転校することを<b>ほのめかした</b>",jp:"におわせる"},
+  {w:"慌てふためく",pos:"あわてふためく",e:"🏃",def:"ひどくあわてて、さわぐ",ex:"突然の大雨に<b>慌てふためいた</b>",jp:"大あわてする"},
+  {w:"見すかす",pos:"みすかす",e:"👀",def:"相手の考えや気持ちを見ぬく",ex:"うそを<b>見すかされた</b>",jp:"見抜く"},
+  {w:"あしらう",pos:"あしらう",e:"🤚",def:"相手をいいかげんにあつかう",ex:"弟の話を軽く<b>あしらった</b>",jp:"適当にあつかう"},
+  {w:"たしなめる",pos:"たしなめる",e:"☝️",def:"よくないことを、おだやかに注意する",ex:"母が、さわぐ弟を<b>たしなめた</b>",jp:"注意する"},
+  {w:"しゃくりあげる",pos:"しゃくりあげる",e:"😭",def:"声をつまらせ、息をすいこむようにして泣く",ex:"小さな子が<b>しゃくりあげて</b>泣いている",jp:"すすり泣く"},
+  {w:"あさる",pos:"あさる",e:"🔍",def:"食べ物や物を、あちこちさがし求める",ex:"カラスがごみを<b>あさって</b>いる",jp:"さがし回る"},
+  {w:"はかどる",pos:"はかどる",e:"📈",def:"仕事や勉強が、順調に進む",ex:"静かな部屋だと宿題が<b>はかどる</b>",jp:"順調に進む"},
+  {w:"ののしる",pos:"ののしる",e:"🤬",def:"大声で悪口を言う",ex:"相手を<b>ののしる</b>のはよくない",jp:"罵る"},
+  {w:"しばたたく",pos:"しばたたく",e:"😑",def:"まばたきを何度もする",ex:"まぶしくて目を<b>しばたたいた</b>",jp:"しばたく"},
+  {w:"見くびる",pos:"みくびる",e:"🙄",def:"相手の力を実際より低く見て、軽んじる",ex:"年下だと<b>見くびって</b>いたら負けた",jp:"あなどる"},
+  {w:"危ぶむ",pos:"あやぶむ",e:"🤔",def:"うまくいくかどうか、心配する",ex:"計画の成功を<b>危ぶむ</b>声がある",jp:"不安に思う"},
+  {w:"あららげる",pos:"あららげる",e:"📢",def:"声や態度を荒くする。「声をあららげる」の形で使う",ex:"父が思わず声を<b>あららげた</b>",jp:"荒らげる"}
+ ]},
+ {name:"ユニット10 行動・動作のことば④",sub:"語彙トレーニング 行動・動作の言葉",stars:3,color:"var(--s2)",words:[
+  {w:"さまよう",pos:"さまよう",e:"🧭",def:"目当てもなく、あちこち歩き回る",ex:"道に迷って森を<b>さまよった</b>",jp:"うろつく"},
+  {w:"はやす",pos:"はやす",e:"👏",def:"声を出したり手をたたいたりして、からかったり、もり立てたりする",ex:"みんなが手をたたいて<b>はやした</b>",jp:"はやし立てる"},
+  {w:"はばかる",pos:"はばかる",e:"🤐",def:"人の目を気にして、遠慮する",ex:"人目を<b>はばからず</b>泣いた",jp:"遠慮する"},
+  {w:"あがめる",pos:"あがめる",e:"🙌",def:"この上なく尊いものとして、うやまう",ex:"村人は山を神として<b>あがめた</b>",jp:"崇める・尊ぶ"},
+  {w:"いさめる",pos:"いさめる",e:"✋",def:"目上の人のあやまちを指摘して、改めるように言う",ex:"家来が王を<b>いさめた</b>",jp:"忠告する"},
+  {w:"まかなう",pos:"まかなう",e:"🍚",def:"限られたお金や人手で、うまくやりくりする",ex:"会費で費用を<b>まかなう</b>",jp:"やりくりする"},
+  {w:"ひけらかす",pos:"ひけらかす",e:"💎",def:"得意になって見せびらかす",ex:"覚えたての知識を<b>ひけらかす</b>",jp:"見せびらかす"},
+  {w:"こじらせる",pos:"こじらせる",e:"🤧",def:"物事をもつれさせて、解決しにくくする。病気を長引かせる",ex:"かぜを<b>こじらせて</b>しまった",jp:"悪化させる"},
+  {w:"めぐらす",pos:"めぐらす",e:"💭",def:"あれこれと考える。まわりを囲む",ex:"作戦を<b>めぐらす</b>",jp:"参考：「思いをめぐらす」"},
+  {w:"はばむ",pos:"はばむ",e:"🚧",def:"進もうとするのをじゃまして、止める",ex:"大雪が行く手を<b>はばんだ</b>",jp:"さまたげる"},
+  {w:"たじろぐ",pos:"たじろぐ",e:"😧",def:"相手の勢いにおされて、しりごみする",ex:"するどい質問に<b>たじろいだ</b>",jp:"ひるむ"},
+  {w:"うるむ",pos:"うるむ",e:"🥹",def:"涙で目がぬれる。声が涙声になる",ex:"感動で目が<b>うるんだ</b>",jp:"潤む"},
+  {w:"時めく",pos:"ときめく",e:"✨",def:"よい時にめぐりあって、栄える。「今を時めく」の形で使う",ex:"今を<b>時めく</b>人気歌手",jp:"参考：「胸がときめく」とは別の意味"},
+  {w:"はびこる",pos:"はびこる",e:"🌿",def:"草木がのび広がる。よくないものが勢いをふるう",ex:"雑草が庭に<b>はびこる</b>",jp:"広がる・蔓延する"}
+ ]},
+ {name:"ユニット11 行動・動作のことば⑤",sub:"語彙トレーニング 行動・動作の言葉",stars:3,color:"var(--s3)",words:[
+  {w:"あえぐ",pos:"あえぐ",e:"🥵",def:"苦しそうに息をする。生活などに苦しむ",ex:"急な坂道で<b>あえいだ</b>",jp:"息を切らす"},
+  {w:"見かねる",pos:"みかねる",e:"🫣",def:"だまって見ていられなくなる",ex:"困っている人を<b>見かねて</b>手を貸した",jp:"参考：「見るに見かねる」"},
+  {w:"くってかかる",pos:"くってかかる",e:"😠",def:"はげしい勢いで、相手に言い返したり問いつめたりする",ex:"判定に<b>くってかかった</b>",jp:"食ってかかる"},
+  {w:"絶する",pos:"ぜっする",e:"🤯",def:"ふつうでは考えられないほど、程度がはなはだしい。「想像を絶する」の形で使う",ex:"想像を<b>絶する</b>寒さだった",jp:"参考：「言語に絶する」"},
+  {w:"すくめる",pos:"すくめる",e:"🐢",def:"体や首などを、ちぢめる",ex:"寒さに首を<b>すくめた</b>",jp:"参考：「肩をすくめる」"},
+  {w:"むさぼる",pos:"むさぼる",e:"🍖",def:"満足することなく、ほしがる",ex:"<b>むさぼる</b>ように本を読んだ",jp:"貪る"},
+  {w:"見立てる",pos:"みたてる",e:"🧐",def:"見て選ぶ。あるものを別のものになぞらえる",ex:"石を山に<b>見立てて</b>庭をつくる",jp:"なぞらえる"},
+  {w:"ちなむ",pos:"ちなむ",e:"🔗",def:"ある物事と関係をもたせる",ex:"祖父の名に<b>ちなんで</b>名前をつけた",jp:"関連づける"},
+  {w:"委ねる",pos:"ゆだねる",e:"🤲",def:"人に任せる",ex:"決定を先生に<b>委ねる</b>",jp:"任せる"},
+  {w:"そばだてる",pos:"そばだてる",e:"👂",def:"耳をすまして、よく聞こうとする。「耳をそばだてる」の形で使う",ex:"物音に耳を<b>そばだてた</b>",jp:"耳をすます"},
+  {w:"癒やす",pos:"いやす",e:"🛁",def:"病気や傷、心の苦しみなどをなおす",ex:"温泉でつかれを<b>癒やす</b>",jp:"治す・なぐさめる"},
+  {w:"労う",pos:"ねぎらう",e:"🍵",def:"苦労や努力に感謝して、いたわる",ex:"父の仕事の苦労を<b>労った</b>",jp:"いたわる"},
+  {w:"ふける",pos:"ふける",e:"📚",def:"一つのことに夢中になる",ex:"夜おそくまで読書に<b>ふけった</b>",jp:"没頭する"},
+  {w:"せせら笑う",pos:"せせらわらう",e:"😏",def:"人をばかにして、ひややかに笑う",ex:"失敗を<b>せせら笑われた</b>",jp:"あざ笑う"}
  ]}
 ];
 const TOTAL=STAGES.reduce(function(n,s){return n+s.words.length;},0);
@@ -465,7 +581,7 @@ function toggleKnow(){var c=curCard();var _was=!!known[c.w];known[c.w]=!known[c.
   render();if(allNow)setTimeout(function(){showDone(STAGES[si].name);},250);}
 function toggleFilter(){filterOn=!filterOn;idx=0;render();}
 function shuffle(){for(var i=order.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=order[i];order[i]=order[j];order[j]=t;}idx=0;render();}
-function fmtHint(j){return /^(対義|意味|類似|同義|反対)/.test(j)?j:'類似：'+j;}
+function fmtHint(j){return /^(対義|意味|類似|同義|反対|例|参考)/.test(j)?j:'類似：'+j;}
 function toggleJp(ev){ev.stopPropagation();var c=curCard();var en=EN[c.w]?'<span class="word-en">'+EN[c.w]+'</span>':'';document.getElementById('jpBtn').outerHTML='<span class="word-jp" id="jpBtn">💡 '+fmtHint(c.jp)+en+'</span>';}
 var enVoice=null;
 function pickVoice(){try{if(!('speechSynthesis'in window))return;var vs=window.speechSynthesis.getVoices()||[];if(!vs.length)return;
@@ -496,6 +612,9 @@ function qTodayCount(){var k=window.qbKEnsure?qbKEnsure('jvocab'):{},n=new Date(
   ALLW.forEach(function(x){var t=k[x.w];if(t>1){var d=new Date(t);if(d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate())c++;}});return c;}
 /* ===== 検問（テスト） ===== */
 var ALLW=[];STAGES.forEach(function(s){s.words.forEach(function(w){ALLW.push(w);});});
+/* 収録語リスト：ボードの「いま収録○語」「覚えた語」はこのリストで数える。語を足したり減らしたりしたら DECK_VER を上げる */
+var DECK_VER=2026111201;
+try{var _dk=JSON.stringify({v:DECK_VER,w:ALLW.map(function(x){return x.w;})});if(localStorage.getItem(QB_APP+'_deck')!==_dk)localStorage.setItem(QB_APP+'_deck',_dk);if(window.qbSyncKick)qbSyncKick();}catch(e){}
 function QANS(c){return c.def;}
 /* 合格ライン：クエストボードの保護者メニューで設定（同じ端末の設定を読む） */
 function qPassCfg(){var c={};try{c=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}return {pct:+c.passPct||50,min:+c.passMin||10};}
@@ -540,7 +659,10 @@ function answerQ(t,btn){
   setTimeout(function(){QZ.i++;if(QZ.i<QZ.qs.length)renderQ();else finishQuiz();},1000);}
 function finishQuiz(){
   var n=QZ.qs.length,r=QZ.right,pct=Math.round(r/n*100);
-  var q=loadQuiz();q.tests=(q.tests||0)+1;if(r===n)q.perfects=(q.perfects||0)+1;q.bestPct=Math.max(q.bestPct||0,pct);q.last={s:r,t:n};q.updated=Date.now();var _hd=qTodayStr();if(!q.hist||q.hist.d!==_hd)q.hist={d:_hd,r:[]};q.hist.r.push([r,n,q.updated]);if(q.hist.r.length>30)q.hist.r=q.hist.r.slice(-30);saveQuizRec(q);var _pc=qPassCfg(),_pass=(n>=_pc.min&&pct>=_pc.pct);
+  var q=loadQuiz();q.tests=(q.tests||0)+1;if(r===n)q.perfects=(q.perfects||0)+1;q.bestPct=Math.max(q.bestPct||0,pct);q.last={s:r,t:n};q.updated=Date.now();var _hd=qTodayStr();if(!q.hist||q.hist.d!==_hd)q.hist={d:_hd,r:[]};q.hist.r.push([r,n,q.updated]);if(q.hist.r.length>30)q.hist.r=q.hist.r.slice(-30);
+  q.days=q.days||{};var _dd=q.days[_hd]||{t:0,p:0,b:0};_dd.t=Math.max((_dd.t||0)+1,q.hist.r.length);if(r===n)_dd.p=(_dd.p||0)+1;_dd.b=Math.max(_dd.b||0,pct);q.days[_hd]=_dd;
+  var _dk=Object.keys(q.days);if(_dk.length>400){_dk.sort(function(a,b){var x=a.split('-'),y=b.split('-');return (x[0]*1e4+x[1]*100+ +x[2])-(y[0]*1e4+y[1]*100+ +y[2]);});while(_dk.length>400)delete q.days[_dk.shift()];}
+  saveQuizRec(q);var _pc=qPassCfg(),_pass=(n>=_pc.min&&pct>=_pc.pct);
   document.getElementById('qCard').hidden=true;
   var res=document.getElementById('qResult');res.hidden=false;
   var msg=(r===n)?'🏆 満点！すごい！':(pct>=80?'👏 よくできました！':(pct>=50?'🙂 その調子！':'💪 もう一度やってみよう'));

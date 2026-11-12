@@ -102,6 +102,7 @@
   .c-open{display:block;text-align:center;background:#3b6fe0;color:#fff;padding:12px;border-radius:14px;text-decoration:none;font-weight:800;margin-top:10px;font-size:1.02rem;box-shadow:0 3px 0 #2f5bc0}
   .c-open:active{transform:translateY(2px);box-shadow:0 1px 0 #2f5bc0}
   .c-cap{font-size:.72rem;color:#6a77a0;font-weight:800;margin:8px 0 5px}
+  .kiroku-link{display:block;margin:10px auto 0;width:max-content;max-width:100%;padding:7px 16px;border-radius:999px;background:#fff;border:2px solid #3b6fe0;color:#3b6fe0;font-weight:900;font-size:.82rem;text-decoration:none}
   .c-pb{margin:8px 0 2px;padding:7px 10px;border-radius:12px;background:#fff6d6;border:1.5px dashed #e0a800;color:#7a5600;font-size:.78rem;font-weight:800;text-align:center;line-height:1.45}
   .c-pb b{color:#c25e00}
   .c-grid{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:5px 6px;align-items:center}
@@ -262,6 +263,7 @@
   <div id="passCard"></div>
 
   <div id="calcCard"></div>
+  <a class="kiroku-link" style="margin:-4px auto 14px" href="./kiroku.html">📈 がんばり記録を見る</a>
 
   <div id="stage"></div>
   <div class="mini" id="rewardLog" style="margin-top:4px"></div>
@@ -595,9 +597,15 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;
 function calcOwner(){try{return localStorage.getItem('qb_calc_owner')==='papa'?'papa':'child';}catch(e){return 'child';}}
 function fmtLast(ms){ms=+ms;if(!ms||!isFinite(ms))return '';var d=new Date(ms);function p(n){return String(n).padStart(2,'0');}return (d.getMonth()+1)+'/'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes());}
 /* 覚えた語リスト（単語ページと同じ元データ）から 覚えた数・今日の数・最終時刻 を出す */
+/* 収録語リスト（各アプリが {v:版,w:[語…]} を書く）。端末とサーバのうち新しい版を使う */
+function qbDeck(key){var l=null,r=null;try{l=JSON.parse(localStorage.getItem(key+'_deck')||'null');}catch(e){}
+  var rs=SYNC&&SYNC.astatRemote&&SYNC.astatRemote[key+'_deck'];if(typeof rs==='string'){try{r=JSON.parse(rs);}catch(e){}}
+  var d=l;if(r&&r.w&&(!l||_num(r.v)>_num(l.v))){d=r;try{localStorage.setItem(key+'_deck',rs);}catch(e){}}
+  if(!d||!d.w||!d.w.length)return null;if(!d.set){var o={};d.w.forEach(function(w){o[w]=1;});d.set=o;}return d;}
 function qbKStat(key){var k=null;try{k=JSON.parse(localStorage.getItem(key+'_kts')||'null');}catch(e){}
   if(!k){var old={};try{old=JSON.parse(localStorage.getItem(key+'_known')||'{}')||{};}catch(e){}k={};for(var _w in old){if(old[_w])k[_w]=1;}try{localStorage.setItem(key+'_kts',JSON.stringify(k));}catch(e){}}
-  var n=new Date(),L=0,T=0,M=0,w,t,d;for(w in k){t=k[w];if(Math.abs(t)>M&&Math.abs(t)>1)M=Math.abs(t);if(t>0){L++;if(t>1){d=new Date(t);if(d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate())T++;}}}
+  var dk=qbDeck(key),ds=dk&&dk.set; /* 今の収録語だけを数える（前に収録していた語は除く） */
+  var n=new Date(),L=0,T=0,M=0,w,t,d;for(w in k){t=k[w];if(Math.abs(t)>M&&Math.abs(t)>1)M=Math.abs(t);if(t>0){if(ds&&!ds[w])continue;L++;if(t>1){d=new Date(t);if(d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate())T++;}}}
   return {learned:L,today:T,last:M};}
 function qbKMergeRemote(key,str){if(typeof str!=='string')return;var r;try{r=JSON.parse(str)||{};}catch(e){return;}
   var now={};try{now=JSON.parse(localStorage.getItem(key+'_kts')||'{}')||{};}catch(e){}var o={},w;for(w in now)o[w]=now[w];
@@ -639,8 +647,8 @@ function renderCalc(){
     +'<div class="c-cap">'+cap+'</div>'+grid+_pbh+_clh
     +'<a class="c-open" href="./keisan.html">▶ 計算をはじめる</a></div>';
 }
-function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var deck=st.deckSize||0;var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
-function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var deck=st.deckSize||0;var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';}
+function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('vocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
+function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('jvocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';}
 /* 1日のコミットライン：英単語・語彙＝新しく覚えた語数＋検問の点数（その日の最高記録）／計算＝全演算＋ミックスを全問正解 */
 function qbQuizToday(key){var st=_lsGet(key+'_stats')||{},q=st.quiz||null,td=qbTodayStr(),r=[];if(!q)return r;
   if(q.hist&&q.hist.d===td&&q.hist.r)r=q.hist.r.slice();
@@ -656,12 +664,12 @@ function qbPbToday(){var rem=SYNC.astatRemote||{},cache=_lsGet('qb_appstats')||{
 /* がんばりカレンダー：その日のコミットライン結果を記録（1=ナイス〔合格〕・2=パーフェクト〔全部コンプ〕）。
    今日のマスは常に「今のコミットライン判定」と同じにする（設定変更などで下がった場合も合わせる）。過去の日はその日の最終結果のまま。
    同期中の端末は、学習データ（appstats）を受信するまでは書き込まない（古いデータで上書きしないため） */
-function clRecord(l){S.clog=S.clog||{};var td=today();if(SYNC.on&&!SYNC.astatReady)return;if(l!==(+S.clog[td]||0)){if(l)S.clog[td]=l;else delete S.clog[td];var ks=Object.keys(S.clog).sort();while(ks.length>60)delete S.clog[ks.shift()];save();maybeSync();setTimeout(function(){try{render();}catch(e){}},0);}}
+function clRecord(l){S.clog=S.clog||{};var td=today();if(SYNC.on&&!SYNC.astatReady)return;if(l!==(+S.clog[td]||0)){if(l)S.clog[td]=l;else delete S.clog[td];var ks=Object.keys(S.clog).sort();while(ks.length>400)delete S.clog[ks.shift()];save();maybeSync();setTimeout(function(){try{render();}catch(e){}},0);}}
 function clLevel(k){return +((S.clog||{})[k])||0;}
 /* 🌈レインボー（パーフェクト＋宿題1つ以上）でパーティモード。到達した瞬間＋その後宿題が1つ増えるたびに1回。回数は日ごとに記録 */
 function partyTrack(lvl,hwN){if(lvl!==3)return;if(SYNC.on&&!SYNC.astatReady)return;S.clp=S.clp||{};var td=today(),r=S.clp[td],ch=false;
   if(!r){r={h0:hwN,n:1};ch=true;}else{var n=Math.max(_num(r.n),1+hwN-_num(r.h0));if(n!==r.n){r.n=n;ch=true;}}
-  if(ch){S.clp[td]=r;var ks=Object.keys(S.clp).sort();while(ks.length>60)delete S.clp[ks.shift()];save();maybeSync();}
+  if(ch){S.clp[td]=r;var ks=Object.keys(S.clp).sort();while(ks.length>400)delete S.clp[ks.shift()];save();maybeSync();}
   try{var seen=JSON.parse(localStorage.getItem('qb_partyseen')||'{}');if(seen.d!==td)seen={d:td,n:0};if(r.n>seen.n){seen.n=r.n;localStorage.setItem('qb_partyseen',JSON.stringify(seen));setTimeout(function(){partyFire(r.n);},50);}}catch(e){}}
 function partyCount(k){var r=(S.clp||{})[k];return r?_num(r.n):0;}
 var PARTY_EM=['🎉','🎊','🥳','🎈','🌈','✨','🪅','💖','⭐'];
@@ -704,7 +712,7 @@ function bonusDay(){var b=(S.day&&S.day.date===today()&&S.day.bonus)||{};return 
 function bonusHw(){var d=(S.day&&S.day.date===today())?S.day:{};return {n:_num(d.hwOk),all:!!d.hwAll};}
 function bonusEarned(n,all){if(!S.cfg.bonusOn)return 0;var w=bonusHw();return n*(+S.cfg.bonusPer||0)+(all?(+S.cfg.bonusAll||0):0)+w.n*(+S.cfg.hwPer||0)+(w.all?(+S.cfg.hwAll||0):0)+qbPbToday()*(+S.cfg.pbPer||0);}
 function bonusBreak(n,all){var w=bonusHw(),p=[];if(w.n)p.push('宿題 '+w.n+'つ +'+(w.n*(+S.cfg.hwPer||0))+'分');if(w.all&&+S.cfg.hwAll)p.push('宿題ぜんぶ +'+S.cfg.hwAll+'分');if(n)p.push('クエスト '+n+'つ +'+(n*(+S.cfg.bonusPer||0))+'分');if(all&&+S.cfg.bonusAll)p.push('3つ全部 +'+S.cfg.bonusAll+'分');var pb=qbPbToday();if(pb&&+S.cfg.pbPer)p.push('計算ベスト更新 '+pb+'回 +'+(pb*(+S.cfg.pbPer))+'分');return p.join('・');}
-function bonusLogSet(e,g){S.bonusLog=S.bonusLog||{};S.bonusLog[today()]={e:e,g:g};var ks=Object.keys(S.bonusLog).sort();while(ks.length>60)delete S.bonusLog[ks.shift()];}
+function bonusLogSet(e,g){S.bonusLog=S.bonusLog||{};S.bonusLog[today()]={e:e,g:g};var ks=Object.keys(S.bonusLog).sort();while(ks.length>400)delete S.bonusLog[ks.shift()];}
 function bonusHTML(n,all,isPapa){_bonusN=n;_bonusAll=all;if(!S.cfg.bonusOn)return '';
   var e=bonusEarned(n,all),b=bonusDay(),left=Math.max(0,e-b.req-b.grant),per=+S.cfg.bonusPer||0,ab=+S.cfg.bonusAll||0,h='',cls='ps-bonus';
   if(isPapa){var amt=Math.max(b.req,e-b.grant,0),brk=bonusBreak(n,all);
@@ -787,7 +795,7 @@ function calHTML(){
   for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const lvl=clLevel(k);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);const pn=(lvl===3)?partyCount(k):0;cells+='<div class="hcell'+(lvl===3?' rainbow':lvl===2?' star':lvl===1?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')">'+(pn?pn:'')+'</div>';}
   const lab=(col,txt,al)=>'<span style="grid-column:'+col+(al?';justify-self:'+al:'')+'">'+txt+'</span>';
   const labels=lab(1,'15日前','start')+lab(6,'10日前')+lab(11,'5日前')+lab(16,'今日','end');
-  return '<div class="callabels">'+labels+'</div><div class="calgrid">'+cells+'</div>';
+  return '<div class="callabels">'+labels+'</div><div class="calgrid">'+cells+'</div><a class="kiroku-link" href="./kiroku.html">📈 がんばり記録を見る</a>';
 }
 function partySum(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);const k=dstr(d);if(clLevel(k)===3)c+=partyCount(k);}return c;}
 function histCount(min){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(clLevel(dstr(d))>=(min||1))c++;}return c;}
@@ -1019,8 +1027,18 @@ function mergeVocab(a,b){
   var w=(_num(a.learned)!==_num(b.learned))?(_num(a.learned)>_num(b.learned)?a:b):(_num(a.updated)>=_num(b.updated)?a:b);
   var qa=_num(a.quiz&&a.quiz.updated),qb=_num(b.quiz&&b.quiz.updated),q=(qa>=qb)?a.quiz:b.quiz; // 検問記録は新しい方を残す
   if(q&&w.quiz!==q){var o={},k;for(k in w)o[k]=w[k];o.quiz=q;w=o;}
+  var nw=(_num(a.updated)>=_num(b.updated))?a:b; // 収録語数・目標は、いちばん新しく書いた側（＝今のアプリ）の値
+  if(w!==nw&&(w.deckSize!==nw.deckSize||w.goal!==nw.goal)){var o2={},k2;for(k2 in w)o2[k2]=w[k2];if(nw.deckSize!=null)o2.deckSize=nw.deckSize;if(nw.goal!=null)o2.goal=nw.goal;w=o2;}
+  var dm=mergeDayMax(a.quiz&&a.quiz.days,b.quiz&&b.quiz.days);
+  if(dm&&w.quiz&&JSON.stringify(dm)!==JSON.stringify(w.quiz.days||null)){w=JSON.parse(JSON.stringify(w));w.quiz.days=dm;}
   return w;
 }
+/* がんばり記録：日付ごと・項目ごとに大きい方を残す（検問 days／計算 hist）。ベスト更新履歴 pbl は和集合 */
+function mergeDayMax(a,b){if(!a&&!b)return null;var o={},d,f;a=a||{};b=b||{};
+  for(d in a)o[d]=a[d];for(d in b){if(!o[d]){o[d]=b[d];continue;}var x=o[d]||{},y=b[d]||{},z={};for(f in x)z[f]=_num(x[f]);for(f in y)z[f]=Math.max(_num(z[f]),_num(y[f]));o[d]=z;}
+  var ks=Object.keys(o).sort(function(p,q){return _dnum(p)-_dnum(q);});while(ks.length>400)delete o[ks.shift()];return o;}
+function mergePbl(a,b){if(!a&&!b)return null;var o={},k;a=a||{};b=b||{};for(k in a)o[k]=a[k];for(k in b)o[k]=b[k];
+  var ks=Object.keys(o).sort(function(p,q){return _num(p)-_num(q);});while(ks.length>500)delete o[ks.shift()];return o;}
 function mergeKeisan(a,b){
   if(!a)return b||null; if(!b)return a;
   var best={},ab=a.best||{},bb=b.best||{},k;
@@ -1033,6 +1051,8 @@ function mergeKeisan(a,b){
   res.ts=Math.max(_num(a.ts),_num(b.ts));
   var pf=mergePerf(a.perf,b.perf);if(pf)res.perf=pf;
   var pb=mergePbs(a.pbs,b.pbs);if(pb)res.pbs=pb;
+  var hm=mergeDayMax(a.hist,b.hist);if(hm)res.hist=hm;
+  var pl=mergePbl(a.pbl,b.pbl);if(pl)res.pbl=pl;
   return res;
 }
 function mergePerf(a,b){if(!a)return b||null;if(!b)return a;var da=_dnum(a.d),db=_dnum(b.d);if(da!==db)return da>db?a:b;
