@@ -9,6 +9,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon-180.png">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="./kanji-data.js"></script>
 <title>わたしのクエスト</title>
 <style>
   :root{--paper:#fdf3e3;--ink:#3a3226;--coral:#ff7a59;--teal:#2ec5b6;--sun:#ffc857;
@@ -82,6 +83,59 @@
   .kj-steps b{color:#b23a37}
   .kj-bonus{margin-top:8px;padding:8px 10px;border-radius:12px;background:#fff6d6;border:1.5px dashed #e0a800;color:#7a5600;font-size:.8rem;font-weight:800;text-align:center;line-height:1.5}
   .kj-bonus b{color:#c25e00}
+  .kj-test{margin-top:10px;background:#fff;border:2px solid #f0b8b3;border-radius:14px;padding:10px}
+  .kj-test.req{border-color:#e0a800;background:#fffaf0}
+  .kj-th{font-weight:900;font-size:.95rem;color:#8a3330}
+  .kj-rule{margin:8px 0;padding:7px 10px;border-radius:10px;background:#fff0ee;color:#8a3330;font-size:.8rem;font-weight:800;line-height:1.5}
+  .kj-rule b{color:#c0302c}
+  .kj-qs{list-style:none;margin:6px 0 8px;padding:0;display:grid;gap:4px}
+  .kj-qs li{display:flex;gap:8px;align-items:baseline;font-size:1.02rem;font-weight:700;line-height:1.5;border-bottom:1px dashed #f3cdc8;padding:4px 2px}
+  .kj-no{font-weight:900;color:#c0302c;flex:none}
+  .kj-blank{font-weight:900;color:#c0302c;letter-spacing:.04em}
+  .kj-btn{display:block;width:100%;border:none;background:#d6504e;color:#fff;padding:12px;border-radius:14px;font-weight:900;font-size:1rem;margin-top:8px;box-shadow:0 3px 0 #b23a37;font-family:inherit}
+  .kj-btn.ok{background:#2f9e5e;box-shadow:0 3px 0 #22804a}
+  .kj-link{display:block;margin:8px auto 0;background:none;border:none;color:#8a6a66;font-weight:800;font-size:.8rem;text-decoration:underline;font-family:inherit}
+  .kj-mini{font-size:.75rem;color:#8a6a66;font-weight:700;margin-top:4px}
+  .kj-grade{display:grid;grid-template-columns:1fr;gap:5px;margin-top:6px}
+  .kj-g{display:flex;align-items:center;gap:6px;background:#eef8f1;border:2px solid #9fd5b3;border-radius:12px;padding:8px;font-family:inherit;font-size:.95rem;font-weight:800;color:#2a3a30;text-align:left}
+  .kj-g.x{background:#fdecea;border-color:#e58b86;color:#7a2522}
+  .kj-gm{font-weight:900;font-size:1.1rem;width:18px;text-align:center;color:#2f9e5e}
+  .kj-g.x .kj-gm{color:#d6504e}
+  .kj-ga b{color:#c0302c;font-size:1.1rem}
+  .kj-ph{display:flex;gap:10px;align-items:center;margin:8px 0}
+  .kj-ph img{width:96px;height:96px;object-fit:cover;border-radius:10px;border:2px solid #e9c9c5}
+  .kj-fx{display:grid;gap:6px;margin-top:8px}
+  .kj-fi{background:#fffaf9;border:1.5px solid #f3cdc8;border-radius:12px;padding:7px 10px;font-size:.88rem;font-weight:800}
+  .kj-fi.ok{background:#eef8f1;border-color:#9fd5b3}
+  .kj-fi.sub{background:#fffaf0;border-color:#f0d58a}
+  .kj-big{font-size:1.15rem;color:#c0302c}
+  .kj-st{font-size:.72rem;margin-left:4px;color:#8a6a66}
+  .kj-done{margin-top:10px;text-align:center;font-weight:900;color:#2f7d45;background:#eef8f1;border:1.5px solid #9fd5b3;border-radius:12px;padding:8px}
+  .kj-done b{color:#c25e00}
+  .kj-start{margin-top:10px;background:#fff;border:2px dashed #f0b8b3;border-radius:14px;padding:10px}
+  .kj-start label{font-size:.8rem;font-weight:900;color:#8a3330}
+  .kj-start select{width:100%;margin-top:4px;padding:8px;border-radius:10px;border:1.5px solid #e9c9c5;font-family:inherit;font-size:.9rem;background:#fff}
+  .zv{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:80;display:none;flex-direction:column}
+  .zv-bar{display:flex;gap:8px;align-items:center;justify-content:center;padding:10px;padding-top:calc(10px + env(safe-area-inset-top))}
+  .zv-bar button{background:#fff;border:none;border-radius:10px;padding:8px 14px;font-weight:900;font-size:1rem;font-family:inherit}
+  .zv-bar .zv-x{margin-left:12px;background:#d6504e;color:#fff}
+  #zvPct{color:#fff;font-weight:800;min-width:52px;text-align:center}
+  .zv-box{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}
+  .zv-box img{display:block;width:100%;height:auto}
+  .zv-tip{color:#ccc;text-align:center;font-size:.75rem;padding:6px 0 calc(8px + env(safe-area-inset-bottom))}
+  .kj-ex{display:inline-block;margin-top:3px;background:#fff;border-radius:6px;padding:1px 8px;color:#5b3a37}
+  .kj-warn{margin:6px 0;padding:7px 10px;border-radius:10px;background:#fff6d6;border:1.5px dashed #e0a800;color:#7a5600;font-size:.78rem;font-weight:800;line-height:1.5}
+  .kj-warn b{color:#b45309}
+  .kj-time{margin:6px 0;padding:6px 10px;border-radius:10px;background:#eef6ff;color:#2c4f7c;font-size:.78rem;font-weight:800;line-height:1.5}
+  .kj-time.warn{background:#fdecea;color:#8a2522}
+  .kj-gs{font-size:.92rem;line-height:1.45}
+  .kj-ans{color:#c0302c;font-size:1.12rem;background:#fff3c4;border-radius:4px;padding:0 2px}
+  .zv-key{display:none;background:#fffdf7;max-height:42vh;overflow:auto;padding:8px 10px;border-top:3px solid #d6504e}
+  .zv-key.fold .zk-list,.zv-key.fold .kj-btn{display:none}
+  .zk-h{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:.85rem;color:#8a3330;margin-bottom:6px}
+  .zk-h button{border:none;background:#f3e3e0;border-radius:8px;padding:4px 10px;font-weight:900;font-family:inherit}
+  .zk-list{display:grid;gap:5px}
+  .zk-list .kj-g{padding:6px 8px}
   .kj-soon{display:block;text-align:center;background:#e9c9c5;color:#8a4a45;padding:12px;border-radius:14px;font-weight:900;margin-top:10px;font-size:1rem}
   .pscard{border:2px solid #d9a521;background:#fff8e6}
   .pscard.on{background:linear-gradient(180deg,#fff6d6,#ffefb8);box-shadow:0 0 0 2px #ffe08a,3px 4px 0 rgba(0,0,0,.05)}
@@ -284,6 +338,8 @@
 </div>
 
 <input type="file" id="hwFile" accept="image/*" capture="environment" style="display:none" onchange="hwPhotoPicked(event)">
+<input type="file" id="kjFile" accept="image/*" capture="environment" style="display:none" onchange="kjPhotoPicked(event)">
+<div id="zoomView" class="zv"><div class="zv-bar"><button onclick="zvStep(-0.5)">－</button><span id="zvPct">100%</span><button onclick="zvStep(0.5)">＋</button><button class="zv-x" onclick="zvClose()">✕ とじる</button></div><div id="zvBox" class="zv-box"><img id="zvImg" alt=""></div><div id="zvKey" class="zv-key"></div><div class="zv-tip">2本指で広げる／ダブルタップで拡大・もどす</div></div>
 <div class="cheer" id="cheer" onclick="this.style.display='none'"><div class="msg" id="cheerMsg"></div><div style="color:#fff;margin-top:14px;font-size:.9rem">タップで閉じる</div></div>
 <div class="cheer" id="photoView" onclick="this.style.display='none'"><img id="pvImg" style="max-width:90%;max-height:78%;border-radius:12px" alt=""><div style="color:#fff;margin-top:10px;font-size:.9rem">タップで閉じる</div></div>
 <div class="cheer" id="reactSend"><div class="msg" style="max-width:340px;text-align:left" onclick="event.stopPropagation()"><div style="font-weight:800;text-align:center;margin-bottom:8px">💌 娘への応援（今日の達成に）</div><div id="stampRow"></div><div id="phraseRow" style="margin-top:6px"></div><button class="btn" style="margin-top:10px" onclick="sendReaction()">💌 応援を送る</button><button class="btn gray" style="margin-top:8px" onclick="closeReactSend()">とじる</button><div class="hint" id="reactState" style="margin-top:6px;text-align:center"></div></div></div>
@@ -363,6 +419,10 @@
     <div class="two">
       <div><label>⚡ 計算のベスト更新1回ごと</label><select id="d_pbPer"><option value="0">なし</option><option value="5">＋5分</option><option value="10">＋10分</option></select></div>
       <div><label>✅ がんばりタスク1つごと</label><select id="d_taskPer"><option value="0">なし</option><option value="5">＋5分</option><option value="10">＋10分</option></select></div>
+    </div>
+    <div class="two">
+      <div><label>✍️ 漢字 正解・直しOK 1問ごと</label><select id="d_kanjiPer"><option value="0">なし</option><option value="1">＋1分</option><option value="2">＋2分</option></select></div>
+      <div><label>✍️ 漢字 10問クリアのおまけ</label><select id="d_kanjiAll"><option value="0">なし</option><option value="5">＋5分</option><option value="10">＋10分</option></select></div>
     </div>
     <label style="margin-top:10px">🔔 申請をパパのスマホにプッシュ通知（ntfy アプリ）</label>
     <p class="hint">iPhone に無料アプリ「ntfy」を入れ、下の通知トピック名を購読すると、娘が申請した瞬間に通知が届きます。トピック名は合言葉なので「生成」で作った推測されにくい名前を使ってください。</p>
@@ -486,7 +546,7 @@ function def(){return{
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;if(x.nt!==undefined)o.nt=x.nt;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;if(S.cfg.newMinJ===undefined)S.cfg.newMinJ=14;if(S.cfg.pbPer===undefined)S.cfg.pbPer=5;if(S.cfg.taskPer===undefined)S.cfg.taskPer=5;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};S.clog=S.clog||{};S.clp=S.clp||{};if(S.cfg.ntfyTopic)ntfyCache(S.cfg.ntfyTopic);}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;if(x.nt!==undefined)o.nt=x.nt;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;if(S.cfg.newMinJ===undefined)S.cfg.newMinJ=14;if(S.cfg.pbPer===undefined)S.cfg.pbPer=5;if(S.cfg.taskPer===undefined)S.cfg.taskPer=5;if(S.cfg.kanjiPer===undefined)S.cfg.kanjiPer=1;if(S.cfg.kanjiAll===undefined)S.cfg.kanjiAll=5;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};S.clog=S.clog||{};S.clp=S.clp||{};S.kj=S.kj||{};S.kj.tests=S.kj.tests||[];S.kj.prog=S.kj.prog||{};if(S.cfg.ntfyTopic)ntfyCache(S.cfg.ntfyTopic);}
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
@@ -600,7 +660,7 @@ function hwNg(i){var it=S.homework[i];if(!it)return;var note=prompt('やり直�
 function hwUnok(i){var it=S.homework[i];if(!it)return;rollover();if(it.okDate===today()&&_num(S.day.hwOk)>0)S.day.hwOk=_num(S.day.hwOk)-1;
   if(S.day.hwAll&&S.hwAllSig===hwSig()){S.day.hwAll=0;S.hwAllSig='';}
   it.st='';it.done=false;delete it.okDate;save();maybeSync();render();}
-function viewHwPhoto(id){var d=HWPH[id];if(!d)return;document.getElementById('pvImg').src=d;document.getElementById('photoView').style.display='flex';}
+function viewHwPhoto(id){var d=HWPH[id];if(!d)return;kjZoom(d);}
 /* ページ範囲の小分け：「…p62~69…」→「…p62~63…」「…p64~65…」… */
 function hwSplitText(t,n){n=+n||0;if(!n)return [t];var m=String(t).match(/^(.*?)([pPｐ])\s*(\d+)\s*([~〜～\-－ー])\s*(\d+)(.*)$/);if(!m)return [t];var a=+m[3],b=+m[5];if(!(b>a)||b-a+1<=n)return [t];
   var out=[];for(var x=a;x<=b;x+=n){var y=Math.min(b,x+n-1);out.push(m[1]+m[2]+(x===y?x:(x+m[4]+y))+m[6]);}return out;}
@@ -665,19 +725,151 @@ function renderCalc(){
 }
 function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('vocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
 function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('jvocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';renderKanji();}
-/* 漢字クエスト（設計中）：ルールだけ先に見せるカード。漢字データと kanji.html ができたら「ひらく」ボタンに切りかえる */
+/* ===== 漢字クエスト（書き取りテスト） =====
+   流れ：娘がテスト開始（10問）→ ノートに書く → 写真で提出 → パパが丸つけ（×だけタップ）
+         → ×の問題は［］の中を5回書いて写真で提出 → パパが1問ずつ OK／やり直し → 10問ぜんぶクリアで完了
+   ボーナス：正解1問 or 直しOK 1問ごとに +kanjiPer分、10問クリアで +kanjiAll分（10問ごとに何回でも）
+   コミットライン：その日に10問クリア（テスト1回分）で ✍️漢字 クリア
+   くり返し：×の字は1日後→3日後→7日後に再出題。3回つづけて正解でマスター */
+function kjOn(){return !!(window.KANJI_UNITS&&window.KANJI_UNITS.length)&&S.cfg.kjOn!==0;}
+var _KJ=null;
+function kjDict(){if(_KJ)return _KJ;var d={},order=[];(window.KANJI_UNITS||[]).forEach(function(u,ui){u.k.forEach(function(x){d[x[0]]={c:x[0],on:x[1],kun:x[2],q:x[3],a:x[4],u:ui};order.push(x[0]);});});_KJ={d:d,order:order};return _KJ;}
+function kjS(){S.kj=S.kj||{};S.kj.tests=S.kj.tests||[];S.kj.prog=S.kj.prog||{};return S.kj;}
+function kjAddDays(n){var d=new Date();d.setDate(d.getDate()+n);return dstr(d);}
+function kjQHTML(q){return esc(q).replace(/［([^］]*)］/g,'<span class="kj-blank">［$1］</span>');}
+function kjAnsHTML(a,c){return esc(a).split(c).join('<b>'+c+'</b>');}
+function kjFull(x){return esc(x.q).replace(/［[^］]*］/,'<b class="kj-ans">'+esc(x.a)+'</b>');}
+function kjNum(i){return '①②③④⑤⑥⑦⑧⑨⑩'.charAt(i)||String(i+1);}
+function kjActive(){return kjS().tests.filter(function(t){return t.st!=='done';});}
+function kjBusy(){return kjS().tests.some(function(t){return t.st==='take'||t.st==='sub';});}
+function kjMastered(){var p=kjS().prog,n=0,k;for(k in p){if(p[k]&&p[k].m)n++;}return n;}
+function kjDefaultUnit(){var D=kjDict(),p=kjS().prog,U=window.KANJI_UNITS||[];for(var i=0;i<U.length;i++){if(U[i].k.some(function(x){return !p[x[0]];}))return i;}return 0;}
+/* 10問をえらぶ：期日が来た「にがて」→ えらんだ回の新しい字 → その先の回 → 期日の近い字 → マスター済みから */
+function kjPick(ui){var D=kjDict(),p=kjS().prog,td=today(),out=[],used={};
+  function add(c){if(out.length<10&&!used[c]){used[c]=1;out.push(c);}}
+  D.order.filter(function(c){var r=p[c];return r&&!r.m&&r.due&&r.due<=td;}).sort(function(a,b){return (p[a].due<p[b].due?-1:p[a].due>p[b].due?1:0)||(_num(p[b].w)-_num(p[a].w));}).forEach(add);
+  var U=window.KANJI_UNITS||[];for(var i=ui;i<U.length&&out.length<10;i++)U[i].k.forEach(function(x){if(!p[x[0]])add(x[0]);});
+  for(i=0;i<ui&&out.length<10;i++)U[i].k.forEach(function(x){if(!p[x[0]])add(x[0]);});
+  D.order.filter(function(c){var r=p[c];return r&&!r.m;}).sort(function(a,b){return (p[a].due||'')<(p[b].due||'')?-1:1;}).forEach(add);
+  D.order.slice().sort(function(){return Math.random()-.5;}).forEach(add);
+  return out;}
+function kjStart(){if(!kjOn())return;if(kjBusy()){alert('いまのテストを先に出してね');return;}var sel=document.getElementById('kjUnit'),ui=sel?(+sel.value||0):kjDefaultUnit();
+  var K=kjS();K.unit=ui;var t={id:'t'+Date.now().toString(36),d:today(),st:'take',q:kjPick(ui),at:Date.now()};K.tests.push(t);while(K.tests.length>40)K.tests.shift();
+  save();maybeSync();renderKanji();sTick();setTimeout(function(){var e=document.getElementById('kjCard');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});},50);}
+function kjCancel(id){var t=kjFind(id);if(!t||t.st!=='take')return;if(!confirm('このテストをやめますか？（まだ何も記録されません）'))return;var K=kjS();K.tests=K.tests.filter(function(x){return x.id!==id;});save();maybeSync();renderKanji();}
+function kjFind(id){return kjS().tests.find(function(t){return t.id===id;});}
+/* 写真：宿題と同じ保存・同期（hwphotos）を使う */
+var _kjPick=null;
+function kjSnap(id,kind){var t=kjFind(id);if(!t)return;_kjCam=true;_kjPick={id:id,kind:kind};var f=document.getElementById('kjFile');f.value='';f.click();}
+function kjPhotoPicked(ev){_kjCam=false;var f=ev.target.files&&ev.target.files[0],pk=_kjPick;if(!f||!pk)return;var rd=new FileReader();
+  rd.onload=function(e){var img=new Image();img.onload=function(){var max=1400,w=img.width,h=img.height,sc=Math.min(1,max/Math.max(w,h)),cw=Math.round(w*sc),ch=Math.round(h*sc),cv=document.createElement('canvas');cv.width=cw;cv.height=ch;cv.getContext('2d').drawImage(img,0,0,cw,ch);var data;try{data=cv.toDataURL('image/jpeg',0.7);}catch(err){alert('写真を読み込めませんでした');return;}
+    kjSubmit(pk.id,pk.kind,data);};img.src=e.target.result;};rd.readAsDataURL(f);}
+function kjSubmit(id,kind,data){var t=kjFind(id);if(!t)return;var pid='k'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  HWPH[pid]=data;hwPhSave();var r=hwPhRef();if(r){try{r.child(pid).set(data);}catch(e){}}
+  var title,body,per=(+S.cfg.kanjiPer||0);
+  if(kind==='test'){if(t.ph&&t.ph!==pid)hwPhDel(t.ph);t.ph=pid;t.st='sub';t.sat=Date.now();t.nt=0;delete t.note;title='✍️ 漢字テストの丸つけ';body='漢字テスト10問の写真が届きました。ボードで丸つけしてください。';showCheer('📷 パパに送ったよ！丸つけを待ってね');}
+  else{var n=0;t.fx=t.fx||{};Object.keys(t.fx).forEach(function(i){var x=t.fx[i];if(x.st===''||x.st==='ng'){x.st='sub';delete x.note;n++;}});if(!n){hwPhDel(pid);return;}if(t.fxph&&t.fxph!==pid)hwPhDel(t.fxph);t.fxph=pid;t.fxnt=0;title='✍️ 漢字の直し';body='漢字の直し（'+n+'問分）の写真が届きました。ボードで OK／やり直し を押してください。';showCheer('📷 直しをパパに送ったよ！'+(S.cfg.bonusOn&&per?'OKで 1問 +'+per+'分':''));}
+  save();maybeSync();renderKanji();sTick();
+  qbNotify(title,body).then(function(ok){var x=kjFind(id);if(!x)return;var v=ok?1:(_ntfyErr||'不明');if(kind==='test'){if(x.st==='sub'){x.nt=v;}}else x.fxnt=v;save();maybeSync();renderKanji();});}
+/* パパの丸つけ */
+var KJG={};
+function kjMark(id,i){var g=KJG[id]=KJG[id]||{};g[i]=!g[i];renderKanji();if(_zvTid===id)zvKey();}
+function kjProg(c,ok){var p=kjS().prog,r=p[c]||{s:0,w:0,n:0};r.n=_num(r.n)+1;
+  if(ok){r.s=_num(r.s)+1;if(r.s>=3){r.m=1;delete r.due;}else r.due=kjAddDays(r.s===1?(r.w?3:7):7);}
+  else{r.s=0;r.w=_num(r.w)+1;delete r.m;r.due=kjAddDays(1);}
+  r.last=today();p[c]=r;}
+function kjGrade(id){var t=kjFind(id);if(!t||t.st!=='sub')return;rollover();var g=KJG[id]||{},wrong=Object.keys(g).filter(function(i){return g[i];}).map(Number);
+  if(!confirm(wrong.length?('×が '+wrong.length+'問（'+wrong.map(function(i){return kjNum(i);}).join('')+'）で確定しますか？'):'10問ぜんぶ○で確定しますか？'))return;
+  t.res=t.q.map(function(c,i){var ok=wrong.indexOf(i)<0;kjProg(c,ok);return ok?1:0;});t.gd=today();t.ga=Date.now();if(t.ph)hwPhDel(t.ph);delete t.ph;delete t.nt;delete KJG[id];
+  if(!wrong.length){t.st='done';t.dd=today();}else{t.st='graded';t.fx={};wrong.forEach(function(i){t.fx[i]={st:'',ng:0};});}
+  save();maybeSync();render();}
+function kjRetake(id){var t=kjFind(id);if(!t||t.st!=='sub')return;var note=prompt('とり直しの理由（娘に表示されます）','写真が見えにくいので、もう一度とってね');if(note===null)return;
+  if(t.ph)hwPhDel(t.ph);delete t.ph;delete t.nt;t.st='take';t.note=note||'もう一度写真をとってね';save();maybeSync();renderKanji();}
+function kjFixOk(id,i){var t=kjFind(id);if(!t||!t.fx||!t.fx[i])return;rollover();var x=t.fx[i];x.st='ok';x.od=today();delete x.note;kjFixAfter(t);}
+function kjFixNg(id,i){var t=kjFind(id);if(!t||!t.fx||!t.fx[i])return;var c=t.q[i],d=kjDict().d[c]||{a:c};var note=prompt('やり直しの理由（娘に表示されます）','［'+d.a+'］をもう一度ていねいに5回書いてね');if(note===null)return;
+  var x=t.fx[i];x.st='ng';x.ng=_num(x.ng)+1;x.note=note||'もう一度5回書いてね';kjFixAfter(t);}
+function kjFixAfter(t){var ks=Object.keys(t.fx||{});
+  if(!ks.some(function(i){return t.fx[i].st==='sub';})){if(t.fxph)hwPhDel(t.fxph);delete t.fxph;delete t.fxnt;}
+  if(ks.length&&ks.every(function(i){return t.fx[i].st==='ok';})){t.st='done';t.dd=today();}
+  save();maybeSync();render();}
+/* 今日の漢字（ボーナス・コミットライン） */
+function qbKanjiToday(){var td=today(),c=0,f=0,d=0,last=null;if(!kjOn())return {c:0,f:0,d:0,min:0,on:false};
+  kjS().tests.forEach(function(t){if(t.gd===td&&t.res)c+=t.res.filter(Boolean).length;if(t.fx)Object.keys(t.fx).forEach(function(i){if(t.fx[i].st==='ok'&&t.fx[i].od===td)f++;});if(t.dd===td)d++;if(t.d===td||t.dd===td||t.gd===td)last=t;});
+  var per=+S.cfg.kanjiPer||0,all=+S.cfg.kanjiAll||0;return {c:c,f:f,d:d,min:(c+f)*per+d*all,on:true,last:last};}
+function kjTestScore(t){if(!t||!t.res)return 0;var n=t.res.filter(Boolean).length;if(t.fx)Object.keys(t.fx).forEach(function(i){if(t.fx[i].st==='ok')n++;});return n;}
+/* 写真の拡大表示（ピンチ・ダブルタップ・＋－ボタン） */
+var _zm=1;
+var _zvTid=null;
+function kjZoom(src,tid){if(!src)return;var v=document.getElementById('zoomView');document.getElementById('zvImg').src=src;_zm=1;_zvTid=tid||null;zvKey();v.style.display='flex';document.body.style.overflow='hidden';zvApply();}
+function zvKey(){var k=document.getElementById('zvKey'),t=_zvTid&&kjFind(_zvTid);if(!t||t.st!=='sub'){k.style.display='none';k.innerHTML='';return;}var g=KJG[t.id]||{},nx=Object.keys(g).filter(function(i){return g[i];}).length;
+  k.style.display='block';k.innerHTML='<div class="zk-h"><span>📝 正解の文（タップで ×）</span><button onclick="zvKeyFold()">'+(k.classList.contains('fold')?'▲ 見る':'▼ かくす')+'</button></div><div class="zk-list">'+kjGradeRows(t)+'</div><button class="kj-btn ok" style="margin-top:6px" onclick="zvClose();kjGrade(\''+t.id+'\')">✅ '+(nx?'×'+nx+'問で':'ぜんぶ○で')+' 確定</button>';}
+function zvKeyFold(){var k=document.getElementById('zvKey');k.classList.toggle('fold');zvKey();}
+function zvApply(cx,cy){var img=document.getElementById('zvImg'),box=document.getElementById('zvBox');var bw=box.clientWidth,oldW=img.clientWidth||bw;var sl=box.scrollLeft,st=box.scrollTop;img.style.width=(bw*_zm)+'px';document.getElementById('zvPct').textContent=Math.round(_zm*100)+'%';
+  if(cx!=null){var r=(bw*_zm)/oldW;box.scrollLeft=(sl+cx)*r-cx;box.scrollTop=(st+cy)*r-cy;}}
+function zvStep(d){_zm=Math.max(1,Math.min(5,_zm+d));zvApply(document.getElementById('zvBox').clientWidth/2,document.getElementById('zvBox').clientHeight/2);}
+function zvClose(){document.getElementById('zoomView').style.display='none';document.body.style.overflow='';_zvTid=null;}
+(function(){var d0=0,z0=1,lastTap=0;function dist(t){var x=t[0].clientX-t[1].clientX,y=t[0].clientY-t[1].clientY;return Math.sqrt(x*x+y*y);}
+  document.addEventListener('DOMContentLoaded',function(){var box=document.getElementById('zvBox');if(!box)return;
+    box.addEventListener('touchstart',function(e){if(e.touches.length===2){d0=dist(e.touches);z0=_zm;e.preventDefault();}
+      else if(e.touches.length===1){var now=Date.now();if(now-lastTap<300){var r=box.getBoundingClientRect();_zm=(_zm>1.4)?1:2.5;zvApply(e.touches[0].clientX-r.left,e.touches[0].clientY-r.top);e.preventDefault();}lastTap=now;}},{passive:false});
+    box.addEventListener('touchmove',function(e){if(e.touches.length===2&&d0){var r=box.getBoundingClientRect(),cx=(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,cy=(e.touches[0].clientY+e.touches[1].clientY)/2-r.top;_zm=Math.max(1,Math.min(5,z0*dist(e.touches)/d0));zvApply(cx,cy);e.preventDefault();}},{passive:false});
+    box.addEventListener('touchend',function(e){if(e.touches.length<2)d0=0;});
+    box.addEventListener('dblclick',function(e){var r=box.getBoundingClientRect();_zm=(_zm>1.4)?1:2.5;zvApply(e.clientX-r.left,e.clientY-r.top);});});})();
+function kjThumb(pid,label,tid){var src=HWPH[pid],a=tid?('kjZoom(HWPH[\''+pid+'\'],\''+tid+'\')'):('kjZoom(HWPH[\''+pid+'\'])');return src?'<div class="kj-ph"><img src="'+src+'" onclick="'+a+'"><div><button class="hw-ab" onclick="'+a+'">🔍 拡大して'+(tid?'正解と見くらべる':'見る')+'</button><div class="kj-mini">'+(label||'')+'</div></div></div>':'<div class="hw-st">📷 写真を読み込み中…</div>';}
+/* 丸つけ用：正解の文（［］の部分を答えの漢字にした文）を1行ずつ。タップで ○／× */
+function kjGradeRows(t){var D=kjDict(),g=KJG[t.id]||{};return t.q.map(function(c,i){var x=D.d[c]||{c:c,q:c,a:c},w=!!g[i];return '<button class="kj-g'+(w?' x':'')+'" onclick="kjMark(\''+t.id+'\','+i+')"><span class="kj-gm">'+(w?'×':'○')+'</span><span class="kj-no">'+kjNum(i)+'</span><span class="kj-gs">'+kjFull(x)+'</span></button>';}).join('');}
+/* テスト時間と「ほかの画面」を開いた記録（パパに表示） */
+function kjTimeLine(t){if(!t.at)return '';function hm(ms){var d=new Date(ms);return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');}var end=t.sat||Date.now(),min=Math.max(0,Math.round((end-t.at)/60000)),aw=_num(t.away),as=Math.round(_num(t.awayMs)/1000);
+  return '<div class="kj-time'+(aw?' warn':'')+'">⏱ テスト時間 '+min+'分（'+hm(t.at)+' 開始 → '+hm(end)+' 提出）<br>'+(aw?'👀 テスト中に ほかの画面を <b>'+aw+'回</b> 開いた（合計 '+(as>=60?Math.floor(as/60)+'分':'')+(as%60)+'秒）':'👀 ほかの画面は開いていません')+'</div>';}
+/* テスト中の見はり：娘の端末でテスト中に画面を離れたら回数と時間を記録（カメラ撮影中はのぞく） */
+var _kjCam=false;
+function kjTaking(){if(calcOwner()==='papa'||!S.kj||!S.kj.tests)return null;return S.kj.tests.find(function(t){return t.st==='take';})||null;}
+function kjVis(ev){var t=kjTaking();if(!t)return;var hid=document.hidden||(ev&&ev.type==='pagehide');
+  if(hid){if(_kjCam||t._hs)return;t._hs=Date.now();t.away=_num(t.away)+1;save();try{maybeSync();}catch(e){}}
+  else{if(_kjCam){_kjCam=false;if(t._hs){delete t._hs;}return;}if(t._hs){t.awayMs=_num(t.awayMs)+(Date.now()-t._hs);delete t._hs;save();maybeSync();renderKanji();showCheer('👀 テスト中に ほかの画面を開いたね。パパに伝わるよ');}}}
+document.addEventListener('visibilitychange',kjVis);window.addEventListener('pagehide',kjVis);
+/* カード */
 function renderKanji(){var el=document.getElementById('kanjiCard');if(!el)return;var per=(S.cfg&&S.cfg.kanjiPer!=null)?+S.cfg.kanjiPer:1,all=(S.cfg&&S.cfg.kanjiAll!=null)?+S.cfg.kanjiAll:5;
-  el.innerHTML='<div class="card kjcard"><div class="v-h"><span>✍️ 漢字クエスト</span><span class="v-count">🔧 じゅんび中</span></div>'
-    +'<div class="v-sub" style="color:#7a4a46">ノートに書いておぼえる漢字クエストが、もうすぐ始まるよ！</div>'
-    +'<ul class="kj-steps">'
-    +'<li><span class="n">1</span><span>アプリで漢字をおぼえる（読み・例文）</span></li>'
-    +'<li><span class="n">2</span><span>書き取りテスト10問。ノートに<b>番号</b>と<b>『　』の中ぜんぶ</b>を書く</span></li>'
-    +'<li><span class="n">3</span><span>ノートの写真をとって、パパに丸つけをお願い</span></li>'
-    +'<li><span class="n">4</span><span>まちがえた漢字は<b>『　』の中を5回</b>書いて、写真で出す（OKが出るまで出しなおし）</span></li>'
-    +'</ul>'
-    +'<div class="kj-bonus" style="background:#eef6ff;border-color:#7aa7e0;color:#2c4f7c">🎯 <b style="color:#1f5fbf">1日10問（テスト1回）</b>が今日のコミットライン</div>'
-    +((S.cfg&&S.cfg.bonusOn)?'<div class="kj-bonus">📱 正解1問ごとに <b>＋'+per+'分</b>（まちがえた問題は 5回書き直しを出すと <b>＋'+per+'分</b>）<br>10問ぜんぶクリアで さらに <b>＋'+all+'分</b> → 10問ごとに 最大 <b>＋'+(per*10+all)+'分</b>！<br>もう10問やれば、また最大 <b>＋'+(per*10+all)+'分</b>（何回でもOK）</div>':'')
-    +'<span class="kj-soon">🔧 じゅんび中 — 漢字をとうろくしたら始まるよ</span></div>';}
+  var bon=(S.cfg&&S.cfg.bonusOn&&(per||all))?'<div class="kj-bonus">📱 正解1問ごとに <b>＋'+per+'分</b>（まちがえた問題は 5回書き直しがOKで <b>＋'+per+'分</b>）<br>10問ぜんぶクリアで さらに <b>＋'+all+'分</b> → 10問ごとに 最大 <b>＋'+(per*10+all)+'分</b>（何回でもOK）</div>':'';
+  if(!kjOn()){el.innerHTML='<div class="card kjcard"><div class="v-h"><span>✍️ 漢字クエスト</span><span class="v-count">🔧 じゅんび中</span></div><div class="v-sub" style="color:#7a4a46">ノートに書いておぼえる漢字クエストが、もうすぐ始まるよ！</div>'+bon+'<span class="kj-soon">🔧 じゅんび中</span></div>';return;}
+  var isPapa=(calcOwner()==='papa'),D=kjDict(),K=kjS(),total=D.order.length,ms=kjMastered(),kt=qbKanjiToday(),U=window.KANJI_UNITS;
+  var nig=Object.keys(K.prog).filter(function(c){var r=K.prog[c];return r&&!r.m&&_num(r.w)>0;}).length,tested=Object.keys(K.prog).length;
+  var h='<div class="card kjcard" id="kjCard"><div class="v-h"><span>✍️ 漢字クエスト</span><span class="v-count">マスター '+ms+' / '+total+'字</span></div>'
+    +'<div class="v-bar"><div class="v-fill" style="width:'+Math.round(tested/total*100)+'%;background:linear-gradient(90deg,#f0a24a,#d6504e)"></div></div>'
+    +'<div class="v-sub" style="color:#7a4a46">テストした字 '+tested+' / '+total+'字・にがて '+nig+'字'+(kt.d?'<br>🎯 今日の10問 <b>クリア！</b>'+(kt.d>1?'（'+kt.d+'回）':''):'<br>🎯 今日の10問：まだ（10問クリアでコミットライン達成）')+'</div>';
+  var act=kjActive().slice().reverse();
+  act.forEach(function(t){var qs=t.q.map(function(c){return D.d[c]||{c:c,q:c,a:c};});
+    if(t.st==='take'){
+      h+='<div class="kj-test"><div class="kj-th">✍️ 書き取りテスト（10問）'+(t.d!==today()?' <span class="kj-mini">'+t.d.slice(5).replace('-','/')+' から</span>':'')+'</div>'
+        +(t.note?'<div class="hw-st ng">↩ '+esc(t.note)+'</div>':'')
+        +'<div class="kj-rule">📓 ノートに <b>番号から文の最後まで</b> ぜんぶ書いてね。<b>［　］の中は漢字</b>で（送りがなも）<br><span class="kj-ex">例：問題「① ［ハナ］がさく。」→ ノートに「① 花がさく。」</span></div>'
+        +(isPapa?'':'<div class="kj-warn">⏱ テスト中は <b>漢字カードやほかのアプリを開かないでね</b>。開いた回数と時間はパパに伝わるよ'+(_num(t.away)?'<br>👀 いま '+_num(t.away)+'回 開いたよ':'')+'</div>')
+        +'<ol class="kj-qs">'+qs.map(function(x,i){return '<li><span class="kj-no">'+kjNum(i)+'</span><span>'+kjQHTML(x.q)+'</span></li>';}).join('')+'</ol>'
+        +(isPapa?'<div class="kj-mini">娘がノートに書いています。写真が届くと丸つけできます。</div>':'<button class="kj-btn" onclick="kjSnap(\''+t.id+'\',\'test\')">📷 書けたら写真をとってパパに送る</button><button class="kj-link" onclick="kjCancel(\''+t.id+'\')">やめる</button>')
+        +'</div>';}
+    else if(t.st==='sub'){
+      if(isPapa){var g=KJG[t.id]||{},nx=Object.keys(g).filter(function(i){return g[i];}).length;
+        h+='<div class="kj-test req"><div class="kj-th">🔔 丸つけ（10問）</div>'+kjTimeLine(t)+kjThumb(t.ph,'写真を拡大すると、下に正解の文が出ます。見くらべながら×をつけられます',t.id)+ntfyLine(t.nt)
+          +'<div class="kj-rule">まちがえた問題だけタップして ×にしてください（正解の文）</div><div class="kj-grade">'+kjGradeRows(t)
+          +'</div><button class="kj-btn ok" onclick="kjGrade(\''+t.id+'\')">✅ '+(nx?'×'+nx+'問で':'ぜんぶ○で')+' 確定</button><button class="kj-link" onclick="kjRetake(\''+t.id+'\')">📷 写真をとり直してもらう</button></div>';}
+      else h+='<div class="kj-test"><div class="kj-th">📷 パパの丸つけ待ち（10問）</div>'+((t.nt&&t.nt!==1)?'<div class="hw-st ng">⚠️ パパに通知できなかったよ。直接「漢字の写真送ったよ」と伝えてね</div>':'<div class="kj-mini">丸つけが終わると、ここに結果が出るよ</div>')+'</div>';}
+    else if(t.st==='graded'&&!isPapa&&kjTaking()){h+='<div class="kj-test"><div class="kj-th">📝 前のテストの直し</div><div class="kj-mini">🙈 テスト中は答えが見えないようにかくしています。テストを出したら、また見られるよ</div></div>';}
+    else if(t.st==='graded'){var fx=t.fx||{},ks=Object.keys(fx).map(Number).sort(function(a,b){return a-b;}),okN=t.res.filter(Boolean).length,need=ks.filter(function(i){return fx[i].st===''||fx[i].st==='ng';}),subN=ks.filter(function(i){return fx[i].st==='sub';});
+      h+='<div class="kj-test'+(isPapa&&subN.length?' req':'')+'"><div class="kj-th">📝 けっか：○ '+okN+'問・直し '+ks.length+'問（クリア '+kjTestScore(t)+'/10）</div>';
+      if(isPapa&&subN.length)h+=kjThumb(t.fxph,'直しの写真（'+subN.length+'問分）')+ntfyLine(t.fxnt);
+      h+='<div class="kj-fx">'+ks.map(function(i){var x=fx[i],d=qs[i],st=x.st,lab=st==='ok'?'✅ OK':st==='sub'?'📷 確認待ち':st==='ng'?'↩ やり直し'+(x.ng>1?'（'+x.ng+'回目）':''):'✏️ まだ';
+        var acts=(isPapa&&st==='sub')?'<div class="hw-act"><button class="hw-ab" onclick="kjFixOk(\''+t.id+'\','+i+')">✅ OK</button><button class="hw-ab ng" onclick="kjFixNg(\''+t.id+'\','+i+')">↩ やり直し</button></div>':'';
+        return '<div class="kj-fi '+(st||'todo')+'"><div><span class="kj-no">'+kjNum(i)+'</span> ［<span class="kj-big">'+esc(d.a)+'</span>］を <b>5回</b> 書く <span class="kj-st">'+lab+'</span></div>'+(st==='ng'&&x.note?'<div class="hw-st ng">'+esc(x.note)+'</div>':'')+acts+'</div>';}).join('')+'</div>';
+      if(!isPapa){if(need.length)h+='<div class="kj-rule">📓 ノートに <b>番号</b> と <b>［　］の中</b> を <b>5回ずつ</b> 書いて、まとめて写真を1まいとってね</div><button class="kj-btn" onclick="kjSnap(\''+t.id+'\',\'fix\')">📷 直し（'+need.length+'問分）の写真を送る</button>';else if(subN.length)h+='<div class="kj-mini">📷 パパの確認待ち（'+subN.length+'問）'+((t.fxnt&&t.fxnt!==1)?'・⚠️ 通知できなかったので、直接パパに伝えてね':'')+'</div>';}
+      h+='</div>';}});
+  var doneToday=K.tests.filter(function(t){return t.st==='done'&&t.dd===today();});
+  if(doneToday.length)h+='<div class="kj-done">🎉 今日 10問クリア '+doneToday.length+'回'+((S.cfg.bonusOn&&kt.min)?'・漢字で <b>＋'+kt.min+'分</b>':'')+'</div>';
+  if(!kjBusy()){var du=(K.unit!=null&&K.unit<U.length)?K.unit:kjDefaultUnit(),dueN=Object.keys(K.prog).filter(function(c){var r=K.prog[c];return r&&!r.m&&r.due&&r.due<=today();}).length;
+    h+='<div class="kj-start"><label>どの回から出す？</label><select id="kjUnit">'+U.map(function(u,i){var left=u.k.filter(function(x){return !K.prog[x[0]];}).length;return '<option value="'+i+'"'+(i===du?' selected':'')+'>'+u.u+'（'+u.k.map(function(x){return x[0];}).join('')+'）'+(left?'':' ✓')+'</option>';}).join('')+'</select>'
+      +(dueN?'<div class="kj-mini">🔁 にがての復習 '+Math.min(10,dueN)+'問も入るよ</div>':'')
+      +'<button class="kj-btn" onclick="kjStart()">✍️ '+(doneToday.length?'もう10問やる':'10問テストをはじめる')+'</button></div>';}
+  h+=((!isPapa&&kjTaking())?'':'<a class="v-open" style="background:#d6504e;box-shadow:0 3px 0 #b23a37" href="./kanji.html">📖 漢字カードで覚える</a>')+bon+'</div>';
+  el.innerHTML=h;}
 /* 1日のコミットライン：英単語・語彙＝新しく覚えた語数＋検問の点数（その日の最高記録）／計算＝全演算＋ミックスを全問正解 */
 function qbQuizToday(key){var st=_lsGet(key+'_stats')||{},q=st.quiz||null,td=qbTodayStr(),r=[];if(!q)return r;
   if(q.hist&&q.hist.d===td&&q.hist.r)r=q.hist.r.slice();
@@ -722,13 +914,16 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
   var pm=qbCalcPerfToday(),cm=[['add','➕たし'],['sub','➖ひき'],['mul','✖️かけ'],['div','➗わり'],['mix','🎲ミックス']];
   var cOk=cm.filter(function(m){return _num(pm[m[0]])>=cd+1;}).length,cDone=(cOk===cm.length);
   rows.push({k:'keisan',done:cDone,html:'<div class="ps-row'+(cDone?' ok':'')+'"><span class="ps-q">⚡ 計算'+(cDone?' クリア！':' '+cOk+'/5')+'</span><div class="ps-chips">'+cm.map(function(m){return chip(_num(pm[m[0]])>=cd+1,m[1]);}).join('')+'</div></div>'});
+  if(kjOn()){var _kj=qbKanjiToday(),kDone=_kj.d>0,_ls=_kj.last,_sc=kjTestScore(_ls);
+    rows.push({k:'kanji',done:kDone,html:'<div class="ps-row'+(kDone?' ok':'')+'"><span class="ps-q">✍️ 漢字'+(kDone?' クリア！':'')+'</span><div class="ps-chips">'+chip(kDone,'10問クリア '+(kDone?10:_sc)+'/10')+'</div></div>'});}
+  _bonusRows=rows.length;
   var n=rows.filter(function(x){return x.done;}).length,all=(n===rows.length);
-  var line='新しく覚えた語：英単語＋'+nmin+'・語彙＋'+nminJ+'／検問'+ptxt+'（'+min+'問以上）／計算：全演算＋ミックスを全問正解'+(cd===1?'（ふつう以上）':cd===2?'（むずかしい）':'');
+  var line='新しく覚えた語：英単語＋'+nmin+'・語彙＋'+nminJ+'／検問'+ptxt+'（'+min+'問以上）／計算：全演算＋ミックスを全問正解'+(cd===1?'（ふつう以上）':cd===2?'（むずかしい）':'')+(kjOn()?'／漢字：10問クリア':'');
   var dn={};rows.forEach(function(x){dn[x.k]=x.done;});var _hwN=bonusHw().n,lvl=all?(_hwN>=1?3:2):((dn.keisan||(dn.vocab&&dn.jvocab))?1:0);clRecord(lvl);partyTrack(lvl,_hwN);
   var msg=lvl===3?(isPapa?'<div class="ps-msg">🌈 今日はレインボー（パーフェクト＋宿題）・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg">🌈 レインボー！パーティ '+partyCount(today())+'回目 🥳<br><span style="font-size:.8rem">宿題をもう1つ終わらせると またパーティ！</span></div>')
-    :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト（3つぜんぶコンプ）・宿題1つでレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！今日はぜんぶできたね<br><span style="font-size:.8rem">宿題を1つ終わらせると 🌈レインボー＆パーティ！</span></div>')
+    :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト（ぜんぶコンプ）・宿題1つでレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！今日はぜんぶできたね<br><span style="font-size:.8rem">宿題を1つ終わらせると 🌈レインボー＆パーティ！</span></div>')
     :lvl===1?(isPapa?'<div class="ps-msg">👍 今日はナイス（合格）・あと '+(rows.length-n)+'つでパーフェクト</div>':'<div class="ps-msg">👍 ナイス！カレンダーに色がついたよ。あと '+(rows.length-n)+'つでパーフェクト🌟</div>')
-    :'<div class="ps-tip">👍 計算ぜんぶ か 英単語と語彙の両方で「ナイス」／3つぜんぶで「パーフェクト🌟」</div>';
+    :'<div class="ps-tip">👍 計算ぜんぶ か 英単語と語彙の両方で「ナイス」／'+rows.length+'つぜんぶで「パーフェクト🌟」</div>';
   el.innerHTML='<div class="card pscard'+(all?' on':'')+'"><div class="v-h"><span>🎯 今日のコミットライン</span><span class="v-count">'+n+' / '+rows.length+'</span></div><div class="ps-line">'+line+'</div>'+rows.map(function(x){return x.html;}).join('')+msg+bonusHTML(n,all,isPapa)+'</div>';
   bonusCheer(isPapa);
   if(lvl&&!isPapa){try{var key='qb_passcheer',c=JSON.parse(localStorage.getItem(key)||'{}'),td=qbTodayStr(),ck=td+':'+(lvl>=2?'all':'nice');
@@ -736,15 +931,15 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
       if(lvl===3){/* パーティ演出で祝う */}else if(lvl===2){showCheer('🌟 パーフェクト！今日はぜんぶできたね');sBig();burst(60,true);}else{showCheer('👍 ナイス！カレンダーに色がついたよ');sWin();burst();}}}catch(e){}}
 }
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
-var _bonusN=0,_bonusAll=false;
+var _bonusN=0,_bonusAll=false,_bonusRows=3;
 function bonusDay(){var b=(S.day&&S.day.date===today()&&S.day.bonus)||{};return {req:_num(b.req),reqAt:_num(b.reqAt),grant:_num(b.grant),grantAt:_num(b.grantAt),nt:b.nt};}
 function bonusHw(){var d=(S.day&&S.day.date===today())?S.day:{};return {n:_num(d.hwOk),all:!!d.hwAll};}
-function bonusEarned(n,all){if(!S.cfg.bonusOn)return 0;var w=bonusHw();return n*(+S.cfg.bonusPer||0)+(all?(+S.cfg.bonusAll||0):0)+w.n*(+S.cfg.hwPer||0)+(w.all?(+S.cfg.hwAll||0):0)+qbPbToday()*(+S.cfg.pbPer||0)+qbTaskDone()*(+S.cfg.taskPer||0);}
+function bonusEarned(n,all){if(!S.cfg.bonusOn)return 0;var w=bonusHw();return n*(+S.cfg.bonusPer||0)+(all?(+S.cfg.bonusAll||0):0)+w.n*(+S.cfg.hwPer||0)+(w.all?(+S.cfg.hwAll||0):0)+qbPbToday()*(+S.cfg.pbPer||0)+qbTaskDone()*(+S.cfg.taskPer||0)+qbKanjiToday().min;}
 /* がんばりタスク（娘の今日のタスク）の達成数 */
 function taskBonusMemo(){var tp=+S.cfg.taskPer||0;if(!S.cfg.bonusOn||!tp)return '';var n=qbTaskDone();
   return '<div class="task-pb">📱 がんばりタスクを1つ達成するごとに <b>＋'+tp+'分</b> お願いできるよっ！'+(n?'<br>きょうは '+n+'個 達成 → <b>＋'+(n*tp)+'分</b> ゲット中✨':'')+'</div>';}
 function qbTaskDone(){try{if(!meReady())return 0;return meQuests().filter(function(q){return S.day.me[q.key];}).length;}catch(e){return 0;}}
-function bonusBreak(n,all){var w=bonusHw(),p=[];if(w.n)p.push('宿題 '+w.n+'つ +'+(w.n*(+S.cfg.hwPer||0))+'分');if(w.all&&+S.cfg.hwAll)p.push('宿題ぜんぶ +'+S.cfg.hwAll+'分');if(n)p.push('クエスト '+n+'つ +'+(n*(+S.cfg.bonusPer||0))+'分');if(all&&+S.cfg.bonusAll)p.push('3つ全部 +'+S.cfg.bonusAll+'分');var pb=qbPbToday();if(pb&&+S.cfg.pbPer)p.push('計算ベスト更新 '+pb+'回 +'+(pb*(+S.cfg.pbPer))+'分');var tk=qbTaskDone();if(tk&&+S.cfg.taskPer)p.push('がんばりタスク '+tk+'つ +'+(tk*(+S.cfg.taskPer))+'分');return p.join('・');}
+function bonusBreak(n,all){var w=bonusHw(),p=[];if(w.n)p.push('宿題 '+w.n+'つ +'+(w.n*(+S.cfg.hwPer||0))+'分');if(w.all&&+S.cfg.hwAll)p.push('宿題ぜんぶ +'+S.cfg.hwAll+'分');if(n)p.push('クエスト '+n+'つ +'+(n*(+S.cfg.bonusPer||0))+'分');if(all&&+S.cfg.bonusAll)p.push('コミットライン全部 +'+S.cfg.bonusAll+'分');var pb=qbPbToday();if(pb&&+S.cfg.pbPer)p.push('計算ベスト更新 '+pb+'回 +'+(pb*(+S.cfg.pbPer))+'分');var tk=qbTaskDone();if(tk&&+S.cfg.taskPer)p.push('がんばりタスク '+tk+'つ +'+(tk*(+S.cfg.taskPer))+'分');var kj=qbKanjiToday();if(kj.min)p.push('漢字 '+(kj.c?'正解'+kj.c:'')+(kj.c&&kj.f?'・':'')+(kj.f?'直し'+kj.f:'')+(kj.d?(kj.c||kj.f?'・':'')+'10問クリア'+kj.d+'回':'')+' +'+kj.min+'分');return p.join('・');}
 function bonusLogSet(e,g){S.bonusLog=S.bonusLog||{};S.bonusLog[today()]={e:e,g:g};var ks=Object.keys(S.bonusLog).sort();while(ks.length>400)delete S.bonusLog[ks.shift()];}
 function bonusHTML(n,all,isPapa){_bonusN=n;_bonusAll=all;if(!S.cfg.bonusOn)return '';
   var e=bonusEarned(n,all),b=bonusDay(),left=Math.max(0,e-b.req-b.grant),per=+S.cfg.bonusPer||0,ab=+S.cfg.bonusAll||0,h='',cls='ps-bonus';
@@ -758,10 +953,10 @@ function bonusHTML(n,all,isPapa){_bonusN=n;_bonusAll=all;if(!S.cfg.bonusOn)retur
   }else{
     if(left>0)h='<div class="ps-bh">📱 スマホ時間 +'+left+'分 たまったよ</div><button class="ps-btn" onclick="bonusRequest()">📱 パパにお願いする（+'+left+'分）</button>';
     else if(b.req>0){cls+=' req';h='<div class="ps-bh">⏳ +'+b.req+'分 パパの承認待ち</div>'+(_ntfyMsg?'<div class="ps-bs">'+_ntfyMsg+'</div>':'')+((ntfyTopic()&&Date.now()-_ntfyLast>120000)?'<button class="ps-btn" style="background:#f0a24a;box-shadow:0 3px 0 #c97f2c" onclick="bonusRenotify()">🔔 もう一度パパに知らせる</button>':'');}
-    else if(e===0)h='<div class="ps-bh">📱 スマホ時間をためよう</div><div class="ps-bs">📒 宿題1つ（写真→パパOK）で +'+(+S.cfg.hwPer||0)+'分'+(+S.cfg.hwAll?'・ぜんぶ終わると +'+S.cfg.hwAll+'分':'')+'<br>🎯 クエスト1つで +'+per+'分'+(ab?'・3つ全部で さらに +'+ab+'分':'')+(+S.cfg.pbPer?'<br>⚡ 計算のベスト更新1回で +'+S.cfg.pbPer+'分':'')+(+S.cfg.taskPer?'<br>✅ がんばりタスク1つで +'+S.cfg.taskPer+'分':'')+'</div>';
+    else if(e===0)h='<div class="ps-bh">📱 スマホ時間をためよう</div><div class="ps-bs">📒 宿題1つ（写真→パパOK）で +'+(+S.cfg.hwPer||0)+'分'+(+S.cfg.hwAll?'・ぜんぶ終わると +'+S.cfg.hwAll+'分':'')+'<br>🎯 クエスト1つで +'+per+'分'+(ab?'・全部で さらに +'+ab+'分':'')+(kjOn()&&(+S.cfg.kanjiPer||+S.cfg.kanjiAll)?'<br>✍️ 漢字 1問で +'+(+S.cfg.kanjiPer||0)+'分・10問クリアで +'+(+S.cfg.kanjiAll||0)+'分':'')+(+S.cfg.pbPer?'<br>⚡ 計算のベスト更新1回で +'+S.cfg.pbPer+'分':'')+(+S.cfg.taskPer?'<br>✅ がんばりタスク1つで +'+S.cfg.taskPer+'分':'')+'</div>';
     if(b.grant>0)h+='<div class="ps-bs" style="color:#2f7d45">✅ 今日もらった時間 +'+b.grant+'分</div>';
     if(!h)h='<div class="ps-bh">📱 スマホ時間ボーナス</div>';
-    if(e>0&&!all)h+='<div class="ps-bs">あと1つクリアで +'+(per+((n+1===3)?ab:0))+'分</div>';
+    if(e>0&&!all)h+='<div class="ps-bs">コミットラインあと1つで +'+(per+((n+1===_bonusRows)?ab:0))+'分</div>';
   }
   return '<div class="'+cls+'">'+h+'</div>';}
 function bonusRequest(){var e=bonusEarned(_bonusN,_bonusAll),b=bonusDay(),left=Math.max(0,e-b.req-b.grant);if(left<=0)return;
@@ -914,7 +1109,7 @@ function render(){
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
         <div class="calwrap">${calHTML()}</div>
         <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
-        <div class="mini" style="font-size:.72rem;margin-top:4px">👍ナイス＝計算ぜんぶ か 英単語と語彙の両方 ／ 🌟パーフェクト＝3つぜんぶ ／ 🌈レインボー＝パーフェクト＋宿題1つ以上（マスの数字＝その日のパーティ回数）</div>
+        <div class="mini" style="font-size:.72rem;margin-top:4px">👍ナイス＝計算ぜんぶ か 英単語と語彙の両方 ／ 🌟パーフェクト＝コミットラインぜんぶ ／ 🌈レインボー＝パーフェクト＋宿題1つ以上（マスの数字＝その日のパーティ回数）</div>
         <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日・🌈レインボー ${histCount(3)}日）${partySum()?'<br>🥳 パーティ 合計 '+partySum()+'回':''}</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span></div></div>
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 今日の記録</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読動画やドリルの写真を残そう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
@@ -944,7 +1139,7 @@ function dadOpen(){
   document.getElementById('d_count').value=S.cfg.count;document.getElementById('d_goal').value=S.cfg.goal;
   document.getElementById('d_pa').value=S.cfg.pa.join('\n');
   document.getElementById('d_season').value=S.cfg.season;
-  try{document.getElementById('d_passPct').value=String(S.cfg.passPct);document.getElementById('d_passMin').value=String(S.cfg.passMin);document.getElementById('d_newMin').value=String(S.cfg.newMin);document.getElementById('d_calcDiff').value=String(S.cfg.calcDiff);document.getElementById('d_bonusOn').value=S.cfg.bonusOn?'1':'0';document.getElementById('d_bonusPer').value=String(S.cfg.bonusPer);document.getElementById('d_bonusAll').value=String(S.cfg.bonusAll);document.getElementById('d_ntfy').value=S.cfg.ntfyTopic||'';document.getElementById('d_hwPer').value=String(S.cfg.hwPer);document.getElementById('d_hwAll').value=String(S.cfg.hwAll);document.getElementById('d_hwChunk').value=String(S.cfg.hwChunk);document.getElementById('d_newMinJ').value=String(S.cfg.newMinJ);document.getElementById('d_pbPer').value=String(S.cfg.pbPer);document.getElementById('d_taskPer').value=String(S.cfg.taskPer);}catch(e){}
+  try{document.getElementById('d_passPct').value=String(S.cfg.passPct);document.getElementById('d_passMin').value=String(S.cfg.passMin);document.getElementById('d_newMin').value=String(S.cfg.newMin);document.getElementById('d_calcDiff').value=String(S.cfg.calcDiff);document.getElementById('d_bonusOn').value=S.cfg.bonusOn?'1':'0';document.getElementById('d_bonusPer').value=String(S.cfg.bonusPer);document.getElementById('d_bonusAll').value=String(S.cfg.bonusAll);document.getElementById('d_ntfy').value=S.cfg.ntfyTopic||'';document.getElementById('d_hwPer').value=String(S.cfg.hwPer);document.getElementById('d_hwAll').value=String(S.cfg.hwAll);document.getElementById('d_hwChunk').value=String(S.cfg.hwChunk);document.getElementById('d_newMinJ').value=String(S.cfg.newMinJ);document.getElementById('d_pbPer').value=String(S.cfg.pbPer);document.getElementById('d_taskPer').value=String(S.cfg.taskPer);document.getElementById('d_kanjiPer').value=String(S.cfg.kanjiPer);document.getElementById('d_kanjiAll').value=String(S.cfg.kanjiAll);}catch(e){}
   document.getElementById('d_rewards').value=S.cfg.rewards.join('\n');
   document.getElementById('d_gacha').value=S.cfg.gacha.join('\n');
   document.getElementById('d_pin').value=S.cfg.pin;
@@ -969,7 +1164,7 @@ function dadSave(){
   S.cfg.count=Math.max(0,parseInt(document.getElementById('d_count').value)||0);
   S.cfg.goal=Math.max(1,parseInt(document.getElementById('d_goal').value)||14);
   S.cfg.pa=lines('d_pa');S.cfg.season=document.getElementById('d_season').value||S.cfg.season;
-  S.cfg.passPct=parseInt(document.getElementById('d_passPct').value)||50;S.cfg.passMin=parseInt(document.getElementById('d_passMin').value)||10;S.cfg.newMin=parseInt(document.getElementById('d_newMin').value)||10;S.cfg.calcDiff=Math.max(0,Math.min(2,parseInt(document.getElementById('d_calcDiff').value)||0));S.cfg.bonusOn=document.getElementById('d_bonusOn').value==='1'?1:0;S.cfg.bonusPer=parseInt(document.getElementById('d_bonusPer').value)||10;S.cfg.bonusAll=parseInt(document.getElementById('d_bonusAll').value)||0;S.cfg.ntfyTopic=(document.getElementById('d_ntfy').value||'').trim();ntfyCache(S.cfg.ntfyTopic);ntfyPush(S.cfg.ntfyTopic);S.cfg.hwPer=parseInt(document.getElementById('d_hwPer').value)||0;S.cfg.hwAll=parseInt(document.getElementById('d_hwAll').value)||0;S.cfg.newMinJ=parseInt(document.getElementById('d_newMinJ').value)||14;S.cfg.pbPer=parseInt(document.getElementById('d_pbPer').value)||0;S.cfg.taskPer=parseInt(document.getElementById('d_taskPer').value)||0;
+  S.cfg.passPct=parseInt(document.getElementById('d_passPct').value)||50;S.cfg.passMin=parseInt(document.getElementById('d_passMin').value)||10;S.cfg.newMin=parseInt(document.getElementById('d_newMin').value)||10;S.cfg.calcDiff=Math.max(0,Math.min(2,parseInt(document.getElementById('d_calcDiff').value)||0));S.cfg.bonusOn=document.getElementById('d_bonusOn').value==='1'?1:0;S.cfg.bonusPer=parseInt(document.getElementById('d_bonusPer').value)||10;S.cfg.bonusAll=parseInt(document.getElementById('d_bonusAll').value)||0;S.cfg.ntfyTopic=(document.getElementById('d_ntfy').value||'').trim();ntfyCache(S.cfg.ntfyTopic);ntfyPush(S.cfg.ntfyTopic);S.cfg.hwPer=parseInt(document.getElementById('d_hwPer').value)||0;S.cfg.hwAll=parseInt(document.getElementById('d_hwAll').value)||0;S.cfg.newMinJ=parseInt(document.getElementById('d_newMinJ').value)||14;S.cfg.pbPer=parseInt(document.getElementById('d_pbPer').value)||0;S.cfg.taskPer=parseInt(document.getElementById('d_taskPer').value)||0;S.cfg.kanjiPer=parseInt(document.getElementById('d_kanjiPer').value)||0;S.cfg.kanjiAll=parseInt(document.getElementById('d_kanjiAll').value)||0;
   flSave();
   S.cfg.rewards=lines('d_rewards');S.cfg.gacha=lines('d_gacha');
   const pin=document.getElementById('d_pin').value;if(/^\d{4}$/.test(pin))S.cfg.pin=pin;
@@ -999,7 +1194,7 @@ function restoreAuto(){var b;try{b=JSON.parse(localStorage.getItem('qb_backup')|
 function restoreUndo(){var u;try{u=JSON.parse(localStorage.getItem('qb_undo')||'null');}catch(e){}if(!u||!u.s){alert('取り消せる操作がありません');return;}if(!confirm('直前の状態（'+_fmtTs(u.t)+'）に戻します。よろしいですか？'))return;if(restoreFrom(u.s)){alert('直前の状態に戻しました');dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,cfgVer:S.cfgVer};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,kj:S.kj,cfgVer:S.cfgVer};}
 function maybeSync(){
   if(!SYNC.on||SYNC.applying||!SYNC.ref||!SYNC.stateReady)return;
   const snap=JSON.stringify(snapshotState());
@@ -1032,14 +1227,14 @@ function initSync(){
       if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
       if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');maybeSync();return;}
       SYNC.applying=true;
-      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','hwAllSig','bonusLog','clog','clp','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
+      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','hwAllSig','bonusLog','clog','clp','kj','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
       normalize();
       var _mig=false;if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;_mig=true;}
       SYNC.applying=false;
       SYNC.lastSent=_mig?'':JSON.stringify(snapshotState());
       save();render();syncStatus('同期中 ✓（更新を受信）');
     },function(err){syncStatus('接続エラー: '+((err&&err.message)||''));});
-    try{SYNC.hwref=firebase.database().ref('rooms/'+SYNC.creds.room+'/hwphotos');var _hwOn=function(sn){if(typeof sn.val()==='string'){HWPH[sn.key]=sn.val();hwPhSave();renderHomework();}};SYNC.hwref.on('child_added',_hwOn);SYNC.hwref.on('child_changed',_hwOn);SYNC.hwref.on('child_removed',function(sn){delete HWPH[sn.key];hwPhSave();});}catch(e){}
+    try{SYNC.hwref=firebase.database().ref('rooms/'+SYNC.creds.room+'/hwphotos');var _hwOn=function(sn){if(typeof sn.val()==='string'){HWPH[sn.key]=sn.val();hwPhSave();renderHomework();renderKanji();}};SYNC.hwref.on('child_added',_hwOn);SYNC.hwref.on('child_changed',_hwOn);SYNC.hwref.on('child_removed',function(sn){delete HWPH[sn.key];hwPhSave();});}catch(e){}
     try{SYNC.nref=firebase.database().ref('rooms/'+SYNC.creds.room+'/notify/topic');SYNC.nref.on('value',function(sn){var v=sn.val();if(v===null){if(S.cfg.ntfyTopic)ntfyPush(S.cfg.ntfyTopic);return;}v=String(v||'').trim();ntfyCache(v);if((S.cfg.ntfyTopic||'')!==v){S.cfg.ntfyTopic=v;save();maybeSync();}});}catch(e){}
     try{SYNC.pref=firebase.database().ref('rooms/'+SYNC.creds.room+'/photos');SYNC.pref.on('child_added',handlePhoto);SYNC.pref.on('child_changed',handlePhoto);}catch(e){}
     try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;SYNC.astatReady=true;if(SYNC.astatRemote){qbKMergeRemote('vocab',SYNC.astatRemote.vocab_k);qbKMergeRemote('jvocab',SYNC.astatRemote.jvocab_k);}if(SYNC.astatRemote)cacheAppstats(SYNC.astatRemote);appStatsSync();});}catch(e){}

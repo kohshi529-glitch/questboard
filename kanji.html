@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#d6504e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon-180.png">
+<script src="./kanji-data.js"></script>
+<title>漢字カード</title>
+<style>
+  :root{--paper:#fdf3e3;--ink:#3a3226;--soft:#8a7d64;--line:#e9c9c5;--red:#d6504e;--red-d:#b23a37;--red-ink:#8a3330;--card:#fffdf7}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:"Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;background:var(--paper);color:var(--ink);
+    background-image:radial-gradient(#ead9bd 1px,transparent 1px);background-size:22px 22px;padding:14px 16px 60px;line-height:1.5}
+  .wrap{max-width:520px;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  h1{font-size:1.35rem;margin:.1em 0}
+  .back{white-space:nowrap;flex:none;font-weight:900;font-size:.85rem;color:var(--red-ink);text-decoration:none;background:#fff;border:2px solid var(--line);border-radius:999px;padding:5px 12px}
+  .sub{font-size:.78rem;color:var(--soft);font-weight:800}
+  .units{display:flex;gap:6px;overflow-x:auto;padding:10px 0 6px;scrollbar-width:none}
+  .units::-webkit-scrollbar{display:none}
+  .ub{flex:none;border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-weight:900;font-size:.82rem;color:var(--red-ink);font-family:inherit}
+  .ub.on{background:var(--red);border-color:var(--red);color:#fff}
+  .ub small{font-weight:800;opacity:.8;margin-left:3px}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:8px 0 12px}
+  .gk{position:relative;background:#fff;border:2px solid var(--line);border-radius:14px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:1.9rem;font-weight:700;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;color:var(--ink)}
+  .gk.on{border-color:var(--red);box-shadow:0 0 0 2px var(--red) inset}
+  .gk .bd{position:absolute;top:2px;right:4px;font-size:.7rem;font-family:system-ui}
+  .card{background:var(--card);border:2.5px solid var(--line);border-radius:22px;padding:18px 16px;box-shadow:3px 4px 0 rgba(0,0,0,.05);text-align:center}
+  .kno{font-size:.78rem;font-weight:900;color:var(--soft)}
+  .kbig{font-size:6.2rem;line-height:1.1;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;margin:6px 0 4px;color:#2b2420}
+  .yomi{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;text-align:left;max-width:320px;margin:6px auto 0;font-size:.95rem;font-weight:800}
+  .yomi .k{font-size:.72rem;color:#fff;background:var(--red);border-radius:6px;padding:1px 7px;align-self:center}
+  .yomi .k.kun{background:#2f8f86}
+  .ex{margin-top:14px;background:#fff6f4;border:1.5px dashed #f0b8b3;border-radius:14px;padding:10px 12px;text-align:left}
+  .ex .lab{font-size:.72rem;font-weight:900;color:var(--red-ink)}
+  .ex .w{font-size:1.35rem;font-weight:900;margin-top:2px}
+  .ex .w b{color:var(--red)}
+  .ex .r{font-size:.82rem;color:var(--soft);font-weight:800}
+  .ex .q{font-size:.92rem;font-weight:700;margin-top:6px;color:#5b4a46}
+  .st{margin-top:10px;font-size:.8rem;font-weight:900;border-radius:999px;display:inline-block;padding:3px 12px}
+  .st.m{background:#eef8f1;color:#2f7d45}.st.n{background:#fdecea;color:#b23a37}.st.t{background:#f3eee4;color:#6b604c}.st.new{background:#eef3fb;color:#3a5a8a}
+  .nav{display:flex;gap:10px;margin-top:12px}
+  .nav button{flex:1;border:none;border-radius:14px;padding:13px;font-weight:900;font-size:1rem;font-family:inherit;background:#fff;border:2px solid var(--line);color:var(--red-ink)}
+  .nav button.pri{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 3px 0 var(--red-d)}
+  .hint{margin-top:14px;font-size:.78rem;color:var(--red-ink);font-weight:800;background:#fff;border:2px dashed var(--line);border-radius:14px;padding:10px;line-height:1.6}
+  .hint a{color:var(--red);font-weight:900}
+  .lock{padding:26px 16px}.lk{font-size:1.2rem;font-weight:900;color:var(--red-ink);margin-top:6px}.lks{font-size:.88rem;font-weight:800;color:#6b5a56;margin-top:8px;line-height:1.7}.lks b{color:var(--red)}
+  .lkb{display:block;margin-top:14px;background:var(--red);color:#fff;text-decoration:none;font-weight:900;padding:12px;border-radius:14px;box-shadow:0 3px 0 var(--red-d)}
+  .empty{padding:40px 0;text-align:center;font-weight:800;color:var(--soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div><h1>📖 漢字カード</h1><div class="sub" id="sum"></div></div><a class="back" href="./index.html">← ボード</a></div>
+  <div class="units" id="units"></div>
+  <div class="grid" id="grid"></div>
+  <div id="card"></div>
+  <div class="nav"><button onclick="go(-1)">◀ まえ</button><button class="pri" onclick="go(1)">つぎ ▶</button></div>
+  <div class="hint">✍️ 覚えたら、ボードの「漢字クエスト」で <b>10問の書き取りテスト</b> にちょうせん！<br>ノートに番号から文の最後まで書いて（［　］の中は漢字で）、写真でパパに送ってね。<br>テスト中は漢字カードは見られないよ。<br><a href="./index.html#kjCard">→ ボードの漢字クエストへ</a></div>
+</div>
+<script>
+var U=window.KANJI_UNITS||[],ui=0,ki=0;
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+function prog(){var s=lsGet('questboard_v3')||{};return (s.kj&&s.kj.prog)||{};}
+function today(){var d=new Date();function p(n){return (n<10?'0':'')+n;}return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
+function k2h(s){return s.replace(/[ァ-ヶ]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60);});}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function badge(r){if(!r)return ['','new','まだテストしていない字'];if(r.m)return ['⭐','m','マスター！（3回つづけて正解）'];if(+r.w>0&&+r.s<1)return ['⚠️','n','にがて（もう一度テストに出るよ）'];return ['✔️','t','テスト済み（あと '+Math.max(0,3-(+r.s||0))+'回正解でマスター）'];}
+function taking(){var s=lsGet('questboard_v3')||{};var ts=(s.kj&&s.kj.tests)||[];var own='child';try{own=localStorage.getItem('qb_calc_owner')==='papa'?'papa':'child';}catch(e){}return own!=='papa'&&ts.some(function(t){return t.st==='take';});}
+function render(){
+  if(taking()){document.getElementById('units').innerHTML='';document.getElementById('grid').innerHTML='';document.querySelector('.nav').style.display='none';
+    document.getElementById('card').innerHTML='<div class="card lock"><div style="font-size:3rem">🙈</div><div class="lk">いまは書き取りテスト中だよ</div><div class="lks">テスト中は漢字カードは見られません。<br>ノートに書いて、写真をパパに送ったら また見られるよ。<br><b>この画面を開いたことは、パパに伝わります。</b></div><a class="lkb" href="./index.html#kjCard">✍️ テストにもどる</a></div>';return;}
+  document.querySelector('.nav').style.display='';
+  if(!U.length){document.getElementById('card').innerHTML='<div class="empty">漢字データを読みこめませんでした</div>';return;}
+  var P=prog(),tot=0,ms=0;U.forEach(function(u){u.k.forEach(function(x){tot++;if(P[x[0]]&&P[x[0]].m)ms++;});});
+  document.getElementById('sum').textContent='予習シリーズ 漢字とことば 4年上 ・ '+tot+'字（マスター '+ms+'字）';
+  document.getElementById('units').innerHTML=U.map(function(u,i){var m=u.k.filter(function(x){return P[x[0]]&&P[x[0]].m;}).length;return '<button class="ub'+(i===ui?' on':'')+'" onclick="pickU('+i+')">'+u.u+(m?'<small>⭐'+m+'</small>':'')+'</button>';}).join('');
+  var u=U[ui];document.getElementById('grid').innerHTML=u.k.map(function(x,i){var b=badge(P[x[0]]);return '<button class="gk'+(i===ki?' on':'')+'" onclick="pickK('+i+')">'+x[0]+(b[0]?'<span class="bd">'+b[0]+'</span>':'')+'</button>';}).join('');
+  var x=u.k[ki],r=P[x[0]],b=badge(r),m=x[3].match(/［([^］]*)］/),yomi=m?k2h(m[1]):'';
+  document.getElementById('card').innerHTML='<div class="card"><div class="kno">'+u.u+' ・ '+(ki+1)+' / '+u.k.length+'</div><div class="kbig">'+x[0]+'</div>'
+    +'<div class="yomi">'+(x[1]?'<span class="k">音</span><span>'+esc(x[1])+'</span>':'')+(x[2]?'<span class="k kun">訓</span><span>'+esc(x[2])+'</span>':'')+'</div>'
+    +'<div class="ex"><div class="lab">テストに出ることば</div><div class="w">'+esc(x[4]).split(x[0]).join('<b>'+x[0]+'</b>')+'</div><div class="r">（'+esc(yomi)+'）</div><div class="q">例：'+esc(x[3]).replace(/［([^］]*)］/,'［'+esc(x[4])+'］')+'</div></div>'
+    +'<div class="st '+b[1]+'">'+(b[0]?b[0]+' ':'')+b[2]+'</div></div>';
+}
+function pickU(i){ui=i;ki=0;try{localStorage.setItem('kanji_pos',JSON.stringify([ui,ki]));}catch(e){}render();}
+function pickK(i){ki=i;try{localStorage.setItem('kanji_pos',JSON.stringify([ui,ki]));}catch(e){}render();}
+function go(d){var n=ki+d;if(n<0){if(ui>0){ui--;n=U[ui].k.length-1;}else n=0;}else if(n>=U[ui].k.length){if(ui<U.length-1){ui++;n=0;}else n=U[ui].k.length-1;}ki=n;try{localStorage.setItem('kanji_pos',JSON.stringify([ui,ki]));}catch(e){}render();window.scrollTo({top:0,behavior:'smooth'});}
+(function(){var p=lsGet('kanji_pos');if(p&&U[p[0]]){ui=p[0];ki=Math.min(p[1]||0,U[ui].k.length-1);}else{var P=prog();for(var i=0;i<U.length;i++){if(U[i].k.some(function(x){return !P[x[0]];})){ui=i;break;}}}})();
+render();
+</script>
+</body>
+</html>
