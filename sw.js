@@ -1,4 +1,4 @@
-const CACHE = 'questboard-v4-34';
+const CACHE = 'questboard-v4-35';
 const ASSETS = ['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./apple-touch-icon-180.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -9,9 +9,10 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const req = e.request;
-  const isHTML = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
+  const isHTML = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')
+    || /\.js(\?|$)/.test(new URL(req.url).pathname + new URL(req.url).search); // データ（kanji-data.js など）も最新を優先
   if (isHTML) {
-    // network-first: always try the latest page when online, cache per URL
+    // network-first: always try the latest page / data script when online, cache per URL
     e.respondWith(
       fetch(req).then(resp => {
         const copy = resp.clone();

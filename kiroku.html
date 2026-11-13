@@ -138,6 +138,8 @@ function build(rem,state,src){
   var loc=lsGet('questboard_v3')||{},st=state||{};
   var o={src:src};
   o.clog={};o.clp={};o.bonus={};
+  /* 漢字クエスト：同期の state を優先（なければこの端末） */
+  var kjs=(st.kj&&st.kj.tests)?st.kj:(loc.kj||{});o.kj={tests:kjs.tests||[],prog:kjs.prog||{}};
   [loc,st].forEach(function(s){var k;for(k in (s.clog||{}))o.clog[nk(k)]=Math.max(num(o.clog[nk(k)]),num(s.clog[k]));
     for(k in (s.clp||{})){var n=num(s.clp[k]&&s.clp[k].n);o.clp[nk(k)]=Math.max(num(o.clp[nk(k)]),n);}
     for(k in (s.bonusLog||{})){var g=num(s.bonusLog[k]&&s.bonusLog[k].g);o.bonus[nk(k)]=Math.max(num(o.bonus[nk(k)]),g);}});
@@ -188,6 +190,9 @@ function render(){
   var qt=sumBy(V.quiz,function(h){return h&&h.t;})+sumBy(J.quiz,function(h){return h&&h.t;});
   var lv1=0,lv2=0,lv3=0,party=0;days.forEach(function(k){var l=num(D.clog[k]);if(l>=1)lv1++;if(l===2)lv2++;if(l===3){lv3++;party+=Math.max(1,num(D.clp[k]));}});
   var bonus=sumBy(D.bonus);
+  var KJ=D.kj||{tests:[],prog:{}},kjDay={};KJ.tests.forEach(function(t){function add(k,f,n){if(!k)return;k=nk(k);kjDay[k]=kjDay[k]||{c:0,f:0,d:0};kjDay[k][f]+=n;}
+    if(t.gd&&t.res)add(t.gd,'c',t.res.filter(Boolean).length);if(t.fx)Object.keys(t.fx).forEach(function(i){if(t.fx[i].st==='ok')add(t.fx[i].od,'f',1);});if(t.st==='done')add(t.dd,'d',1);});
+  var kjDone=days.reduce(function(s,k){return s+num(kjDay[k]&&kjDay[k].d);},0),kjMs=Object.keys(KJ.prog).filter(function(c){return KJ.prog[c]&&KJ.prog[c].m;}).length,kjTested=Object.keys(KJ.prog).length;
   var h='';
   /* タイル */
   function vt(icon,name,X,add,col){var pct=Math.min(100,Math.round(X.learned/X.goal*100));
@@ -196,6 +201,7 @@ function render(){
   h+='<div class="tiles">'+vt('🔤','英単語',V,vAdd,'var(--vocab)')+vt('📖','語彙',J,jAdd,'var(--jvocab)')
     +'<div class="tile"><div class="k">⚡ 計算</div><div class="v">'+cq+'<small>問</small></div><div class="d">'+cs+'セット・<b>⭐ベスト更新 '+cb+'回</b></div></div>'
     +'<div class="tile"><div class="k">🧪 検問（テスト）</div><div class="v">'+qt+'<small>回</small></div><div class="d">英単語＋語彙の合計</div></div>'
+    +'<div class="tile wide"><div class="k">✍️ 漢字クエスト</div><div class="v">'+kjDone+'<small>回 10問クリア</small></div><div class="d">マスター <b>'+kjMs+'字</b>・テストした字 '+kjTested+' / 160字</div></div>'
     +'<div class="tile wide"><div class="k">🗓️ がんばりカレンダー</div><div class="v">'+lv1+'<small>日 ナイス以上</small></div>'
     +'<div class="d">🌟パーフェクト <b>'+lv2+'日</b>・🌈レインボー <b>'+lv3+'日</b>（🥳パーティ '+party+'回）・📱ボーナス <b>+'+bonus+'分</b></div></div></div>';
   /* 語数チャート */
@@ -232,6 +238,7 @@ function render(){
     if(num(ch.q))its+='<span class="it c">⚡ 計算 '+num(ch.q)+'問'+(num(ch.s)?'（'+num(ch.s)+'セット'+(num(ch.f)?'・満点'+num(ch.f):'')+'）':'')+'</span>';
     if(bc)its+='<span class="it b">⭐ ベスト更新 '+bc+'回</span>';
     var qq=num(vq.t)+num(jq.t);if(qq)its+='<span class="it">🧪 検問 '+qq+'回'+((num(vq.p)+num(jq.p))?'（満点'+(num(vq.p)+num(jq.p))+'）':'')+'</span>';
+    var kd=kjDay[k];if(kd&&(kd.c||kd.f||kd.d))its+='<span class="it" style="background:#fde6e3">✍️ 漢字 '+(kd.d?'10問クリア'+(kd.d>1?kd.d+'回':'')+'・':'')+'正解'+kd.c+(kd.f?'・直し'+kd.f:'')+'</span>';
     if(bn)its+='<span class="it p">📱 +'+bn+'分</span>';
     if(!its&&!l){rows+='<div class="day rest">'+mdw(k)+'　おやすみ</div>';return;}
     rows+='<div class="day"><div class="dh">'+mdw(k)+(l?'<span class="lv l'+l+'">'+LVN[l]+(l===3&&num(D.clp[k])?' 🥳'+num(D.clp[k]):'')+'</span>':'')+'</div>'+(its?'<div class="items">'+its+'</div>':'')+'</div>';});
