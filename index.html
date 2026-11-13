@@ -74,6 +74,15 @@
   .jvcard .v-sub{color:#5a4b73}
   .jvcard .v-open{background:#8a5cd6;box-shadow:0 3px 0 #6f3fc0}
   .jvcard .v-open:active{box-shadow:0 1px 0 #6f3fc0}
+  .kjcard{border:2px solid #d6504e;background:#fdf0ee}
+  .kjcard .v-count{color:#b23a37;background:#fff;border:1.5px solid #f0b8b3;border-radius:999px;padding:1px 9px;font-size:.75rem}
+  .kj-steps{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+  .kj-steps li{display:flex;gap:8px;align-items:flex-start;background:#fff;border:1.5px solid #f3cdc8;border-radius:12px;padding:7px 10px;font-size:.84rem;font-weight:800;color:#5b3a37;line-height:1.45}
+  .kj-steps .n{flex:none;width:22px;height:22px;border-radius:50%;background:#d6504e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem}
+  .kj-steps b{color:#b23a37}
+  .kj-bonus{margin-top:8px;padding:8px 10px;border-radius:12px;background:#fff6d6;border:1.5px dashed #e0a800;color:#7a5600;font-size:.8rem;font-weight:800;text-align:center;line-height:1.5}
+  .kj-bonus b{color:#c25e00}
+  .kj-soon{display:block;text-align:center;background:#e9c9c5;color:#8a4a45;padding:12px;border-radius:14px;font-weight:900;margin-top:10px;font-size:1rem}
   .pscard{border:2px solid #d9a521;background:#fff8e6}
   .pscard.on{background:linear-gradient(180deg,#fff6d6,#ffefb8);box-shadow:0 0 0 2px #ffe08a,3px 4px 0 rgba(0,0,0,.05)}
   .ps-line{font-size:.78rem;color:#9a6b00;font-weight:800;margin-top:2px}
@@ -261,6 +270,8 @@
   <div id="vocabCard"></div>
 
   <div id="jvocabCard"></div>
+
+  <div id="kanjiCard"></div>
 
   <div id="passCard"></div>
 
@@ -653,7 +664,20 @@ function renderCalc(){
     +'<a class="c-open" href="./keisan.html">▶ 計算をはじめる</a></div>';
 }
 function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('vocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
-function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('jvocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';}
+function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('jvocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';renderKanji();}
+/* 漢字クエスト（設計中）：ルールだけ先に見せるカード。漢字データと kanji.html ができたら「ひらく」ボタンに切りかえる */
+function renderKanji(){var el=document.getElementById('kanjiCard');if(!el)return;var per=(S.cfg&&S.cfg.kanjiPer!=null)?+S.cfg.kanjiPer:1,all=(S.cfg&&S.cfg.kanjiAll!=null)?+S.cfg.kanjiAll:5;
+  el.innerHTML='<div class="card kjcard"><div class="v-h"><span>✍️ 漢字クエスト</span><span class="v-count">🔧 じゅんび中</span></div>'
+    +'<div class="v-sub" style="color:#7a4a46">ノートに書いておぼえる漢字クエストが、もうすぐ始まるよ！</div>'
+    +'<ul class="kj-steps">'
+    +'<li><span class="n">1</span><span>アプリで漢字をおぼえる（読み・例文）</span></li>'
+    +'<li><span class="n">2</span><span>書き取りテスト10問。ノートに<b>番号</b>と<b>『　』の中ぜんぶ</b>を書く</span></li>'
+    +'<li><span class="n">3</span><span>ノートの写真をとって、パパに丸つけをお願い</span></li>'
+    +'<li><span class="n">4</span><span>まちがえた漢字は<b>『　』の中を5回</b>書いて、写真で出す（OKが出るまで出しなおし）</span></li>'
+    +'</ul>'
+    +'<div class="kj-bonus" style="background:#eef6ff;border-color:#7aa7e0;color:#2c4f7c">🎯 <b style="color:#1f5fbf">1日10問（テスト1回）</b>が今日のコミットライン</div>'
+    +((S.cfg&&S.cfg.bonusOn)?'<div class="kj-bonus">📱 正解1問ごとに <b>＋'+per+'分</b>（まちがえた問題は 5回書き直しを出すと <b>＋'+per+'分</b>）<br>10問ぜんぶクリアで さらに <b>＋'+all+'分</b> → 10問ごとに 最大 <b>＋'+(per*10+all)+'分</b>！<br>もう10問やれば、また最大 <b>＋'+(per*10+all)+'分</b>（何回でもOK）</div>':'')
+    +'<span class="kj-soon">🔧 じゅんび中 — 漢字をとうろくしたら始まるよ</span></div>';}
 /* 1日のコミットライン：英単語・語彙＝新しく覚えた語数＋検問の点数（その日の最高記録）／計算＝全演算＋ミックスを全問正解 */
 function qbQuizToday(key){var st=_lsGet(key+'_stats')||{},q=st.quiz||null,td=qbTodayStr(),r=[];if(!q)return r;
   if(q.hist&&q.hist.d===td&&q.hist.r)r=q.hist.r.slice();
