@@ -26,8 +26,12 @@ window.QB_APP='keisan';
       if(num(ls.learned)===num(cur.learned)&&num(ls.updated)>=num(cur.updated))return ls;
       return cur;
     },function(){},false);}catch(e){}}
-  function pushKeisan(){var ls=lsGet('keisan_stats');if(!ls)return;var r=role();
+  function kEp(r){try{return +(localStorage.getItem('qb_kep_'+r)||0)||0;}catch(e){return 0;}}
+  function pushKeisan(){var ls=lsGet('keisan_stats');if(!ls)return;var r=role(),adopt=null;
     try{db.ref(base+'/'+r).transaction(function(cur){
+      adopt=null;
+      /* クラウドの記録が復元された（版が新しい）ときは、この端末の記録で上書きせず、クラウドの記録に入れ替える */
+      if(cur&&+(cur.ep||0)>kEp(r)){adopt={k:cur.keisan||null,ep:+cur.ep};return;}
       cur=cur||{};var del=cur.del||{},ck=cur.keisan||{},best={},k,cb=ck.best||{},lb=ls.best||{};
       for(k in cb)best[k]=cb[k];
       for(k in lb)best[k]=(best[k]==null)?lb[k]:Math.min(best[k],lb[k]);
@@ -42,7 +46,8 @@ window.QB_APP='keisan';
       var bc=ck.pbs,bl2=ls.pbs,dbc=dnum(bc&&bc.d),dbl=dnum(bl2&&bl2.d);if(bc||bl2){m.pbs=(dbc===dbl)?{d:(bc||bl2).d,n:Math.max(num(bc&&bc.n),num(bl2&&bl2.n))}:((dbc>dbl)?bc:bl2);}
       var hm=mergeHistK(ck.hist,ls.hist);if(hm)m.hist=hm;var pm2=mergePbl(ck.pbl,ls.pbl);if(pm2)m.pbl=pm2;
       cur.keisan=m;return cur;
-    },function(){},false);}catch(e){}}
+    },function(){if(!adopt)return;try{localStorage.setItem('keisan_stats',JSON.stringify(adopt.k));localStorage.setItem('qb_kep_'+r,String(adopt.ep));}catch(e){}
+      try{if(typeof loadStats==='function')stats=loadStats();if(typeof renderHome==='function')renderHome();}catch(e){}},false);}catch(e){}}
   /* がんばり記録：日ごとの記録 hist={日付:{q:正解した問題数,s:セット数,f:全問正解セット,b:ベスト更新}}（項目ごとに大きい方）、ベスト更新の履歴 pbl={時刻:[種目,秒,前の秒]}（和集合） */
   function mergeHistK(a,b){if(!a&&!b)return null;var o={},d,f;a=a||{};b=b||{};
     for(d in a)o[d]=a[d];for(d in b){if(!o[d]){o[d]=b[d];continue;}var x=o[d]||{},y=b[d]||{},z={};for(f in x)z[f]=num(x[f]);for(f in y)z[f]=Math.max(num(z[f]),num(y[f]));o[d]=z;}

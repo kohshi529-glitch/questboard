@@ -502,11 +502,18 @@
 
   <div class="sec">
     <h3>🧮 この端末で計算するのは？</h3>
-    <p class="hint">パパ専用の端末なら「パパ」を選ぶと、この端末で出したミックスの記録が、計算クエストに「パパのベスト」として別表示されます。端末ごとの設定で、同期はされません。</p>
+    <p class="hint">パパ専用の端末なら「パパ」を選ぶと、この端末で出したミックスの記録が、計算クエストに「パパのベスト」として別表示されます。端末ごとの設定で、同期はされません。切り替えると、この端末の計算記録も切り替え先の人の記録に入れ替わります（混ざりません）。</p>
     <div class="two">
       <button class="btn gray" id="own_child" onclick="setCalcOwner('child')">👧 娘</button>
       <button class="btn gray" id="own_papa" onclick="setCalcOwner('papa')">🧔 パパ</button>
     </div>
+  </div>
+
+  <div class="sec" id="ksFixSec" style="display:none">
+    <h3>🛟 娘の計算記録を復元（11/14の上書きの修正）</h3>
+    <p class="hint">パパの端末で「娘／パパ」を切り替えたときに、パパの記録が娘の計算記録に混ざりました。<b>娘の端末</b>に残っている、もとの記録でクラウドを置き換えます。まず差分を確認してください。<br>（復元が終わるまで、この端末の計算記録はクラウドと混ぜずに守っています）</p>
+    <button class="btn gray" onclick="ksFixPreview()">🔍 差分を確認</button>
+    <div id="ksFixOut"></div>
   </div>
 
   <div class="sec">
@@ -597,6 +604,15 @@ function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
+/* 11/14 計算記録の上書き事故の修正：
+   ・役割（娘/パパ）を切り替えても、この端末の計算記録を別の役割に混ぜない（切替時に入れ替える）
+   ・クラウドの記録に「版（ep）」を付け、復元後は古い版の端末が自分の記録で上書きせず、クラウドの記録に入れ替える
+   ・復元までは娘役の端末は計算記録をクラウドと混ぜない（もとの記録を守る） */
+var KS_EP=2026111401;
+function kEp(r){try{return +(localStorage.getItem('qb_kep_'+r)||0)||0;}catch(e){return 0;}}
+function kEpSet(r,v){try{localStorage.setItem('qb_kep_'+r,String(v));}catch(e){}}
+function kHold(role,rem){return role==='child'&&kEp('child')<KS_EP&&!(rem&&rem.child&&+rem.child.ep>=KS_EP);}
+(function(){try{if(!localStorage.getItem('qb_fix1114_snap'))localStorage.setItem('qb_fix1114_snap',JSON.stringify({at:Date.now(),role:calcOwner(),ks:_lsGet('keisan_stats'),cache:_lsGet('qb_appstats')}));}catch(e){}})();
 /* 設定リンク（#qbjoin=…）で開いたら、このブラウザにも同期設定・役割・通知先を入れる */
 (function(){try{var o=null,qm=location.search.match(/[?&]j=([A-Za-z0-9_-]+)/),m=location.hash.match(/^#qbjoin=(.+)$/);
   if(qm){var b=qm[1].replace(/-/g,'+').replace(/_/g,'/');while(b.length%4)b+='=';var c=JSON.parse(decodeURIComponent(escape(atob(b))));if(c&&c.u&&c.r)o={fb:{apiKey:c.a,databaseURL:c.u,projectId:c.p},room:c.r,role:c.o,topic:c.t};}
@@ -1385,7 +1401,7 @@ function initSync(){
     try{SYNC.hwref=firebase.database().ref('rooms/'+SYNC.creds.room+'/hwphotos');var _hwOn=function(sn){if(typeof sn.val()==='string'){HWPH[sn.key]=sn.val();hwPhSave();renderHomework();renderKanji();}};SYNC.hwref.on('child_added',_hwOn);SYNC.hwref.on('child_changed',_hwOn);SYNC.hwref.on('child_removed',function(sn){delete HWPH[sn.key];hwPhSave();});}catch(e){}
     try{SYNC.nref=firebase.database().ref('rooms/'+SYNC.creds.room+'/notify/topic');SYNC.nref.on('value',function(sn){var v=sn.val();if(v===null){if(S.cfg.ntfyTopic)ntfyPush(S.cfg.ntfyTopic);return;}v=String(v||'').trim();ntfyCache(v);if((S.cfg.ntfyTopic||'')!==v){S.cfg.ntfyTopic=v;save();maybeSync();}});}catch(e){}
     try{SYNC.pref=firebase.database().ref('rooms/'+SYNC.creds.room+'/photos');SYNC.pref.on('child_added',handlePhoto);SYNC.pref.on('child_changed',handlePhoto);}catch(e){}
-    try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;SYNC.astatReady=true;if(SYNC.astatRemote){qbKMergeRemote('vocab',SYNC.astatRemote.vocab_k);qbKMergeRemote('jvocab',SYNC.astatRemote.jvocab_k);}if(SYNC.astatRemote)cacheAppstats(SYNC.astatRemote);appStatsSync();});}catch(e){}
+    try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;SYNC.astatRaw=SYNC.astatRemote;SYNC.astatReady=true;if(SYNC.astatRemote){qbKMergeRemote('vocab',SYNC.astatRemote.vocab_k);qbKMergeRemote('jvocab',SYNC.astatRemote.jvocab_k);}if(SYNC.astatRemote)cacheAppstats(SYNC.astatRemote);appStatsSync();});}catch(e){}
   }catch(e){syncStatus('初期化エラー: '+e.message);}
 }
 
@@ -1462,11 +1478,14 @@ function appStatsSync(){
   var pend=SYNC.pendDel||{child:{},papa:{}};
   var childDel=mergeDel(remCd,pend.child),papaDel=mergeDel(remPd,pend.papa);
   var myDel=(role==='papa')?papaDel:childDel;
+  var myRem=(role==='papa')?papaRem:childRem;
+  var hold=kHold(role,rem),remEp=+((rem[role]&&rem[role].ep)||0);
+  // クラウドの版が新しい（復元された）ときは、この端末の記録を混ぜずにクラウドの記録に入れ替える
+  if(!hold&&remEp>kEp(role)){lk=myRem?JSON.parse(JSON.stringify(myRem)):null;_lsSet('keisan_stats',lk);kEpSet(role,remEp);}
   // 自分の役割の削除指定を端末ローカルにも適用（復活防止）
   if(lk&&lk.best){var nb=applyDel(lk.best,myDel);if(nb!==lk.best)lk=withBest(lk,nb);}
   var mv=mergeVocab(lv,rv),mjv=mergeVocab(ljv,rjv);
-  var myRem=(role==='papa')?papaRem:childRem;
-  var myMerged=mergeKeisan(lk,myRem);
+  var myMerged=hold?lk:mergeKeisan(lk,myRem); // 復元待ちの娘端末はクラウドと混ぜない
   if(myMerged&&myMerged.best)myMerged=withBest(myMerged,applyDel(myMerged.best,myDel));
   // 書き戻し
   if(JSON.stringify(mv)!==JSON.stringify(lv))_lsSet('vocab_stats',mv);
@@ -1482,8 +1501,9 @@ function appStatsSync(){
     child:(role==='child')?{keisan:childFinal||null,del:childDel}:{keisan:childRem||null,del:childDel},
     papa:(role==='papa')?{keisan:papaFinal||null,del:papaDel}:{keisan:papaRem||null,del:papaDel}
   };
+  ['child','papa'].forEach(function(r){var e=+((rem[r]&&rem[r].ep)||0);if(e)SYNC.astatRemote[r].ep=e;});
   cacheAppstats(SYNC.astatRemote);
-  renderVocab();renderJvocab();renderPass();renderCalc();
+  renderVocab();renderJvocab();renderPass();renderCalc();ksFixPaint();
   // 書き込みは「自分のロールのバケット＋共有(vocab/jvocab)」だけ。他ロールの keisan は絶対に書かない（競合・消失の根絶）。
   var mineFin=(role==='papa')?papaFinal:childFinal, mineDel=(role==='papa')?papaDel:childDel;
   var mineRem=(role==='papa')?papaRem:childRem, mineRemDel=(role==='papa')?remPd:remCd;
@@ -1496,7 +1516,7 @@ function appStatsSync(){
     SYNC.astatSent=js;
     var _pl={updatedAt:Date.now(),updatedBy:DEVICE};
     if(mv!=null)_pl.vocab=mv; if(mjv!=null)_pl.jvocab=mjv;
-    if(mineFin!=null||(mineDel&&Object.keys(mineDel).length))_pl[role]={keisan:mineFin||null,del:mineDel||{}};
+    if(!hold&&(mineFin!=null||(mineDel&&Object.keys(mineDel).length))){_pl[role]={keisan:mineFin||null,del:mineDel||{}};var _ep=Math.max(kEp(role),remEp);if(_ep)_pl[role].ep=_ep;}
     SYNC.astatRef.update(_pl).catch(function(){});
   }
 }
@@ -1515,10 +1535,47 @@ function deleteBest(role,key){
   if(SYNC.on)appStatsSync();else renderCalc();
   return true;
 }
-function paintCalcOwner(){var c=document.getElementById('own_child'),p=document.getElementById('own_papa');if(!c||!p)return;var o=calcOwner();
+function paintCalcOwner(){ksFixPaint();var c=document.getElementById('own_child'),p=document.getElementById('own_papa');if(!c||!p)return;var o=calcOwner();
   function sel(b,on){b.style.background=on?'#3b6fe0':'';b.style.color=on?'#fff':'';b.style.fontWeight=on?'900':'';}
   sel(c,o==='child');sel(p,o==='papa');}
-function setCalcOwner(o){try{localStorage.setItem('qb_calc_owner',o==='papa'?'papa':'child');}catch(e){}paintCalcOwner();renderCalc();renderFlJump();if(SYNC.on){SYNC.astatSent='';appStatsSync();}}
+function setCalcOwner(o){o=(o==='papa')?'papa':'child';var old=calcOwner();
+  if(o!==old){try{ // この端末の記録は元の役割に置いておき、切り替え先の役割の記録に入れ替える（混ぜない）
+    _lsSet('keisan_stats@'+old,_lsGet('keisan_stats'));
+    var rem=(SYNC.on&&SYNC.astatReady)?(SYNC.astatRaw||SYNC.astatRemote):null,nb=null,ep=0;
+    if(rem){var b=rem[o];nb=(b&&b.keisan)||(o==='child'?rem.keisan:null)||null;ep=+((b&&b.ep)||0);}
+    if(!nb)nb=_lsGet('keisan_stats@'+o);
+    _lsSet('keisan_stats',nb?JSON.parse(JSON.stringify(nb)):null);if(ep>kEp(o))kEpSet(o,ep);
+  }catch(e){}}
+  try{localStorage.setItem('qb_calc_owner',o);}catch(e){}paintCalcOwner();renderCalc();renderFlJump();if(SYNC.on){SYNC.astatSent='';appStatsSync();}}
+/* ---- 11/14 娘の計算記録の復元（娘の端末で実行） ---- */
+function ksFixPaint(){var s=document.getElementById('ksFixSec');if(!s)return;
+  s.style.display=(SYNC.on&&SYNC.astatReady&&calcOwner()==='child'&&kHold('child',SYNC.astatRaw||{}))?'':'none';}
+function ksFixKN(k){var MN={add:'たし算',sub:'ひき算',mul:'かけ算',div:'わり算',mix:'ミックス'},DN={'0':'やさしい','1':'ふつう','2':'むずかしい'};var m=String(k).match(/^([a-z]+)(\d)$/);return m?(MN[m[1]]||m[1])+'・'+(DN[m[2]]||m[2]):k;}
+function ksFixTable(title,cur,neu){
+  function ft(s){return s==null?'–':Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+  var cb=(cur&&cur.best)||{},nb=(neu&&neu.best)||{},ks={},k,rows='',nd=0;for(k in cb)ks[k]=1;for(k in nb)ks[k]=1;
+  Object.keys(ks).sort().forEach(function(k){var d=cb[k]!==nb[k];if(d)nd++;rows+='<tr'+(d?' style="background:#fff3cd;font-weight:900"':'')+'><td>'+ksFixKN(k)+'</td><td>'+ft(cb[k])+'</td><td>'+ft(nb[k])+'</td></tr>';});
+  var hc=Object.keys((cur&&cur.hist)||{}).length,hn=Object.keys((neu&&neu.hist)||{}).length,pc=Object.keys((cur&&cur.pbl)||{}).length,pn=Object.keys((neu&&neu.pbl)||{}).length;
+  var diff=nd>0||hc!==hn||pc!==pn||JSON.stringify((cur&&cur.hist)||{})!==JSON.stringify((neu&&neu.hist)||{});
+  return {diff:diff,html:'<div style="font-weight:900;margin:10px 0 4px">'+title+'</div><table style="width:100%;border-collapse:collapse;font-size:.82rem" border="1" cellpadding="4"><tr style="background:#f3f3f3"><th>種目</th><th>いまのクラウド</th><th>復元後</th></tr>'+(rows||'<tr><td colspan="3">ベスト記録なし</td></tr>')+'</table><div class="hint" style="margin-top:4px">記録した日数：'+hc+'日 → '+hn+'日 ／ ベスト更新の履歴：'+pc+'件 → '+pn+'件（色つきの行がちがうところ）</div>'};}
+function ksFixPreview(){var out=document.getElementById('ksFixOut');if(!out)return;
+  var raw=SYNC.astatRaw||{},lk=_lsGet('keisan_stats'),snap=_lsGet('qb_fix1114_snap')||{};
+  var cur=(raw.child&&raw.child.keisan)||raw.keisan||null,a=ksFixTable('👧 娘の記録（この端末に残っている記録で置き換え）',cur,lk);
+  var pk=snap.cache&&snap.cache.papa&&snap.cache.papa.keisan,b=pk?ksFixTable('🧔 パパの記録（この端末が前回受け取ったパパの記録に戻す）',raw.papa&&raw.papa.keisan,pk):null;
+  var h=a.html+(b?b.html+'<label style="display:flex;gap:6px;align-items:center;margin-top:6px;font-weight:800"><input type="checkbox" id="ksFixPapa"'+(b.diff?' checked':'')+'> パパの記録も戻す</label>':'');
+  if(!a.diff)h+='<p class="hint" style="color:#b23a37;font-weight:900">娘の記録に差がありません。この端末もすでに上書きされている可能性があります。復元せずに、このまま知らせてください。</p>';
+  else h+='<button class="btn" style="margin-top:10px" onclick="ksFixDo()">🛟 この内容で復元する</button>';
+  out.innerHTML=h;}
+function ksFixDo(){
+  if(!SYNC.on||!SYNC.astatRef){alert('同期がつながっていません');return;}
+  if(!confirm('この端末に残っている記録で、クラウドの娘の計算記録を置き換えます。よろしいですか？'))return;
+  var raw=SYNC.astatRaw||{},lk=_lsGet('keisan_stats'),snap=_lsGet('qb_fix1114_snap')||{},pk=snap.cache&&snap.cache.papa&&snap.cache.papa.keisan,cb=document.getElementById('ksFixPapa');
+  var up={updatedAt:Date.now(),updatedBy:DEVICE};
+  up.child={keisan:lk||null,del:(raw.child&&raw.child.del)||{},ep:KS_EP};
+  if(pk&&cb&&cb.checked)up.papa={keisan:pk,del:(raw.papa&&raw.papa.del)||{},ep:KS_EP};
+  SYNC.astatRef.update(up).then(function(){kEpSet('child',KS_EP);SYNC.astatSent='';
+    var out=document.getElementById('ksFixOut');if(out)out.innerHTML='<p class="hint" style="font-weight:900;color:#2f7d45">✅ 復元しました。パパの端末は、次にボードか計算クエストを開いたときに自動で正しい記録に入れ替わります。</p>';
+    appStatsSync();}).catch(function(e){alert('復元できませんでした：'+((e&&e.message)||''));});}
 function deleteBestUI(){
   var role=document.getElementById('del_role').value,mode=document.getElementById('del_mode').value,diff=document.getElementById('del_diff').value,key=mode+diff;
   var RN={child:'娘',papa:'パパ'},MN={add:'たし算',sub:'ひき算',mul:'かけ算',div:'わり算',mix:'ミックス'},DN={'0':'やさしい','1':'ふつう','2':'むずかしい'};
