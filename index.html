@@ -136,12 +136,13 @@
   .zk-h button{border:none;background:#f3e3e0;border-radius:8px;padding:4px 10px;font-weight:900;font-family:inherit}
   .zk-list{display:grid;gap:5px}
   .zk-list .kj-g{padding:6px 8px}
-  .ps-it{margin-top:6px;background:#fff;border:1.5px solid #ead9b0;border-radius:10px;padding:6px 8px}
+  .ps-it{display:flex;align-items:center;gap:6px;margin-top:3px;background:#fff;border:1.5px solid #ead9b0;border-radius:8px;padding:3px 6px}
   .ps-it.ok{background:#eef8f1;border-color:#9fd5b3}
   .ps-it.off{opacity:.55;background:#f4f1ea}
-  .ps-in{font-weight:900;font-size:.85rem}
-  .ps-offt{font-size:.75rem;font-weight:800;color:#8a7d64;margin-left:6px}
-  .ps-or{text-align:center;font-size:.7rem;font-weight:900;color:#a08a5a;margin:2px 0}
+  .ps-in{flex:none;width:4.5em;font-weight:900;font-size:.8rem;white-space:nowrap}
+  .ps-it .ps-offt{margin-left:0;font-size:.66rem}
+  .ps-offt{font-size:.68rem;font-weight:800;color:#8a7d64;margin-left:6px;white-space:nowrap;letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .ps-or{font-size:.6rem;font-weight:900;color:#b09a6a;margin:1px 0 0 6px;line-height:1.2}
   .ps-day{display:inline-block;font-size:.72rem;background:#fff3c4;color:#8a5a00;border-radius:999px;padding:1px 8px;margin-left:4px}
   .rdcard{border:2px solid #3f8f4a;background:#eef7e8}
   .rdcard .v-count{color:#2f6f3a}
@@ -163,12 +164,12 @@
   .pscard{border:2px solid #d9a521;background:#fff8e6}
   .pscard.on{background:linear-gradient(180deg,#fff6d6,#ffefb8);box-shadow:0 0 0 2px #ffe08a,3px 4px 0 rgba(0,0,0,.05)}
   .ps-line{font-size:.78rem;color:#9a6b00;font-weight:800;margin-top:2px}
-  .ps-row{display:flex;justify-content:space-between;gap:8px;align-items:center;background:#fff;border:1.5px solid #f0dca8;border-radius:10px;padding:8px 10px;margin-top:8px;font-size:.88rem;font-weight:700;flex-wrap:wrap}
+  .ps-row{display:block;background:#fff;border:1.5px solid #f0dca8;border-radius:10px;padding:5px 8px 6px;margin-top:6px;font-size:.85rem;font-weight:700}
   .ps-row.ok{border-color:#4caf6a;background:#eef9f0;color:#2f7d45}
   .pscard .v-count{color:#9a6b00}
-  .ps-q{font-weight:800}
-  .ps-chips{display:flex;flex-wrap:wrap;gap:5px;width:100%}
-  .ps-chip{font-size:.78rem;font-weight:800;padding:3px 8px;border-radius:999px;background:#f6f1e3;color:#8a7a55;border:1px solid #eadfbf}
+  .ps-q{display:block;font-weight:900;font-size:.85rem;margin-bottom:2px}
+  .ps-chips{display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0}
+  .ps-chip{font-size:.72rem;font-weight:800;padding:1px 7px;border-radius:999px;background:#f6f1e3;color:#8a7a55;border:1px solid #eadfbf;white-space:nowrap}
   .ps-chip.ok{background:#dff3e4;color:#2f7d45;border-color:#9fd5ae}
   .ps-none{color:#a89a7c}
   .ps-bonus{margin-top:10px;background:#fff;border:2px solid #f0c75e;border-radius:12px;padding:10px;text-align:center}
@@ -432,7 +433,7 @@
 
   <div class="sec">
     <h3>🎯 1日のコミットライン</h3>
-    <p class="hint">英単語・語彙：その日に新しく覚えた語数＋検問の点数（その日の最高記録）。計算：たし・ひき・かけ・わり・ミックスを各1回以上 全問正解。3つ全部そろうとボードに「クリア」が出ます。</p>
+    <p class="hint">3つのわく（①計算 ②英単語か語彙 ③漢字か読書）。英単語・語彙は新しく覚えた語数＋検問の点数、計算は5種類を各1回以上 全問正解。②③は前日に片方だけクリアした場合、今日はもう片方だけを数えます（日替わり）。</p>
     <div class="two">
       <div><label>新しく覚えた語（英単語）</label><select id="d_newMin"><option value="5">＋5語</option><option value="10">＋10語</option><option value="14">＋14語</option><option value="15">＋15語</option><option value="20">＋20語</option></select></div>
       <div><label>新しく覚えた語（語彙）</label><select id="d_newMinJ"><option value="5">＋5語</option><option value="10">＋10語</option><option value="14">＋14語</option><option value="15">＋15語</option><option value="20">＋20語</option></select></div>
@@ -583,7 +584,7 @@ function def(){return{
     season:'シーズン1：スタートダッシュ', goal:14,
     rewards:['いっしょに映画を見る','行きたかった場所へおでかけ','いっしょにお菓子づくり','自由リクエスト（パパと相談して決める）'],
     gacha:['ダンス帰りの温泉','クエスト1日おやすみ券','ネトフリ動画30分','いっしょにボードゲーム30分'],
-    pin:'5290'
+    pin:'5555'
   },
   season:{reward:'',startClears:0},
   day:{date:'',picks:[],me:{},pa:{}},
@@ -592,7 +593,7 @@ function def(){return{
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;if(x.nt!==undefined)o.nt=x.nt;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5290';if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;if(S.cfg.newMinJ===undefined)S.cfg.newMinJ=14;if(S.cfg.pbPer===undefined)S.cfg.pbPer=5;if(S.cfg.taskPer===undefined)S.cfg.taskPer=5;if(S.cfg.kanjiPer===undefined)S.cfg.kanjiPer=1;if(S.cfg.kanjiAll===undefined)S.cfg.kanjiAll=5;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};S.clog=S.clog||{};S.clp=S.clp||{};S.kj=S.kj||{};S.kj.tests=S.kj.tests||[];S.kj.prog=S.kj.prog||{};S.cday=S.cday||{};rdS();if(S.cfg.readMin===undefined)S.cfg.readMin=10;if(!S.cfg.fix1113){S.cfg.fix1113=1;if((+S.clog['2026-11-13']||0)<2)S.clog['2026-11-13']=2;}if(S.cfg.ntfyTopic)ntfyCache(S.cfg.ntfyTopic);}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;if(x.nt!==undefined)o.nt=x.nt;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5555';if(!S.cfg.pin5555){S.cfg.pin5555=1;S.cfg.pin='5555';}if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;if(S.cfg.newMinJ===undefined)S.cfg.newMinJ=14;if(S.cfg.pbPer===undefined)S.cfg.pbPer=5;if(S.cfg.taskPer===undefined)S.cfg.taskPer=5;if(S.cfg.kanjiPer===undefined)S.cfg.kanjiPer=1;if(S.cfg.kanjiAll===undefined)S.cfg.kanjiAll=5;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};S.clog=S.clog||{};S.clp=S.clp||{};S.kj=S.kj||{};S.kj.tests=S.kj.tests||[];S.kj.prog=S.kj.prog||{};S.cday=S.cday||{};rdS();if(S.cfg.readMin===undefined)S.cfg.readMin=10;if(!S.cfg.fix1113){S.cfg.fix1113=1;if((+S.clog['2026-11-13']||0)<2)S.clog['2026-11-13']=2;}if(!S.cfg.fix1113b){S.cfg.fix1113b=1;if((+S.clog['2026-11-13']||0)<3){S.clog['2026-11-13']=3;if(!S.clp['2026-11-13'])S.clp['2026-11-13']={h0:0,n:1};}}if(S.cfg.ntfyTopic)ntfyCache(S.cfg.ntfyTopic);}
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
@@ -882,7 +883,7 @@ function renderKanji(){var el=document.getElementById('kanjiCard');if(!el)return
   var nig=Object.keys(K.prog).filter(function(c){var r=K.prog[c];return r&&!r.m&&_num(r.w)>0;}).length,tested=Object.keys(K.prog).length;
   var h='<div class="card kjcard" id="kjCard"><div class="v-h"><span>✍️ 漢字クエスト</span><span class="v-count">マスター '+ms+' / '+total+'字</span></div>'
     +'<div class="v-bar"><div class="v-fill" style="width:'+Math.round(tested/total*100)+'%;background:linear-gradient(90deg,#f0a24a,#d6504e)"></div></div>'
-    +'<div class="v-sub" style="color:#7a4a46">テストした字 '+tested+' / '+total+'字・にがて '+nig+'字'+(kt.d?'<br>🎯 今日の10問 <b>クリア！</b>'+(kt.d>1?'（'+kt.d+'回）':''):'<br>🎯 今日の10問：まだ（10問クリアでコミットライン達成）')+'</div>';
+    +'<div class="v-sub" style="color:#7a4a46">テストした字 '+tested+' / '+total+'字・にがて '+nig+'字'+(qbRotOff().k?'<br>🔁 今日は📕 読書の日（漢字は昨日やったので、パーフェクトカウント外）'+(kt.d?'・10問クリア'+(kt.d>1?kt.d+'回':''):''):(kt.d?'<br>🎯 今日の10問 <b>クリア！</b>'+(kt.d>1?'（'+kt.d+'回）':''):'<br>🎯 今日の10問：まだ（10問クリアでコミットラインの③クリア）'))+'</div>';
   var act=kjActive().slice().reverse();
   act.forEach(function(t){var qs=t.q.map(function(c){return D.d[c]||{c:c,q:c,a:c};});
     if(t.st==='take'){
@@ -978,12 +979,15 @@ function qbDayDone(dk){var o={},y=(S.cday||{})[dk]||{},k;for(k in y)o[k]=!!_num(
   var p=dk.split('-'),uk=(+p[0])+'-'+(+p[1])+'-'+(+p[2]),pct=+S.cfg.passPct||50;
   [['vocab','v',+S.cfg.newMin||10],['jvocab','j',+S.cfg.newMinJ||14]].forEach(function(x){if(o[x[1]])return;var kt=_lsGet(x[0]+'_kts')||{},dkk=qbDeck(x[0]),ds=dkk&&dkk.set,n=0,w;
     for(w in kt){var t=+kt[w];if(t>1e12&&(!ds||ds[w])&&dstr(new Date(t))===dk)n++;}var st=_lsGet(x[0]+'_stats')||{},qd=(st.quiz&&st.quiz.days&&st.quiz.days[uk])||null;
-    if(n>=x[2]&&qd&&_num(qd.b)>=pct)o[x[1]]=true;});
+    if(n>=x[2]&&qd&&(qd.ok!=null?!!_num(qd.ok):_num(qd.b)>=pct))o[x[1]]=true;});
   if(!o.k&&S.kj&&S.kj.tests)o.k=S.kj.tests.some(function(t){return t.st==='done'&&t.dd===dk;});
   if(!o.r){var l=S.rd&&S.rd.log&&S.rd.log[dk];if(l&&_num(l.t)-_num(l.f)>=(+S.cfg.readMin||10))o.r=true;}
   return o;}
 function slotAllow(a,b){var y=qbDayDone(yesterday());if(b){var ya=!!y[a],yb=!!y[b];if(ya&&!yb)return [b];if(yb&&!ya)return [a];}return b?[a,b]:[a];}
 var QNAME={c:'⚡ 計算',v:'🔤 英単語',j:'📖 語彙',k:'✍️ 漢字',r:'📕 読書'};
+/* 今日パーフェクトのカウント外になるクエスト {v:true…}（日替わり） */
+function qbRotOff(){var off={},kon=kjOn();[['v','j'],kon?['k','r']:null].forEach(function(pr){if(!pr)return;var al=slotAllow(pr[0],pr[1]);pr.forEach(function(i){if(al.indexOf(i)<0)off[i]=true;});});return off;}
+function rotRecord(off){var td=today(),ks=Object.keys(off).sort(),r=S.rot;if(r&&r.d===td&&JSON.stringify(r.off||[])===JSON.stringify(ks))return;S.rot={d:td,off:ks};save();}
 function renderPass(){var el=document.getElementById('passCard');if(!el)return;
   var pct=+S.cfg.passPct||50,min=+S.cfg.passMin||10,nmin=+S.cfg.newMin||10,nminJ=+S.cfg.newMinJ||14,cd=+S.cfg.calcDiff||0,isPapa=(calcOwner()==='papa');
   var ptxt=(pct>=100?'満点':pct+'点');
@@ -999,10 +1003,11 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
   var kon=kjOn();if(kon){var _kj=qbKanjiToday(),kDone=_kj.d>0;Q.k={done:kDone,chips:chip(kDone,'10問 '+(kDone?10:kjTestScore(_kj.last))+'/10')};}
   var rp=qbReadToday(),rmin=+S.cfg.readMin||10;Q.r={done:rp>=rmin,chips:chip(rp>=rmin,'今日 '+rp+'/'+rmin+'ページ')};
   cdayRecord({c:Q.c.done,v:Q.v.done,j:Q.j.done,k:kon?Q.k.done:0,r:Q.r.done});
+  rotRecord(qbRotOff());
   var slots=[{t:'計算',items:['c']},{t:'ことば',items:slotAllow('v','j'),pair:['v','j']},{t:kon?'漢字か読書':'読書',items:kon?slotAllow('k','r'):['r'],pair:kon?['k','r']:['r']}];
   var n=0,rowsH='';
   slots.forEach(function(s,si){var done=s.items.some(function(i){return Q[i].done;});if(done)n++;var only=(s.pair&&s.pair.length===2&&s.items.length===1)?s.items[0]:null;
-    var body=(s.pair||s.items).map(function(i){var off=s.items.indexOf(i)<0;return '<div class="ps-it'+(off?' off':'')+(Q[i].done&&!off?' ok':'')+'"><span class="ps-in">'+QNAME[i]+'</span>'+(off?'<span class="ps-offt">きのうやったので今日はお休み</span>':'<div class="ps-chips">'+Q[i].chips+'</div>')+'</div>';}).join(s.items.length>1?'<div class="ps-or">または</div>':'');
+    var body=(!s.pair)?'<div class="ps-chips">'+Q[s.items[0]].chips+'</div>':(s.pair).map(function(i){var off=s.items.indexOf(i)<0;return '<div class="ps-it'+(off?' off':'')+(Q[i].done&&!off?' ok':'')+'"><span class="ps-in">'+QNAME[i]+'</span>'+(off?'<span class="ps-offt">昨日やったので今日はパーフェクトカウント外</span>':'<div class="ps-chips">'+Q[i].chips+'</div>')+'</div>';}).join(s.items.length>1?'<div class="ps-or">または</div>':'');
     rowsH+='<div class="ps-row'+(done?' ok':'')+'"><span class="ps-q">'+'①②③'.charAt(si)+' '+s.t+(done?' クリア！':'')+(only?' <span class="ps-day">今日は'+QNAME[only]+'の日</span>':'')+'</span>'+body+'</div>';});
   _bonusRows=3;var all=(n===3);
   var _hwN=bonusHw().n,_tk=qbTaskDone(),_tkAll=meAllDone(),lvl=all?((_tkAll&&_hwN>=2)?4:(_hwN>=1&&_tk>=1)?3:2):(n>=2?1:0);clRecord(lvl);flagCheck(lvl);partyTrack(lvl,_hwN);amTrack(lvl);
@@ -1011,7 +1016,7 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
     :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト・宿題1つ＋がんばりタスク1つでレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！<br><span style="font-size:.8rem">宿題1つ＋がんばりタスク1つで 🌈レインボー</span></div>')
     :lvl===1?(isPapa?'<div class="ps-msg">👍 今日はナイス・あと1つでパーフェクト</div>':'<div class="ps-msg">👍 ナイス！あと1つでパーフェクト🌟</div>')
     :'<div class="ps-tip">2つで👍ナイス・3つで🌟パーフェクト</div>';
-  el.innerHTML='<div class="card pscard'+(all?' on':'')+'"><div class="v-h"><span>🎯 今日のコミットライン</span><span class="v-count">'+n+' / 3</span></div><div class="ps-line">3つのわくをクリアしよう（くわしくは いちばん下の📋ルール表）</div>'+rowsH+msg+bonusHTML(n,all,isPapa)+'</div>';
+  el.innerHTML='<div class="card pscard'+(all?' on':'')+'"><div class="v-h"><span>🎯 今日のコミットライン</span><span class="v-count">'+n+' / 3</span></div><div class="ps-line">3つのわくをクリア（くわしくは下の📋ルール表）</div>'+rowsH+msg+bonusHTML(n,all,isPapa)+'</div>';
   bonusCheer(isPapa);
   if(lvl&&!isPapa){try{var key='qb_passcheer',c=JSON.parse(localStorage.getItem(key)||'{}'),td=qbTodayStr(),ck=td+':'+(lvl>=2?'all':'nice');
     if(!c[ck]&&document.getElementById('cheer').style.display!=='flex'){var o={};for(var _k in c){if(_k.indexOf(td+':')===0)o[_k]=c[_k];}o[ck]=1;if(lvl>=2)o[td+':nice']=1;localStorage.setItem(key,JSON.stringify(o));
@@ -1033,7 +1038,7 @@ function renderRead(){var el=document.getElementById('readCard');if(!el)return;v
     +'<div class="v-sub" style="color:#4a5a3a">『'+esc(R.title||'本')+'』 しおり <b>'+R.page+'</b>'+(R.total?' / '+R.total+'ページ（'+pct+'%）':'ページ')+'</div>'
     +(R.total?'<div class="v-bar"><div class="v-fill" style="width:'+pct+'%;background:linear-gradient(90deg,#8fc96a,#3f8f4a)"></div></div>':'')
     +'<div class="rd-in"><input id="rdPage" type="number" inputmode="numeric" min="0" placeholder="いま何ページ？"><button onclick="rdSave()">📕 しおりを記録</button></div>'
-    +'<div class="kj-mini" style="color:#4a5a3a">読み終わったページの数字を入れてね（1日'+rmin+'ページ）</div></div>';}
+    +'<div class="kj-mini" style="color:#4a5a3a">'+((kjOn()&&qbRotOff().r)?'🔁 今日は✍️ 漢字の日（読書は昨日やったので、パーフェクトカウント外）':'読み終わったページの数字を入れてね（1日'+rmin+'ページでコミットラインの③クリア）')+'</div></div>';}
 /* ===== 📋 ルール表（ページのいちばん下） ===== */
 function renderRules(){var el=document.getElementById('rulesCard');if(!el)return;var c=S.cfg,kon=kjOn(),pct=+c.passPct||50,min=+c.passMin||10,bon=!!c.bonusOn;
   function m(v){return bon&&+v?'+'+(+v)+'分':'–';}
@@ -1179,7 +1184,7 @@ function pickE(e){_selE=e;renderReactPicker();}
 function pickM(m){_selM=m;renderReactPicker();}
 function sendReaction(){var t=today();S.reactions[t]={e:_selE,m:_selM,ts:Date.now()};try{var seen=JSON.parse(localStorage.getItem('qb_seenreact')||'{}');seen[t]=S.reactions[t].ts;localStorage.setItem('qb_seenreact',JSON.stringify(seen));}catch(e){}save();maybeSync();var el=document.getElementById('reactState');if(el)el.textContent='送りました：'+_selE+' '+_selM;setTimeout(closeReactSend,900);}
 var _reactUnlocked=false;
-function openReactSend(){if(!_reactUnlocked){var p=prompt('暗証番号（4桁）');if(p!==S.cfg.pin){if(p!==null)alert('ちがうよ');return;}_reactUnlocked=true;}renderReactPicker();var el=document.getElementById('reactState');if(el)el.textContent='';document.getElementById('reactSend').style.display='flex';}
+function openReactSend(){if(!_reactUnlocked){var p=prompt('暗証番号（4桁）');if(p===null)return;if(String(p).trim()!==String(S.cfg.pin)){alert('ちがうよ');return;}_reactUnlocked=true;}renderReactPicker();var el=document.getElementById('reactState');if(el)el.textContent='';document.getElementById('reactSend').style.display='flex';}
 function closeReactSend(){document.getElementById('reactSend').style.display='none';}
 function checkNewReaction(){try{var r=S.reactions&&S.reactions[today()];if(!r||!r.ts)return;var seen=JSON.parse(localStorage.getItem('qb_seenreact')||'{}');if(seen[today()]!==r.ts){seen[today()]=r.ts;localStorage.setItem('qb_seenreact',JSON.stringify(seen));showCheer('💌 パパから：'+r.e+' '+r.m);sWin();burst();}}catch(e){}}
 function makeICS(hhmm){const d=today().replace(/-/g,'');const t=(hhmm||'19:00').replace(':','')+'00';const uid='qb-'+t+'-'+d+'@questboard';return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//QuestBoard//JP','CALSCALE:GREGORIAN','BEGIN:VEVENT','UID:'+uid,'DTSTART:'+d+'T'+t,'RRULE:FREQ=DAILY','SUMMARY:クエストの時間だよ！🗺️','DESCRIPTION:きょうのクエストをやろう！','BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:クエストの時間だよ！','TRIGGER:PT0M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');}
@@ -1246,14 +1251,10 @@ function render(){
   save();maybeSync();
 }
 
-/* father: long-press on date + PIN */
+/* father: 日付をタップ → 暗証番号 → 保護者メニュー */
 (function(){
-  const dl=document.getElementById('dateline');let t=null;
-  const start=()=>{t=setTimeout(()=>{t=null;const p=prompt('暗証番号（4桁）');if(p===S.cfg.pin)dadOpen();else if(p!==null)alert('ちがうよ');},650);};
-  const cancel=()=>{if(t){clearTimeout(t);t=null;}};
-  dl.addEventListener('touchstart',start,{passive:true});
-  dl.addEventListener('touchend',cancel);dl.addEventListener('touchmove',cancel);dl.addEventListener('touchcancel',cancel);
-  dl.addEventListener('mousedown',start);dl.addEventListener('mouseup',cancel);dl.addEventListener('mouseleave',cancel);
+  const dl=document.getElementById('dateline');dl.style.cursor='pointer';
+  dl.addEventListener('click',function(){const p=prompt('暗証番号（4桁）');if(p===null)return;if(String(p).trim()===String(S.cfg.pin))dadOpen();else alert('ちがうよ');});
   dl.addEventListener('contextmenu',e=>e.preventDefault());
 })();
 function fillExport(){document.getElementById('d_export').value=cfgExport();}

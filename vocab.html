@@ -847,7 +847,9 @@ var DECK_VER=2026111201;
 try{var _dk=JSON.stringify({v:DECK_VER,w:ALLW.map(function(x){return x.w;})});if(localStorage.getItem(QB_APP+'_deck')!==_dk)localStorage.setItem(QB_APP+'_deck',_dk);if(window.qbSyncKick)qbSyncKick();}catch(e){}
 function QANS(c){return c.def;} /* 英語の意味（カード裏面と同じ）で答える */
 /* 合格ライン：クエストボードの保護者メニューで設定（同じ端末の設定を読む） */
-function qPassCfg(){var c={};try{c=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}return {pct:+c.passPct||100,min:+c.passMin||10};}
+function qPassCfg(){var c={};try{c=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}return {pct:+c.passPct||50,min:+c.passMin||10};}
+/* ボードの日替わり：今日このクエストがパーフェクトのカウント外か（ボードが今日記録した rot を見る） */
+function qRotOff(){try{var s=JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{},r=s.rot,d=new Date(),p=function(n){return (n<10?'0':'')+n;},td=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());return !!(r&&r.d===td&&r.off&&r.off.indexOf('v')>=0);}catch(e){return false;}}
 function loadQuiz(){var o=_qs();return o.quiz||{tests:0,perfects:0,bestPct:0,last:null};}
 function saveQuizRec(q){var o=_qs();o.quiz=q;_qsSave(o);if(window.qbSyncKick)qbSyncKick();}
 function renderQuizRec(){var el=document.getElementById('quizRec');if(!el)return;var q=loadQuiz();var learned=learnedCount();
@@ -890,14 +892,14 @@ function answerQ(t,btn){
 function finishQuiz(){
   var n=QZ.qs.length,r=QZ.right,pct=Math.round(r/n*100);
   var q=loadQuiz();q.tests=(q.tests||0)+1;if(r===n)q.perfects=(q.perfects||0)+1;q.bestPct=Math.max(q.bestPct||0,pct);q.last={s:r,t:n};q.updated=Date.now();var _hd=qTodayStr();if(!q.hist||q.hist.d!==_hd)q.hist={d:_hd,r:[]};q.hist.r.push([r,n,q.updated]);if(q.hist.r.length>30)q.hist.r=q.hist.r.slice(-30);
-  q.days=q.days||{};var _dd=q.days[_hd]||{t:0,p:0,b:0};_dd.t=Math.max((_dd.t||0)+1,q.hist.r.length);if(r===n)_dd.p=(_dd.p||0)+1;_dd.b=Math.max(_dd.b||0,pct);q.days[_hd]=_dd;
+  q.days=q.days||{};var _dd=q.days[_hd]||{t:0,p:0,b:0};_dd.t=Math.max((_dd.t||0)+1,q.hist.r.length);if(r===n)_dd.p=(_dd.p||0)+1;_dd.b=Math.max(_dd.b||0,pct);var _pcx=qPassCfg();if(n>=_pcx.min&&pct>=_pcx.pct)_dd.ok=1;q.days[_hd]=_dd;
   var _dk=Object.keys(q.days);if(_dk.length>400){_dk.sort(function(a,b){var x=a.split('-'),y=b.split('-');return (x[0]*1e4+x[1]*100+ +x[2])-(y[0]*1e4+y[1]*100+ +y[2]);});while(_dk.length>400)delete q.days[_dk.shift()];}
   saveQuizRec(q);var _pc=qPassCfg(),_pass=(n>=_pc.min&&pct>=_pc.pct);
   document.getElementById('qCard').hidden=true;
   var res=document.getElementById('qResult');res.hidden=false;
   var msg=(r===n)?'🏆 満点！すごい！':(pct>=80?'👏 よくできました！':(pct>=50?'🙂 その調子！':'💪 もう一度やってみよう'));
   res.innerHTML='<div class="qr-score">'+r+' / '+n+'</div><div class="qr-msg">'+msg+'</div>'
-    +(_pass?'<div style="font-weight:800;color:#b7791f;margin:2px 0 10px">🏅 合格ライン突破！クエストボードを見てみよう</div>':'<div class="qr-rec">合格ライン：'+(_pc.pct>=100?'満点':_pc.pct+'%以上')+'・'+_pc.min+'問以上</div>')
+    +(_pass?(qRotOff()?'<div style="font-weight:800;color:#8a7d64;margin:2px 0 10px">🏅 合格ライン突破！<br><span style="font-size:.85em">ただし今日は📖 語彙の日なので、パーフェクトカウント外だよ</span></div>':'<div style="font-weight:800;color:#b7791f;margin:2px 0 10px">🏅 合格ライン突破！クエストボードを見てみよう</div>'):'<div class="qr-rec">合格ライン：'+(_pc.pct>=100?'満点':_pc.pct+'%以上')+'・'+_pc.min+'問以上</div>')
     +'<div class="qr-rec">受けた '+q.tests+'回 ・ 満点 '+q.perfects+'回 ・ 自己ベスト '+q.bestPct+'%</div>'
     +'<div class="qr-btns"><button class="q-again" onclick="startQuiz()">🔁 もう一度</button><button class="q-home" onclick="quizHome()">🏠 ホームへ</button></div>';
   document.getElementById('qFill').style.width='100%';window.scrollTo(0,0);}
