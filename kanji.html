@@ -56,10 +56,9 @@
   .so{position:relative;width:min(230px,62vw);aspect-ratio:1;margin:6px auto 2px;background:#fff;border:2.5px solid #e2b9b4;border-radius:12px}
   .so svg{width:100%;height:100%;display:block}
   .so .gl{stroke:#f0d3cf;stroke-width:.7;stroke-dasharray:3 3}
-  .so .bg{fill:none;stroke:#efe6da;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+  .so .bg{fill:none;stroke:#d9cab3;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
   .so .fg{fill:none;stroke:#2b2420;stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round}
   .so .fg.cur{stroke:var(--red)}
-  .so text{font-size:7.5px;font-weight:900;fill:var(--red);font-family:system-ui,sans-serif}
   .soc{font-size:.85rem;font-weight:900;color:var(--red-ink);margin-top:2px}
   .sob{display:flex;justify-content:center;gap:5px;margin-top:6px;flex-wrap:wrap}
   .sob button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:6px 8px;font-weight:900;font-size:.74rem;color:var(--red-ink);font-family:inherit}
@@ -76,7 +75,7 @@
   <div class="grid" id="grid"></div>
   <div id="card"></div>
   <div class="nav"><button onclick="go(-1)">◀ まえ</button><button class="pri" onclick="go(1)">つぎ ▶</button></div>
-  <div class="hint">🖌️ 「書き順」にすると、1画ずつ じどうで書いて見せてくれるよ。いっしょに指でなぞってみよう！<br>✍️ 覚えたら、ボードの「漢字クエスト」で <b>10問の書き取りテスト</b> にちょうせん！<br>ノートに番号から文の最後まで書いて（［　］の中は漢字で）、写真でパパに送ってね。<br>テスト中は漢字カードは見られないよ。<br><a href="./index.html#kjCard">→ ボードの漢字クエストへ</a></div>
+  <div class="hint">🖌️ カードを開くと、書き順を1画ずつ じどうで見せてくれるよ。いっしょに指でなぞってみよう！止めたいときは「字」をおしてね。<br>✍️ 覚えたら、ボードの「漢字クエスト」で <b>10問の書き取りテスト</b> にちょうせん！<br>ノートに番号から文の最後まで書いて（［　］の中は漢字で）、写真でパパに送ってね。<br>テスト中は漢字カードは見られないよ。<br><a href="./index.html#kjCard">→ ボードの漢字クエストへ</a></div>
   <div class="credit">書き順データ：<a href="https://kanjivg.tagaini.net/" target="_blank" rel="noopener">KanjiVG</a>（CC BY-SA 3.0）</div>
 </div>
 <script>
@@ -107,25 +106,25 @@ function render(){
   soStop();if(so)soStart(SD);
 }
 /* ===== 書き順（自動表示） ===== */
-var soMode=false,soSpd=1,soTok=0,soTm=null,soPaused=false,soStep=false,soS=null,soI=0;
-try{soMode=localStorage.getItem('kanji_so')==='1';soSpd=+(localStorage.getItem('kanji_so_spd')||1)||1;}catch(e){}
-function setMode(v){soMode=!!v;try{localStorage.setItem('kanji_so',v?'1':'0');}catch(e){}render();}
+var SO_SP=[0.55,1,1.8],soMode=true,soSpd=1,soTok=0,soTm=null,soPaused=false,soStep=false,soS=null,soI=0;
+soMode=true;try{soSpd=+(localStorage.getItem('kanji_so_spd')||1)||1;}catch(e){}if(SO_SP.indexOf(soSpd)<0)soSpd=1;
+function setMode(v){soMode=!!v;render();}
+function spLabel(){return soSpd<1?'🐢 ゆっくり':soSpd>1?'🚀 はやい':'🐇 ふつう';}
 function soHtml(SD){
   var g='<rect x="0" y="0" width="109" height="109" fill="none"/><line class="gl" x1="54.5" y1="2" x2="54.5" y2="107"/><line class="gl" x1="2" y1="54.5" x2="107" y2="54.5"/>';
   var bg=SD.map(function(s){return '<path class="bg" d="'+s[0]+'"/>';}).join('');
   var fg=SD.map(function(s,i){return '<path class="fg" id="sf'+i+'" d="'+s[0]+'" style="visibility:hidden"/>';}).join('');
-  var nm=SD.map(function(s,i){return '<text id="sn'+i+'" x="'+s[1]+'" y="'+s[2]+'" style="visibility:hidden">'+(i+1)+'</text>';}).join('');
-  return '<div class="so"><svg viewBox="0 0 109 109">'+g+bg+fg+nm+'</svg></div><div class="soc" id="soc">&nbsp;</div>'
-    +'<div class="sob"><button onclick="soReplay()">🔁 もう一回</button><button id="sopb" onclick="soPause()">⏸ とめる</button><button onclick="soNext()">👆 1画ずつ</button><button id="sosb" onclick="soSpeed()">'+(soSpd<1?'🐢 ゆっくり':'🐇 ふつう')+'</button></div>';
+  return '<div class="so"><svg viewBox="0 0 109 109">'+g+bg+fg+'</svg></div><div class="soc" id="soc">&nbsp;</div>'
+    +'<div class="sob"><button onclick="soReplay()">🔁 もう一回</button><button onclick="soNext()">👆 1画ずつ</button><button id="sosb" onclick="soSpeed()">'+spLabel()+'</button></div>';
 }
 function soStop(){soTok++;if(soTm){clearTimeout(soTm);soTm=null;}}
 function soCount(n){var e=document.getElementById('soc');if(e)e.textContent=n>=soS.length?'✨ '+soS.length+'画 かけたよ！':(n+1)+'画め / '+soS.length+'画';}
-function soReset(){for(var i=0;i<soS.length;i++){var p=document.getElementById('sf'+i),t=document.getElementById('sn'+i);if(p){p.style.visibility='hidden';p.classList.remove('cur');}if(t)t.style.visibility='hidden';}soI=0;}
-function soStart(SD){soS=SD;soPaused=false;soStep=false;soReset();var b=document.getElementById('sopb');if(b)b.textContent='⏸ とめる';soTm=setTimeout(soRun.bind(null,soTok),400);}
+function soReset(){for(var i=0;i<soS.length;i++){var p=document.getElementById('sf'+i);if(p){p.style.visibility='hidden';p.classList.remove('cur');}}soI=0;}
+function soStart(SD){soS=SD;soPaused=false;soStep=false;soReset();soTm=setTimeout(soRun.bind(null,soTok),400);}
 function soDraw(i,tok,done){
-  var p=document.getElementById('sf'+i),t=document.getElementById('sn'+i);if(!p){done();return;}
+  var p=document.getElementById('sf'+i);if(!p){done();return;}
   var L=p.getTotalLength?p.getTotalLength():60,dur=Math.max(260,L*16/soSpd),t0=null;
-  p.style.strokeDasharray=L+' '+L;p.style.strokeDashoffset=L;p.style.visibility='visible';p.classList.add('cur');if(t)t.style.visibility='visible';soCount(i);
+  p.style.strokeDasharray=L+' '+L;p.style.strokeDashoffset=L;p.style.visibility='visible';p.classList.add('cur');soCount(i);
   function f(ts){if(tok!==soTok)return;if(t0===null)t0=ts;var k=Math.min(1,(ts-t0)/dur);p.style.strokeDashoffset=L*(1-k);if(k<1)requestAnimationFrame(f);else{p.classList.remove('cur');p.style.strokeDasharray='';p.style.strokeDashoffset='';done();}}
   requestAnimationFrame(f);
 }
@@ -135,12 +134,11 @@ function soRun(tok){
   var i=soI++;soDraw(i,tok,function(){if(tok!==soTok)return;soTm=setTimeout(soRun.bind(null,tok),Math.round(260/soSpd));});
 }
 function soReplay(){var S=soS;soStop();if(S)soStart(S);}
-function soPause(){var b=document.getElementById('sopb');if(soPaused||soStep){soPaused=false;soStep=false;if(b)b.textContent='⏸ とめる';if(soI>=soS.length)soReset();soStop();soRun(soTok);}else{soPaused=true;if(b)b.textContent='▶ うごかす';}}
-function soNext(){var b=document.getElementById('sopb');soStop();soStep=true;if(b)b.textContent='▶ うごかす';
+function soNext(){soStop();soStep=true;
   if(soI>=soS.length){soReset();soCount(0);return;}
-  for(var j=0;j<soI;j++){var q=document.getElementById('sf'+j);if(q){q.style.visibility='visible';q.style.strokeDasharray='';q.style.strokeDashoffset='';q.classList.remove('cur');}var tt=document.getElementById('sn'+j);if(tt)tt.style.visibility='visible';}
+  for(var j=0;j<soI;j++){var q=document.getElementById('sf'+j);if(q){q.style.visibility='visible';q.style.strokeDasharray='';q.style.strokeDashoffset='';q.classList.remove('cur');}}
   var tok=soTok,i=soI++;soDraw(i,tok,function(){if(soI>=soS.length)soCount(soS.length);});}
-function soSpeed(){soSpd=soSpd<1?1:0.55;try{localStorage.setItem('kanji_so_spd',String(soSpd));}catch(e){}var b=document.getElementById('sosb');if(b)b.textContent=soSpd<1?'🐢 ゆっくり':'🐇 ふつう';}
+function soSpeed(){soSpd=SO_SP[(SO_SP.indexOf(soSpd)+1)%SO_SP.length];try{localStorage.setItem('kanji_so_spd',String(soSpd));}catch(e){}var b=document.getElementById('sosb');if(b)b.textContent=spLabel();}
 document.addEventListener('visibilitychange',function(){if(document.hidden)soStop();else if(soMode&&soS&&!soPaused&&!soStep)soReplay();});
 function pickU(i){ui=i;ki=0;try{localStorage.setItem('kanji_pos',JSON.stringify([ui,ki]));}catch(e){}render();}
 function pickK(i){ki=i;try{localStorage.setItem('kanji_pos',JSON.stringify([ui,ki]));}catch(e){}render();}
