@@ -65,7 +65,7 @@
   .day.rest{background:transparent;border-style:dashed;padding:4px 10px;color:var(--soft);font-size:.75rem;font-weight:800}
   .day .dh{display:flex;align-items:center;gap:6px;font-weight:900;font-size:.88rem}
   .day .lv{font-size:.72rem;font-weight:900;border-radius:999px;padding:1px 8px;color:#fff;background:#b9ad95}
-  .lv.l1{background:#2ec5b6}.lv.l2{background:#f2a20c}.lv.l3{background:linear-gradient(90deg,#ff5f6d,#ffc371,#47e891,#3fa9f5,#a46bf5)}
+  .lv.l1{background:#2ec5b6}.lv.l2{background:#f2a20c}.lv.l3{background:linear-gradient(90deg,#ff5f6d,#ffc371,#47e891,#3fa9f5,#a46bf5)}.lv.l4{background:linear-gradient(90deg,#7b2ff7,#c084fc,#ec4899)}
   .day .items{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
   .it{font-size:.75rem;font-weight:800;border-radius:8px;padding:2px 7px;background:#f5efe2;color:var(--ink)}
   .it.v{background:#e6effb}.it.j{background:#fdeadf}.it.c{background:#e0f5ec}.it.b{background:#fff3cf}.it.p{background:#fde6ef}
@@ -139,7 +139,7 @@ function build(rem,state,src){
   var o={src:src};
   o.clog={};o.clp={};o.bonus={};
   /* 漢字クエスト：同期の state を優先（なければこの端末） */
-  var kjs=(st.kj&&st.kj.tests)?st.kj:(loc.kj||{});o.kj={tests:kjs.tests||[],prog:kjs.prog||{}};
+  var kjs=(st.kj&&st.kj.tests)?st.kj:(loc.kj||{});o.rd=(st.rd&&st.rd.log)?st.rd:(loc.rd||{log:{}});o.kj={tests:kjs.tests||[],prog:kjs.prog||{}};
   [loc,st].forEach(function(s){var k;for(k in (s.clog||{}))o.clog[nk(k)]=Math.max(num(o.clog[nk(k)]),num(s.clog[k]));
     for(k in (s.clp||{})){var n=num(s.clp[k]&&s.clp[k].n);o.clp[nk(k)]=Math.max(num(o.clp[nk(k)]),n);}
     for(k in (s.bonusLog||{})){var g=num(s.bonusLog[k]&&s.bonusLog[k].g);o.bonus[nk(k)]=Math.max(num(o.bonus[nk(k)]),g);}});
@@ -188,7 +188,7 @@ function render(){
   var vAdd=sumBy(V.byDay),jAdd=sumBy(J.byDay);
   var cq=sumBy(C.hist,function(h){return h&&h.q;}),cs=sumBy(C.hist,function(h){return h&&h.s;}),cb=C.plog.filter(function(p){var k=dkey(new Date(p.t));return k>=first&&k<=last;}).length;
   var qt=sumBy(V.quiz,function(h){return h&&h.t;})+sumBy(J.quiz,function(h){return h&&h.t;});
-  var lv1=0,lv2=0,lv3=0,party=0;days.forEach(function(k){var l=num(D.clog[k]);if(l>=1)lv1++;if(l===2)lv2++;if(l===3){lv3++;party+=Math.max(1,num(D.clp[k]));}});
+  var lv1=0,lv2=0,lv3=0,lv4=0,party=0;days.forEach(function(k){var l=num(D.clog[k]);if(l>=1)lv1++;if(l===2)lv2++;if(l===3)lv3++;if(l===4)lv4++;if(l>=3)party+=Math.max(1,num(D.clp[k]));});
   var bonus=sumBy(D.bonus);
   var KJ=D.kj||{tests:[],prog:{}},kjDay={};KJ.tests.forEach(function(t){function add(k,f,n){if(!k)return;k=nk(k);kjDay[k]=kjDay[k]||{c:0,f:0,d:0};kjDay[k][f]+=n;}
     if(t.gd&&t.res)add(t.gd,'c',t.res.filter(Boolean).length);if(t.fx)Object.keys(t.fx).forEach(function(i){if(t.fx[i].st==='ok')add(t.fx[i].od,'f',1);});if(t.st==='done')add(t.dd,'d',1);});
@@ -203,7 +203,7 @@ function render(){
     +'<div class="tile"><div class="k">🧪 検問（テスト）</div><div class="v">'+qt+'<small>回</small></div><div class="d">英単語＋語彙の合計</div></div>'
     +'<div class="tile wide"><div class="k">✍️ 漢字クエスト</div><div class="v">'+kjDone+'<small>回 10問クリア</small></div><div class="d">マスター <b>'+kjMs+'字</b>・テストした字 '+kjTested+' / 160字</div></div>'
     +'<div class="tile wide"><div class="k">🗓️ がんばりカレンダー</div><div class="v">'+lv1+'<small>日 ナイス以上</small></div>'
-    +'<div class="d">🌟パーフェクト <b>'+lv2+'日</b>・🌈レインボー <b>'+lv3+'日</b>（🥳パーティ '+party+'回）・📱ボーナス <b>+'+bonus+'分</b></div></div></div>';
+    +'<div class="d">🌟パーフェクト <b>'+lv2+'日</b>・🌈レインボー <b>'+lv3+'日</b>・💜アメジスト <b>'+lv4+'日</b>（🥳パーティ '+party+'回）・📱ボーナス <b>+'+bonus+'分</b></div></div></div>';
   /* 語数チャート */
   h+='<div class="card"><h2>📚 毎日 覚えた語数</h2><p class="note">覚えたボタンを押した日で数えています</p>'
     +'<div class="legend"><span><i style="background:var(--vocab)"></i>英単語</span><span><i style="background:var(--jvocab)"></i>語彙</span></div>'
@@ -229,7 +229,7 @@ function render(){
       return '<li><div class="l1"><span class="when">'+(d.getMonth()+1)+'/'+d.getDate()+'（'+WD[d.getDay()]+'）'+pad(d.getHours())+':'+pad(d.getMinutes())+'</span><span class="gain">'+gain+'</span></div><div class="what">'+m[1]+' '+m[2]+'・'+DIFF[di]+'　'+(p.p?ft(p.p)+' → ':'')+'<b>'+ft(p.s)+'</b></div></li>';}).join('')+'</ul>';}
   h+='</div>';
   /* 日ごと */
-  var LVN=['','👍 ナイス','🌟 パーフェクト','🌈 レインボー'];
+  var LVN=['','👍 ナイス','🌟 パーフェクト','🌈 レインボー','💜 アメジスト'];
   var rows='';days.slice().reverse().forEach(function(k){var l=num(D.clog[k]),vh=num(V.byDay[k]),jh=num(J.byDay[k]),ch=C.hist[k]||{},vq=V.quiz[k]||{},jq=J.quiz[k]||{},bn=num(D.bonus[k]);
     var bc=C.plog.filter(function(p){return dkey(new Date(p.t))===k;}).length||num(ch.b);
     var its='';
@@ -238,10 +238,11 @@ function render(){
     if(num(ch.q))its+='<span class="it c">⚡ 計算 '+num(ch.q)+'問'+(num(ch.s)?'（'+num(ch.s)+'セット'+(num(ch.f)?'・満点'+num(ch.f):'')+'）':'')+'</span>';
     if(bc)its+='<span class="it b">⭐ ベスト更新 '+bc+'回</span>';
     var qq=num(vq.t)+num(jq.t);if(qq)its+='<span class="it">🧪 検問 '+qq+'回'+((num(vq.p)+num(jq.p))?'（満点'+(num(vq.p)+num(jq.p))+'）':'')+'</span>';
+    var rl=(D.rd&&D.rd.log||{})[k];if(rl&&num(rl.t)-num(rl.f)>0)its+='<span class="it" style="background:#e6f3dc">📕 読書 '+(num(rl.t)-num(rl.f))+'ページ（〜'+num(rl.t)+'）</span>';
     var kd=kjDay[k];if(kd&&(kd.c||kd.f||kd.d))its+='<span class="it" style="background:#fde6e3">✍️ 漢字 '+(kd.d?'10問クリア'+(kd.d>1?kd.d+'回':'')+'・':'')+'正解'+kd.c+(kd.f?'・直し'+kd.f:'')+'</span>';
     if(bn)its+='<span class="it p">📱 +'+bn+'分</span>';
     if(!its&&!l){rows+='<div class="day rest">'+mdw(k)+'　おやすみ</div>';return;}
-    rows+='<div class="day"><div class="dh">'+mdw(k)+(l?'<span class="lv l'+l+'">'+LVN[l]+(l===3&&num(D.clp[k])?' 🥳'+num(D.clp[k]):'')+'</span>':'')+'</div>'+(its?'<div class="items">'+its+'</div>':'')+'</div>';});
+    rows+='<div class="day"><div class="dh">'+mdw(k)+(l?'<span class="lv l'+l+'">'+LVN[l]+(l>=3&&num(D.clp[k])?' 🥳'+num(D.clp[k]):'')+'</span>':'')+'</div>'+(its?'<div class="items">'+its+'</div>':'')+'</div>';});
   h+='<div class="card"><h2>🗓️ 日ごとの記録</h2><div class="days">'+rows+'</div></div>';
   /* 注記 */
   var notes=[];
