@@ -1025,7 +1025,12 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
 /* ===== 📕 読書クエスト（しおり方式） ===== */
 function rdS(){S.rd=S.rd||{};S.rd.log=S.rd.log||{};if(S.rd.title==null)S.rd.title='赤毛のアン';S.rd.page=_num(S.rd.page);S.rd.total=_num(S.rd.total);return S.rd;}
 function qbReadToday(){var l=rdS().log[today()];return l?Math.max(0,_num(l.t)-_num(l.f)):0;}
-function rdSave(){var R=rdS(),inp=document.getElementById('rdPage'),p=parseInt(inp&&inp.value,10);if(!(p>=0)){alert('ページの数字を入れてね');return;}
+/* はじめの1回だけ：いま読んでいるページ（ここから先を数える）を娘に入れてもらう */
+function rdStart(){var R=rdS(),inp=document.getElementById('rdStart'),p=parseInt(inp&&inp.value,10);if(!(p>=0)){alert('ページの数字を入れてね');return;}
+  if(R.total&&p>R.total){alert('この本は '+R.total+'ページまでだよ');return;}
+  if(!confirm(p+'ページまで読んでいるところから はじめるね。\nここから先に読んだページを数えるよ。いい？'))return;
+  R.page=p;R.startPage=p;R.started=today();delete R.log[today()];save();maybeSync();render();showCheer('📕 '+p+'ページからスタート！');sTick();}
+function rdSave(){var R=rdS();if(!R.started){renderRead();return;}var inp=document.getElementById('rdPage'),p=parseInt(inp&&inp.value,10);if(!(p>=0)){alert('ページの数字を入れてね');return;}
   if(R.total&&p>R.total){alert('この本は '+R.total+'ページまでだよ');return;}
   if(p<R.page&&!confirm('しおりを '+R.page+'ページ → '+p+'ページ に戻しますか？'))return;
   rollover();var td=today(),l=R.log[td];if(!l)l=R.log[td]={f:R.page,t:R.page};if(p<_num(l.f))l.f=p;l.t=p;l.at=Date.now();R.page=p;
@@ -1033,6 +1038,10 @@ function rdSave(){var R=rdS(),inp=document.getElementById('rdPage'),p=parseInt(i
   var got=qbReadToday(),rmin=+S.cfg.readMin||10;save();maybeSync();render();
   if(got>=rmin)showCheer('📕 今日 '+got+'ページ読んだね！');else showCheer('📕 しおり '+p+'ページ（今日 '+got+'/'+rmin+'）');sTick();}
 function renderRead(){var el=document.getElementById('readCard');if(!el)return;var R=rdS(),got=qbReadToday(),rmin=+S.cfg.readMin||10,ok=got>=rmin;
+  if(!R.started){el.innerHTML='<div class="card rdcard"><div class="v-h"><span>📕 読書クエスト</span><span class="v-count">はじめに</span></div>'
+    +'<div class="v-sub" style="color:#4a5a3a">『'+esc(R.title||'本')+'』は いま何ページまで読んでいる？<br>そこから先に読んだページを、毎日数えるよ。</div>'
+    +'<div class="rd-in"><input id="rdStart" type="number" inputmode="numeric" min="0" placeholder="読み終わったページ"><button onclick="rdStart()">📕 ここからスタート</button></div>'
+    +'<div class="kj-mini" style="color:#4a5a3a">まだ読んでいなければ 0 を入れてね</div></div>';return;}
   var pct=R.total?Math.min(100,Math.round(R.page/R.total*100)):0;
   el.innerHTML='<div class="card rdcard"><div class="v-h"><span>📕 読書クエスト</span><span class="v-count">今日 '+got+' / '+rmin+'ページ'+(ok?' ✅':'')+'</span></div>'
     +'<div class="v-sub" style="color:#4a5a3a">『'+esc(R.title||'本')+'』 しおり <b>'+R.page+'</b>'+(R.total?' / '+R.total+'ページ（'+pct+'%）':'ページ')+'</div>'
@@ -1291,7 +1300,7 @@ function dadSave(){
   S.cfg.count=Math.max(0,parseInt(document.getElementById('d_count').value)||0);
   S.cfg.goal=Math.max(1,parseInt(document.getElementById('d_goal').value)||14);
   S.cfg.pa=lines('d_pa');S.cfg.season=document.getElementById('d_season').value||S.cfg.season;
-  S.cfg.passPct=parseInt(document.getElementById('d_passPct').value)||50;S.cfg.passMin=parseInt(document.getElementById('d_passMin').value)||10;S.cfg.newMin=parseInt(document.getElementById('d_newMin').value)||10;S.cfg.calcDiff=Math.max(0,Math.min(2,parseInt(document.getElementById('d_calcDiff').value)||0));S.cfg.bonusOn=document.getElementById('d_bonusOn').value==='1'?1:0;S.cfg.bonusPer=parseInt(document.getElementById('d_bonusPer').value)||10;S.cfg.bonusAll=parseInt(document.getElementById('d_bonusAll').value)||0;S.cfg.ntfyTopic=(document.getElementById('d_ntfy').value||'').trim();ntfyCache(S.cfg.ntfyTopic);ntfyPush(S.cfg.ntfyTopic);S.cfg.hwPer=parseInt(document.getElementById('d_hwPer').value)||0;S.cfg.hwAll=parseInt(document.getElementById('d_hwAll').value)||0;S.cfg.newMinJ=parseInt(document.getElementById('d_newMinJ').value)||14;S.cfg.pbPer=parseInt(document.getElementById('d_pbPer').value)||0;S.cfg.taskPer=parseInt(document.getElementById('d_taskPer').value)||0;S.cfg.kanjiPer=parseInt(document.getElementById('d_kanjiPer').value)||0;S.cfg.kanjiAll=parseInt(document.getElementById('d_kanjiAll').value)||0;S.cfg.readMin=parseInt(document.getElementById('d_readMin').value)||10;var _R2=rdS();_R2.title=(document.getElementById('d_rdTitle').value||'').trim()||'赤毛のアン';_R2.total=parseInt(document.getElementById('d_rdTotal').value)||0;var _np=parseInt(document.getElementById('d_rdPage').value);if(_np>=0&&_np!==_R2.page){var _l=_R2.log[today()];if(_l){_l.t=_np;if(_np<_l.f)_l.f=_np;}_R2.page=_np;}
+  S.cfg.passPct=parseInt(document.getElementById('d_passPct').value)||50;S.cfg.passMin=parseInt(document.getElementById('d_passMin').value)||10;S.cfg.newMin=parseInt(document.getElementById('d_newMin').value)||10;S.cfg.calcDiff=Math.max(0,Math.min(2,parseInt(document.getElementById('d_calcDiff').value)||0));S.cfg.bonusOn=document.getElementById('d_bonusOn').value==='1'?1:0;S.cfg.bonusPer=parseInt(document.getElementById('d_bonusPer').value)||10;S.cfg.bonusAll=parseInt(document.getElementById('d_bonusAll').value)||0;S.cfg.ntfyTopic=(document.getElementById('d_ntfy').value||'').trim();ntfyCache(S.cfg.ntfyTopic);ntfyPush(S.cfg.ntfyTopic);S.cfg.hwPer=parseInt(document.getElementById('d_hwPer').value)||0;S.cfg.hwAll=parseInt(document.getElementById('d_hwAll').value)||0;S.cfg.newMinJ=parseInt(document.getElementById('d_newMinJ').value)||14;S.cfg.pbPer=parseInt(document.getElementById('d_pbPer').value)||0;S.cfg.taskPer=parseInt(document.getElementById('d_taskPer').value)||0;S.cfg.kanjiPer=parseInt(document.getElementById('d_kanjiPer').value)||0;S.cfg.kanjiAll=parseInt(document.getElementById('d_kanjiAll').value)||0;S.cfg.readMin=parseInt(document.getElementById('d_readMin').value)||10;var _R2=rdS();_R2.title=(document.getElementById('d_rdTitle').value||'').trim()||'赤毛のアン';_R2.total=parseInt(document.getElementById('d_rdTotal').value)||0;var _np=parseInt(document.getElementById('d_rdPage').value),_chg=(_np>=0&&_np!==_R2.page);if(_chg){var _l=_R2.log[today()];if(_l){_l.t=_np;if(_np<_l.f)_l.f=_np;}_R2.page=_np;}if(_chg&&!_R2.started){_R2.started=today();_R2.startPage=_np;delete _R2.log[today()];}
   flSave();
   S.cfg.rewards=lines('d_rewards');S.cfg.gacha=lines('d_gacha');
   const pin=document.getElementById('d_pin').value;if(/^\d{4}$/.test(pin))S.cfg.pin=pin;
