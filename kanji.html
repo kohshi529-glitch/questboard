@@ -8,6 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon-180.png">
 <script src="./kanji-data.js?v=20261113b"></script>
+<script src="./kanji-strokes.js?v=20261114a"></script>
 <title>漢字カード</title>
 <style>
   :root{--paper:#fdf3e3;--ink:#3a3226;--soft:#8a7d64;--line:#e9c9c5;--red:#d6504e;--red-d:#b23a37;--red-ink:#8a3330;--card:#fffdf7}
@@ -49,6 +50,22 @@
   .hint a{color:var(--red);font-weight:900}
   .lock{padding:26px 16px}.lk{font-size:1.2rem;font-weight:900;color:var(--red-ink);margin-top:6px}.lks{font-size:.88rem;font-weight:800;color:#6b5a56;margin-top:8px;line-height:1.7}.lks b{color:var(--red)}
   .lkb{display:block;margin-top:14px;background:var(--red);color:#fff;text-decoration:none;font-weight:900;padding:12px;border-radius:14px;box-shadow:0 3px 0 var(--red-d)}
+  .mode{display:flex;justify-content:center;gap:6px;margin:8px 0 2px}
+  .mode button{border:2px solid var(--line);background:#fff;border-radius:999px;padding:5px 14px;font-weight:900;font-size:.82rem;color:var(--red-ink);font-family:inherit}
+  .mode button.on{background:var(--red);border-color:var(--red);color:#fff}
+  .so{position:relative;width:min(230px,62vw);aspect-ratio:1;margin:6px auto 2px;background:#fff;border:2.5px solid #e2b9b4;border-radius:12px}
+  .so svg{width:100%;height:100%;display:block}
+  .so .gl{stroke:#f0d3cf;stroke-width:.7;stroke-dasharray:3 3}
+  .so .bg{fill:none;stroke:#efe6da;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+  .so .fg{fill:none;stroke:#2b2420;stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round}
+  .so .fg.cur{stroke:var(--red)}
+  .so text{font-size:7.5px;font-weight:900;fill:var(--red);font-family:system-ui,sans-serif}
+  .soc{font-size:.85rem;font-weight:900;color:var(--red-ink);margin-top:2px}
+  .sob{display:flex;justify-content:center;gap:5px;margin-top:6px;flex-wrap:wrap}
+  .sob button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:6px 8px;font-weight:900;font-size:.74rem;color:var(--red-ink);font-family:inherit}
+  .sob button.on{background:#fdecea;border-color:#f0b8b3}
+  .credit{margin-top:8px;font-size:.66rem;color:var(--soft);text-align:center}
+  .credit a{color:var(--soft)}
   .empty{padding:40px 0;text-align:center;font-weight:800;color:var(--soft)}
 </style>
 </head>
@@ -59,7 +76,8 @@
   <div class="grid" id="grid"></div>
   <div id="card"></div>
   <div class="nav"><button onclick="go(-1)">◀ まえ</button><button class="pri" onclick="go(1)">つぎ ▶</button></div>
-  <div class="hint">✍️ 覚えたら、ボードの「漢字クエスト」で <b>10問の書き取りテスト</b> にちょうせん！<br>ノートに番号から文の最後まで書いて（［　］の中は漢字で）、写真でパパに送ってね。<br>テスト中は漢字カードは見られないよ。<br><a href="./index.html#kjCard">→ ボードの漢字クエストへ</a></div>
+  <div class="hint">🖌️ 「書き順」にすると、1画ずつ じどうで書いて見せてくれるよ。いっしょに指でなぞってみよう！<br>✍️ 覚えたら、ボードの「漢字クエスト」で <b>10問の書き取りテスト</b> にちょうせん！<br>ノートに番号から文の最後まで書いて（［　］の中は漢字で）、写真でパパに送ってね。<br>テスト中は漢字カードは見られないよ。<br><a href="./index.html#kjCard">→ ボードの漢字クエストへ</a></div>
+  <div class="credit">書き順データ：<a href="https://kanjivg.tagaini.net/" target="_blank" rel="noopener">KanjiVG</a>（CC BY-SA 3.0）</div>
 </div>
 <script>
 var U=window.KANJI_UNITS||[],ui=0,ki=0;
@@ -79,12 +97,51 @@ function render(){
   document.getElementById('sum').textContent='予習シリーズ 漢字とことば 4年上 ・ '+tot+'字（マスター '+ms+'字）';
   document.getElementById('units').innerHTML=U.map(function(u,i){var m=u.k.filter(function(x){return P[x[0]]&&P[x[0]].m;}).length;return '<button class="ub'+(i===ui?' on':'')+'" onclick="pickU('+i+')">'+u.u+(m?'<small>⭐'+m+'</small>':'')+'</button>';}).join('');
   var u=U[ui];document.getElementById('grid').innerHTML=u.k.map(function(x,i){var b=badge(P[x[0]]);return '<button class="gk'+(i===ki?' on':'')+'" onclick="pickK('+i+')">'+x[0]+(b[0]?'<span class="bd">'+b[0]+'</span>':'')+'</button>';}).join('');
-  var x=u.k[ki],r=P[x[0]],b=badge(r),m=x[3].match(/［([^］]*)］/),yomi=m?k2h(m[1]):'';
-  document.getElementById('card').innerHTML='<div class="card"><div class="kno">'+u.u+' ・ '+(ki+1)+' / '+u.k.length+'</div><div class="kbig">'+x[0]+'</div>'
+  var x=u.k[ki],r=P[x[0]],b=badge(r),m=x[3].match(/［([^］]*)］/),yomi=m?k2h(m[1]):'',SD=(window.KANJI_STROKES||{})[x[0]],so=soMode&&SD;
+  document.getElementById('card').innerHTML='<div class="card"><div class="kno">'+u.u+' ・ '+(ki+1)+' / '+u.k.length+(SD?' ・ '+SD.length+'画':'')+'</div>'
+    +(SD?'<div class="mode"><button class="'+(so?'':'on')+'" onclick="setMode(0)">字</button><button class="'+(so?'on':'')+'" onclick="setMode(1)">🖌️ 書き順</button></div>':'')
+    +(so?soHtml(SD):'<div class="kbig">'+x[0]+'</div>')
     +'<div class="yomi">'+(x[1]?'<span class="k">音</span><span>'+esc(x[1])+'</span>':'')+(x[2]?'<span class="k kun">訓</span><span>'+esc(x[2])+'</span>':'')+'</div>'
     +'<div class="ex"><div class="lab">テストに出ることば</div><div class="w">'+esc(x[4]).split(x[0]).join('<b>'+x[0]+'</b>')+'</div><div class="r">（'+esc(yomi)+'）</div><div class="q">例：'+esc(x[3]).replace(/［([^］]*)］/,'［'+esc(x[4])+'］')+'</div></div>'
     +'<div class="st '+b[1]+'">'+(b[0]?b[0]+' ':'')+b[2]+'</div></div>';
+  soStop();if(so)soStart(SD);
 }
+/* ===== 書き順（自動表示） ===== */
+var soMode=false,soSpd=1,soTok=0,soTm=null,soPaused=false,soStep=false,soS=null,soI=0;
+try{soMode=localStorage.getItem('kanji_so')==='1';soSpd=+(localStorage.getItem('kanji_so_spd')||1)||1;}catch(e){}
+function setMode(v){soMode=!!v;try{localStorage.setItem('kanji_so',v?'1':'0');}catch(e){}render();}
+function soHtml(SD){
+  var g='<rect x="0" y="0" width="109" height="109" fill="none"/><line class="gl" x1="54.5" y1="2" x2="54.5" y2="107"/><line class="gl" x1="2" y1="54.5" x2="107" y2="54.5"/>';
+  var bg=SD.map(function(s){return '<path class="bg" d="'+s[0]+'"/>';}).join('');
+  var fg=SD.map(function(s,i){return '<path class="fg" id="sf'+i+'" d="'+s[0]+'" style="visibility:hidden"/>';}).join('');
+  var nm=SD.map(function(s,i){return '<text id="sn'+i+'" x="'+s[1]+'" y="'+s[2]+'" style="visibility:hidden">'+(i+1)+'</text>';}).join('');
+  return '<div class="so"><svg viewBox="0 0 109 109">'+g+bg+fg+nm+'</svg></div><div class="soc" id="soc">&nbsp;</div>'
+    +'<div class="sob"><button onclick="soReplay()">🔁 もう一回</button><button id="sopb" onclick="soPause()">⏸ とめる</button><button onclick="soNext()">👆 1画ずつ</button><button id="sosb" onclick="soSpeed()">'+(soSpd<1?'🐢 ゆっくり':'🐇 ふつう')+'</button></div>';
+}
+function soStop(){soTok++;if(soTm){clearTimeout(soTm);soTm=null;}}
+function soCount(n){var e=document.getElementById('soc');if(e)e.textContent=n>=soS.length?'✨ '+soS.length+'画 かけたよ！':(n+1)+'画め / '+soS.length+'画';}
+function soReset(){for(var i=0;i<soS.length;i++){var p=document.getElementById('sf'+i),t=document.getElementById('sn'+i);if(p){p.style.visibility='hidden';p.classList.remove('cur');}if(t)t.style.visibility='hidden';}soI=0;}
+function soStart(SD){soS=SD;soPaused=false;soStep=false;soReset();var b=document.getElementById('sopb');if(b)b.textContent='⏸ とめる';soTm=setTimeout(soRun.bind(null,soTok),400);}
+function soDraw(i,tok,done){
+  var p=document.getElementById('sf'+i),t=document.getElementById('sn'+i);if(!p){done();return;}
+  var L=p.getTotalLength?p.getTotalLength():60,dur=Math.max(260,L*16/soSpd),t0=null;
+  p.style.strokeDasharray=L+' '+L;p.style.strokeDashoffset=L;p.style.visibility='visible';p.classList.add('cur');if(t)t.style.visibility='visible';soCount(i);
+  function f(ts){if(tok!==soTok)return;if(t0===null)t0=ts;var k=Math.min(1,(ts-t0)/dur);p.style.strokeDashoffset=L*(1-k);if(k<1)requestAnimationFrame(f);else{p.classList.remove('cur');p.style.strokeDasharray='';p.style.strokeDashoffset='';done();}}
+  requestAnimationFrame(f);
+}
+function soRun(tok){
+  if(tok!==soTok||soPaused||soStep)return;
+  if(soI>=soS.length){soCount(soS.length);soTm=setTimeout(function(){if(tok!==soTok||soPaused||soStep)return;soReset();soTm=setTimeout(soRun.bind(null,tok),500);},2600);return;}
+  var i=soI++;soDraw(i,tok,function(){if(tok!==soTok)return;soTm=setTimeout(soRun.bind(null,tok),Math.round(260/soSpd));});
+}
+function soReplay(){var S=soS;soStop();if(S)soStart(S);}
+function soPause(){var b=document.getElementById('sopb');if(soPaused||soStep){soPaused=false;soStep=false;if(b)b.textContent='⏸ とめる';if(soI>=soS.length)soReset();soStop();soRun(soTok);}else{soPaused=true;if(b)b.textContent='▶ うごかす';}}
+function soNext(){var b=document.getElementById('sopb');soStop();soStep=true;if(b)b.textContent='▶ うごかす';
+  if(soI>=soS.length){soReset();soCount(0);return;}
+  for(var j=0;j<soI;j++){var q=document.getElementById('sf'+j);if(q){q.style.visibility='visible';q.style.strokeDasharray='';q.style.strokeDashoffset='';q.classList.remove('cur');}var tt=document.getElementById('sn'+j);if(tt)tt.style.visibility='visible';}
+  var tok=soTok,i=soI++;soDraw(i,tok,function(){if(soI>=soS.length)soCount(soS.length);});}
+function soSpeed(){soSpd=soSpd<1?1:0.55;try{localStorage.setItem('kanji_so_spd',String(soSpd));}catch(e){}var b=document.getElementById('sosb');if(b)b.textContent=soSpd<1?'🐢 ゆっくり':'🐇 ふつう';}
+document.addEventListener('visibilitychange',function(){if(document.hidden)soStop();else if(soMode&&soS&&!soPaused&&!soStep)soReplay();});
 function pickU(i){ui=i;ki=0;try{localStorage.setItem('kanji_pos',JSON.stringify([ui,ki]));}catch(e){}render();}
 function pickK(i){ki=i;try{localStorage.setItem('kanji_pos',JSON.stringify([ui,ki]));}catch(e){}render();}
 function go(d){var n=ki+d;if(n<0){if(ui>0){ui--;n=U[ui].k.length-1;}else n=0;}else if(n>=U[ui].k.length){if(ui<U.length-1){ui++;n=0;}else n=U[ui].k.length-1;}ki=n;try{localStorage.setItem('kanji_pos',JSON.stringify([ui,ki]));}catch(e){}render();window.scrollTo({top:0,behavior:'smooth'});}
