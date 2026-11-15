@@ -1403,9 +1403,10 @@ var _heroMiss={};
 function heroImg(src,px){if(_heroMiss[src])return '';return '<img class="hero-img" src="'+src+'" alt="" onload="this.parentNode.classList.add(\'img\')" onerror="_heroMiss[\''+src+'\']=1;this.remove()">';}
 function heroToggle(id){var e=document.getElementById(id||'heroBox');if(e)e.classList.toggle('open');}
 function heroHTML(who){var pa=who==='pa',P=pa?S.pa:S.me,T=pa?HERO_PA:HERO,l=lv(P.xp),ti=heroTier(l,T),g=T[ti],nx=T[ti+1],pw=pa?heroPowerPa():heroPower(),id=pa?'heroBoxPa':'heroBox';
-  var sub=heroSub(l,T),need=l*100-P.xp;
+  var sub=heroSub(l,T),need=lvStart(l+1)-P.xp,fast=(l>=2&&l<LV_FAST_TOP);
   var nxt=(nx&&l+1>=nx.min)?('あと '+need+' 経験値で 昇格！ '+nx.w+' '+nx.wn+'・「'+nx.cls+'」'):('あと '+need+' 経験値で 「'+g.cls+' '+heroRank(sub+1)+'」'+(nx?'（'+heroRank(3)+'の次は昇格）':''));
-  var pct=Math.max(0,Math.min(100,P.xp%100));
+  var pct=Math.max(0,Math.min(100,Math.round((P.xp-lvStart(l))/(lvStart(l+1)-lvStart(l))*100)));
+  if(fast)nxt='🚀 急成長モード（Lv.'+LV_FAST_TOP+'まで がんばり3つで1レベル）<br>'+nxt;
   var ped=['#c98b5a','#c0c7d1','#f2c94c','#9be7f5'][Math.min(3,sub-1)],pedName=['銅','銀','金','宝石'][Math.min(3,sub-1)];
   var SPK=[[10,18],[88,22],[18,64],[84,60],[50,4],[6,42],[94,44]],spk='';if(!pa){for(var q=0;q<Math.min(7,sub*2+(sub>3?1:0));q++)spk+='<i class="hero-spk" style="left:'+SPK[q][0]+'%;top:'+SPK[q][1]+'%;animation-delay:'+(q*.27).toFixed(2)+'s">✦</i>';}
   var fbAv=pa?'<span>🐮</span>':capySvg(1);
@@ -1531,7 +1532,10 @@ function hwReplace(){var el=document.getElementById('d_hwnew');var nw=hwParse(el
 function hwResetAll(){if(!S.homework||!S.homework.length){alert('宿題がまだありません');return;}if(!confirm('宿題のチェックを全部リセットしますか？'))return;S.homework.forEach(function(h){if(h.ph)hwPhDel(h.ph);h.done=false;h.st='';delete h.ph;delete h.okDate;delete h.note;});save();maybeSync();renderHomework();alert('宿題のチェックをリセットしました');}
 function copyText(t,msg){try{navigator.clipboard.writeText(t);}catch(e){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(_){}}try{showCheer(msg||'コピーしたよ📋');}catch(e){}}
 function burst(n,big,ems){const N=n||26;const em=ems||(big?['🎉','🏆','⭐','✨','🎊','👑','💛','🥳']:['🎉','⭐','✨','🎊','🔥','💛']);for(let i=0;i<N;i++){const s=document.createElement('div');s.className='confetti';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=((big?2:1.5)+Math.random()*1.5)+'s';s.style.fontSize=((big?1.5:1)+Math.random()*(big?1.6:1.4))+'rem';document.body.appendChild(s);setTimeout(function(){s.remove();},4200);}}
-const lv=xp=>Math.floor(xp/100)+1;
+/* レベルの曲線（2026-11-15）：Lv.2（経験値100）から Lv.6 までは 🚀急成長モード＝がんばり3つ（30）で1レベル。Lv.6（220）からは ふつう＝100で1レベル */
+const LV_FAST_TOP=6;
+function lvStart(l){return l<=2?(l-1)*100:(l<=LV_FAST_TOP?100+(l-2)*30:220+(l-LV_FAST_TOP)*100);}
+const lv=xp=>{xp=+xp||0;if(xp<100)return 1;if(xp<220)return 2+Math.floor((xp-100)/30);return LV_FAST_TOP+Math.floor((xp-220)/100);};
 function frameClass(level){return 'flvl-'+Math.min(10,Math.max(1,level));}
 function frameOrn(level){var t=Math.min(10,level),o='';var topE=t>=9?'🌟':'⭐',botE=t>=9?'💎':'✨';if(t>=3)o+='<span class="orn tl">'+topE+'</span><span class="orn tr">'+topE+'</span>';if(t>=6)o+='<span class="orn bl">'+botE+'</span><span class="orn br">'+botE+'</span>';if(t>=7)o+='<span class="orn crown">👑</span>';return o;}
 function calHTML(){
