@@ -39,6 +39,13 @@
   .zoom-v{font-weight:800;letter-spacing:.06em;font-size:1.05rem;font-family:'Courier New',monospace}
   .zoom-copy{margin-left:auto;border:none;background:#2d8cff;color:#fff;font-weight:800;border-radius:8px;padding:6px 10px;font-size:.8rem}
   .hwcard{border:2px solid #7a5aa6;background:#f3eefb}
+  .phwcard{border:2px solid #2b7bb9;background:#eef6fc}
+  .phwcard .hw-count,.phwcard .hw-tip{color:#2b5f8a}
+  .phwcard .hw-item{border-color:#cfe2f2}
+  .phw-next{margin-top:8px;font-size:.78rem;font-weight:800;color:#2b5f8a}
+  .quest.auto{cursor:default;opacity:.95;border-style:dashed}
+  .quest.auto .qsub{display:block;font-size:.68rem;color:var(--soft);font-weight:700}
+  .pcell.pm{box-shadow:inset 0 -3px 0 #f5b301}
   .hw-h{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:6px;justify-content:space-between}
   .hw-count{font-size:.82rem;color:#6a4b97;font-weight:800}
   .hw-list{margin-top:10px;display:grid;gap:7px}
@@ -395,6 +402,7 @@
   </div>
 
   <div id="hwCard"></div>
+  <div id="phwCard"></div>
 
   <div id="vocabCard"></div>
 
@@ -460,6 +468,16 @@
     <label style="margin-top:12px">✂️ ページ範囲の小分け（「p62~69」などを小さく分けてチェックしやすくする）</label>
     <div class="two"><div><select id="d_hwChunk"><option value="0">小分けしない</option><option value="2">2ページずつ</option><option value="3">3ページずつ</option><option value="4">4ページずつ</option></select></div><div style="flex:0 0 auto"><button class="btn gray" style="width:auto;padding:8px 12px" onclick="hwSplitNow()">今の宿題を小分け</button></div></div>
     <p class="hint">新しい宿題を貼り付けたときも、この設定で自動的に小分けされます。</p>
+  </div>
+
+  <div class="sec">
+    <h3>🧔 パパの宿題（毎日）</h3>
+    <p class="hint">先生の宿題とは別に、パパが毎日1日分を出す宿題です。写真→パパOKで、先生の宿題と同じく＋時間・宿題の数に1つ数えます。OKの次の日に、自動で次の日の分へ進みます。やらなかった日は、次の日も同じ分が出ます。</p>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="d_phwOn" style="width:auto"> 毎日出す</label>
+    <label>教材名</label><input id="d_phwBook" placeholder="計算シリーズ">
+    <div class="two"><div><label>今の回</label><input id="d_phwKai" type="number" min="1"></div><div><label>何日目</label><input id="d_phwDay" type="number" min="1"></div></div>
+    <label>1回の日数（例：1日目〜5日目なら 5）</label><input id="d_phwDays" type="number" min="1">
+    <button class="btn gray" style="margin-top:8px" onclick="phwSave()">💾 パパの宿題を保存</button>
   </div>
 
   <div class="sec">
@@ -622,8 +640,8 @@ function def(){return{
   me:{name:'わたし',emoji:'🦊',xp:0},
   pa:{name:'パパ',emoji:'🐻',xp:0},
   cfg:{
-    fixed:['算数：計算ドリル 20問 / 10分'],
-    choice:['#🎯 めざせ英検準1級！','英語①多読/音読 10分＋新出英語5語メモ','英語②英作文/英語日記 5文以上','#💪 算数・国語 基礎力UP！','算数①計算ドリル ＋20問/10分','国語①読書 10分＋新出漢字5字反復','国語②日本語日記 5文以上','国語③漢字ドリル 10字反復'],
+    fixed:[],
+    choice:['#🎯 めざせ英検準1級！','英語①多読/音読 10分＋新出英語5語メモ','英語②英作文/英語日記 5文以上','#✏️ 国語 書く力UP！','国語②日本語日記 5文以上（接続詞を2つ以上）'],
     count:2,
     pa:['ビーモン 1回','平日のお迎え 1回','週末の送り迎え 1回'],
     season:'シーズン1：スタートダッシュ', goal:14,
@@ -673,7 +691,7 @@ function defaultPicks(){
   return res;
 }
 function rollover(){
-  if(S.day.date!==today()){S.day={date:today(),picks:defaultPicks(),me:{},pa:{},seeded:true};return;}
+  if(S.day.date!==today()){chFixApply();S.day={date:today(),picks:defaultPicks(),me:{},pa:{},seeded:true};return;}
   if(!S.day.seeded&&(!S.day.picks||S.day.picks.length===0)){S.day.picks=defaultPicks();S.day.seeded=true;}
 }
 
@@ -705,7 +723,7 @@ function toggle(who,key){
   const before=lv(p.xp);
   if(rec[key]){rec[key]=false;p.xp=Math.max(0,p.xp-10);}else{rec[key]=true;p.xp+=10;sTick();}
   const after=lv(p.xp);
-  if(who==='pa'){var bee=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/ビーモン/.test(q);});var car=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/迎/.test(q);});var code=(bee&&car)?'bc':bee?'b':car?'c':'';if(code)S.papaHistory[today()]=code;else delete S.papaHistory[today()];}
+  if(who==='pa')papaHistUpdate();
   const cleared=(who==='me'&&meAllDone()&&S.prog.lastClear!==today());
   if(cleared)onClear();
   else if(who==='me'&&after>before){var ot=Math.min(6,before),nt=Math.min(6,after);if(nt>ot){bigCelebrate('レベルアップ！ Lv.'+after+' ✨ フレームがグレードアップ！');}else{showCheer('レベルアップ！ Lv.'+after+' 🆙');sWin();burst();}}
@@ -747,9 +765,9 @@ function hwTap(i){var h=S.homework&&S.homework[i];if(!h)return;
   if(calcOwner()==='papa'){if(h.st==='sub')return;if(h.st==='ok'){if(confirm('「'+h.t+'」を未完了に戻しますか？'))hwUnok(i);}else if(confirm('写真なしで「'+h.t+'」を完了（OK）にしますか？'))hwOk(i);return;}
   if(h.st==='ok')return;if(h.st==='sub'&&!confirm('写真を撮り直しますか？'))return;
   _hwPick=i;var f=document.getElementById('hwFile');f.value='';f.click();}
-function hwPhotoPicked(ev){var f=ev.target.files&&ev.target.files[0],i=_hwPick;if(!f||i<0||!S.homework[i])return;var rd=new FileReader();
+function hwPhotoPicked(ev){var f=ev.target.files&&ev.target.files[0],i=_hwPick;if(!f||(i!==-2&&(i<0||!S.homework[i])))return;var rd=new FileReader();
   rd.onload=function(e){var img=new Image();img.onload=function(){var max=1000,w=img.width,h=img.height,sc=Math.min(1,max/Math.max(w,h)),cw=Math.round(w*sc),ch=Math.round(h*sc),cv=document.createElement('canvas');cv.width=cw;cv.height=ch;cv.getContext('2d').drawImage(img,0,0,cw,ch);var data;try{data=cv.toDataURL('image/jpeg',0.6);}catch(err){alert('写真を読み込めませんでした');return;}
-    hwSubmit(i,data);};img.src=e.target.result;};rd.readAsDataURL(f);}
+    if(i===-2)phwSubmit(data);else hwSubmit(i,data);};img.src=e.target.result;};rd.readAsDataURL(f);}
 function hwSubmit(i,data){var it=S.homework[i];if(!it)return;var old=it.ph,id='h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
   HWPH[id]=data;hwPhSave();var r=hwPhRef();if(r){try{r.child(id).set(data);}catch(e){}}if(old&&old!==id)hwPhDel(old);
   it.st='sub';it.ph=id;it.at=Date.now();it.done=false;delete it.note;save();maybeSync();renderHomework();
@@ -759,15 +777,69 @@ function hwSubmit(i,data){var it=S.homework[i];if(!it)return;var old=it.ph,id='h
   qbNotify('📒 宿題の写真','「'+it.t+'」の写真が届きました（確認待ち '+pend+'件）。ボードで OK／やり直し を押してください。').then(function(ok){
     var h=(S.homework||[]).find(function(x){return x.ph===id;});if(h&&h.st==='sub'){h.nt=ok?1:(_ntfyErr||'不明');save();maybeSync();renderHomework();}});}
 function hwOk(i){var it=S.homework[i];if(!it)return;rollover();if(it.ph)hwPhDel(it.ph);
-  it.st='ok';it.done=true;it.okDate=today();delete it.ph;delete it.note;delete it.nt;S.day.hwOk=_num(S.day.hwOk)+1;
+  it.st='ok';it.done=true;it.okDate=today();delete it.ph;delete it.note;delete it.nt;S.day.hwOk=_num(S.day.hwOk)+1;qbRv();
   if(S.homework.every(function(h){return h.st==='ok';})){var sg=hwSig();if(S.hwAllSig!==sg){S.hwAllSig=sg;S.day.hwAll=1;}}
   save();maybeSync();render();}
 function hwNg(i){var it=S.homework[i];if(!it)return;var note=prompt('やり直しの理由（娘に表示されます）','写真が見えにくいので撮り直してね');if(note===null)return;
-  if(it.ph)hwPhDel(it.ph);it.st='ng';it.done=false;delete it.ph;delete it.nt;it.note=note||'もう一度やってみよう';save();maybeSync();renderHomework();}
+  rollover();if(it.ph)hwPhDel(it.ph);it.st='ng';it.done=false;delete it.ph;delete it.nt;it.note=note||'もう一度やってみよう';qbRv();save();maybeSync();render();}
 function hwUnok(i){var it=S.homework[i];if(!it)return;rollover();if(it.okDate===today()&&_num(S.day.hwOk)>0)S.day.hwOk=_num(S.day.hwOk)-1;
   if(S.day.hwAll&&S.hwAllSig===hwSig()){S.day.hwAll=0;S.hwAllSig='';}
   it.st='';it.done=false;delete it.okDate;save();maybeSync();render();}
 function viewHwPhoto(id){var d=HWPH[id];if(!d)return;kjZoom(d);}
+/* ===== 🧔 パパの宿題（毎日1日分。写真→パパOKで宿題1つに数える。OKの次の日に次の分へ進む） ===== */
+function phwS(){if(!S.phw)S.phw={on:1,book:'計算シリーズ',kai:1,day:1,days:5,st:''};return S.phw;}
+function phwLabel(p,k,d){p=p||phwS();return (p.book||'計算シリーズ')+' 第'+(k||p.kai)+'回 '+(d||p.day)+'日目';}
+function phwNextPos(p){var k=+p.kai||1,d=(+p.day||1)+1;if(d>(+p.days||5)){d=1;k++;}return [k,d];}
+function phwRoll(){var p=phwS();if(p.st==='ok'&&p.okDate&&p.okDate<today()){var n=phwNextPos(p);p.kai=n[0];p.day=n[1];p.st='';delete p.okDate;save();maybeSync();}}
+function phwTap(){var p=phwS();if(!p.on)return;
+  if(calcOwner()==='papa'){if(p.st==='sub')return;if(p.st==='ok'){if(p.okDate===today()&&confirm('「'+phwLabel(p)+'」を未完了に戻しますか？'))phwUnok();}else if(confirm('写真なしで「'+phwLabel(p)+'」を完了（OK）にしますか？'))phwOk();return;}
+  if(p.st==='ok')return;if(p.st==='sub'&&!confirm('写真を撮り直しますか？'))return;
+  _hwPick=-2;var f=document.getElementById('hwFile');f.value='';f.click();}
+function phwSubmit(data){var p=phwS(),old=p.ph,id='h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  HWPH[id]=data;hwPhSave();var r=hwPhRef();if(r){try{r.child(id).set(data);}catch(e){}}if(old&&old!==id)hwPhDel(old);
+  p.st='sub';p.ph=id;p.at=Date.now();delete p.note;p.nt=0;save();maybeSync();renderPhw();
+  var per=+S.cfg.hwPer||0;showCheer('📷 パパに送ったよ！'+(S.cfg.bonusOn&&per?'OKが出たら +'+per+'分':''));sTick();
+  qbNotify('🧔 パパの宿題の写真','「'+phwLabel(p)+'」の写真が届きました。ボードで OK／やり直し を押してください。').then(function(ok){var q=phwS();if(q.ph===id&&q.st==='sub'){q.nt=ok?1:(_ntfyErr||'不明');save();maybeSync();renderPhw();}});}
+function phwOk(){var p=phwS();rollover();if(p.ph)hwPhDel(p.ph);p.st='ok';p.okDate=today();p.log=p.log||{};p.log[today()]=phwLabel(p);var ks=Object.keys(p.log).sort();while(ks.length>120)delete p.log[ks.shift()];
+  delete p.ph;delete p.note;delete p.nt;S.day.hwOk=_num(S.day.hwOk)+1;qbRv();save();maybeSync();render();}
+function phwNg(){var p=phwS();var note=prompt('やり直しの理由（娘に表示されます）','まちがえたところを直して、もう一度写真をとってね');if(note===null)return;
+  rollover();if(p.ph)hwPhDel(p.ph);p.st='ng';delete p.ph;delete p.nt;p.note=note||'もう一度やってみよう';qbRv();save();maybeSync();render();}
+function phwUnok(){var p=phwS();rollover();if(p.okDate===today()&&_num(S.day.hwOk)>0)S.day.hwOk=_num(S.day.hwOk)-1;if(p.log)delete p.log[today()];p.st='';delete p.okDate;save();maybeSync();render();}
+function renderPhw(){var el=document.getElementById('phwCard');if(!el)return;var p=phwS();if(!p.on){el.innerHTML='';return;}
+  var isPapa=(calcOwner()==='papa'),per=+S.cfg.hwPer||0,st=p.st||'',lab=phwLabel(p),cls=st==='ok'?' done':st==='sub'?' sub':st==='ng'?' ng':'',box=st==='ok'?'✓':st==='sub'?'📷':st==='ng'?'↩':'',info='';
+  if(st==='sub'){if(isPapa){var src=HWPH[p.ph];info='<div class="hw-act">'+(src?'<img class="hw-th" src="'+src+'" onclick="event.stopPropagation();viewHwPhoto(\''+p.ph+'\')">':'<span class="hw-st">📷 写真を読み込み中…</span>')+'<button class="hw-ab" onclick="event.stopPropagation();phwOk()">✅ OK</button><button class="hw-ab ng" onclick="event.stopPropagation();phwNg()">↩ やり直し</button></div>'+ntfyLine(p.nt);}
+    else info='<div class="hw-st">📷 パパの確認待ち（OKで +'+per+'分）</div>'+((p.nt&&p.nt!==1)?'<div class="hw-st ng">⚠️ パパに通知できなかったよ。直接「写真送ったよ」と伝えてね</div>':'');}
+  else if(st==='ng')info='<div class="hw-st ng">↩ やり直し：'+esc(p.note||'もう一度やってみよう')+'</div>';
+  else if(st==='ok'&&per&&S.cfg.bonusOn)info='<div class="hw-st ok">+'+per+'分 ゲット！</div>';
+  var nx=phwNextPos(p);
+  var tip=isPapa?(st==='sub'?'<div class="hw-tip">🔔 写真が届いています。OK／やり直し を押してください</div>':'<div class="hw-tip">毎日1日分。保護者メニューで教材名・今の回と日を変えられます</div>')
+    :'<div class="hw-tip">📷 終わったら タップして写真をとってパパに送ろう'+(S.cfg.bonusOn&&per?'（OKで +'+per+'分・宿題1つに数えるよ）':'（宿題1つに数えるよ）')+'</div>';
+  el.innerHTML='<div class="card hwcard phwcard"><div class="hw-h"><span>🧔 パパの宿題（毎日）</span><span class="hw-count">今日の分 '+(st==='ok'?'1':'0')+' / 1'+(st==='ok'?' 🎉':'')+'</span></div>'+tip
+    +'<div class="hw-list"><div class="hw-item'+cls+'" onclick="phwTap()"><div class="hw-box">'+box+'</div><div class="hw-body"><div class="hw-txt">'+esc(lab)+'</div>'+info+'</div></div></div>'
+    +(st==='ok'?'<div class="phw-next">✅ 今日の分クリア！ 明日は '+esc(phwLabel(p,nx[0],nx[1]))+'</div>':'')+'</div>';}
+function phwSave(){var p=phwS(),g=function(id){return document.getElementById(id);};
+  var k=parseInt(g('d_phwKai').value)||1,d=parseInt(g('d_phwDay').value)||1,ds=parseInt(g('d_phwDays').value)||5;if(d>ds){alert('「何日目」が「1回の日数」より大きくなっています');return;}
+  p.on=g('d_phwOn').checked?1:0;p.book=(g('d_phwBook').value||'').trim()||'計算シリーズ';p.days=ds;
+  if(k!==+p.kai||d!==+p.day){p.kai=k;p.day=d;if(p.st!=='ok'){if(p.ph)hwPhDel(p.ph);p.st='';delete p.ph;delete p.note;delete p.nt;}}
+  save();maybeSync();render();alert('パパの宿題を保存しました：'+(p.on?phwLabel(p):'お休み中'));}
+/* 写真の確認（OK・やり直し・丸つけ）をした回数：パパタスク「丸つけ・OKをその日のうちに」の判定に使う */
+function qbRv(){rollover();S.day.rv=_num(S.day.rv)+1;}
+function qbPending(){var n=(S.homework||[]).filter(function(h){return h.st==='sub';}).length;if(S.phw&&S.phw.on&&S.phw.st==='sub')n++;
+  ((S.kj&&S.kj.tests)||[]).forEach(function(t){if(t.st==='sub')n++;if(t.fx)Object.keys(t.fx).forEach(function(i){if(t.fx[i].st==='sub')n++;});});return n;}
+function papaMarkDone(){return _num(S.day&&S.day.date===today()&&S.day.rv)>0&&qbPending()===0;}
+function papaAutoRow(){var pend=qbPending(),ok=papaMarkDone(),sub=ok?'今日の写真はぜんぶ確認ずみ':pend?'確認待ち '+pend+'件':'今日はまだ写真がないよ';
+  return '<div class="quest auto'+(ok?' done':'')+'"><div class="chk">'+(ok?'✓':'')+'</div><div>🖊️ 丸つけ・OKをその日のうちに<span class="qsub">（自動）'+sub+'</span></div></div>';}
+function papaHistUpdate(){S.papaHistory=S.papaHistory||{};var td=today();var bee=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/ビーモン/.test(q);});var car=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/迎/.test(q);});
+  var code=((bee&&car)?'bc':bee?'b':car?'c':'')+(papaMarkDone()?'m':''),cur=S.papaHistory[td]||'';if(code===cur)return false;if(code)S.papaHistory[td]=code;else delete S.papaHistory[td];return true;}
+/* がんばりタスクの候補の整理（2026-11-15決定）：コミットライン・宿題と重なる候補を外す。次の日の切りかえで1回だけ */
+function chFixDup(q){return /計算ドリル/.test(q)||/漢字ドリル/.test(q)||(/読書/.test(q)&&/漢字/.test(q));}
+function chFixApply(){if(!S.cfg||S.cfg.chFix1)return;S.cfg.chFix1=1;var ch=S.cfg.choice||[],out=[];
+  var fx=S.cfg.fixed||[],fx2=fx.filter(function(q){return !chFixDup(q);}),rmF=fx.length-fx2.length;S.cfg.fixed=fx2; /* 固定の「算数：計算ドリル」も外す（毎日のタスクの数はえらぶ数で保つ） */
+  ch.forEach(function(q){if(chFixDup(q))return;
+    if(q.charAt(0)==='#'&&/算数/.test(q))q='#✏️ 国語 書く力UP！';
+    if(/日本語日記/.test(q)&&!/接続詞/.test(q))q=q+'（接続詞を2つ以上）';out.push(q);});
+  out=out.filter(function(q,i){return !(q.charAt(0)==='#'&&(i===out.length-1||out[i+1].charAt(0)==='#'));});
+  S.cfg.choice=out;var n=out.filter(function(q){return q.charAt(0)!=='#';}).length;S.cfg.count=Math.min(n,(S.cfg.count==null?2:+S.cfg.count)+rmF);}
 /* ページ範囲の小分け：「…p62~69…」→「…p62~63…」「…p64~65…」… */
 function hwSplitText(t,n){n=+n||0;if(!n)return [t];var m=String(t).match(/^(.*?)([pPｐ])\s*(\d+)\s*([~〜～\-－ー])\s*(\d+)(.*)$/);if(!m)return [t];var a=+m[3],b=+m[5];if(!(b>a)||b-a+1<=n)return [t];
   var out=[];for(var x=a;x<=b;x+=n){var y=Math.min(b,x+n-1);out.push(m[1]+m[2]+(x===y?x:(x+m[4]+y))+m[6]);}return out;}
@@ -904,14 +976,14 @@ function kjProg(c,ok){var p=kjS().prog,r=p[c]||{s:0,w:0,n:0};r.n=_num(r.n)+1;
   r.last=today();p[c]=r;}
 function kjGrade(id){var t=kjFind(id);if(!t||t.st!=='sub')return;rollover();var g=KJG[id]||{},wrong=Object.keys(g).filter(function(i){return g[i];}).map(Number);
   if(!confirm(wrong.length?('×が '+wrong.length+(t.mode==='p'?'字':'問')+'（'+wrong.map(function(i){return kjNum(i);}).join('')+'）で確定しますか？'):'ぜんぶ○で確定しますか？'))return;
-  t.res=t.q.map(function(c,i){var ok=wrong.indexOf(i)<0;kjProg(c,ok);return ok?1:0;});t.gd=today();t.ga=Date.now();if(t.ph)hwPhDel(t.ph);delete t.ph;delete t.nt;delete KJG[id];
+  t.res=t.q.map(function(c,i){var ok=wrong.indexOf(i)<0;kjProg(c,ok);return ok?1:0;});t.gd=today();qbRv();t.ga=Date.now();if(t.ph)hwPhDel(t.ph);delete t.ph;delete t.nt;delete KJG[id];
   if(!wrong.length){kjFinish(t);}else{t.st='graded';t.fx={};wrong.forEach(function(i){t.fx[i]={st:'',ng:0};});}
   save();maybeSync();render();}
 function kjRetake(id){var t=kjFind(id);if(!t||t.st!=='sub')return;var note=prompt('とり直しの理由（娘に表示されます）','写真が見えにくいので、もう一度とってね');if(note===null)return;
-  if(t.ph)hwPhDel(t.ph);delete t.ph;delete t.nt;t.st='take';t.note=note||'もう一度写真をとってね';save();maybeSync();renderKanji();}
-function kjFixOk(id,i){var t=kjFind(id);if(!t||!t.fx||!t.fx[i])return;rollover();var x=t.fx[i];x.st='ok';x.od=today();delete x.note;kjFixAfter(t);}
+  rollover();if(t.ph)hwPhDel(t.ph);delete t.ph;delete t.nt;t.st='take';t.note=note||'もう一度写真をとってね';qbRv();save();maybeSync();render();}
+function kjFixOk(id,i){var t=kjFind(id);if(!t||!t.fx||!t.fx[i])return;rollover();var x=t.fx[i];x.st='ok';x.od=today();delete x.note;qbRv();kjFixAfter(t);}
 function kjFixNg(id,i){var t=kjFind(id);if(!t||!t.fx||!t.fx[i])return;var d=kjItems(t)[i]||{a:t.q[i]};var note=prompt('やり直しの理由（娘に表示されます）','［'+d.a+'］をもう一度ていねいに5回書いてね');if(note===null)return;
-  var x=t.fx[i];x.st='ng';x.ng=_num(x.ng)+1;x.note=note||'もう一度5回書いてね';kjFixAfter(t);}
+  rollover();var x=t.fx[i];x.st='ng';x.ng=_num(x.ng)+1;x.note=note||'もう一度5回書いてね';qbRv();kjFixAfter(t);}
 function kjFixAfter(t){var ks=Object.keys(t.fx||{});
   if(!ks.some(function(i){return t.fx[i].st==='sub';})){if(t.fxph)hwPhDel(t.fxph);delete t.fxph;delete t.fxnt;}
   if(ks.length&&ks.every(function(i){return t.fx[i].st==='ok';}))kjFinish(t);
@@ -1164,7 +1236,7 @@ function renderRules(){var el=document.getElementById('rulesCard');if(!el)return
   var t2='<table class="rl-t"><tr><th>できたこと</th><th>📱</th></tr>'
     +'<tr><td>コミットラインのわく 1つ</td><td class="mn">'+m(c.bonusPer)+'</td></tr>'
     +'<tr><td>わく 3つ全部（おまけ）</td><td class="mn">'+m(c.bonusAll)+'</td></tr>'
-    +'<tr><td>📒 宿題 1つ（写真→パパOK）</td><td class="mn">'+m(c.hwPer)+'</td></tr>'
+    +'<tr><td>📒 宿題 1つ（先生の宿題・🧔パパの宿題　写真→パパOK）</td><td class="mn">'+m(c.hwPer)+'</td></tr>'
     +(+c.hwAll?'<tr><td>📒 宿題ぜんぶ（おまけ）</td><td class="mn">'+m(c.hwAll)+'</td></tr>':'')
     +'<tr><td>✅ がんばりタスク 1つ</td><td class="mn">'+m(c.taskPer)+'</td></tr>'
     +'<tr><td>⚡ 計算ベスト更新 1回</td><td class="mn">'+m(c.pbPer)+'</td></tr>'
@@ -1172,7 +1244,7 @@ function renderRules(){var el=document.getElementById('rulesCard');if(!el)return
   el.innerHTML='<div class="card rlcard"><div class="v-h"><span>📋 ルール表</span></div>'
     +'<div class="rl-h">🎯 コミットライン：3つのわく</div>'+t1
     +'<div class="rl-n">🔁 <b>日替わり</b>：きのう②で英単語だけやったら、今日は語彙だけ数えるよ（反対も同じ）。③の漢字と読書も同じ。きのう両方やった日・どちらもやらなかった日は、どちらでもOK。</div>'
-    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋宿題1つ＋がんばりタスク1つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋がんばりタスク全部＋宿題2つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋がんばりタスク全部＋宿題3つ</div>'
+    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋宿題1つ＋がんばりタスク1つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋がんばりタスク全部＋宿題2つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋がんばりタスク全部＋宿題3つ<br>※ 宿題は、ゆうや先生の宿題と🧔パパの宿題（計算シリーズ）のどちらも1つに数えるよ。1つの練習は1か所でだけ数えるので、計算・漢字・読書はがんばりタスクには入れないよ</div>'
     +(bon?'<div class="rl-h">📱 スマホ時間のため方</div>'+t2+'<div class="rl-n">たまった時間は「📱 パパにお願いする」でパパに送ってね。</div>':'')+'</div>';}
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
 var _bonusN=0,_bonusAll=false,_bonusRows=3;
@@ -1285,7 +1357,7 @@ function avatarHTML(p){if(p&&p.avatar)return '<img src="'+p.avatar+'" class="ava
 function setAvatar(who,ev){var f=ev.target.files&&ev.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(e){var img=new Image();img.onload=function(){var sz=96,cv=document.createElement('canvas');cv.width=sz;cv.height=sz;var ctx=cv.getContext('2d'),m=Math.min(img.width,img.height),sx=(img.width-m)/2,sy=(img.height-m)/2;ctx.drawImage(img,sx,sy,m,m,0,0,sz,sz);var data;try{data=cv.toDataURL('image/jpeg',0.7);}catch(err){alert('画像を読み込めませんでした');return;}S[who].avatar=data;save();maybeSync();renderAvaPrev();render();};img.src=e.target.result;};rd.readAsDataURL(f);}
 function clearAvatar(who){delete S[who].avatar;save();maybeSync();renderAvaPrev();render();}
 function renderAvaPrev(){var me=document.getElementById('avaPrevMe'),pa=document.getElementById('avaPrevPa');if(me)me.innerHTML=S.me.avatar?('<img src="'+S.me.avatar+'" class="ava">'):'（なし）';if(pa)pa.innerHTML=S.pa.avatar?('<img src="'+S.pa.avatar+'" class="ava">'):'（なし）';}
-function papaCalHTML(){const N=16,base=new Date(),tk=today();let cells='';for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const v=S.papaHistory&&S.papaHistory[k];const on=!!v;var g='';if(v==='b')g='b';else if(v==='c')g=CAR;else if(v==='bc')g='b'+CAR;else if(v)g='●';cells+='<div class="hcell pcell'+(on?' pa':'')+(k===tk?' today':'')+'" title="'+k+'">'+g+'</div>';}return '<div class="calgrid">'+cells+'</div>';}
+function papaCalHTML(){const N=16,base=new Date(),tk=today();let cells='';for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const v=S.papaHistory&&S.papaHistory[k];const on=!!v;const mk=!!v&&String(v).indexOf('m')>=0,vb=String(v||'').replace('m','');var g='';if(vb==='b')g='b';else if(vb==='c')g=CAR;else if(vb==='bc')g='b'+CAR;else if(vb)g='●';else if(mk)g='✓';cells+='<div class="hcell pcell'+(on?' pa':'')+(mk?' pm':'')+(k===tk?' today':'')+'" title="'+k+'">'+g+'</div>';}return '<div class="calgrid">'+cells+'</div>';}
 function papaCount(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.papaHistory&&S.papaHistory[dstr(d)])c++;}return c;}
 function papaStreak(){let c=0;const base=new Date();let start=(S.papaHistory&&S.papaHistory[dstr(base)])?0:1;for(let j=start;;j++){const d=new Date(base);d.setDate(base.getDate()-j);if(S.papaHistory&&S.papaHistory[dstr(d)])c++;else break;}return c;}
 const PKEY='qb_photos';
@@ -1332,6 +1404,7 @@ function render(){
 
   var _sw=document.getElementById('syncWarn');if(_sw)_sw.innerHTML=(!SYNC.creds&&/[?&]src=ntfy/.test(location.search))?'<div class="card" style="border:2px solid #e2574f;background:#fdeceb;font-weight:800;font-size:.88rem;line-height:1.6">⚠️ このブラウザはクエストボードと同期していません（ここで押した OK などは記録されません）。<br>ホーム画面のアプリから開くか、保護者メニューの「Safari用の設定リンク」をこのブラウザで1回開いてください。</div>':'';
   renderHomework();
+  phwRoll();renderPhw();if(papaHistUpdate()){save();maybeSync();}
   renderVocab();
   renderJvocab();
   renderPass();
@@ -1354,6 +1427,7 @@ function render(){
       </div>
       <div class="player ${frameClass(lv(S.pa.xp))}">${frameOrn(lv(S.pa.xp))}<h3>${avatarHTML(S.pa)} ${S.pa.name}</h3><div class="lvl"><span class="lvlbadge">Lv.${lv(S.pa.xp)}</span></div><div class="xpbar"><div class="xpfill" style="width:${S.pa.xp%100}%"></div></div>
         ${S.cfg.pa.map((q,i)=>`<div class="quest ${S.day.pa['p'+i]?'done':''}" onclick="toggle('pa','p'+${i})"><div class="chk">${S.day.pa['p'+i]?'✓':''}</div><div>${q}</div></div>`).join('')}
+        ${papaAutoRow()}
       </div></div>`+taskBonusMemo();
     stage.innerHTML=`<div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：${S.prog.gacha}回）</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
@@ -1361,7 +1435,7 @@ function render(){
         <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
         <div class="mini" style="font-size:.72rem;margin-top:4px">👍＝2つ ／ 🌟＝3つ ／ 🌈＝🌟＋宿題1つ＋がんばりタスク1つ ／ 💜＝🌟＋がんばりタスク全部＋宿題2つ ／ 👑GOD＝🌟＋がんばりタスク全部＋宿題3つ（数字＝パーティ回数）</div>
         <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日・🌈レインボー ${histCount(3)}日・💜アメジスト ${histCount(4)-histCount(5)}日・👑GOD ${histCount(5)}日）${partySum()?'<br>🥳 パーティ 合計 '+partySum()+'回':''}</div></div>
-      <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span></div></div>
+      <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span><span><b style="color:#f5b301">▁</b>＝丸つけ当日</span></div></div>
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 今日の記録</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読動画やドリルの写真を残そう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=rewardCardHTML();
@@ -1377,7 +1451,7 @@ function render(){
   dl.addEventListener('contextmenu',e=>e.preventDefault());
 })();
 function fillExport(){document.getElementById('d_export').value=cfgExport();}
-function dadOpen(){try{var _cd=document.getElementById('d_clDate');_cd.value=yesterday();_cd.max=yesterday();document.getElementById('d_clLv').value=String(clLevel(yesterday()));_cd.onchange=function(){document.getElementById('d_clLv').value=String(clLevel(_cd.value));};}catch(e){}
+function dadOpen(){try{var _p=phwS();document.getElementById('d_phwOn').checked=!!_p.on;document.getElementById('d_phwBook').value=_p.book||'';document.getElementById('d_phwKai').value=_p.kai;document.getElementById('d_phwDay').value=_p.day;document.getElementById('d_phwDays').value=_p.days||5;}catch(e){}try{var _cd=document.getElementById('d_clDate');_cd.value=yesterday();_cd.max=yesterday();document.getElementById('d_clLv').value=String(clLevel(yesterday()));_cd.onchange=function(){document.getElementById('d_clLv').value=String(clLevel(_cd.value));};}catch(e){}
   document.getElementById('d_meName').value=S.me.name;document.getElementById('d_meEmoji').value=S.me.emoji;
   document.getElementById('d_paName').value=S.pa.name;document.getElementById('d_paEmoji').value=S.pa.emoji;
   document.getElementById('d_fixed').value=S.cfg.fixed.join('\n');
@@ -1440,7 +1514,7 @@ function restoreAuto(){var b;try{b=JSON.parse(localStorage.getItem('qb_backup')|
 function restoreUndo(){var u;try{u=JSON.parse(localStorage.getItem('qb_undo')||'null');}catch(e){}if(!u||!u.s){alert('取り消せる操作がありません');return;}if(!confirm('直前の状態（'+_fmtTs(u.t)+'）に戻します。よろしいですか？'))return;if(restoreFrom(u.s)){alert('直前の状態に戻しました');dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,kj:S.kj,rd:S.rd,cday:S.cday,cfgVer:S.cfgVer};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,phw:S.phw,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,kj:S.kj,rd:S.rd,cday:S.cday,cfgVer:S.cfgVer};}
 function maybeSync(){
   if(!SYNC.on||SYNC.applying||!SYNC.ref||!SYNC.stateReady)return;
   const snap=JSON.stringify(snapshotState());
@@ -1473,7 +1547,7 @@ function initSync(){
       if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
       if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');maybeSync();return;}
       SYNC.applying=true;
-      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','hwAllSig','bonusLog','clog','clp','kj','rd','cday','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
+      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','phw','hwAllSig','bonusLog','clog','clp','kj','rd','cday','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
       normalize();
       var _mig=false;if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;_mig=true;}
       SYNC.applying=false;
