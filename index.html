@@ -40,13 +40,16 @@
   .zoom-copy{margin-left:auto;border:none;background:#2d8cff;color:#fff;font-weight:800;border-radius:8px;padding:6px 10px;font-size:.8rem}
   .hwcard{border:2px solid #7a5aa6;background:#f3eefb}
   .phwcard{border:2px solid #2b7bb9;background:#eef6fc}
+  .dtcard{border:2px solid #2ec5b6;background:#effbf8}
+  .dtcard .quest{margin:6px 0 0;background:#fff}
+  .dtcard .quest.dt:not([onclick]){cursor:default}
+  .dtcard .quest.off{opacity:.5}
+  .dt-sub{display:block;font-size:.7rem;color:var(--soft);font-weight:700;text-decoration:none}
+  .dt-note{margin-top:8px;font-size:.72rem;color:#3a7d74;font-weight:800}
+  .gq-h{font-size:.74rem;font-weight:900;color:#8a6a2a;margin:8px 0 4px}.gq-h span{font-size:.64rem;color:var(--soft);font-weight:700;margin-left:4px}
   .phwcard .hw-count,.phwcard .hw-tip{color:#2b5f8a}
   .phwcard .hw-item{border-color:#cfe2f2}
-  .phw-next{margin-top:8px;font-size:.78rem;font-weight:800;color:#2b5f8a}
-  .quest.auto{cursor:default;opacity:.95;border-style:dashed}
-  .quest.auto .qsub{display:block;font-size:.68rem;color:var(--soft);font-weight:700}
-  .pcell.pm{box-shadow:inset 0 -3px 0 #f5b301}
-  .hw-h{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:6px;justify-content:space-between}
+    .hw-h{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:6px;justify-content:space-between}
   .hw-count{font-size:.82rem;color:#6a4b97;font-weight:800}
   .hw-list{margin-top:10px;display:grid;gap:7px}
   .hw-item{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #e0d4f2;border-radius:10px;padding:10px 12px;cursor:pointer}
@@ -304,7 +307,7 @@
   .gd-dust{position:absolute;top:-12px;border-radius:50%;background:radial-gradient(circle,#fff 0,#cffafe 40%,rgba(103,232,249,0) 70%);animation:gdDrift linear forwards}
   @keyframes gdDrift{to{transform:translate(var(--dx),110vh) rotate(200deg);opacity:.2}}
   .gd-em{position:absolute;top:-40px;animation:gdDrift linear forwards;filter:drop-shadow(0 0 6px rgba(165,243,252,.95))}
-  .gd-core::before{content:'';position:absolute;left:50%;top:58%;width:150%;height:120%;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(2,14,40,.7) 0,rgba(2,14,40,.42) 45%,rgba(2,14,40,0) 70%);z-index:-1}
+  .gd-core::before{content:'';position:absolute;left:50%;top:82%;width:150%;height:60%;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(2,14,40,.7) 0,rgba(2,14,40,.42) 45%,rgba(2,14,40,0) 70%);z-index:-1}
   .gd-core{position:relative;z-index:1;text-align:center;animation:gdRise 1.6s .5s cubic-bezier(.2,.8,.2,1) both}
   @keyframes gdRise{0%{opacity:0;transform:translateY(-40px) scale(.7);filter:blur(10px)}100%{opacity:1;transform:none;filter:none}}
   .gd-halo{width:150px;height:34px;margin:0 auto -6px;border-radius:50%;border:4px solid #e0fbff;box-shadow:0 0 18px 4px rgba(103,232,249,.95),inset 0 0 12px rgba(224,251,255,.9);animation:gdHalo 2s ease-in-out infinite}
@@ -313,6 +316,17 @@
   .gd-title{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-size:clamp(3.4rem,17vw,5.6rem);font-weight:900;letter-spacing:.12em;line-height:1.1;background:linear-gradient(100deg,#7dd3fc 0,#ffffff 18%,#cffafe 30%,#fff7d6 42%,#67e8f9 56%,#ffffff 72%,#a5f3fc 86%,#e0f2fe 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 1.5px #032a52) drop-shadow(0 0 1.5px #032a52) drop-shadow(0 0 14px rgba(103,232,249,.95)) drop-shadow(0 3px 0 rgba(2,20,50,.7));animation:gdGold 2.2s linear infinite}
   @keyframes gdGold{from{background-position:120% 0}to{background-position:-130% 0}}
   .gd-sub{margin-top:6px;font-size:1.05rem;font-weight:900;letter-spacing:.32em;color:#e0fbff;text-shadow:0 0 10px rgba(103,232,249,1),0 0 22px rgba(56,189,248,.9)}
+  /* 光の天使（GODの演出のキャラ。オリジナルの絵） */
+  .gd-angel-wrap{width:min(94vw,440px,56vh);margin:0 auto -40px;animation:agIn 1.8s .5s cubic-bezier(.2,.8,.2,1) both}
+  .gd-angel-wrap>div{animation:agFloat 3.2s ease-in-out infinite}
+  .gd-angel{display:block;width:100%;height:auto;overflow:visible;animation:agHue 3.2s ease-in-out infinite alternate}
+  .gd-angel .ag-flap{transform-box:view-box;transform-origin:200px 128px;animation:agFlap 2.6s ease-in-out infinite}
+  .gd-angel .ag-halo{animation:agHalo 2s ease-in-out infinite}
+  @keyframes agIn{0%{opacity:0;transform:translateY(-70px) scale(.55);filter:blur(14px) brightness(2.2)}100%{opacity:1;transform:none;filter:none}}
+  @keyframes agFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @keyframes agFlap{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-5deg)}}
+  @keyframes agHue{from{filter:hue-rotate(-70deg) saturate(1.4)}to{filter:hue-rotate(80deg) saturate(1.4)}}
+  @keyframes agHalo{0%,100%{opacity:.7}50%{opacity:1}}
   .gd-cond{display:inline-block;margin-top:12px;padding:5px 16px;border-radius:999px;border:1.5px solid rgba(165,243,252,.9);background:rgba(2,16,44,.55);color:#cffafe;font-size:.82rem;font-weight:800;letter-spacing:.06em;box-shadow:0 0 14px rgba(103,232,249,.45)}
   #amparty{position:fixed;inset:0;z-index:66;pointer-events:none;display:flex;align-items:center;justify-content:center;animation:partyFade 3s ease forwards}
   #amparty::before{content:'';position:absolute;inset:0;border:8px solid #a855f7;box-shadow:inset 0 0 40px rgba(168,85,247,.6)}
@@ -471,12 +485,13 @@
   </div>
 
   <div class="sec">
-    <h3>🧔 パパの宿題（毎日）</h3>
-    <p class="hint">先生の宿題とは別に、パパが毎日1日分を出す宿題です。写真→パパOKで、先生の宿題と同じく＋時間・宿題の数に1つ数えます。OKの次の日に、自動で次の日の分へ進みます。やらなかった日は、次の日も同じ分が出ます。</p>
-    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="d_phwOn" style="width:auto"> 毎日出す</label>
-    <label>教材名</label><input id="d_phwBook" placeholder="計算シリーズ">
-    <div class="two"><div><label>今の回</label><input id="d_phwKai" type="number" min="1"></div><div><label>何日目</label><input id="d_phwDay" type="number" min="1"></div></div>
-    <label>1回の日数（例：1日目〜5日目なら 5）</label><input id="d_phwDays" type="number" min="1">
+    <h3>🧔 パパの宿題（計算）</h3>
+    <p class="hint">先生の宿題とは別に、パパが出す宿題です。つねに3つ表示し、写真→パパOKで先生の宿題と同じく＋時間・宿題の数に1つ数えます。OKした分は次の日に消えて、次の項目が足されます（第3回①〜⑦ → 第4回①〜④ → 第4回⑤〜⑦ → 第5回①〜④ …）。</p>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="d_phwOn" style="width:auto"> 表示する</label>
+    <label>教材名</label><input id="d_phwBook" placeholder="四谷大塚 計算 4年上">
+    <label>次に足す項目（変えると、まだ終わっていない項目をここから並べ直します）</label>
+    <div class="two"><div><input id="d_phwKai" type="number" min="1" placeholder="回"></div><div><select id="d_phwHalf"><option value="0">①〜④</option><option value="1">⑤〜⑦</option></select></div></div>
+    <label>最後の回（ここまで終わったら、次のテキストに切りかえ。教材名と「次に足す項目」を第1回に変えて保存）</label><input id="d_phwMax" type="number" min="1">
     <button class="btn gray" style="margin-top:8px" onclick="phwSave()">💾 パパの宿題を保存</button>
   </div>
 
@@ -514,7 +529,7 @@
     </div>
     <div class="two">
       <div><label>⚡ 計算のベスト更新1回ごと</label><select id="d_pbPer"><option value="0">なし</option><option value="5">＋5分</option><option value="10">＋10分</option></select></div>
-      <div><label>✅ がんばりタスク1つごと</label><select id="d_taskPer"><option value="0">なし</option><option value="5">＋5分</option><option value="10">＋10分</option></select></div>
+      <div><label>📘 語彙トレ（毎日タスク）</label><select id="d_taskPer"><option value="0">なし</option><option value="5">＋5分</option><option value="10">＋10分</option></select></div>
     </div>
     <div class="two">
       <div><label>✍️ 漢字 正解・直しOK 1問ごと</label><select id="d_kanjiPer"><option value="0">なし</option><option value="1">＋1分</option><option value="2">＋2分</option></select></div>
@@ -656,7 +671,7 @@ function def(){return{
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;if(x.nt!==undefined)o.nt=x.nt;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5555';if(!S.cfg.pin5555){S.cfg.pin5555=1;S.cfg.pin='5555';}if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;if(S.cfg.newMinJ===undefined)S.cfg.newMinJ=14;if(S.cfg.pbPer===undefined)S.cfg.pbPer=5;if(S.cfg.taskPer===undefined)S.cfg.taskPer=5;if(!S.cfg.flsc){try{var _f=(localStorage.getItem('qb_flsc')||'').trim();if(_f)S.cfg.flsc=_f;}catch(e){}}if(S.cfg.kanjiPer===undefined)S.cfg.kanjiPer=1;if(S.cfg.kanjiAll===undefined)S.cfg.kanjiAll=5;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};S.clog=S.clog||{};S.clp=S.clp||{};S.kj=S.kj||{};S.kj.tests=S.kj.tests||[];S.kj.prog=S.kj.prog||{};S.cday=S.cday||{};rdS();if(S.cfg.readMin===undefined)S.cfg.readMin=10;if(!S.cfg.fix1113){S.cfg.fix1113=1;if((+S.clog['2026-11-13']||0)<2)S.clog['2026-11-13']=2;}if(!S.cfg.fix1113b){S.cfg.fix1113b=1;if((+S.clog['2026-11-13']||0)<3){S.clog['2026-11-13']=3;if(!S.clp['2026-11-13'])S.clp['2026-11-13']={h0:0,n:1};}}if(!S.cfg.kjU1){S.cfg.kjU1=1;S.kj=S.kj||{};S.kj.ud=S.kj.ud||{};if(!S.kj.ud[0])S.kj.ud[0]='2026-11-15';}if(S.cfg.ntfyTopic)ntfyCache(S.cfg.ntfyTopic);}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;if(x.nt!==undefined)o.nt=x.nt;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5555';if(!S.cfg.pin5555){S.cfg.pin5555=1;S.cfg.pin='5555';}if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;if(S.cfg.newMinJ===undefined)S.cfg.newMinJ=14;if(S.cfg.pbPer===undefined)S.cfg.pbPer=5;if(S.cfg.taskPer===undefined)S.cfg.taskPer=5;if(!S.cfg.flsc){try{var _f=(localStorage.getItem('qb_flsc')||'').trim();if(_f)S.cfg.flsc=_f;}catch(e){}}if(S.cfg.kanjiPer===undefined)S.cfg.kanjiPer=1;if(S.cfg.kanjiAll===undefined)S.cfg.kanjiAll=5;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};S.clog=S.clog||{};S.clp=S.clp||{};S.kj=S.kj||{};S.kj.tests=S.kj.tests||[];S.kj.prog=S.kj.prog||{};S.cday=S.cday||{};rdS();if(S.cfg.readMin===undefined)S.cfg.readMin=10;if(!S.cfg.fix1113){S.cfg.fix1113=1;if((+S.clog['2026-11-13']||0)<2)S.clog['2026-11-13']=2;}if(!S.cfg.fix1113b){S.cfg.fix1113b=1;if((+S.clog['2026-11-13']||0)<3){S.clog['2026-11-13']=3;if(!S.clp['2026-11-13'])S.clp['2026-11-13']={h0:0,n:1};}}if(!S.cfg.pmFix){S.cfg.pmFix=1;var _ph=S.papaHistory||{};Object.keys(_ph).forEach(function(k){var v=String(_ph[k]||'').replace(/m/g,'');if(v)_ph[k]=v;else delete _ph[k];});}if(!S.cfg.kjU1){S.cfg.kjU1=1;S.kj=S.kj||{};S.kj.ud=S.kj.ud||{};if(!S.kj.ud[0])S.kj.ud[0]='2026-11-15';}if(S.cfg.ntfyTopic)ntfyCache(S.cfg.ntfyTopic);}
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
@@ -767,7 +782,7 @@ function hwTap(i){var h=S.homework&&S.homework[i];if(!h)return;
   _hwPick=i;var f=document.getElementById('hwFile');f.value='';f.click();}
 function hwPhotoPicked(ev){var f=ev.target.files&&ev.target.files[0],i=_hwPick;if(!f||(i!==-2&&(i<0||!S.homework[i])))return;var rd=new FileReader();
   rd.onload=function(e){var img=new Image();img.onload=function(){var max=1000,w=img.width,h=img.height,sc=Math.min(1,max/Math.max(w,h)),cw=Math.round(w*sc),ch=Math.round(h*sc),cv=document.createElement('canvas');cv.width=cw;cv.height=ch;cv.getContext('2d').drawImage(img,0,0,cw,ch);var data;try{data=cv.toDataURL('image/jpeg',0.6);}catch(err){alert('写真を読み込めませんでした');return;}
-    if(i===-2)phwSubmit(data);else hwSubmit(i,data);};img.src=e.target.result;};rd.readAsDataURL(f);}
+    if(i===-2)phwSubmit(data,_phwId);else hwSubmit(i,data);};img.src=e.target.result;};rd.readAsDataURL(f);}
 function hwSubmit(i,data){var it=S.homework[i];if(!it)return;var old=it.ph,id='h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
   HWPH[id]=data;hwPhSave();var r=hwPhRef();if(r){try{r.child(id).set(data);}catch(e){}}if(old&&old!==id)hwPhDel(old);
   it.st='sub';it.ph=id;it.at=Date.now();it.done=false;delete it.note;save();maybeSync();renderHomework();
@@ -786,51 +801,58 @@ function hwUnok(i){var it=S.homework[i];if(!it)return;rollover();if(it.okDate===
   if(S.day.hwAll&&S.hwAllSig===hwSig()){S.day.hwAll=0;S.hwAllSig='';}
   it.st='';it.done=false;delete it.okDate;save();maybeSync();render();}
 function viewHwPhoto(id){var d=HWPH[id];if(!d)return;kjZoom(d);}
-/* ===== 🧔 パパの宿題（毎日1日分。写真→パパOKで宿題1つに数える。OKの次の日に次の分へ進む） ===== */
-function phwS(){if(!S.phw)S.phw={on:1,book:'計算シリーズ',kai:1,day:1,days:5,st:''};return S.phw;}
-function phwLabel(p,k,d){p=p||phwS();return (p.book||'計算シリーズ')+' 第'+(k||p.kai)+'回 '+(d||p.day)+'日目';}
-function phwNextPos(p){var k=+p.kai||1,d=(+p.day||1)+1;if(d>(+p.days||5)){d=1;k++;}return [k,d];}
-function phwRoll(){var p=phwS();if(p.st==='ok'&&p.okDate&&p.okDate<today()){var n=phwNextPos(p);p.kai=n[0];p.day=n[1];p.st='';delete p.okDate;save();maybeSync();}}
-function phwTap(){var p=phwS();if(!p.on)return;
-  if(calcOwner()==='papa'){if(p.st==='sub')return;if(p.st==='ok'){if(p.okDate===today()&&confirm('「'+phwLabel(p)+'」を未完了に戻しますか？'))phwUnok();}else if(confirm('写真なしで「'+phwLabel(p)+'」を完了（OK）にしますか？'))phwOk();return;}
-  if(p.st==='ok')return;if(p.st==='sub'&&!confirm('写真を撮り直しますか？'))return;
-  _hwPick=-2;var f=document.getElementById('hwFile');f.value='';f.click();}
-function phwSubmit(data){var p=phwS(),old=p.ph,id='h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-  HWPH[id]=data;hwPhSave();var r=hwPhRef();if(r){try{r.child(id).set(data);}catch(e){}}if(old&&old!==id)hwPhDel(old);
-  p.st='sub';p.ph=id;p.at=Date.now();delete p.note;p.nt=0;save();maybeSync();renderPhw();
+/* ===== 🧔 パパの宿題（四谷大塚 計算 4年上）：つねに3項目を表示。写真→パパOKで宿題1つに数える。OKした分は次の日に消え、次の項目が足される =====
+   並び：第3回①〜⑦ → 第4回①〜④ → 第4回⑤〜⑦ → 第5回①〜④ → 第5回⑤〜⑦ → … */
+function phwS(){var p=S.phw;if(!p||p.v!==2){p=S.phw={v:2,on:1,book:'四谷大塚 計算 4年上',items:[{id:'p3a',k:3,h:-1,st:''}],nk:4,nh:0,max:20,log:{}};}p.items=p.items||[];return p;}
+function phwFinished(){var p=phwS();return p.nk>(+p.max||20)&&!p.items.some(function(x){return x.st!=='ok';});}
+var PHW_H=['①〜④','⑤〜⑦'];
+function phwLabel(it,p){p=p||phwS();return (p.book||'計算')+' 第'+it.k+'回'+(it.h<0?'①〜⑦':PHW_H[it.h]||'');}
+function phwOpen(){return phwS().items.filter(function(x){return x.st!=='ok';});}
+function phwFill(){var p=phwS(),td=today(),ch=false;
+  var keep=p.items.filter(function(x){return !(x.st==='ok'&&x.okDate&&x.okDate<td);});if(keep.length!==p.items.length){p.items=keep;ch=true;}
+  var mx=+p.max||20;while(phwOpen().length<3&&p.nk<=mx){p.items.push({id:'p'+p.nk+(p.nh?'b':'a'),k:p.nk,h:p.nh,st:''});p.nh++;if(p.nh>1){p.nh=0;p.nk++;}ch=true;}
+  if(ch){save();maybeSync();}}
+function phwRoll(){phwFill();}
+function phwFind(id){return phwS().items.find(function(x){return x.id===id;});}
+var _phwId=null;
+function phwTap(id){var p=phwS(),it=phwFind(id);if(!p.on||!it)return;
+  if(calcOwner()==='papa'){if(it.st==='sub')return;if(it.st==='ok'){if(confirm('「'+phwLabel(it)+'」を未完了に戻しますか？'))phwUnok(id);}else if(confirm('写真なしで「'+phwLabel(it)+'」を完了（OK）にしますか？'))phwOk(id);return;}
+  if(it.st==='ok')return;if(it.st==='sub'&&!confirm('写真を撮り直しますか？'))return;
+  _phwId=id;_hwPick=-2;var f=document.getElementById('hwFile');f.value='';f.click();}
+function phwSubmit(data,id){id=id||_phwId;var it=phwFind(id);if(!it)return;var old=it.ph,pid='h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  HWPH[pid]=data;hwPhSave();var r=hwPhRef();if(r){try{r.child(pid).set(data);}catch(e){}}if(old&&old!==pid)hwPhDel(old);
+  it.st='sub';it.ph=pid;it.at=Date.now();delete it.note;it.nt=0;save();maybeSync();renderPhw();
   var per=+S.cfg.hwPer||0;showCheer('📷 パパに送ったよ！'+(S.cfg.bonusOn&&per?'OKが出たら +'+per+'分':''));sTick();
-  qbNotify('🧔 パパの宿題の写真','「'+phwLabel(p)+'」の写真が届きました。ボードで OK／やり直し を押してください。').then(function(ok){var q=phwS();if(q.ph===id&&q.st==='sub'){q.nt=ok?1:(_ntfyErr||'不明');save();maybeSync();renderPhw();}});}
-function phwOk(){var p=phwS();rollover();if(p.ph)hwPhDel(p.ph);p.st='ok';p.okDate=today();p.log=p.log||{};p.log[today()]=phwLabel(p);var ks=Object.keys(p.log).sort();while(ks.length>120)delete p.log[ks.shift()];
-  delete p.ph;delete p.note;delete p.nt;S.day.hwOk=_num(S.day.hwOk)+1;qbRv();save();maybeSync();render();}
-function phwNg(){var p=phwS();var note=prompt('やり直しの理由（娘に表示されます）','まちがえたところを直して、もう一度写真をとってね');if(note===null)return;
-  rollover();if(p.ph)hwPhDel(p.ph);p.st='ng';delete p.ph;delete p.nt;p.note=note||'もう一度やってみよう';qbRv();save();maybeSync();render();}
-function phwUnok(){var p=phwS();rollover();if(p.okDate===today()&&_num(S.day.hwOk)>0)S.day.hwOk=_num(S.day.hwOk)-1;if(p.log)delete p.log[today()];p.st='';delete p.okDate;save();maybeSync();render();}
+  qbNotify('🧔 パパの宿題の写真','「'+phwLabel(it)+'」の写真が届きました。ボードで OK／やり直し を押してください。').then(function(ok){var x=phwFind(id);if(x&&x.ph===pid&&x.st==='sub'){x.nt=ok?1:(_ntfyErr||'不明');save();maybeSync();renderPhw();}});}
+function phwOk(id){var p=phwS(),it=phwFind(id);if(!it)return;rollover();if(it.ph)hwPhDel(it.ph);it.st='ok';it.okDate=today();p.log=p.log||{};(p.log[today()]=p.log[today()]||[]).push(phwLabel(it));var ks=Object.keys(p.log).sort();while(ks.length>120)delete p.log[ks.shift()];
+  delete it.ph;delete it.note;delete it.nt;S.day.hwOk=_num(S.day.hwOk)+1;qbRv();save();maybeSync();render();}
+function phwNg(id){var it=phwFind(id);if(!it)return;var note=prompt('やり直しの理由（娘に表示されます）','まちがえたところを直して、もう一度写真をとってね');if(note===null)return;
+  rollover();if(it.ph)hwPhDel(it.ph);it.st='ng';delete it.ph;delete it.nt;it.note=note||'もう一度やってみよう';qbRv();save();maybeSync();render();}
+function phwUnok(id){var p=phwS(),it=phwFind(id);if(!it)return;rollover();if(it.okDate===today()&&_num(S.day.hwOk)>0)S.day.hwOk=_num(S.day.hwOk)-1;
+  var lg=p.log&&p.log[today()];if(lg){var k=lg.indexOf(phwLabel(it));if(k>=0)lg.splice(k,1);}it.st='';delete it.okDate;save();maybeSync();render();}
+function phwOkToday(){var td=today();return phwS().items.filter(function(x){return x.st==='ok'&&x.okDate===td;}).length;}
 function renderPhw(){var el=document.getElementById('phwCard');if(!el)return;var p=phwS();if(!p.on){el.innerHTML='';return;}
-  var isPapa=(calcOwner()==='papa'),per=+S.cfg.hwPer||0,st=p.st||'',lab=phwLabel(p),cls=st==='ok'?' done':st==='sub'?' sub':st==='ng'?' ng':'',box=st==='ok'?'✓':st==='sub'?'📷':st==='ng'?'↩':'',info='';
-  if(st==='sub'){if(isPapa){var src=HWPH[p.ph];info='<div class="hw-act">'+(src?'<img class="hw-th" src="'+src+'" onclick="event.stopPropagation();viewHwPhoto(\''+p.ph+'\')">':'<span class="hw-st">📷 写真を読み込み中…</span>')+'<button class="hw-ab" onclick="event.stopPropagation();phwOk()">✅ OK</button><button class="hw-ab ng" onclick="event.stopPropagation();phwNg()">↩ やり直し</button></div>'+ntfyLine(p.nt);}
-    else info='<div class="hw-st">📷 パパの確認待ち（OKで +'+per+'分）</div>'+((p.nt&&p.nt!==1)?'<div class="hw-st ng">⚠️ パパに通知できなかったよ。直接「写真送ったよ」と伝えてね</div>':'');}
-  else if(st==='ng')info='<div class="hw-st ng">↩ やり直し：'+esc(p.note||'もう一度やってみよう')+'</div>';
-  else if(st==='ok'&&per&&S.cfg.bonusOn)info='<div class="hw-st ok">+'+per+'分 ゲット！</div>';
-  var nx=phwNextPos(p);
-  var tip=isPapa?(st==='sub'?'<div class="hw-tip">🔔 写真が届いています。OK／やり直し を押してください</div>':'<div class="hw-tip">毎日1日分。保護者メニューで教材名・今の回と日を変えられます</div>')
-    :'<div class="hw-tip">📷 終わったら タップして写真をとってパパに送ろう'+(S.cfg.bonusOn&&per?'（OKで +'+per+'分・宿題1つに数えるよ）':'（宿題1つに数えるよ）')+'</div>';
-  el.innerHTML='<div class="card hwcard phwcard"><div class="hw-h"><span>🧔 パパの宿題（毎日）</span><span class="hw-count">今日の分 '+(st==='ok'?'1':'0')+' / 1'+(st==='ok'?' 🎉':'')+'</span></div>'+tip
-    +'<div class="hw-list"><div class="hw-item'+cls+'" onclick="phwTap()"><div class="hw-box">'+box+'</div><div class="hw-body"><div class="hw-txt">'+esc(lab)+'</div>'+info+'</div></div></div>'
-    +(st==='ok'?'<div class="phw-next">✅ 今日の分クリア！ 明日は '+esc(phwLabel(p,nx[0],nx[1]))+'</div>':'')+'</div>';}
-function phwSave(){var p=phwS(),g=function(id){return document.getElementById(id);};
-  var k=parseInt(g('d_phwKai').value)||1,d=parseInt(g('d_phwDay').value)||1,ds=parseInt(g('d_phwDays').value)||5;if(d>ds){alert('「何日目」が「1回の日数」より大きくなっています');return;}
-  p.on=g('d_phwOn').checked?1:0;p.book=(g('d_phwBook').value||'').trim()||'計算シリーズ';p.days=ds;
-  if(k!==+p.kai||d!==+p.day){p.kai=k;p.day=d;if(p.st!=='ok'){if(p.ph)hwPhDel(p.ph);p.st='';delete p.ph;delete p.note;delete p.nt;}}
-  save();maybeSync();render();alert('パパの宿題を保存しました：'+(p.on?phwLabel(p):'お休み中'));}
+  var isPapa=(calcOwner()==='papa'),per=+S.cfg.hwPer||0,td=today(),pend=p.items.filter(function(x){return x.st==='sub';}).length,okN=phwOkToday();
+  var items=p.items.map(function(it){var st=it.st||'',cls=st==='ok'?' done':st==='sub'?' sub':st==='ng'?' ng':'',box=st==='ok'?'✓':st==='sub'?'📷':st==='ng'?'↩':'',info='',idq="'"+it.id+"'";
+    if(st==='sub'){if(isPapa){var src=HWPH[it.ph];info='<div class="hw-act">'+(src?'<img class="hw-th" src="'+src+'" onclick="event.stopPropagation();viewHwPhoto(\''+it.ph+'\')">':'<span class="hw-st">📷 写真を読み込み中…</span>')+'<button class="hw-ab" onclick="event.stopPropagation();phwOk('+idq+')">✅ OK</button><button class="hw-ab ng" onclick="event.stopPropagation();phwNg('+idq+')">↩ やり直し</button></div>'+ntfyLine(it.nt);}
+      else info='<div class="hw-st">📷 パパの確認待ち（OKで +'+per+'分）</div>'+((it.nt&&it.nt!==1)?'<div class="hw-st ng">⚠️ パパに通知できなかったよ。直接「写真送ったよ」と伝えてね</div>':'');}
+    else if(st==='ng')info='<div class="hw-st ng">↩ やり直し：'+esc(it.note||'もう一度やってみよう')+'</div>';
+    else if(st==='ok'&&per&&S.cfg.bonusOn)info='<div class="hw-st ok">+'+per+'分 ゲット！</div>';
+    return '<div class="hw-item'+cls+'" onclick="phwTap('+idq+')"><div class="hw-box">'+box+'</div><div class="hw-body"><div class="hw-txt">'+esc(phwLabel(it,p))+'</div>'+info+'</div></div>';}).join('');
+  var tip=isPapa?(pend?'<div class="hw-tip">🔔 確認待ちが '+pend+'件 あります。写真を見て OK／やり直し を押してください</div>':'<div class="hw-tip">つねに3つ表示。OKした分は次の日に消えて、次の回が足されます</div>')
+    :'<div class="hw-tip">📷 1つ終わったら タップして写真をとってパパに送ろう'+(S.cfg.bonusOn&&per?'（OKで +'+per+'分・宿題1つに数えるよ）':'（宿題1つに数えるよ）')+'</div>';
+  var fin=phwFinished()?'<div class="hw-tip" style="margin-top:8px;font-weight:900">🎉 第'+(+p.max||20)+'回まで ぜんぶ終わったよ！'+(isPapa?'（次のテキストは保護者メニューで教材名・回を設定してください）':'つぎのテキストはパパが用意するね')+'</div>':'';
+  el.innerHTML='<div class="card hwcard phwcard"><div class="hw-h"><span>🧔 パパの宿題</span><span class="hw-count">今日OK '+okN+(pend?' ・確認待ち '+pend:'')+'</span></div>'+tip+'<div class="hw-list">'+items+'</div>'+fin+'</div>';}
+function phwSave(){var p=phwS(),g=function(id){return document.getElementById(id);};var k=parseInt(g('d_phwKai').value)||p.nk,h=+g('d_phwHalf').value||0;
+  p.on=g('d_phwOn').checked?1:0;p.book=(g('d_phwBook').value||'').trim()||'四谷大塚 計算 4年上';p.max=parseInt(g('d_phwMax').value)||20;
+  if(k!==p.nk||h!==p.nh){if(confirm('まだ終わっていない項目を消して、第'+k+'回'+PHW_H[h]+' から並べ直しますか？')){p.items=p.items.filter(function(x){if(x.st!=='ok'&&x.ph)hwPhDel(x.ph);return x.st==='ok';});p.nk=k;p.nh=h;}}
+  phwFill();save();maybeSync();render();alert('パパの宿題を保存しました'+(p.on?'':'（お休み中）'));}
 /* 写真の確認（OK・やり直し・丸つけ）をした回数：パパタスク「丸つけ・OKをその日のうちに」の判定に使う */
 function qbRv(){rollover();S.day.rv=_num(S.day.rv)+1;}
-function qbPending(){var n=(S.homework||[]).filter(function(h){return h.st==='sub';}).length;if(S.phw&&S.phw.on&&S.phw.st==='sub')n++;
+function qbPending(){var n=(S.homework||[]).filter(function(h){return h.st==='sub';}).length;if(S.phw&&S.phw.on&&S.phw.items)n+=S.phw.items.filter(function(x){return x.st==='sub';}).length;
   ((S.kj&&S.kj.tests)||[]).forEach(function(t){if(t.st==='sub')n++;if(t.fx)Object.keys(t.fx).forEach(function(i){if(t.fx[i].st==='sub')n++;});});return n;}
-function papaMarkDone(){return _num(S.day&&S.day.date===today()&&S.day.rv)>0&&qbPending()===0;}
-function papaAutoRow(){var pend=qbPending(),ok=papaMarkDone(),sub=ok?'今日の写真はぜんぶ確認ずみ':pend?'確認待ち '+pend+'件':'今日はまだ写真がないよ';
-  return '<div class="quest auto'+(ok?' done':'')+'"><div class="chk">'+(ok?'✓':'')+'</div><div>🖊️ 丸つけ・OKをその日のうちに<span class="qsub">（自動）'+sub+'</span></div></div>';}
 function papaHistUpdate(){S.papaHistory=S.papaHistory||{};var td=today();var bee=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/ビーモン/.test(q);});var car=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/迎/.test(q);});
-  var code=((bee&&car)?'bc':bee?'b':car?'c':'')+(papaMarkDone()?'m':''),cur=S.papaHistory[td]||'';if(code===cur)return false;if(code)S.papaHistory[td]=code;else delete S.papaHistory[td];return true;}
+  var code=((bee&&car)?'bc':bee?'b':car?'c':''),cur=S.papaHistory[td]||'';if(code===cur)return false;if(code)S.papaHistory[td]=code;else delete S.papaHistory[td];return true;}
 /* がんばりタスクの候補の整理（2026-11-15決定）：コミットライン・宿題と重なる候補を外す。次の日の切りかえで1回だけ */
 function chFixDup(q){return /計算ドリル/.test(q)||/漢字ドリル/.test(q)||(/読書/.test(q)&&/漢字/.test(q));}
 function chFixApply(){if(!S.cfg||S.cfg.chFix1)return;S.cfg.chFix1=1;var ch=S.cfg.choice||[],out=[];
@@ -1118,7 +1140,7 @@ function amTrack(lvl){if(lvl<4)return;if(SYNC.on&&!SYNC.astatReady)return;var td
   if(lvl>=5)return; /* いきなりGODに届いたときは、アメジストは出さずにGODだけ */
   var w=Math.max(50,_fxUntil-Date.now());_fxUntil=Math.max(_fxUntil,Date.now())+3200;setTimeout(amFire,w);}
 function amFire(){var o=document.getElementById('amparty');if(o)o.remove();o=document.createElement('div');o.id='amparty';
-  o.innerHTML='<div class="party-banner am">💜 アメジスト！ 🏆<span>がんばりタスク全部＋宿題2つ</span></div>';document.body.appendChild(o);document.body.classList.add('partying');
+  o.innerHTML='<div class="party-banner am">💜 アメジスト！ 🏆<span>毎日タスク全部＋宿題2つ</span></div>';document.body.appendChild(o);document.body.classList.add('partying');
   sBig();burst(55,true,AM_EM);setTimeout(function(){burst(45,true,AM_EM);},800);setTimeout(function(){burst(45,true,AM_EM);},1600);setTimeout(function(){burst(35,true,AM_EM);},2300);
   setTimeout(function(){try{o.remove();}catch(e){}document.body.classList.remove('partying');},3100);}
 /* 👑 GOD 神セレブレーション：神降臨の演出（端末ごとに1日1回） */
@@ -1127,10 +1149,40 @@ function godTrack(lvl){if(lvl<5)return;if(SYNC.on&&!SYNC.astatReady)return;var t
   var w=Math.max(50,_fxUntil-Date.now());_fxUntil=Math.max(_fxUntil,Date.now())+6600;setTimeout(godFire,w);}
 function sGod(){[[261.6,0],[329.6,.06],[392,.12],[493.9,.18],[587.3,.24]].forEach(function(x){tone(x[0],3.2,'sine',x[1]);tone(x[0]*2,2.6,'sine',x[1]+.02);});
   [1046.5,1318.5,1568,1975.5,2349.3,2637].forEach(function(f,i){tone(f,0.9,'triangle',0.9+i*0.11);});[1568,2093,2637,3136].forEach(function(f,i){tone(f,1.4,'sine',2.0+i*0.16);});}
+/* 光の天使：輝く白い姿と、虹色にゆらめく大きな羽（羽根を扇形に重ねて描く） */
+function angelSVG(){
+  var sx=200,sy=130;
+  /* 羽根1枚＝根元(0,0)から先(L,0)へ細くなる形。肩を中心に回して扇形に並べる（右の羽を作り、左は鏡映） */
+  function fea(a,L,w,g,op){var f=function(x){return x.toFixed(1);};return '<path d="M0 0 C'+f(L*.3)+' '+f(-w)+' '+f(L*.82)+' '+f(-w*.85)+' '+f(L)+' 0 C'+f(L*.8)+' '+f(w*.45)+' '+f(L*.3)+' '+f(w*.45)+' 0 0Z" fill="url(#'+g+')" opacity="'+op+'" transform="translate('+sx+' '+sy+') rotate('+f(-a)+')"/>';}
+  function row(n,a0,a1,f,w,g,op){var s='';for(var i=0;i<n;i++){var t=i/(n-1),a=a0+(a1-a0)*t;s+=fea(a,f(t),w,g,op);}return s;}
+  var wing=row(19,-26,62,function(t){return 112+104*Math.exp(-Math.pow((t-.5)/.26,2));},26,'agW1',.72)
+          +row(10,-34,12,function(t){return 150-20*t;},26,'agW2',.8)
+          +row(12,-14,48,function(t){return 104+26*Math.exp(-Math.pow((t-.5)/.3,2));},25,'agW2',.86)
+          +row(9,-6,54,function(t){return 66+14*Math.sin(Math.PI*t);},24,'agW3',.95);
+  return '<svg class="gd-angel" viewBox="0 0 400 380" aria-hidden="true"><defs>'
+   +'<linearGradient id="agW1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".42" stop-color="#f0fdff"/><stop offset=".66" stop-color="#a5f3fc"/><stop offset=".82" stop-color="#c4b5fd"/><stop offset=".93" stop-color="#f9a8d4"/><stop offset="1" stop-color="#fde68a"/></linearGradient>'
+   +'<linearGradient id="agW2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#ecfeff"/><stop offset=".85" stop-color="#99f6e4"/><stop offset="1" stop-color="#bae6fd"/></linearGradient>'
+   +'<linearGradient id="agW3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f0fdff"/></linearGradient>'
+   +'<linearGradient id="agBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".7" stop-color="#f5feff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>'
+   +'<filter id="agGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+   +'<filter id="agBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>'
+   +'</defs>'
+   +'<ellipse cx="200" cy="210" rx="60" ry="150" fill="#fff" opacity=".35" filter="url(#agBlur)"/>'
+   +'<g class="ag-wings" filter="url(#agGlow)"><g class="ag-flap">'+wing+'</g><g transform="translate(400 0) scale(-1 1)"><g class="ag-flap">'+wing+'</g></g></g>'
+   +'<g filter="url(#agGlow)">'
+   +'<ellipse class="ag-halo" cx="200" cy="66" rx="28" ry="7.5" fill="none" stroke="#fffbe6" stroke-width="4"/>'
+   +'<circle cx="200" cy="97" r="17" fill="#fff" stroke="#a5f3fc" stroke-width="1.5"/>'
+   +'<path d="M193 110 C195 118 205 118 207 110 L210 126 L190 126 Z" fill="#fff"/>'
+   +'<path d="M172 132 C180 123 220 123 228 132 L234 196 C238 240 248 300 256 376 L144 376 C152 300 162 240 166 196 Z" fill="url(#agBody)"/>'
+   +'<path d="M172 134 C162 152 160 192 163 238 C164 248 171 248 172 238 C171 202 173 172 179 152 Z" fill="#fff"/>'
+   +'<path d="M228 134 C238 152 240 192 237 238 C236 248 229 248 228 238 C229 202 227 172 221 152 Z" fill="#fff"/>'
+   +'</g>'
+   +'<ellipse cx="200" cy="372" rx="80" ry="14" fill="#fff" opacity=".7" filter="url(#agBlur)"/>'
+   +'</svg>';}
 function godFire(){var o=document.getElementById('godparty');if(o)o.remove();o=document.createElement('div');o.id='godparty';
   var st='',i;for(i=0;i<40;i++)st+='<i class="gd-star" style="left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*1.6).toFixed(2)+'s"></i>';
   o.innerHTML='<div class="gd-sky"></div><div class="gd-rays"></div><div class="gd-beam"></div>'+st
-    +'<div class="gd-core"><div class="gd-halo"></div><div class="gd-crown">👑</div><div class="gd-title">神降臨</div><div class="gd-sub">GOD 神セレブレーション</div><div class="gd-cond">がんばりタスク全部 ＋ 宿題3つ</div></div>';
+    +'<div class="gd-core"><div class="gd-angel-wrap"><div>'+angelSVG()+'</div></div><div class="gd-title">神降臨</div><div class="gd-sub">GOD 神セレブレーション</div><div class="gd-cond">毎日タスク全部 ＋ 宿題3つ</div></div>';
   document.body.appendChild(o);document.body.classList.add('partying');sGod();
   function dust(n,em){for(var k=0;k<n;k++){var d=document.createElement('div');if(em){d.className='gd-em';d.textContent=GOD_EM[k%GOD_EM.length];d.style.fontSize=(1.3+Math.random()*1.5)+'rem';}else{d.className='gd-dust';var s=4+Math.random()*7;d.style.width=s+'px';d.style.height=s+'px';}
     d.style.left=(Math.random()*100)+'vw';d.style.setProperty('--dx',((Math.random()-.5)*80)+'px');d.style.animationDuration=(3+Math.random()*2.6)+'s';d.style.animationDelay=(Math.random()*.8)+'s';o.appendChild(d);}}
@@ -1185,11 +1237,11 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
     var body=(!s.pair)?'<div class="ps-chips">'+Q[s.items[0]].chips+'</div>':(s.pair).map(function(i){var off=s.items.indexOf(i)<0;return '<div class="ps-it'+(off?' off':'')+(Q[i].done&&!off?' ok':'')+'"><span class="ps-in">'+QNAME[i]+'</span>'+(off?'<span class="ps-offt">昨日やったので今日はパーフェクトカウント外</span>':'<div class="ps-chips">'+Q[i].chips+'</div>')+'</div>';}).join(s.items.length>1?'<div class="ps-or">または</div>':'');
     rowsH+='<div class="ps-row'+(done?' ok':'')+'"><span class="ps-q">'+'①②③'.charAt(si)+' '+s.t+(done?' クリア！':'')+(only?' <span class="ps-day">今日は'+QNAME[only]+'の日</span>':'')+'</span>'+body+'</div>';});
   _bonusRows=3;var all=(n===3);
-  var _hwN=bonusHw().n,_tk=qbTaskDone(),_tkAll=meAllDone(),lvl=all?((_tkAll&&_hwN>=3)?5:(_tkAll&&_hwN>=2)?4:(_hwN>=1&&_tk>=1)?3:2):(n>=2?1:0);clRecord(lvl);flagCheck(lvl);partyTrack(lvl,_hwN);amTrack(lvl);godTrack(lvl);
-  var msg=lvl>=5?(isPapa?'<div class="ps-msg god">👑 今日は GOD 神セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg god">👑 GOD 神セレブレーション ✨<br><span>神降臨の一日！がんばりタスク全部＋宿題3つ</span></div>')
+  var _hwN=bonusHw().n,_tk=dtDone(),_tkAll=dtAll(),lvl=all?((_tkAll&&_hwN>=3)?5:(_tkAll&&_hwN>=2)?4:(_hwN>=1&&_tk>=1)?3:2):(n>=2?1:0);clRecord(lvl);flagCheck(lvl);partyTrack(lvl,_hwN);amTrack(lvl);godTrack(lvl);
+  var msg=lvl>=5?(isPapa?'<div class="ps-msg god">👑 今日は GOD 神セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg god">👑 GOD 神セレブレーション ✨<br><span>神降臨の一日！毎日タスク全部＋宿題3つ</span></div>')
     :lvl===4?(isPapa?'<div class="ps-msg am">💜 今日はアメジスト・パーティ '+partyCount(today())+'回・宿題あと1つで👑GOD</div>':'<div class="ps-msg am">💜 アメジスト！最高の一日 🏆<br><span style="font-size:.8rem">宿題をもう1つで 👑GOD 神セレブレーション</span></div>')
-    :lvl===3?(isPapa?'<div class="ps-msg">🌈 今日はレインボー・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg">🌈 レインボー！パーティ '+partyCount(today())+'回目 🥳<br><span style="font-size:.8rem">がんばりタスク全部＋宿題2つで 💜アメジスト</span></div>')
-    :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト・宿題1つ＋がんばりタスク1つでレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！<br><span style="font-size:.8rem">宿題1つ＋がんばりタスク1つで 🌈レインボー</span></div>')
+    :lvl===3?(isPapa?'<div class="ps-msg">🌈 今日はレインボー・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg">🌈 レインボー！パーティ '+partyCount(today())+'回目 🥳<br><span style="font-size:.8rem">毎日タスク全部＋宿題2つで 💜アメジスト</span></div>')
+    :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト・宿題1つ＋毎日タスク1つでレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！<br><span style="font-size:.8rem">宿題1つ＋毎日タスク1つで 🌈レインボー</span></div>')
     :lvl===1?(isPapa?'<div class="ps-msg">👍 今日はナイス・あと1つでパーフェクト</div>':'<div class="ps-msg">👍 ナイス！あと1つでパーフェクト🌟</div>')
     :'<div class="ps-tip">2つで👍ナイス・3つで🌟パーフェクト</div>';
   el.innerHTML='<div class="card pscard'+(all?' on':'')+'"><div class="v-h"><span>🎯 今日のコミットライン</span><span class="v-count">'+n+' / 3</span></div><div class="ps-line">3つのわくをクリア（くわしくは下の📋ルール表）</div>'+rowsH+msg+bonusHTML(n,all,isPapa)+'</div>';
@@ -1238,24 +1290,43 @@ function renderRules(){var el=document.getElementById('rulesCard');if(!el)return
     +'<tr><td>わく 3つ全部（おまけ）</td><td class="mn">'+m(c.bonusAll)+'</td></tr>'
     +'<tr><td>📒 宿題 1つ（先生の宿題・🧔パパの宿題　写真→パパOK）</td><td class="mn">'+m(c.hwPer)+'</td></tr>'
     +(+c.hwAll?'<tr><td>📒 宿題ぜんぶ（おまけ）</td><td class="mn">'+m(c.hwAll)+'</td></tr>':'')
-    +'<tr><td>✅ がんばりタスク 1つ</td><td class="mn">'+m(c.taskPer)+'</td></tr>'
+    +'<tr><td>📘 語彙トレ（毎日タスク）</td><td class="mn">'+m(c.taskPer)+'</td></tr>'
     +'<tr><td>⚡ 計算ベスト更新 1回</td><td class="mn">'+m(c.pbPer)+'</td></tr>'
     +(kon?'<tr><td>✍️ 漢字 正解か直しOK 1字</td><td class="mn">'+m(c.kanjiPer)+'</td></tr><tr><td>✍️ 漢字 1パート（10字）クリア</td><td class="mn">'+m(c.kanjiAll)+'</td></tr>':'')+'</table>';
   el.innerHTML='<div class="card rlcard"><div class="v-h"><span>📋 ルール表</span></div>'
     +'<div class="rl-h">🎯 コミットライン：3つのわく</div>'+t1
     +'<div class="rl-n">🔁 <b>日替わり</b>：きのう②で英単語だけやったら、今日は語彙だけ数えるよ（反対も同じ）。③の漢字と読書も同じ。きのう両方やった日・どちらもやらなかった日は、どちらでもOK。</div>'
-    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋宿題1つ＋がんばりタスク1つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋がんばりタスク全部＋宿題2つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋がんばりタスク全部＋宿題3つ<br>※ 宿題は、ゆうや先生の宿題と🧔パパの宿題（計算シリーズ）のどちらも1つに数えるよ。1つの練習は1か所でだけ数えるので、計算・漢字・読書はがんばりタスクには入れないよ</div>'
+    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋宿題1つ＋毎日タスク1つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋毎日タスク全部＋宿題2つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋毎日タスク全部＋宿題3つ<br>※ 宿題は、ゆうや先生の宿題と🧔パパの宿題（計算シリーズ）のどちらも1つに数えるよ。<br>※ 毎日タスク＝📘語彙トレ・👨‍🏫先生の宿題・🧔パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。⭐がんばりクエストはアバターのレベルアップ用で、スマホ時間とカレンダーには入らないよ</div>'
     +(bon?'<div class="rl-h">📱 スマホ時間のため方</div>'+t2+'<div class="rl-n">たまった時間は「📱 パパにお願いする」でパパに送ってね。</div>':'')+'</div>';}
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
 var _bonusN=0,_bonusAll=false,_bonusRows=3;
 function bonusDay(){var b=(S.day&&S.day.date===today()&&S.day.bonus)||{};return {req:_num(b.req),reqAt:_num(b.reqAt),grant:_num(b.grant),grantAt:_num(b.grantAt),nt:b.nt};}
 function bonusHw(){var d=(S.day&&S.day.date===today())?S.day:{};return {n:_num(d.hwOk),all:!!d.hwAll};}
-function bonusEarned(n,all){if(!S.cfg.bonusOn)return 0;var w=bonusHw();return n*(+S.cfg.bonusPer||0)+(all?(+S.cfg.bonusAll||0):0)+w.n*(+S.cfg.hwPer||0)+(w.all?(+S.cfg.hwAll||0):0)+qbPbToday()*(+S.cfg.pbPer||0)+qbTaskDone()*(+S.cfg.taskPer||0)+qbKanjiToday().min;}
+function bonusEarned(n,all){if(!S.cfg.bonusOn)return 0;var w=bonusHw();return n*(+S.cfg.bonusPer||0)+(all?(+S.cfg.bonusAll||0):0)+w.n*(+S.cfg.hwPer||0)+(w.all?(+S.cfg.hwAll||0):0)+qbPbToday()*(+S.cfg.pbPer||0)+dtGoiN()*(+S.cfg.taskPer||0)+qbKanjiToday().min;}
 /* がんばりタスク（娘の今日のタスク）の達成数 */
 function taskBonusMemo(){var tp=+S.cfg.taskPer||0;if(!S.cfg.bonusOn||!tp)return '';var n=qbTaskDone();
   return '<div class="task-pb">📱 がんばりタスクを1つ達成するごとに <b>＋'+tp+'分</b> お願いできるよっ！'+(n?'<br>きょうは '+n+'個 達成 → <b>＋'+(n*tp)+'分</b> ゲット中✨':'')+'</div>';}
+/* ===== 📅 毎日やるタスク（📘語彙トレ・👨‍🏫先生の宿題・🧔パパの宿題）。カレンダー段階と語彙トレの＋時間に使う。
+   がんばりクエストはアバターのレベルアップ用だけ（スマホ時間・カレンダーには入らない） ===== */
+function dtState(){S.day.dt=S.day.dt||{};return S.day.dt;}
+/* 📘 語彙トレ：語彙クエストのその日のノルマ（新しく覚えた語＋検問合格）をクリアしたら自動で完了 */
+function qbJvocabDone(){var pct=+S.cfg.passPct||50,min=+S.cfg.passMin||10,nminJ=+S.cfg.newMinJ||14;
+  var nOk=qbNewToday('jvocab')>=nminJ,qOk=qbQuizToday('jvocab').some(function(a){return a[1]>=min&&Math.round(a[0]/a[1]*100)>=pct;});return nOk&&qOk;}
+function dtList(){var td=today(),hw=S.homework||[],p=phwS();
+  var tDone=hw.some(function(h){return h.st==='ok'&&h.okDate===td;}),tAv=tDone||hw.some(function(h){return h.st!=='ok';});
+  var pDone=phwOkToday()>0,pAv=!!p.on&&(pDone||p.items.some(function(x){return x.st!=='ok';}));
+  return [{k:'g',e:'📘',n:'語彙トレ',done:qbJvocabDone(),av:true,auto:'語彙クエストで 新しく'+(+S.cfg.newMinJ||14)+'語＋検問合格 したら自動で ✓'},{k:'t',e:'👨‍🏫',n:'ゆうや先生の宿題',done:tDone,av:tAv},{k:'p',e:'🧔',n:'パパの宿題',done:pDone,av:pAv}];}
+function dtDone(){return dtList().filter(function(x){return x.av&&x.done;}).length;}
+function dtAll(){var l=dtList().filter(function(x){return x.av;});return l.length>0&&l.every(function(x){return x.done;});}
+function dtGoiN(){return qbJvocabDone()?1:0;}
+function dtToggle(){rollover();var s=dtState();s.g=!s.g;if(s.g){sTick();}save();maybeSync();render();}
+function dtCardHTML(){var l=dtList(),tp=+S.cfg.taskPer||0,av=l.filter(function(x){return x.av;}),dn=av.filter(function(x){return x.done;}).length;
+  return '<div class="card dtcard"><div class="v-h"><span>📅 毎日やるタスク</span><span class="v-count">'+dn+' / '+av.length+(dn&&dn===av.length?' 🎉':'')+'</span></div>'
+    +l.map(function(x){var sub=x.auto?(x.done?'今日のノルマ クリア！'+((S.cfg.bonusOn&&tp)?'（+'+tp+'分）':''):x.auto+((S.cfg.bonusOn&&tp)?'（+'+tp+'分）':'')):(!x.av?'今日は出ている宿題がないよ（数えない）':x.done?'今日OKが出たよ':'下のカードで1つOKが出たら自動で ✓');
+      return '<div class="quest dt'+(x.done?' done':'')+(x.av?'':' off')+'"'+(x.self?' onclick="dtToggle()"':'')+'><div class="chk">'+(x.done?'✓':'')+'</div><div>'+x.e+' '+x.n+'<span class="dt-sub">'+sub+'</span></div></div>';}).join('')
+    +'<div class="dt-note">🌈 レインボー以上の条件に入るよ。⭐ がんばりクエストは、アバターのレベルアップ用だよ</div></div>';}
 function qbTaskDone(){try{if(!meReady())return 0;return meQuests().filter(function(q){return S.day.me[q.key];}).length;}catch(e){return 0;}}
-function bonusBreak(n,all){var w=bonusHw(),p=[];if(w.n)p.push('宿題 '+w.n+'つ +'+(w.n*(+S.cfg.hwPer||0))+'分');if(w.all&&+S.cfg.hwAll)p.push('宿題ぜんぶ +'+S.cfg.hwAll+'分');if(n)p.push('コミットライン '+n+'つ +'+(n*(+S.cfg.bonusPer||0))+'分');if(all&&+S.cfg.bonusAll)p.push('コミットライン全部 +'+S.cfg.bonusAll+'分');var pb=qbPbToday();if(pb&&+S.cfg.pbPer)p.push('計算ベスト更新 '+pb+'回 +'+(pb*(+S.cfg.pbPer))+'分');var tk=qbTaskDone();if(tk&&+S.cfg.taskPer)p.push('がんばりタスク '+tk+'つ +'+(tk*(+S.cfg.taskPer))+'分');var kj=qbKanjiToday();if(kj.min)p.push('漢字 '+(kj.c?'正解'+kj.c:'')+(kj.c&&kj.f?'・':'')+(kj.f?'直し'+kj.f:'')+(kj.d?(kj.c||kj.f?'・':'')+'10問クリア'+kj.d+'回':'')+' +'+kj.min+'分');return p.join('・');}
+function bonusBreak(n,all){var w=bonusHw(),p=[];if(w.n)p.push('宿題 '+w.n+'つ +'+(w.n*(+S.cfg.hwPer||0))+'分');if(w.all&&+S.cfg.hwAll)p.push('宿題ぜんぶ +'+S.cfg.hwAll+'分');if(n)p.push('コミットライン '+n+'つ +'+(n*(+S.cfg.bonusPer||0))+'分');if(all&&+S.cfg.bonusAll)p.push('コミットライン全部 +'+S.cfg.bonusAll+'分');var pb=qbPbToday();if(pb&&+S.cfg.pbPer)p.push('計算ベスト更新 '+pb+'回 +'+(pb*(+S.cfg.pbPer))+'分');if(dtGoiN()&&+S.cfg.taskPer)p.push('語彙トレ +'+(+S.cfg.taskPer)+'分');var kj=qbKanjiToday();if(kj.min)p.push('漢字 '+(kj.c?'正解'+kj.c:'')+(kj.c&&kj.f?'・':'')+(kj.f?'直し'+kj.f:'')+(kj.d?(kj.c||kj.f?'・':'')+'パートクリア'+kj.d+'回':'')+' +'+kj.min+'分');return p.join('・');}
 function bonusLogSet(e,g){S.bonusLog=S.bonusLog||{};S.bonusLog[today()]={e:e,g:g};var ks=Object.keys(S.bonusLog).sort();while(ks.length>400)delete S.bonusLog[ks.shift()];}
 function bonusHTML(n,all,isPapa){_bonusN=n;_bonusAll=all;if(!S.cfg.bonusOn)return '';
   var e=bonusEarned(n,all),b=bonusDay(),left=Math.max(0,e-b.req-b.grant),per=+S.cfg.bonusPer||0,ab=+S.cfg.bonusAll||0,h='',cls='ps-bonus';
@@ -1357,7 +1428,7 @@ function avatarHTML(p){if(p&&p.avatar)return '<img src="'+p.avatar+'" class="ava
 function setAvatar(who,ev){var f=ev.target.files&&ev.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(e){var img=new Image();img.onload=function(){var sz=96,cv=document.createElement('canvas');cv.width=sz;cv.height=sz;var ctx=cv.getContext('2d'),m=Math.min(img.width,img.height),sx=(img.width-m)/2,sy=(img.height-m)/2;ctx.drawImage(img,sx,sy,m,m,0,0,sz,sz);var data;try{data=cv.toDataURL('image/jpeg',0.7);}catch(err){alert('画像を読み込めませんでした');return;}S[who].avatar=data;save();maybeSync();renderAvaPrev();render();};img.src=e.target.result;};rd.readAsDataURL(f);}
 function clearAvatar(who){delete S[who].avatar;save();maybeSync();renderAvaPrev();render();}
 function renderAvaPrev(){var me=document.getElementById('avaPrevMe'),pa=document.getElementById('avaPrevPa');if(me)me.innerHTML=S.me.avatar?('<img src="'+S.me.avatar+'" class="ava">'):'（なし）';if(pa)pa.innerHTML=S.pa.avatar?('<img src="'+S.pa.avatar+'" class="ava">'):'（なし）';}
-function papaCalHTML(){const N=16,base=new Date(),tk=today();let cells='';for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const v=S.papaHistory&&S.papaHistory[k];const on=!!v;const mk=!!v&&String(v).indexOf('m')>=0,vb=String(v||'').replace('m','');var g='';if(vb==='b')g='b';else if(vb==='c')g=CAR;else if(vb==='bc')g='b'+CAR;else if(vb)g='●';else if(mk)g='✓';cells+='<div class="hcell pcell'+(on?' pa':'')+(mk?' pm':'')+(k===tk?' today':'')+'" title="'+k+'">'+g+'</div>';}return '<div class="calgrid">'+cells+'</div>';}
+function papaCalHTML(){const N=16,base=new Date(),tk=today();let cells='';for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const v=S.papaHistory&&S.papaHistory[k];const on=!!v;var g='';if(v==='b')g='b';else if(v==='c')g=CAR;else if(v==='bc')g='b'+CAR;else if(v)g='●';cells+='<div class="hcell pcell'+(on?' pa':'')+(k===tk?' today':'')+'" title="'+k+'">'+g+'</div>';}return '<div class="calgrid">'+cells+'</div>';}
 function papaCount(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.papaHistory&&S.papaHistory[dstr(d)])c++;}return c;}
 function papaStreak(){let c=0;const base=new Date();let start=(S.papaHistory&&S.papaHistory[dstr(base)])?0:1;for(let j=start;;j++){const d=new Date(base);d.setDate(base.getDate()-j);if(S.papaHistory&&S.papaHistory[dstr(d)])c++;else break;}return c;}
 const PKEY='qb_photos';
@@ -1420,22 +1491,22 @@ function render(){
   }else{
     const mq=meQuests();
     const rc=(S.reactions&&S.reactions[today()])?('<div class="card" style="text-align:center;background:#fff0ea;border-color:#f2c3b2"><div style="font-weight:800">💌 パパからの応援</div><div style="font-size:1.7rem;margin:4px 0">'+S.reactions[today()].e+'</div><div>'+S.reactions[today()].m+'</div></div>'):'';
-    stageTop.innerHTML=rc+`<div class="row">
+    stageTop.innerHTML=rc+dtCardHTML()+`<div class="row">
       <div class="player ${frameClass(lv(S.me.xp))}">${frameOrn(lv(S.me.xp))}<h3>${avatarHTML(S.me)} ${S.me.name}</h3><div class="lvl"><span class="lvlbadge">Lv.${lv(S.me.xp)}</span></div><div class="xpbar"><div class="xpfill" style="width:${S.me.xp%100}%"></div></div>
+        <div class="gq-h">⭐ がんばりクエスト<span>レベルアップ用</span></div>
         ${mq.map(q=>`<div class="quest ${S.day.me[q.key]?'done':''}" onclick="toggle('me','${q.key}')"><div class="chk">${S.day.me[q.key]?'✓':''}</div><div>${q.label}</div></div>`).join('')}
         ${mq.some(q=>S.day.me[q.key])?'':`<div class="mini" style="cursor:pointer;text-decoration:underline" onclick="repick()">えらび直す</div>`}
       </div>
       <div class="player ${frameClass(lv(S.pa.xp))}">${frameOrn(lv(S.pa.xp))}<h3>${avatarHTML(S.pa)} ${S.pa.name}</h3><div class="lvl"><span class="lvlbadge">Lv.${lv(S.pa.xp)}</span></div><div class="xpbar"><div class="xpfill" style="width:${S.pa.xp%100}%"></div></div>
         ${S.cfg.pa.map((q,i)=>`<div class="quest ${S.day.pa['p'+i]?'done':''}" onclick="toggle('pa','p'+${i})"><div class="chk">${S.day.pa['p'+i]?'✓':''}</div><div>${q}</div></div>`).join('')}
-        ${papaAutoRow()}
-      </div></div>`+taskBonusMemo();
+      </div></div>`;
     stage.innerHTML=`<div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：${S.prog.gacha}回）</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
         <div class="calwrap">${calHTML()}</div>
         <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
-        <div class="mini" style="font-size:.72rem;margin-top:4px">👍＝2つ ／ 🌟＝3つ ／ 🌈＝🌟＋宿題1つ＋がんばりタスク1つ ／ 💜＝🌟＋がんばりタスク全部＋宿題2つ ／ 👑GOD＝🌟＋がんばりタスク全部＋宿題3つ（数字＝パーティ回数）</div>
+        <div class="mini" style="font-size:.72rem;margin-top:4px">👍＝2つ ／ 🌟＝3つ ／ 🌈＝🌟＋宿題1つ＋毎日タスク1つ ／ 💜＝🌟＋毎日タスク全部＋宿題2つ ／ 👑GOD＝🌟＋毎日タスク全部＋宿題3つ（数字＝パーティ回数）</div>
         <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日・🌈レインボー ${histCount(3)}日・💜アメジスト ${histCount(4)-histCount(5)}日・👑GOD ${histCount(5)}日）${partySum()?'<br>🥳 パーティ 合計 '+partySum()+'回':''}</div></div>
-      <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span><span><b style="color:#f5b301">▁</b>＝丸つけ当日</span></div></div>
+      <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span></div></div>
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 今日の記録</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読動画やドリルの写真を残そう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=rewardCardHTML();
@@ -1451,7 +1522,7 @@ function render(){
   dl.addEventListener('contextmenu',e=>e.preventDefault());
 })();
 function fillExport(){document.getElementById('d_export').value=cfgExport();}
-function dadOpen(){try{var _p=phwS();document.getElementById('d_phwOn').checked=!!_p.on;document.getElementById('d_phwBook').value=_p.book||'';document.getElementById('d_phwKai').value=_p.kai;document.getElementById('d_phwDay').value=_p.day;document.getElementById('d_phwDays').value=_p.days||5;}catch(e){}try{var _cd=document.getElementById('d_clDate');_cd.value=yesterday();_cd.max=yesterday();document.getElementById('d_clLv').value=String(clLevel(yesterday()));_cd.onchange=function(){document.getElementById('d_clLv').value=String(clLevel(_cd.value));};}catch(e){}
+function dadOpen(){try{var _p=phwS();document.getElementById('d_phwOn').checked=!!_p.on;document.getElementById('d_phwBook').value=_p.book||'';document.getElementById('d_phwKai').value=_p.nk;document.getElementById('d_phwHalf').value=String(_p.nh||0);document.getElementById('d_phwMax').value=_p.max||20;}catch(e){}try{var _cd=document.getElementById('d_clDate');_cd.value=yesterday();_cd.max=yesterday();document.getElementById('d_clLv').value=String(clLevel(yesterday()));_cd.onchange=function(){document.getElementById('d_clLv').value=String(clLevel(_cd.value));};}catch(e){}
   document.getElementById('d_meName').value=S.me.name;document.getElementById('d_meEmoji').value=S.me.emoji;
   document.getElementById('d_paName').value=S.pa.name;document.getElementById('d_paEmoji').value=S.pa.emoji;
   document.getElementById('d_fixed').value=S.cfg.fixed.join('\n');
