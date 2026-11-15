@@ -4,6 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&family=Noto+Sans+JP:wght@500;700&display=swap">
+<script src="./keisan-hw.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
@@ -43,7 +44,7 @@ window.QB_APP='keisan';
       var pc=ck.perf,pl=ls.perf,dpc=dnum(pc&&pc.d),dpl=dnum(pl&&pl.d);
       if(pc||pl){if(dpc===dpl){var pm={},pk,a1=(pc&&pc.m)||{},a2=(pl&&pl.m)||{};for(pk in a1)pm[pk]=a1[pk];for(pk in a2)pm[pk]=Math.max(num(pm[pk]),num(a2[pk]));m.perf={d:(pc||pl).d,m:pm};}else m.perf=(dpc>dpl)?pc:pl;}
       var fb={};for(k in m.best){if(del[k]!=null&&m.best[k]===del[k])continue;fb[k]=m.best[k];}m.best=fb;
-      var bc=ck.pbs,bl2=ls.pbs,dbc=dnum(bc&&bc.d),dbl=dnum(bl2&&bl2.d);if(bc||bl2){m.pbs=(dbc===dbl)?{d:(bc||bl2).d,n:Math.max(num(bc&&bc.n),num(bl2&&bl2.n))}:((dbc>dbl)?bc:bl2);}
+      var bc=ck.pbs,bl2=ls.pbs,dbc=dnum(bc&&bc.d),dbl=dnum(bl2&&bl2.d);if(bc||bl2){if(dbc===dbl){var kk={},q1;for(q1 in ((bc&&bc.k)||{}))kk[q1]=1;for(q1 in ((bl2&&bl2.k)||{}))kk[q1]=1;m.pbs={d:(bc||bl2).d,n:Math.max(num(bc&&bc.n),num(bl2&&bl2.n)),k:kk};}else m.pbs=(dbc>dbl)?bc:bl2;}
       var hm=mergeHistK(ck.hist,ls.hist);if(hm)m.hist=hm;var pm2=mergePbl(ck.pbl,ls.pbl);if(pm2)m.pbl=pm2;
       cur.keisan=m;return cur;
     },function(){if(!adopt)return;try{localStorage.setItem('keisan_stats',JSON.stringify(adopt.k));localStorage.setItem('qb_kep_'+r,String(adopt.ep));}catch(e){}
@@ -165,6 +166,23 @@ window.QB_APP='keisan';
   .btn.prim{background:var(--accent);color:#fff}
   .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line2)}
   .btn:active{transform:translateY(2px)}
+
+  /* 入力のえらび（タップ／手書き） */
+  .inrow{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+  .inp{border:1.5px solid var(--line2);background:var(--card);color:var(--ink-soft);border-radius:999px;padding:9px 16px;font-family:var(--jp);font-weight:800;font-size:14px;cursor:pointer}
+  .inp.on{background:var(--warm);border-color:var(--warm);color:#fff}
+  /* 手書き */
+  .hwbox{display:flex;flex-direction:column;gap:10px}
+  .hwwrap{position:relative;border:2.5px dashed var(--line2);border-radius:18px;background:var(--card);box-shadow:var(--shadow);overflow:hidden}
+  #hwc{display:block;width:100%;height:clamp(170px,28vh,270px);touch-action:none;cursor:crosshair}
+  .hwhint{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-family:var(--jp);font-weight:700;font-size:15px;color:var(--ink-faint);pointer-events:none;line-height:1.6}
+  .hwbtns{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:10px}
+  .hwbtns .key{height:clamp(54px,8vh,70px);font-size:17px;white-space:nowrap}
+  #play.hw .playmid{gap:clamp(10px,2vh,20px)}
+  #play.hw .qbox{gap:12px}
+  #play.hw .ans{min-height:76px}
+  .ans .dq{color:var(--warm);text-decoration:underline wavy;text-underline-offset:6px;text-decoration-thickness:2px}
+  .hwnote{text-align:center;font-size:12.5px;color:var(--ink-faint);font-weight:800;min-height:18px}
 </style>
 
 <div class="wrap">
@@ -180,6 +198,10 @@ window.QB_APP='keisan';
       <button class="diff" data-d="0" onclick="setDiff(0)">やさしい</button>
       <button class="diff on" data-d="1" onclick="setDiff(1)">ふつう</button>
       <button class="diff" data-d="2" onclick="setDiff(2)">むずかしい</button>
+    </div>
+    <div class="inrow">
+      <button class="inp" data-i="tap" onclick="setInput('tap')">👆 タップで答える</button>
+      <button class="inp" data-i="hw" onclick="setInput('hw')">✍️ 手書きで答える</button>
     </div>
     <div class="stat-strip">
       <span class="pill">今日 <span id="todayN">0</span> 問</span>
@@ -224,6 +246,15 @@ window.QB_APP='keisan';
       <button class="key" onclick="press('0')">0</button>
       <button class="key go" onclick="submit()">こたえる</button>
     </div>
+    <div class="hwbox" id="hwbox" hidden>
+      <div class="hwwrap"><canvas id="hwc"></canvas><div class="hwhint" id="hwhint">ここに 答えを 書いてね ✍️<br><small>数字は 1字ずつ すこし はなして</small></div></div>
+      <div class="hwnote" id="hwnote"></div>
+      <div class="hwbtns">
+        <button class="key del" onclick="hwUndo()">1字けす</button>
+        <button class="key del" onclick="hwClear()">ぜんぶけす</button>
+        <button class="key go" onclick="submit()">こたえる</button>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -250,6 +281,10 @@ const SETSIZE=20;
 const MODE_NAME={add:"たし算",sub:"ひき算",mul:"かけ算",div:"わり算",mix:"ミックス"};
 var diff=1, mode='add', problems=[], pi=0, correct=0, cur="", t0=0, timerId=null, locked=false;
 var stats=loadStats();
+var inMode=(function(){try{return localStorage.getItem('keisan_input')==='hw'?'hw':'tap';}catch(e){return 'tap';}})();
+/* ベスト記録のキー：手書きは別に記録（例 add1h）。タップより時間がかかるので、くらべないため */
+function bkey(m){return m+diff+(inMode==='hw'?'h':'');}
+function setInput(i){inMode=(i==='hw')?'hw':'tap';try{localStorage.setItem('keisan_input',inMode);}catch(e){}renderHome();}
 
 function todayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 function loadStats(){var s;try{s=JSON.parse(localStorage.getItem('keisan_stats')||'null');}catch(e){}if(!s||typeof s!=='object')s={};if(s.date!==todayStr()){s.date=todayStr();s.today=0;}s.best=s.best||{};s.hist=s.hist||{};
@@ -285,17 +320,20 @@ function renderHome(){
   document.getElementById('setN').textContent=SETSIZE;
   ['add','sub','mul','div','mix'].forEach(function(m){
     var el=document.getElementById('best'+m);if(!el)return;
-    var key=m+diff;var bv=stats.best[key];
+    var key=bkey(m);var bv=stats.best[key];
     if(m==='mix'){el.textContent=bv?('ベスト '+fmtBest(bv)):'ぜんぶまぜて タイムアタック！';}
     else el.textContent=bv?('ベスト '+fmtBest(bv)):'ベスト —';
     if(modeDone(m))el.textContent='✅ '+el.textContent;
   });
   var cn=document.getElementById('commitN');if(cn)cn.textContent=['add','sub','mul','div','mix'].filter(modeDone).length;
+  document.querySelectorAll('.inp').forEach(function(b){b.classList.toggle('on',b.dataset.i===inMode);});
 }
 function show(id){['home','play','result'].forEach(function(v){document.getElementById(v).hidden=(v!==id);});}
 
 function start(m){mode=m;buildSet();pi=0;correct=0;cur="";locked=false;
-  show('play');document.getElementById('h1').textContent=MODE_NAME[m]+' ⚡';
+  show('play');document.getElementById('h1').textContent=MODE_NAME[m]+(inMode==='hw'?' ✍️':' ⚡');
+  document.querySelector('.pad').hidden=(inMode==='hw');document.getElementById('play').classList.toggle('hw',inMode==='hw');document.getElementById('hwbox').hidden=(inMode!=='hw');
+  if(inMode==='hw')hwSize();
   t0=Date.now();if(timerId)clearInterval(timerId);timerId=setInterval(tick,200);tick();
   showProblem();window.scrollTo(0,0);
 }
@@ -304,13 +342,58 @@ function showProblem(){
   cur="";locked=false;
   var a=document.getElementById('ans');a.className='ans';a.innerHTML='&nbsp;';
   document.getElementById('ngmsg').textContent='';
+  if(inMode==='hw')hwClear();
   document.getElementById('q').textContent=problems[pi].text;
   document.getElementById('qnum').textContent=(pi+1)+' / '+SETSIZE;
   document.getElementById('track').style.width=(pi/SETSIZE*100)+'%';
 }
-function press(n){if(locked)return;if(cur.length>=6)return;cur+=n;paint();}
+function press(n){if(locked||inMode==='hw')return;if(cur.length>=6)return;cur+=n;paint();}
 function del(){if(locked)return;cur=cur.slice(0,-1);paint();}
-function paint(){var a=document.getElementById('ans');a.textContent=cur===""?'':cur;if(cur==='')a.innerHTML='&nbsp;';}
+function paint(){var a=document.getElementById('ans');
+  if(inMode==='hw'&&HW.res.length){a.innerHTML=HW.res.slice(0,6).map(function(r){return r.p<0.6?'<span class="dq">'+r.d+'</span>':String(r.d);}).join('');return;}
+  a.textContent=cur===""?'':cur;if(cur==='')a.innerHTML='&nbsp;';}
+
+/* ---- ✍️ 手書きモード（keisan-hw.js で 端末の中だけで読み取る） ---- */
+var HW={strokes:[],cur:null,pid:null,res:[]};
+function hwC(){return document.getElementById('hwc');}
+function hwSize(){var c=hwC(),r=window.devicePixelRatio||1;var w=c.clientWidth,h=c.clientHeight;if(!w||!h)return;c.width=Math.round(w*r);c.height=Math.round(h*r);hwDraw();}
+function hwPt(e){var r=hwC().getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
+function hwDraw(){var c=hwC(),g=c.getContext('2d'),r=window.devicePixelRatio||1,cs=getComputedStyle(document.documentElement);
+  g.setTransform(r,0,0,r,0,0);g.clearRect(0,0,c.width,c.height);
+  var W=c.clientWidth,H=c.clientHeight;
+  /* 書く高さの目安（うすい2本線） */
+  g.strokeStyle=cs.getPropertyValue('--line').trim()||'#dfe5ef';g.lineWidth=1.5;g.setLineDash([6,6]);
+  g.beginPath();g.moveTo(12,H*0.16);g.lineTo(W-12,H*0.16);g.moveTo(12,H*0.84);g.lineTo(W-12,H*0.84);g.stroke();g.setLineDash([]);
+  /* 読み取った1字ずつのわくと数字 */
+  var acc=cs.getPropertyValue('--accent').trim()||'#3b6fe0',warm=cs.getPropertyValue('--warm').trim()||'#f08a2c';
+  HW.res.forEach(function(q){var b=q.b,pd=8,col=q.p<0.6?warm:acc;g.strokeStyle=col;g.globalAlpha=.45;g.lineWidth=1.5;g.setLineDash([4,4]);
+    g.strokeRect(b[0]-pd,b[1]-pd,b[2]-b[0]+pd*2,b[3]-b[1]+pd*2);g.setLineDash([]);g.globalAlpha=1;
+    g.fillStyle=col;g.font='800 16px Nunito,system-ui,sans-serif';g.fillText(String(q.d),b[0]-pd+3,b[1]-pd-4<14?b[3]+pd+16:b[1]-pd-4);});
+  g.strokeStyle=cs.getPropertyValue('--ink').trim()||'#1f2740';g.lineCap='round';g.lineJoin='round';g.lineWidth=Math.max(5,H*0.028);
+  HW.strokes.forEach(function(st){g.beginPath();st.forEach(function(p,i){if(i)g.lineTo(p[0],p[1]);else g.moveTo(p[0],p[1]);});if(st.length===1)g.lineTo(st[0][0]+.1,st[0][1]);g.stroke();});}
+function hwRead(){
+  if(!window.KHW){document.getElementById('hwnote').textContent='読み取りの準備中…もう一度書いてね';return;}
+  HW.res=HW.strokes.length?KHW.read(HW.strokes,hwC().clientHeight):[];
+  cur=HW.res.slice(0,6).map(function(r){return r.d;}).join('');
+  document.getElementById('hwnote').textContent=HW.res.some(function(r){return r.p<0.6;})?'オレンジの数字は 読み取りが あやしいよ。ちがったら「1字けす」で書き直してね':'';
+  paint();hwDraw();}
+function hwClear(){HW.strokes=[];HW.res=[];HW.cur=null;HW.pid=null;cur='';var h=document.getElementById('hwhint');if(h)h.hidden=(pi>0);
+  document.getElementById('hwnote').textContent='';paint();if(hwC().width)hwDraw();}
+function hwUndo(){if(locked)return;
+  if(HW.res.length){var last=HW.res[HW.res.length-1].s;HW.strokes=HW.strokes.filter(function(st){return last.indexOf(st)<0;});}
+  else HW.strokes.pop();
+  if(!HW.strokes.length){hwClear();return;}hwRead();}
+(function(){var c=hwC();if(!c)return;
+  c.addEventListener('pointerdown',function(e){if(locked||HW.pid!==null)return;e.preventDefault();HW.pid=e.pointerId;try{c.setPointerCapture(e.pointerId);}catch(x){}
+    HW.cur=[hwPt(e)];HW.strokes.push(HW.cur);document.getElementById('hwhint').hidden=true;hwDraw();});
+  c.addEventListener('pointermove',function(e){if(e.pointerId!==HW.pid||!HW.cur)return;e.preventDefault();
+    var evs=(e.getCoalescedEvents&&e.getCoalescedEvents())||[e];if(!evs.length)evs=[e];
+    var g=c.getContext('2d'),last=HW.cur[HW.cur.length-1];g.beginPath();g.moveTo(last[0],last[1]);
+    evs.forEach(function(ev){var p=hwPt(ev);HW.cur.push(p);g.lineTo(p[0],p[1]);});g.stroke();});
+  function up(e){if(e.pointerId!==HW.pid)return;HW.pid=null;HW.cur=null;hwRead();}
+  c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
+  window.addEventListener('resize',function(){if(inMode==='hw'&&!document.getElementById('play').hidden)hwSize();});
+})();
 function submit(){
   if(locked||cur==="")return;locked=true;
   var a=document.getElementById('ans');
@@ -327,9 +410,14 @@ function nextProblem(){pi++;if(pi>=SETSIZE){finish();}else{showProblem();}}
 function finish(){
   if(timerId)clearInterval(timerId);
   var ms=Date.now()-t0, sec=Math.round(ms/1000), acc=Math.round(correct/SETSIZE*100);
-  var key=mode+diff, prevBest=stats.best[key], isBest=false;
+  var key=bkey(mode), prevBest=stats.best[key], isBest=false, hwFirst=false;
   if(correct===SETSIZE){ if(!prevBest||sec<prevBest){stats.best[key]=sec;isBest=true;} }
-  if(isBest){var _pd=todayStr();if(!stats.pbs||stats.pbs.d!==_pd)stats.pbs={d:_pd,n:0};stats.pbs.n=(stats.pbs.n||0)+1;}
+  /* 手書きの はじめての記録は「記録づくり」。ベスト更新のごほうびは 2回目から */
+  if(isBest&&inMode==='hw'&&!prevBest){isBest=false;hwFirst=true;}
+  /* ベスト更新のボーナスは、その日・その種目（例：たし算・ふつう）で1回だけ。タップと手書きのどちらで更新しても同じ */
+  var kind=mode+diff,pbDup=false;
+  if(isBest){var _pd=todayStr();if(!stats.pbs||stats.pbs.d!==_pd)stats.pbs={d:_pd,n:0,k:{}};stats.pbs.k=stats.pbs.k||{};
+    if(stats.pbs.k[kind])pbDup=true;else{stats.pbs.k[kind]=1;stats.pbs.n=(stats.pbs.n||0)+1;}}
   if(correct===SETSIZE){var _td=todayStr();if(!stats.perf||stats.perf.d!==_td)stats.perf={d:_td,m:{}};stats.perf.m[mode]=Math.max(stats.perf.m[mode]||0,diff+1);}
   var _hh=histDay();_hh.s=(_hh.s||0)+1;if(correct===SETSIZE)_hh.f=(_hh.f||0)+1;
   if(isBest){_hh.b=(_hh.b||0)+1;stats.pbl=stats.pbl||{};stats.pbl[Date.now()]=[key,sec,prevBest||0];var _pk=Object.keys(stats.pbl).sort(function(a,b){return a-b;});while(_pk.length>500)delete stats.pbl[_pk.shift()];}
@@ -344,8 +432,10 @@ function finish(){
   document.getElementById('rTitle').textContent=ti;
   var bl=document.getElementById('rBest');
   if(isBest){var _qc={};try{_qc=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}var _pp=(_qc.pbPer===undefined)?5:(+_qc.pbPer||0);
-    bl.textContent='⭐ ベスト更新！（'+fmtBest(sec)+'）'+((_qc.bonusOn!==0&&_pp&&(localStorage.getItem('qb_calc_owner')!=='papa'))?' 📱+'+_pp+'分ゲット！':'');}
-  else if(stats.best[key])bl.textContent='ベスト '+fmtBest(stats.best[key]);
+    var _bon=(_qc.bonusOn!==0&&_pp&&(localStorage.getItem('qb_calc_owner')!=='papa'));
+    bl.textContent=(inMode==='hw'?'⭐ 手書きベスト更新！（':'⭐ ベスト更新！（')+fmtBest(sec)+'）'+(_bon?(pbDup?' きょうの'+MODE_NAME[mode]+'のボーナスは もらいずみ':' 📱+'+_pp+'分ゲット！'):'');}
+  else if(hwFirst)bl.textContent='✍️ 手書きの はじめての記録！（'+fmtBest(sec)+'）次はこれをこえよう';
+  else if(stats.best[key])bl.textContent=(inMode==='hw'?'✍️ 手書きベスト ':'ベスト ')+fmtBest(stats.best[key]);
   else bl.textContent='全問せいかいでベスト記録に挑戦！';
   var cl=document.getElementById('rCommit');if(cl){var mm=['add','sub','mul','div','mix'],left=mm.filter(function(x){return !modeDone(x);});
     cl.textContent=((correct===SETSIZE&&modeDone(mode))?('✅ 今日の'+MODE_NAME[mode]+' クリア！ '):'')+(left.length?('コミットライン：あと '+left.map(function(x){return MODE_NAME[x];}).join('・')):'🎯 計算のコミットライン 全部クリア！');}
@@ -357,7 +447,7 @@ function quit(){if(timerId)clearInterval(timerId);goHome();}
 document.addEventListener('keydown',function(e){
   if(document.getElementById('play').hidden)return;
   if(e.key>='0'&&e.key<='9')press(e.key);
-  else if(e.key==='Backspace')del();
+  else if(e.key==='Backspace'){if(inMode==='hw')hwUndo();else del();}
   else if(e.key==='Enter')submit();
 });
 
