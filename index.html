@@ -44,6 +44,7 @@
   .dtcard .quest{margin:6px 0 0;background:#fff}
   .dtcard .quest.dt:not([onclick]){cursor:default}
   .dtcard .quest.off{opacity:.5}
+  .quest.dt{cursor:default}.quest.dt.off{opacity:.5}.quest.dt.done .dt-sub{text-decoration:none}
   .dt-sub{display:block;font-size:.7rem;color:var(--soft);font-weight:700;text-decoration:none}
   .dt-note{margin-top:8px;font-size:.72rem;color:#3a7d74;font-weight:800}
   .gq-h{font-size:.74rem;font-weight:900;color:#8a6a2a;margin:8px 0 4px}.gq-h span{font-size:.64rem;color:var(--soft);font-weight:700;margin-left:4px}
@@ -657,7 +658,7 @@ function def(){return{
   cfg:{
     fixed:[],
     choice:['#🎯 めざせ英検準1級！','英語①多読/音読 10分＋新出英語5語メモ','英語②英作文/英語日記 5文以上','#✏️ 国語 書く力UP！','国語②日本語日記 5文以上（接続詞を2つ以上）'],
-    count:2,
+    count:0,
     pa:['ビーモン 1回','平日のお迎え 1回','週末の送り迎え 1回'],
     season:'シーズン1：スタートダッシュ', goal:14,
     rewards:['いっしょに映画を見る','行きたかった場所へおでかけ','いっしょにお菓子づくり','自由リクエスト（パパと相談して決める）'],
@@ -671,7 +672,7 @@ function def(){return{
 };}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||def();}catch(e){S=def();}
 if(S.mute===undefined)S.mute=false;
-function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;if(x.nt!==undefined)o.nt=x.nt;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5555';if(!S.cfg.pin5555){S.cfg.pin5555=1;S.cfg.pin='5555';}if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;if(S.cfg.newMinJ===undefined)S.cfg.newMinJ=14;if(S.cfg.pbPer===undefined)S.cfg.pbPer=5;if(S.cfg.taskPer===undefined)S.cfg.taskPer=5;if(!S.cfg.flsc){try{var _f=(localStorage.getItem('qb_flsc')||'').trim();if(_f)S.cfg.flsc=_f;}catch(e){}}if(S.cfg.kanjiPer===undefined)S.cfg.kanjiPer=1;if(S.cfg.kanjiAll===undefined)S.cfg.kanjiAll=5;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};S.clog=S.clog||{};S.clp=S.clp||{};S.kj=S.kj||{};S.kj.tests=S.kj.tests||[];S.kj.prog=S.kj.prog||{};S.cday=S.cday||{};rdS();if(S.cfg.readMin===undefined)S.cfg.readMin=10;if(!S.cfg.fix1113){S.cfg.fix1113=1;if((+S.clog['2026-11-13']||0)<2)S.clog['2026-11-13']=2;}if(!S.cfg.fix1113b){S.cfg.fix1113b=1;if((+S.clog['2026-11-13']||0)<3){S.clog['2026-11-13']=3;if(!S.clp['2026-11-13'])S.clp['2026-11-13']={h0:0,n:1};}}if(!S.cfg.pmFix){S.cfg.pmFix=1;var _ph=S.papaHistory||{};Object.keys(_ph).forEach(function(k){var v=String(_ph[k]||'').replace(/m/g,'');if(v)_ph[k]=v;else delete _ph[k];});}if(!S.cfg.kjU1){S.cfg.kjU1=1;S.kj=S.kj||{};S.kj.ud=S.kj.ud||{};if(!S.kj.ud[0])S.kj.ud[0]='2026-11-15';}if(S.cfg.ntfyTopic)ntfyCache(S.cfg.ntfyTopic);}
+function normalize(){S.day=S.day||{date:'',picks:[],me:{},pa:{}};S.day.me=S.day.me||{};S.day.pa=S.day.pa||{};S.day.picks=S.day.picks||[];S.rewards=(S.rewards||[]).map(function(x){if(typeof x==='string'){var _i=x.indexOf('：');return {n:_i>=0?x.slice(_i+1):x,w:_i>=0?x.slice(0,_i):'',u:false,d:''};}return x||{n:'',w:'',u:false,d:''};});S.history=S.history||{};S.photoDays=S.photoDays||{};S.reactions=S.reactions||{};S.papaHistory=S.papaHistory||{};S.homework=(S.homework||[]).map(function(x){if(typeof x==='string')return{t:x,done:false};x=x||{};var o={t:x.t||'',done:!!x.done};o.st=x.st||(x.done?'ok':'');if(x.ph)o.ph=x.ph;if(x.okDate)o.okDate=x.okDate;if(x.note)o.note=x.note;if(x.at)o.at=x.at;if(x.nt!==undefined)o.nt=x.nt;return o;}).filter(function(h){return h.t;});S.prog=S.prog||{lastClear:'',streak:0,best:0,clears:0,freeze:0,gacha:0};S.season=S.season||{reward:'',startClears:0};if(S.season.done===undefined)S.season.done=false;S.cfg=S.cfg||{};S.cfg.fixed=S.cfg.fixed||[];S.cfg.choice=S.cfg.choice||[];S.cfg.pa=S.cfg.pa||[];S.cfg.rewards=S.cfg.rewards||[];S.cfg.gacha=S.cfg.gacha||[];if(S.cfg.pin===undefined)S.cfg.pin='5555';if(!S.cfg.pin5555){S.cfg.pin5555=1;S.cfg.pin='5555';}if(S.cfg.count===undefined)S.cfg.count=2;if(S.cfg.goal===undefined)S.cfg.goal=14;if(S.cfg.passPct===undefined)S.cfg.passPct=50;if(S.cfg.passMin===undefined)S.cfg.passMin=10;if(S.cfg.clVer!==1){S.cfg.clVer=1;S.cfg.passPct=50;S.cfg.newMin=10;S.cfg.calcDiff=0;}if(S.cfg.newMin===undefined)S.cfg.newMin=10;if(S.cfg.calcDiff===undefined)S.cfg.calcDiff=0;if(S.cfg.bonusOn===undefined)S.cfg.bonusOn=1;if(S.cfg.bonusPer===undefined)S.cfg.bonusPer=10;if(S.cfg.bonusAll===undefined)S.cfg.bonusAll=10;if(S.cfg.ntfyTopic===undefined)S.cfg.ntfyTopic='';if(S.cfg.hwVer!==1){S.cfg.hwVer=1;S.cfg.bonusPer=5;S.cfg.hwPer=10;S.cfg.hwAll=20;S.cfg.hwChunk=2;}if(S.cfg.hwPer===undefined)S.cfg.hwPer=10;if(S.cfg.hwAll===undefined)S.cfg.hwAll=20;if(S.cfg.hwChunk===undefined)S.cfg.hwChunk=2;if(S.cfg.newMinJ===undefined)S.cfg.newMinJ=14;if(S.cfg.pbPer===undefined)S.cfg.pbPer=5;if(S.cfg.taskPer===undefined)S.cfg.taskPer=5;if(!S.cfg.flsc){try{var _f=(localStorage.getItem('qb_flsc')||'').trim();if(_f)S.cfg.flsc=_f;}catch(e){}}if(S.cfg.kanjiPer===undefined)S.cfg.kanjiPer=1;if(S.cfg.kanjiAll===undefined)S.cfg.kanjiAll=5;S.hwAllSig=S.hwAllSig||'';S.bonusLog=S.bonusLog||{};S.clog=S.clog||{};S.clp=S.clp||{};S.kj=S.kj||{};S.kj.tests=S.kj.tests||[];S.kj.prog=S.kj.prog||{};S.cday=S.cday||{};rdS();if(S.cfg.readMin===undefined)S.cfg.readMin=10;if(!S.cfg.fix1113){S.cfg.fix1113=1;if((+S.clog['2026-11-13']||0)<2)S.clog['2026-11-13']=2;}if(!S.cfg.fix1113b){S.cfg.fix1113b=1;if((+S.clog['2026-11-13']||0)<3){S.clog['2026-11-13']=3;if(!S.clp['2026-11-13'])S.clp['2026-11-13']={h0:0,n:1};}}if(!S.cfg.dtMode){S.cfg.dtMode=1;S.cfg.count=0;S.cfg.fixed=[];}if(!S.cfg.pmFix){S.cfg.pmFix=1;var _ph=S.papaHistory||{};Object.keys(_ph).forEach(function(k){var v=String(_ph[k]||'').replace(/m/g,'');if(v)_ph[k]=v;else delete _ph[k];});}if(!S.cfg.kjU1){S.cfg.kjU1=1;S.kj=S.kj||{};S.kj.ud=S.kj.ud||{};if(!S.kj.ud[0])S.kj.ud[0]='2026-11-15';}if(S.cfg.ntfyTopic)ntfyCache(S.cfg.ntfyTopic);}
 normalize();
 if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;save();}
 let DEVICE=localStorage.getItem('qb_device');if(!DEVICE){DEVICE='d'+Math.random().toString(36).slice(2,9);localStorage.setItem('qb_device',DEVICE);}
@@ -752,8 +753,8 @@ function spin(){if(S.prog.gacha<=0||!S.cfg.gacha.length)return;S.prog.gacha--;co
 function rewardCardHTML(){if(!S.rewards||!S.rewards.length)return '';var un=[],us=[];S.rewards.forEach(function(t,i){if(t&&t.u)us.push({t:t,i:i});else un.push({t:t,i:i});});var html='<div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">🎁 ごほうびチケット</div>';if(un.length){html+=un.map(function(o){return '<div class="quest" style="cursor:default"><div style="flex:1">🎫 '+o.t.n+'<div class="mini" style="text-align:left;margin-top:0">獲得 '+(o.t.w||'')+'</div></div><button class="btn" style="width:auto;padding:6px 12px;font-size:.85rem" onclick="useTicket('+o.i+')">つかう</button></div>';}).join('');}else{html+='<div class="mini">未使用のチケットはありません</div>';}if(us.length){html+='<details style="margin-top:8px"><summary class="mini" style="cursor:pointer;text-align:left">使用済み履歴（'+us.length+'）</summary>'+us.slice(0,20).map(function(o){return '<div class="mini" style="text-align:left">✔ '+o.t.n+'（使用 '+(o.t.d||'')+'）<span onclick="undoTicket('+o.i+')" style="color:#a13f22;cursor:pointer;margin-left:6px">取消</span></div>';}).join('')+'</details>';}html+='</div>';return html;}
 function useTicket(i){var t=S.rewards[i];if(!t||t.u)return;if(!confirm('「'+t.n+'」をつかう？'))return;t.u=true;t.d=today();save();maybeSync();render();showCheer('🎫 つかったよ！たのしんでね');sWin();burst();}
 function undoTicket(i){var t=S.rewards[i];if(!t||!t.u)return;if(!confirm('「'+t.n+'」を未使用に戻す？'))return;t.u=false;t.d='';save();maybeSync();render();}
-function celebrate(){showCheer(CHEERS[Math.floor(Math.random()*CHEERS.length)]);sWin();burst();}
-function bigCelebrate(t){showCheer(t);sBig();burst(60,true);}
+function celebrate(){if(_dtQuiet)return;showCheer(CHEERS[Math.floor(Math.random()*CHEERS.length)]);sWin();burst();}
+function bigCelebrate(t){if(_dtQuiet)return;showCheer(t);sBig();burst(60,true);}
 function sBig(){[523,659,784,1047,1319].forEach(function(f,i){tone(f,0.18,'triangle',i*0.08);});}
 function showCheer(t){const c=document.getElementById('cheer');document.getElementById('cheerMsg').textContent=t;c.style.display='flex';}
 function renderHomework(){var el=document.getElementById('hwCard');if(!el)return;var hw=S.homework||[];if(!hw.length){el.innerHTML='<div class="card hwcard"><div class="hw-h"><span>📒 ゆうや先生の宿題</span></div><div class="hw-empty">宿題はまだないよ📝（先生から出たら設定から登録されます）</div></div>';return;}
@@ -1296,7 +1297,7 @@ function renderRules(){var el=document.getElementById('rulesCard');if(!el)return
   el.innerHTML='<div class="card rlcard"><div class="v-h"><span>📋 ルール表</span></div>'
     +'<div class="rl-h">🎯 コミットライン：3つのわく</div>'+t1
     +'<div class="rl-n">🔁 <b>日替わり</b>：きのう②で英単語だけやったら、今日は語彙だけ数えるよ（反対も同じ）。③の漢字と読書も同じ。きのう両方やった日・どちらもやらなかった日は、どちらでもOK。</div>'
-    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋宿題1つ＋毎日タスク1つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋毎日タスク全部＋宿題2つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋毎日タスク全部＋宿題3つ<br>※ 宿題は、ゆうや先生の宿題と🧔パパの宿題（計算シリーズ）のどちらも1つに数えるよ。<br>※ 毎日タスク＝📘語彙トレ・👨‍🏫先生の宿題・🧔パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。⭐がんばりクエストはアバターのレベルアップ用で、スマホ時間とカレンダーには入らないよ</div>'
+    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋宿題1つ＋毎日タスク1つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋毎日タスク全部＋宿題2つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋毎日タスク全部＋宿題3つ<br>※ 宿題は、ゆうや先生の宿題と🧔パパの宿題（計算シリーズ）のどちらも1つに数えるよ。<br>※ 毎日タスク（がんばりタスク）＝📘語彙トレ・👨‍🏫先生の宿題・🧔パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。1つ ✓ でアバターの経験値 +10、3つ全部でシーズンの1日クリアだよ</div>'
     +(bon?'<div class="rl-h">📱 スマホ時間のため方</div>'+t2+'<div class="rl-n">たまった時間は「📱 パパにお願いする」でパパに送ってね。</div>':'')+'</div>';}
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
 var _bonusN=0,_bonusAll=false,_bonusRows=3;
@@ -1320,6 +1321,17 @@ function dtDone(){return dtList().filter(function(x){return x.av&&x.done;}).leng
 function dtAll(){var l=dtList().filter(function(x){return x.av;});return l.length>0&&l.every(function(x){return x.done;});}
 function dtGoiN(){return qbJvocabDone()?1:0;}
 function dtToggle(){rollover();var s=dtState();s.g=!s.g;if(s.g){sTick();}save();maybeSync();render();}
+function dtRowsHTML(){var l=dtList(),av=l.filter(function(x){return x.av;}),dn=av.filter(function(x){return x.done;}).length,tp=+S.cfg.taskPer||0;
+  return '<div class="gq-h">✅ がんばりタスク<span>'+dn+' / '+av.length+'・自動で ✓</span></div>'+l.map(function(x){var sub=x.auto?(x.done?'ノルマ クリア！'+((S.cfg.bonusOn&&tp)?' +'+tp+'分':''):'語彙クエストのノルマで ✓'):(!x.av?'今日は宿題なし（数えない）':x.done?'今日OKが出たよ':'1つOKで ✓');
+    return '<div class="quest dt'+(x.done?' done':'')+(x.av?'':' off')+'"><div class="chk">'+(x.done?'✓':'')+'</div><div>'+x.e+' '+x.n+'<span class="dt-sub">'+sub+'</span></div></div>';}).join('');}
+/* がんばりタスク（毎日の3つ）の結果を、アバターの経験値（1つ +10）とシーズンのクリア（全部で1日クリア）に反映 */
+var _dtQuiet=false;
+function dtSync(){if(!S.season||!S.season.reward)return;var aw=S.day.dtxp=S.day.dtxp||{},ch=false,before=lv(S.me.xp);
+  dtList().forEach(function(x){var on=x.av&&x.done;if(on&&!aw[x.k]){aw[x.k]=1;S.me.xp+=10;ch=true;}else if(!on&&aw[x.k]){delete aw[x.k];S.me.xp=Math.max(0,S.me.xp-10);ch=true;}});
+  var quiet=calcOwner()==='papa',after=lv(S.me.xp);
+  if(dtAll()&&S.prog.lastClear!==today()){_dtQuiet=quiet;try{onClear();}finally{_dtQuiet=false;}ch=true;}
+  else if(ch&&after>before&&!quiet){var ot=Math.min(6,before),nt=Math.min(6,after);if(nt>ot){bigCelebrate('レベルアップ！ Lv.'+after+' ✨ フレームがグレードアップ！');}else{showCheer('レベルアップ！ Lv.'+after+' 🆙');sWin();burst();}}
+  if(ch){save();maybeSync();}}
 function dtCardHTML(){var l=dtList(),tp=+S.cfg.taskPer||0,av=l.filter(function(x){return x.av;}),dn=av.filter(function(x){return x.done;}).length;
   return '<div class="card dtcard"><div class="v-h"><span>📅 毎日やるタスク</span><span class="v-count">'+dn+' / '+av.length+(dn&&dn===av.length?' 🎉':'')+'</span></div>'
     +l.map(function(x){var sub=x.auto?(x.done?'今日のノルマ クリア！'+((S.cfg.bonusOn&&tp)?'（+'+tp+'分）':''):x.auto+((S.cfg.bonusOn&&tp)?'（+'+tp+'分）':'')):(!x.av?'今日は出ている宿題がないよ（数えない）':x.done?'今日OKが出たよ':'下のカードで1つOKが出たら自動で ✓');
@@ -1491,11 +1503,10 @@ function render(){
   }else{
     const mq=meQuests();
     const rc=(S.reactions&&S.reactions[today()])?('<div class="card" style="text-align:center;background:#fff0ea;border-color:#f2c3b2"><div style="font-weight:800">💌 パパからの応援</div><div style="font-size:1.7rem;margin:4px 0">'+S.reactions[today()].e+'</div><div>'+S.reactions[today()].m+'</div></div>'):'';
-    stageTop.innerHTML=rc+dtCardHTML()+`<div class="row">
+    dtSync();
+    stageTop.innerHTML=rc+`<div class="row">
       <div class="player ${frameClass(lv(S.me.xp))}">${frameOrn(lv(S.me.xp))}<h3>${avatarHTML(S.me)} ${S.me.name}</h3><div class="lvl"><span class="lvlbadge">Lv.${lv(S.me.xp)}</span></div><div class="xpbar"><div class="xpfill" style="width:${S.me.xp%100}%"></div></div>
-        <div class="gq-h">⭐ がんばりクエスト<span>レベルアップ用</span></div>
-        ${mq.map(q=>`<div class="quest ${S.day.me[q.key]?'done':''}" onclick="toggle('me','${q.key}')"><div class="chk">${S.day.me[q.key]?'✓':''}</div><div>${q.label}</div></div>`).join('')}
-        ${mq.some(q=>S.day.me[q.key])?'':`<div class="mini" style="cursor:pointer;text-decoration:underline" onclick="repick()">えらび直す</div>`}
+        ${dtRowsHTML()}
       </div>
       <div class="player ${frameClass(lv(S.pa.xp))}">${frameOrn(lv(S.pa.xp))}<h3>${avatarHTML(S.pa)} ${S.pa.name}</h3><div class="lvl"><span class="lvlbadge">Lv.${lv(S.pa.xp)}</span></div><div class="xpbar"><div class="xpfill" style="width:${S.pa.xp%100}%"></div></div>
         ${S.cfg.pa.map((q,i)=>`<div class="quest ${S.day.pa['p'+i]?'done':''}" onclick="toggle('pa','p'+${i})"><div class="chk">${S.day.pa['p'+i]?'✓':''}</div><div>${q}</div></div>`).join('')}
