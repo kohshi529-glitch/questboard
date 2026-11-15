@@ -201,7 +201,7 @@ function render(){
   h+='<div class="tiles">'+vt('🔤','英単語',V,vAdd,'var(--vocab)')+vt('📖','語彙',J,jAdd,'var(--jvocab)')
     +'<div class="tile"><div class="k">⚡ 計算</div><div class="v">'+cq+'<small>問</small></div><div class="d">'+cs+'セット・<b>⭐ベスト更新 '+cb+'回</b></div></div>'
     +'<div class="tile"><div class="k">🧪 検問（テスト）</div><div class="v">'+qt+'<small>回</small></div><div class="d">英単語＋語彙の合計</div></div>'
-    +'<div class="tile wide"><div class="k">✍️ 漢字クエスト</div><div class="v">'+kjDone+'<small>回 10問クリア</small></div><div class="d">マスター <b>'+kjMs+'字</b>・テストした字 '+kjTested+' / 160字</div></div>'
+    +'<div class="tile wide"><div class="k">✍️ 漢字クエスト</div><div class="v">'+kjDone+'<small>回 パートクリア</small></div><div class="d">マスター <b>'+kjMs+'字</b>・テストした字 '+kjTested+' / 160字</div></div>'
     +'<div class="tile wide"><div class="k">🗓️ がんばりカレンダー</div><div class="v">'+lv1+'<small>日 ナイス以上</small></div>'
     +'<div class="d">🌟パーフェクト <b>'+lv2+'日</b>・🌈レインボー <b>'+lv3+'日</b>・💜アメジスト <b>'+lv4+'日</b>（🥳パーティ '+party+'回）・📱ボーナス <b>+'+bonus+'分</b></div></div></div>';
   /* 語数チャート */
@@ -239,7 +239,7 @@ function render(){
     if(bc)its+='<span class="it b">⭐ ベスト更新 '+bc+'回</span>';
     var qq=num(vq.t)+num(jq.t);if(qq)its+='<span class="it">🧪 検問 '+qq+'回'+((num(vq.p)+num(jq.p))?'（満点'+(num(vq.p)+num(jq.p))+'）':'')+'</span>';
     var rl=(D.rd&&D.rd.log||{})[k];if(rl&&num(rl.t)-num(rl.f)>0)its+='<span class="it" style="background:#e6f3dc">📕 読書 '+(num(rl.t)-num(rl.f))+'ページ（〜'+num(rl.t)+'）</span>';
-    var kd=kjDay[k];if(kd&&(kd.c||kd.f||kd.d))its+='<span class="it" style="background:#fde6e3">✍️ 漢字 '+(kd.d?'10問クリア'+(kd.d>1?kd.d+'回':'')+'・':'')+'正解'+kd.c+(kd.f?'・直し'+kd.f:'')+'</span>';
+    var kd=kjDay[k];if(kd&&(kd.c||kd.f||kd.d))its+='<span class="it" style="background:#fde6e3">✍️ 漢字 '+(kd.d?'パートクリア'+(kd.d>1?kd.d+'回':'')+'・':'')+'正解'+kd.c+(kd.f?'・直し'+kd.f:'')+'</span>';
     if(bn)its+='<span class="it p">📱 +'+bn+'分</span>';
     if(!its&&!l){rows+='<div class="day rest">'+mdw(k)+'　おやすみ</div>';return;}
     rows+='<div class="day"><div class="dh">'+mdw(k)+(l?'<span class="lv l'+l+'">'+LVN[l]+(l>=3&&num(D.clp[k])?' 🥳'+num(D.clp[k]):'')+'</span>':'')+'</div>'+(its?'<div class="items">'+its+'</div>':'')+'</div>';});
