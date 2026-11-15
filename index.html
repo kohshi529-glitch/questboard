@@ -277,6 +277,36 @@
   .hcell.amethyst{background:radial-gradient(circle at 30% 25%,#f5e8ff 0,#c084fc 35%,#7b2ff7 75%,#4c1d95 100%);border-color:#6d28d9;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:900;line-height:1;text-shadow:0 0 2px rgba(0,0,0,.5);box-shadow:0 0 6px rgba(155,92,255,.7)}
   .legend .l-amethyst{background:radial-gradient(circle at 30% 25%,#f5e8ff 0,#c084fc 35%,#7b2ff7 80%);border-color:#6d28d9}
   .ps-msg.am{background:linear-gradient(90deg,#f3e8ff,#fce7f3);color:#6b21a8}
+  /* 👑 GOD 神セレブレーション（アメジストの紫と重ならない、透明感のある天空ブルー〜アクア） */
+  .hcell.god{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 28%,#ffffff 0,#cffafe 18%,#5ee0f5 38%,#0ea5e9 58%,#0b4a8f 82%,#06204a 100%);border-color:#a5f3fc;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:900;line-height:1;text-shadow:0 0 3px #04224a,0 0 2px #04224a;animation:godGlow 2.4s ease-in-out infinite}
+  .hcell.god::after{content:'';position:absolute;inset:-50%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.85) 50%,transparent 58%);animation:godShine 2.8s linear infinite}
+  @keyframes godGlow{0%,100%{box-shadow:0 0 0 1px #e0fbff inset,0 0 6px rgba(103,232,249,.85),0 0 10px rgba(14,165,233,.5)}50%{box-shadow:0 0 0 1px #ffffff inset,0 0 12px rgba(165,243,252,1),0 0 20px rgba(56,189,248,.85)}}
+  @keyframes godShine{from{transform:translateX(-55%)}to{transform:translateX(55%)}}
+  .legend .l-god{background:radial-gradient(circle at 50% 30%,#fff 0,#a5f3fc 30%,#0ea5e9 62%,#0b4a8f 100%);border-color:#a5f3fc;box-shadow:0 0 4px rgba(103,232,249,.95)}
+  .ps-msg.god{background:linear-gradient(135deg,#041a3d,#0b4a8f 45%,#041a3d);color:#e0fbff;border:1.5px solid #67e8f9;box-shadow:0 0 14px rgba(103,232,249,.5),inset 0 0 18px rgba(165,243,252,.25);text-shadow:0 0 8px rgba(103,232,249,.85);letter-spacing:.04em}
+  .ps-msg.god span{color:#cffafe;font-size:.8rem;text-shadow:none}
+  #godparty{position:fixed;inset:0;z-index:69;pointer-events:none;overflow:hidden;display:flex;align-items:center;justify-content:center;animation:godFade 6.4s ease forwards}
+  @keyframes godFade{0%{opacity:0}8%,86%{opacity:1}100%{opacity:0}}
+  .gd-sky{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 16%,#ffffff 0,#cffafe 12%,#5ee0f5 26%,#0e7cc4 44%,#0a3a7a 66%,#041633 86%,#020a1c 100%)}
+  .gd-rays{position:absolute;left:50%;top:22%;width:220vmax;height:220vmax;margin:-110vmax 0 0 -110vmax;background:repeating-conic-gradient(from 0deg,rgba(224,251,255,.32) 0deg 5deg,rgba(224,251,255,0) 5deg 15deg);-webkit-mask-image:radial-gradient(circle,#000 0,rgba(0,0,0,.6) 18%,transparent 52%);mask-image:radial-gradient(circle,#000 0,rgba(0,0,0,.6) 18%,transparent 52%);animation:gdSpin 24s linear infinite}
+  @keyframes gdSpin{to{transform:rotate(360deg)}}
+  .gd-beam{position:absolute;left:50%;top:0;width:min(46vw,240px);height:100%;transform:translateX(-50%) scaleY(0);transform-origin:top;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(186,246,255,.45) 38%,rgba(165,243,252,.12) 60%,rgba(165,243,252,0));filter:blur(6px);animation:gdBeam 1.4s .3s cubic-bezier(.2,.8,.2,1) forwards}
+  @keyframes gdBeam{to{transform:translateX(-50%) scaleY(1)}}
+  .gd-star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 6px 2px rgba(165,243,252,.95);animation:gdTw 1.6s ease-in-out infinite}
+  @keyframes gdTw{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:1;transform:scale(1.3)}}
+  .gd-dust{position:absolute;top:-12px;border-radius:50%;background:radial-gradient(circle,#fff 0,#cffafe 40%,rgba(103,232,249,0) 70%);animation:gdDrift linear forwards}
+  @keyframes gdDrift{to{transform:translate(var(--dx),110vh) rotate(200deg);opacity:.2}}
+  .gd-em{position:absolute;top:-40px;animation:gdDrift linear forwards;filter:drop-shadow(0 0 6px rgba(165,243,252,.95))}
+  .gd-core::before{content:'';position:absolute;left:50%;top:58%;width:150%;height:120%;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(2,14,40,.7) 0,rgba(2,14,40,.42) 45%,rgba(2,14,40,0) 70%);z-index:-1}
+  .gd-core{position:relative;z-index:1;text-align:center;animation:gdRise 1.6s .5s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes gdRise{0%{opacity:0;transform:translateY(-40px) scale(.7);filter:blur(10px)}100%{opacity:1;transform:none;filter:none}}
+  .gd-halo{width:150px;height:34px;margin:0 auto -6px;border-radius:50%;border:4px solid #e0fbff;box-shadow:0 0 18px 4px rgba(103,232,249,.95),inset 0 0 12px rgba(224,251,255,.9);animation:gdHalo 2s ease-in-out infinite}
+  @keyframes gdHalo{0%,100%{transform:translateY(0);box-shadow:0 0 14px 3px rgba(103,232,249,.8),inset 0 0 10px rgba(224,251,255,.8)}50%{transform:translateY(-5px);box-shadow:0 0 28px 9px rgba(103,232,249,1),inset 0 0 16px rgba(255,255,255,1)}}
+  .gd-crown{font-size:3.2rem;line-height:1;margin-top:6px;filter:drop-shadow(0 0 12px rgba(165,243,252,1))}
+  .gd-title{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-size:clamp(3.4rem,17vw,5.6rem);font-weight:900;letter-spacing:.12em;line-height:1.1;background:linear-gradient(100deg,#7dd3fc 0,#ffffff 18%,#cffafe 30%,#fff7d6 42%,#67e8f9 56%,#ffffff 72%,#a5f3fc 86%,#e0f2fe 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 1.5px #032a52) drop-shadow(0 0 1.5px #032a52) drop-shadow(0 0 14px rgba(103,232,249,.95)) drop-shadow(0 3px 0 rgba(2,20,50,.7));animation:gdGold 2.2s linear infinite}
+  @keyframes gdGold{from{background-position:120% 0}to{background-position:-130% 0}}
+  .gd-sub{margin-top:6px;font-size:1.05rem;font-weight:900;letter-spacing:.32em;color:#e0fbff;text-shadow:0 0 10px rgba(103,232,249,1),0 0 22px rgba(56,189,248,.9)}
+  .gd-cond{display:inline-block;margin-top:12px;padding:5px 16px;border-radius:999px;border:1.5px solid rgba(165,243,252,.9);background:rgba(2,16,44,.55);color:#cffafe;font-size:.82rem;font-weight:800;letter-spacing:.06em;box-shadow:0 0 14px rgba(103,232,249,.45)}
   #amparty{position:fixed;inset:0;z-index:66;pointer-events:none;display:flex;align-items:center;justify-content:center;animation:partyFade 3s ease forwards}
   #amparty::before{content:'';position:absolute;inset:0;border:8px solid #a855f7;box-shadow:inset 0 0 40px rgba(168,85,247,.6)}
   #amparty::after{content:'';position:absolute;inset:0;background:radial-gradient(circle,rgba(233,213,255,.25),rgba(124,58,237,.3))}
@@ -477,7 +507,7 @@
     <div class="two"><div><label>1日の目標</label><select id="d_readMin"><option value="5">5ページ</option><option value="10">10ページ</option><option value="15">15ページ</option><option value="20">20ページ</option></select></div><div><label>しおり（いまのページ）</label><input id="d_rdPage" type="number" inputmode="numeric" min="0"></div></div>
     <label style="margin-top:10px">📅 がんばりカレンダーの手直し（過去の日）</label>
     <p class="hint">機能を追加した日など、判定が実際とずれた過去の日を書きかえます。今日の分は自動で決まります。</p>
-    <div class="two"><div><input id="d_clDate" type="date"></div><div><select id="d_clLv"><option value="0">お休み</option><option value="1">👍 ナイス</option><option value="2">🌟 パーフェクト</option><option value="3">🌈 レインボー</option><option value="4">💜 アメジスト</option></select></div></div>
+    <div class="two"><div><input id="d_clDate" type="date"></div><div><select id="d_clLv"><option value="0">お休み</option><option value="1">👍 ナイス</option><option value="2">🌟 パーフェクト</option><option value="3">🌈 レインボー</option><option value="4">💜 アメジスト</option><option value="5">👑 GOD 神セレブレーション</option></select></div></div>
     <button class="btn gray" onclick="clEdit()">📅 この日の判定を書きかえる</button>
     <label style="margin-top:10px">🔔 申請をパパのスマホにプッシュ通知（ntfy アプリ）</label>
     <p class="hint">iPhone に無料アプリ「ntfy」を入れ、下の通知トピック名を購読すると、娘が申請した瞬間に通知が届きます。トピック名は合言葉なので「生成」で作った推測されにくい名前を使ってください。</p>
@@ -992,7 +1022,7 @@ function qbPbToday(){var rem=SYNC.astatRemote||{},cache=_lsGet('qb_appstats')||{
 function clRecord(l){S.clog=S.clog||{};var td=today();if(SYNC.on&&!SYNC.astatReady)return;if(l!==(+S.clog[td]||0)){if(l)S.clog[td]=l;else delete S.clog[td];var ks=Object.keys(S.clog).sort();while(ks.length>400)delete S.clog[ks.shift()];save();maybeSync();setTimeout(function(){try{render();}catch(e){}},0);}}
 /* パパの手直し：過去の日のカレンダー判定を書きかえる（今日は自動判定のまま） */
 function clEdit(){var k=(document.getElementById('d_clDate').value||'').trim(),lv=+document.getElementById('d_clLv').value||0;if(!/^\d{4}-\d{2}-\d{2}$/.test(k)){alert('日付をえらんでください');return;}
-  if(k>=today()){alert('今日の分は、その日の達成状況で自動で決まります');return;}var nm=['お休み','👍 ナイス','🌟 パーフェクト','🌈 レインボー','💜 アメジスト'][lv];if(!confirm(k+' を「'+nm+'」に書きかえますか？'))return;
+  if(k>=today()){alert('今日の分は、その日の達成状況で自動で決まります');return;}var nm=['お休み','👍 ナイス','🌟 パーフェクト','🌈 レインボー','💜 アメジスト','👑 GOD 神セレブレーション'][lv];if(!confirm(k+' を「'+nm+'」に書きかえますか？'))return;
   S.clog=S.clog||{};S.clp=S.clp||{};if(lv)S.clog[k]=lv;else delete S.clog[k];if(lv>=3){if(!S.clp[k])S.clp[k]={h0:0,n:1};}else delete S.clp[k];
   save();maybeSync();render();alert(k+' を「'+nm+'」にしました');}
 function clLevel(k){return +((S.clog||{})[k])||0;}
@@ -1013,11 +1043,27 @@ function flagFire(){var o=document.getElementById('rbflag');if(o)o.remove();o=do
 /* 💜アメジスト到達：デコレーションシャワー（端末ごとに1日1回） */
 var AM_EM=['💫','💜','✨','💞','💖','🏆'];
 function amTrack(lvl){if(lvl<4)return;if(SYNC.on&&!SYNC.astatReady)return;var td=today();try{if(localStorage.getItem('qb_amseen')===td)return;localStorage.setItem('qb_amseen',td);}catch(e){return;}
+  if(lvl>=5)return; /* いきなりGODに届いたときは、アメジストは出さずにGODだけ */
   var w=Math.max(50,_fxUntil-Date.now());_fxUntil=Math.max(_fxUntil,Date.now())+3200;setTimeout(amFire,w);}
 function amFire(){var o=document.getElementById('amparty');if(o)o.remove();o=document.createElement('div');o.id='amparty';
   o.innerHTML='<div class="party-banner am">💜 アメジスト！ 🏆<span>がんばりタスク全部＋宿題2つ</span></div>';document.body.appendChild(o);document.body.classList.add('partying');
   sBig();burst(55,true,AM_EM);setTimeout(function(){burst(45,true,AM_EM);},800);setTimeout(function(){burst(45,true,AM_EM);},1600);setTimeout(function(){burst(35,true,AM_EM);},2300);
   setTimeout(function(){try{o.remove();}catch(e){}document.body.classList.remove('partying');},3100);}
+/* 👑 GOD 神セレブレーション：神降臨の演出（端末ごとに1日1回） */
+var GOD_EM=['👑','✨','💎','💠','🌟','🫧','💫','🔱'];
+function godTrack(lvl){if(lvl<5)return;if(SYNC.on&&!SYNC.astatReady)return;var td=today();try{if(localStorage.getItem('qb_godseen')===td)return;localStorage.setItem('qb_godseen',td);}catch(e){return;}
+  var w=Math.max(50,_fxUntil-Date.now());_fxUntil=Math.max(_fxUntil,Date.now())+6600;setTimeout(godFire,w);}
+function sGod(){[[261.6,0],[329.6,.06],[392,.12],[493.9,.18],[587.3,.24]].forEach(function(x){tone(x[0],3.2,'sine',x[1]);tone(x[0]*2,2.6,'sine',x[1]+.02);});
+  [1046.5,1318.5,1568,1975.5,2349.3,2637].forEach(function(f,i){tone(f,0.9,'triangle',0.9+i*0.11);});[1568,2093,2637,3136].forEach(function(f,i){tone(f,1.4,'sine',2.0+i*0.16);});}
+function godFire(){var o=document.getElementById('godparty');if(o)o.remove();o=document.createElement('div');o.id='godparty';
+  var st='',i;for(i=0;i<40;i++)st+='<i class="gd-star" style="left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*1.6).toFixed(2)+'s"></i>';
+  o.innerHTML='<div class="gd-sky"></div><div class="gd-rays"></div><div class="gd-beam"></div>'+st
+    +'<div class="gd-core"><div class="gd-halo"></div><div class="gd-crown">👑</div><div class="gd-title">神降臨</div><div class="gd-sub">GOD 神セレブレーション</div><div class="gd-cond">がんばりタスク全部 ＋ 宿題3つ</div></div>';
+  document.body.appendChild(o);document.body.classList.add('partying');sGod();
+  function dust(n,em){for(var k=0;k<n;k++){var d=document.createElement('div');if(em){d.className='gd-em';d.textContent=GOD_EM[k%GOD_EM.length];d.style.fontSize=(1.3+Math.random()*1.5)+'rem';}else{d.className='gd-dust';var s=4+Math.random()*7;d.style.width=s+'px';d.style.height=s+'px';}
+    d.style.left=(Math.random()*100)+'vw';d.style.setProperty('--dx',((Math.random()-.5)*80)+'px');d.style.animationDuration=(3+Math.random()*2.6)+'s';d.style.animationDelay=(Math.random()*.8)+'s';o.appendChild(d);}}
+  setTimeout(function(){dust(60,false);dust(18,true);},700);setTimeout(function(){dust(50,false);dust(14,true);},2000);setTimeout(function(){dust(40,false);dust(10,true);},3300);
+  setTimeout(function(){try{o.remove();}catch(e){}document.body.classList.remove('partying');},6500);}
 function partyCount(k){var r=(S.clp||{})[k];return r?_num(r.n):0;}
 var PARTY_EM=['🎉','🎊','🥳','🎈','🌈','✨','🪅','💖','⭐'];
 function partyFire(n){var o=document.getElementById('party');if(o)o.remove();o=document.createElement('div');o.id='party';
@@ -1067,8 +1113,9 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
     var body=(!s.pair)?'<div class="ps-chips">'+Q[s.items[0]].chips+'</div>':(s.pair).map(function(i){var off=s.items.indexOf(i)<0;return '<div class="ps-it'+(off?' off':'')+(Q[i].done&&!off?' ok':'')+'"><span class="ps-in">'+QNAME[i]+'</span>'+(off?'<span class="ps-offt">昨日やったので今日はパーフェクトカウント外</span>':'<div class="ps-chips">'+Q[i].chips+'</div>')+'</div>';}).join(s.items.length>1?'<div class="ps-or">または</div>':'');
     rowsH+='<div class="ps-row'+(done?' ok':'')+'"><span class="ps-q">'+'①②③'.charAt(si)+' '+s.t+(done?' クリア！':'')+(only?' <span class="ps-day">今日は'+QNAME[only]+'の日</span>':'')+'</span>'+body+'</div>';});
   _bonusRows=3;var all=(n===3);
-  var _hwN=bonusHw().n,_tk=qbTaskDone(),_tkAll=meAllDone(),lvl=all?((_tkAll&&_hwN>=2)?4:(_hwN>=1&&_tk>=1)?3:2):(n>=2?1:0);clRecord(lvl);flagCheck(lvl);partyTrack(lvl,_hwN);amTrack(lvl);
-  var msg=lvl===4?(isPapa?'<div class="ps-msg am">💜 今日はアメジスト・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg am">💜 アメジスト！最高の一日 🏆</div>')
+  var _hwN=bonusHw().n,_tk=qbTaskDone(),_tkAll=meAllDone(),lvl=all?((_tkAll&&_hwN>=3)?5:(_tkAll&&_hwN>=2)?4:(_hwN>=1&&_tk>=1)?3:2):(n>=2?1:0);clRecord(lvl);flagCheck(lvl);partyTrack(lvl,_hwN);amTrack(lvl);godTrack(lvl);
+  var msg=lvl>=5?(isPapa?'<div class="ps-msg god">👑 今日は GOD 神セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg god">👑 GOD 神セレブレーション ✨<br><span>神降臨の一日！がんばりタスク全部＋宿題3つ</span></div>')
+    :lvl===4?(isPapa?'<div class="ps-msg am">💜 今日はアメジスト・パーティ '+partyCount(today())+'回・宿題あと1つで👑GOD</div>':'<div class="ps-msg am">💜 アメジスト！最高の一日 🏆<br><span style="font-size:.8rem">宿題をもう1つで 👑GOD 神セレブレーション</span></div>')
     :lvl===3?(isPapa?'<div class="ps-msg">🌈 今日はレインボー・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg">🌈 レインボー！パーティ '+partyCount(today())+'回目 🥳<br><span style="font-size:.8rem">がんばりタスク全部＋宿題2つで 💜アメジスト</span></div>')
     :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト・宿題1つ＋がんばりタスク1つでレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！<br><span style="font-size:.8rem">宿題1つ＋がんばりタスク1つで 🌈レインボー</span></div>')
     :lvl===1?(isPapa?'<div class="ps-msg">👍 今日はナイス・あと1つでパーフェクト</div>':'<div class="ps-msg">👍 ナイス！あと1つでパーフェクト🌟</div>')
@@ -1125,7 +1172,7 @@ function renderRules(){var el=document.getElementById('rulesCard');if(!el)return
   el.innerHTML='<div class="card rlcard"><div class="v-h"><span>📋 ルール表</span></div>'
     +'<div class="rl-h">🎯 コミットライン：3つのわく</div>'+t1
     +'<div class="rl-n">🔁 <b>日替わり</b>：きのう②で英単語だけやったら、今日は語彙だけ数えるよ（反対も同じ）。③の漢字と読書も同じ。きのう両方やった日・どちらもやらなかった日は、どちらでもOK。</div>'
-    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋宿題1つ＋がんばりタスク1つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋がんばりタスク全部＋宿題2つ</div>'
+    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋宿題1つ＋がんばりタスク1つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋がんばりタスク全部＋宿題2つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋がんばりタスク全部＋宿題3つ</div>'
     +(bon?'<div class="rl-h">📱 スマホ時間のため方</div>'+t2+'<div class="rl-n">たまった時間は「📱 パパにお願いする」でパパに送ってね。</div>':'')+'</div>';}
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
 var _bonusN=0,_bonusAll=false,_bonusRows=3;
@@ -1223,7 +1270,7 @@ function frameClass(level){return 'flvl-'+Math.min(10,Math.max(1,level));}
 function frameOrn(level){var t=Math.min(10,level),o='';var topE=t>=9?'🌟':'⭐',botE=t>=9?'💎':'✨';if(t>=3)o+='<span class="orn tl">'+topE+'</span><span class="orn tr">'+topE+'</span>';if(t>=6)o+='<span class="orn bl">'+botE+'</span><span class="orn br">'+botE+'</span>';if(t>=7)o+='<span class="orn crown">👑</span>';return o;}
 function calHTML(){
   const N=16,base=new Date(),tk=today();let cells='';
-  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const lvl=clLevel(k);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);const pn=(lvl>=3)?partyCount(k):0;cells+='<div class="hcell'+(lvl===4?' amethyst':lvl===3?' rainbow':lvl===2?' star':lvl===1?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')">'+(pn?pn:'')+'</div>';}
+  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const lvl=clLevel(k);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);const pn=(lvl>=3)?partyCount(k):0;cells+='<div class="hcell'+(lvl>=5?' god':lvl===4?' amethyst':lvl===3?' rainbow':lvl===2?' star':lvl===1?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')">'+(pn?pn:'')+'</div>';}
   const lab=(col,txt,al)=>'<span style="grid-column:'+col+(al?';justify-self:'+al:'')+'">'+txt+'</span>';
   const labels=lab(1,'15日前','start')+lab(6,'10日前')+lab(11,'5日前')+lab(16,'今日','end');
   return '<div class="callabels">'+labels+'</div><div class="calgrid">'+cells+'</div><a class="kiroku-link" href="./kiroku.html">📈 がんばり記録を見る</a>';
@@ -1311,9 +1358,9 @@ function render(){
     stage.innerHTML=`<div class="card" style="text-align:center"><button class="btn gacha-btn" ${S.prog.gacha<=0?'disabled':''} onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：${S.prog.gacha}回）</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
         <div class="calwrap">${calHTML()}</div>
-        <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
-        <div class="mini" style="font-size:.72rem;margin-top:4px">👍＝2つ ／ 🌟＝3つ ／ 🌈＝🌟＋宿題1つ＋がんばりタスク1つ ／ 💜＝🌟＋がんばりタスク全部＋宿題2つ（数字＝パーティ回数）</div>
-        <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日・🌈レインボー ${histCount(3)}日・💜アメジスト ${histCount(4)}日）${partySum()?'<br>🥳 パーティ 合計 '+partySum()+'回':''}</div></div>
+        <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
+        <div class="mini" style="font-size:.72rem;margin-top:4px">👍＝2つ ／ 🌟＝3つ ／ 🌈＝🌟＋宿題1つ＋がんばりタスク1つ ／ 💜＝🌟＋がんばりタスク全部＋宿題2つ ／ 👑GOD＝🌟＋がんばりタスク全部＋宿題3つ（数字＝パーティ回数）</div>
+        <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日・🌈レインボー ${histCount(3)}日・💜アメジスト ${histCount(4)-histCount(5)}日・👑GOD ${histCount(5)}日）${partySum()?'<br>🥳 パーティ 合計 '+partySum()+'回':''}</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span></div></div>
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 今日の記録</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読動画やドリルの写真を残そう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
   }
