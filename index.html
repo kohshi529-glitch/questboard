@@ -1175,7 +1175,7 @@ function amTrack(lvl){if(lvl<4)return;if(SYNC.on&&!SYNC.astatReady)return;var td
   if(lvl>=5)return; /* いきなりGODに届いたときは、アメジストは出さずにGODだけ */
   var w=Math.max(50,_fxUntil-Date.now());_fxUntil=Math.max(_fxUntil,Date.now())+3200;setTimeout(amFire,w);}
 function amFire(){var o=document.getElementById('amparty');if(o)o.remove();o=document.createElement('div');o.id='amparty';
-  o.innerHTML='<div class="party-banner am">💜 アメジスト！ 🏆<span>クエスト全部＋宿題</span></div>';document.body.appendChild(o);document.body.classList.add('partying');
+  o.innerHTML='<div class="party-banner am">💜 アメジスト！ 🏆<span>パーフェクト＋プラス3つ</span></div>';document.body.appendChild(o);document.body.classList.add('partying');
   sBig();burst(55,true,AM_EM);setTimeout(function(){burst(45,true,AM_EM);},800);setTimeout(function(){burst(45,true,AM_EM);},1600);setTimeout(function(){burst(35,true,AM_EM);},2300);
   setTimeout(function(){try{o.remove();}catch(e){}document.body.classList.remove('partying');},3100);}
 /* 👑 GOD 神セレブレーション：神降臨の演出（端末ごとに1日1回） */
@@ -1217,7 +1217,7 @@ function angelSVG(){
 function godFire(){var o=document.getElementById('godparty');if(o)o.remove();o=document.createElement('div');o.id='godparty';
   var st='',i;for(i=0;i<40;i++)st+='<i class="gd-star" style="left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*1.6).toFixed(2)+'s"></i>';
   o.innerHTML='<div class="gd-sky"></div><div class="gd-rays"></div><div class="gd-beam"></div>'+st
-    +'<div class="gd-core"><div class="gd-angel-wrap"><div>'+angelSVG()+'</div></div><div class="gd-title">神降臨</div><div class="gd-sub">GOD 神セレブレーション</div><div class="gd-cond">クエスト全部 ＋ 先生とパパの宿題</div></div>';
+    +'<div class="gd-core"><div class="gd-angel-wrap"><div>'+angelSVG()+'</div></div><div class="gd-title">神降臨</div><div class="gd-sub">GOD 神セレブレーション</div><div class="gd-cond">パーフェクト ＋ プラス4つ ぜんぶ</div></div>';
   document.body.appendChild(o);document.body.classList.add('partying');sGod();
   function dust(n,em){for(var k=0;k<n;k++){var d=document.createElement('div');if(em){d.className='gd-em';d.textContent=GOD_EM[k%GOD_EM.length];d.style.fontSize=(1.3+Math.random()*1.5)+'rem';}else{d.className='gd-dust';var s=4+Math.random()*7;d.style.width=s+'px';d.style.height=s+'px';}
     d.style.left=(Math.random()*100)+'vw';d.style.setProperty('--dx',((Math.random()-.5)*80)+'px');d.style.animationDuration=(3+Math.random()*2.6)+'s';d.style.animationDelay=(Math.random()*.8)+'s';o.appendChild(d);}}
@@ -1272,18 +1272,23 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
     var body=(!s.pair)?'<div class="ps-chips">'+Q[s.items[0]].chips+'</div>':(s.pair).map(function(i){var off=s.items.indexOf(i)<0;return '<div class="ps-it'+(off?' off':'')+(Q[i].done&&!off?' ok':'')+'"><span class="ps-in">'+QNAME[i]+'</span>'+(off?'<span class="ps-offt">昨日やったので今日はパーフェクトカウント外</span>':'<div class="ps-chips">'+Q[i].chips+'</div>')+'</div>';}).join(s.items.length>1?'<div class="ps-or">または</div>':'');
     rowsH+='<div class="ps-row'+(done?' ok':'')+'"><span class="ps-q">'+'①②③'.charAt(si)+' '+s.t+(done?' クリア！':'')+(only?' <span class="ps-day">今日は'+QNAME[only]+'の日</span>':'')+'</span>'+body+'</div>';});
   _bonusRows=3;var all=(n===3);
-  /* カレンダーの段階（2026-11-15 改定）
+  /* カレンダーの段階（2026-11-15 改定②）
      👍ナイス＝わく2つ ／ 🌟パーフェクト＝わく3つ
-     🌈レインボー＝🌟＋②③の のこりのクエストも完了（計算・英単語・語彙・漢字・読書 ぜんぶ）
-     💜アメジスト＝🌈＋先生の宿題かパパの宿題を1つ以上 ／ 👑GOD＝💜＋のこりの宿題（先生とパパの両方。出ている宿題がない方は数えない） */
-  var _hwN=bonusHw().n,remQ=['c','v','j'].concat(kon?['k']:[]).concat(['r']).filter(function(i){return !Q[i].done;});
-  var _dl=dtList(),_tp=[_dl[1],_dl[2]].filter(function(x){return x.av;}),_tpN=_tp.filter(function(x){return x.done;}).length,_tpRem=_tp.filter(function(x){return !x.done;});
-  var lvl=all?(remQ.length?2:(_tpN>=1?(_tpRem.length?4:5):3)):(n>=2?1:0);
-  var _remQT=remQ.map(function(i){return QNAME[i];}).join('・'),_remTT=_tpRem.map(function(x){return x.e+x.n;}).join('・');clRecord(lvl);flagCheck(lvl);partyTrack(lvl,_hwN);amTrack(lvl);godTrack(lvl);
-  var msg=lvl>=5?(isPapa?'<div class="ps-msg god">👑 今日は GOD 神セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg god">👑 GOD 神セレブレーション ✨<br><span>神降臨の一日！クエスト全部＋先生とパパの宿題</span></div>')
-    :lvl===4?(isPapa?'<div class="ps-msg am">💜 今日はアメジスト・パーティ '+partyCount(today())+'回・'+_remTT+'で👑GOD</div>':'<div class="ps-msg am">💜 アメジスト！最高の一日 🏆<br><span style="font-size:.8rem">'+_remTT+'もOKで 👑GOD 神セレブレーション</span></div>')
-    :lvl===3?(isPapa?'<div class="ps-msg">🌈 今日はレインボー・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg">🌈 レインボー！パーティ '+partyCount(today())+'回目 🥳<br><span style="font-size:.8rem">先生かパパの宿題を1つOKで 💜アメジスト</span></div>')
-    :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト・のこりの '+_remQT+' でレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！<br><span style="font-size:.8rem">のこりの '+_remQT+' もクリアで 🌈レインボー</span></div>')
+     パーフェクトのあとの「プラス4つ」＝👨‍🏫先生の宿題・🧔パパの宿題・②ことばの のこり片方・③漢字か読書の のこり片方（読書は1日の最後になりやすいので、どれからでもOK）
+     🌈レインボー＝🌟＋プラス2つ ／ 💜アメジスト＝🌟＋プラス3つ ／ 👑GOD＝🌟＋プラス4つぜんぶ（出ている宿題がない方は数えない。GODはプラス3つ以上かつ、数えるものぜんぶ） */
+  var _hwN=bonusHw().n,_dl=dtList(),EX=[];
+  if(_dl[1].av)EX.push({n:'👨‍🏫先生の宿題',d:!!_dl[1].done});
+  if(_dl[2].av)EX.push({n:'🧔パパの宿題',d:!!_dl[2].done});
+  EX.push({n:'②の のこり（'+(Q.v.done?QNAME.j:Q.j.done?QNAME.v:QNAME.v+'か'+QNAME.j)+'）',d:Q.v.done&&Q.j.done});
+  if(kon)EX.push({n:'③の のこり（'+(Q.k.done?QNAME.r:Q.r.done?QNAME.k:QNAME.k+'か'+QNAME.r)+'）',d:Q.k.done&&Q.r.done});
+  var _exN=EX.filter(function(x){return x.d;}).length,_exRem=EX.filter(function(x){return !x.d;}),_exT=_exRem.map(function(x){return x.n;}).join('・');
+  var lvl=all?((_exN>=3&&!_exRem.length)?5:_exN>=3?4:_exN>=2?3:2):(n>=2?1:0);
+  clRecord(lvl);flagCheck(lvl);partyTrack(lvl,_hwN);amTrack(lvl);godTrack(lvl);
+  var _need=function(k){return 'あと'+k+'つ（のこり：'+_exT+'）';};
+  var msg=lvl>=5?(isPapa?'<div class="ps-msg god">👑 今日は GOD 神セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg god">👑 GOD 神セレブレーション ✨<br><span>神降臨の一日！パーフェクト＋プラス'+_exN+'つ ぜんぶ</span></div>')
+    :lvl===4?(isPapa?'<div class="ps-msg am">💜 今日はアメジスト・パーティ '+partyCount(today())+'回・'+_exT+'で👑GOD</div>':'<div class="ps-msg am">💜 アメジスト！最高の一日 🏆<br><span style="font-size:.8rem">'+_exT+'もクリアで 👑GOD 神セレブレーション</span></div>')
+    :lvl===3?(isPapa?'<div class="ps-msg">🌈 今日はレインボー・パーティ '+partyCount(today())+'回・'+_need(1)+'で'+(_exRem.length<=1?'👑GOD':'💜')+'</div>':'<div class="ps-msg">🌈 レインボー！パーティ '+partyCount(today())+'回目 🥳<br><span style="font-size:.8rem">'+_need(1)+'で '+(_exRem.length<=1?'👑GOD 神セレブレーション':'💜アメジスト')+'</span></div>')
+    :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト・'+_need(2-_exN)+'でレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！<br><span style="font-size:.8rem">'+_need(2-_exN)+'で 🌈レインボー</span></div>')
     :lvl===1?(isPapa?'<div class="ps-msg">👍 今日はナイス・あと1つでパーフェクト</div>':'<div class="ps-msg">👍 ナイス！あと1つでパーフェクト🌟</div>')
     :'<div class="ps-tip">2つで👍ナイス・3つで🌟パーフェクト</div>';
   el.innerHTML='<div class="card pscard'+(all?' on':'')+'"><div class="v-h"><span>🎯 今日のコミットライン</span><span class="v-count">'+n+' / 3</span></div><div class="ps-line">3つのわくをクリア（くわしくは下の📋ルール表）</div>'+rowsH+msg+bonusHTML(n,all,isPapa)+'</div>';
@@ -1338,7 +1343,7 @@ function renderRules(){var el=document.getElementById('rulesCard');if(!el)return
   el.innerHTML='<div class="card rlcard"><div class="v-h"><span>📋 ルール表</span></div>'
     +'<div class="rl-h">🎯 コミットライン：3つのわく</div>'+t1
     +'<div class="rl-n">🔁 <b>日替わり</b>：きのう②で英単語だけやったら、今日は語彙だけ数えるよ（反対も同じ）。③の漢字と読書も同じ。きのう両方やった日・どちらもやらなかった日は、どちらでもOK。</div>'
-    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋②③の のこりのクエストもクリア（計算・英単語・語彙・漢字・読書ぜんぶ。宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝レインボー＋👨‍🏫先生の宿題か🧔パパの宿題を1つ以上 ／ 👑 GOD 神セレブレーション＝アメジスト＋のこりの宿題（先生とパパの両方）<br>※ 宿題はその日に1つOKで ✓。出ている宿題がない方は数えないよ。<br>※ 毎日タスク（がんばりタスク）＝📘語彙トレ・👨‍🏫先生の宿題・🧔パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。1つ ✓ でアバターの経験値 +10、3つ全部でシーズンの1日クリアだよ</div>'
+    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋プラス2つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋プラス3つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋プラス4つぜんぶ<br>※ プラス4つ＝👨‍🏫先生の宿題・🧔パパの宿題・②ことばの のこり片方・③漢字か読書の のこり片方。どれからでもOK。宿題はその日に1つOKで ✓。出ている宿題がない方は数えないよ。<br>※ 毎日タスク（がんばりタスク）＝📘語彙トレ・👨‍🏫先生の宿題・🧔パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。1つ ✓ でアバターの経験値 +10、3つ全部でシーズンの1日クリアだよ</div>'
     +(bon?'<div class="rl-h">📱 スマホ時間のため方</div>'+t2+'<div class="rl-n">たまった時間は「📱 パパにお願いする」でパパに送ってね。使わなかった時間は <b>貯金</b> になって、次の日に持ちこせるよ（一部だけお願いすることもできる）。</div>':'')+'</div>';}
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
 var _bonusN=0,_bonusAll=false,_bonusRows=3;
@@ -1435,7 +1440,7 @@ function dtCardHTML(){var l=dtList(),tp=+S.cfg.taskPer||0,av=l.filter(function(x
   return '<div class="card dtcard"><div class="v-h"><span>📅 毎日やるタスク</span><span class="v-count">'+dn+' / '+av.length+(dn&&dn===av.length?' 🎉':'')+'</span></div>'
     +l.map(function(x){var sub=x.auto?(x.done?'今日のノルマ クリア！'+((S.cfg.bonusOn&&tp)?'（+'+tp+'分）':''):x.auto+((S.cfg.bonusOn&&tp)?'（+'+tp+'分）':'')):(!x.av?'今日は出ている宿題がないよ（数えない）':x.done?'今日OKが出たよ':'下のカードで1つOKが出たら自動で ✓');
       return '<div class="quest dt'+(x.done?' done':'')+(x.av?'':' off')+'"'+(x.self?' onclick="dtToggle()"':'')+'><div class="chk">'+(x.done?'✓':'')+'</div><div>'+x.e+' '+x.n+'<span class="dt-sub">'+sub+'</span></div></div>';}).join('')
-    +'<div class="dt-note">👨‍🏫先生と🧔パパの宿題は 💜アメジスト・👑GOD の条件に入るよ。⭐ がんばりクエストは、アバターのレベルアップ用だよ</div></div>';}
+    +'<div class="dt-note">👨‍🏫先生と🧔パパの宿題は、パーフェクトのあとの「プラス」に入るよ（🌈2つ・💜3つ・👑4つ）。⭐ がんばりクエストは、アバターのレベルアップ用だよ</div></div>';}
 function qbTaskDone(){try{if(!meReady())return 0;return meQuests().filter(function(q){return S.day.me[q.key];}).length;}catch(e){return 0;}}
 function bonusBreak(n,all){var w=bonusHw(),p=[];if(w.n)p.push('宿題 '+w.n+'つ +'+(w.n*(+S.cfg.hwPer||0))+'分');if(w.all&&+S.cfg.hwAll)p.push('宿題ぜんぶ +'+S.cfg.hwAll+'分');if(n)p.push('コミットライン '+n+'つ +'+(n*(+S.cfg.bonusPer||0))+'分');if(all&&+S.cfg.bonusAll)p.push('コミットライン全部 +'+S.cfg.bonusAll+'分');var pb=qbPbToday();if(pb&&+S.cfg.pbPer)p.push('計算ベスト更新 '+pb+'回 +'+(pb*(+S.cfg.pbPer))+'分');if(dtGoiN()&&+S.cfg.taskPer)p.push('語彙トレ +'+(+S.cfg.taskPer)+'分');var kj=qbKanjiToday();if(kj.min)p.push('漢字 '+(kj.c?'正解'+kj.c:'')+(kj.c&&kj.f?'・':'')+(kj.f?'直し'+kj.f:'')+(kj.d?(kj.c||kj.f?'・':'')+'パートクリア'+kj.d+'回':'')+' +'+kj.min+'分');return p.join('・');}
 function bonusLogSet(e,g){S.bonusLog=S.bonusLog||{};S.bonusLog[today()]={e:e,g:g};var ks=Object.keys(S.bonusLog).sort();while(ks.length>400)delete S.bonusLog[ks.shift()];}
@@ -1630,7 +1635,7 @@ function render(){
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
         <div class="calwrap">${calHTML()}</div>
         <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
-        <div class="mini" style="font-size:.72rem;margin-top:4px">👍＝2つ ／ 🌟＝3つ ／ 🌈＝🌟＋のこりのクエストも全部 ／ 💜＝🌈＋先生かパパの宿題 ／ 👑GOD＝💜＋先生とパパの宿題 両方（数字＝パーティ回数）</div>
+        <div class="mini" style="font-size:.72rem;margin-top:4px">👍＝2つ ／ 🌟＝3つ ／ 🌈＝🌟＋プラス2つ ／ 💜＝🌟＋プラス3つ ／ 👑GOD＝🌟＋プラス4つ（プラス＝先生の宿題・パパの宿題・ことばの のこり・漢字か読書の のこり。数字＝パーティ回数）</div>
         <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日・🌈レインボー ${histCount(3)}日・💜アメジスト ${histCount(4)-histCount(5)}日・👑GOD ${histCount(5)}日）${partySum()?'<br>🥳 パーティ 合計 '+partySum()+'回':''}</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span></div></div>
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 今日の記録</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読動画やドリルの写真を残そう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
