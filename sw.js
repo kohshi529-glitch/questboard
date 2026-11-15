@@ -1,4 +1,4 @@
-const CACHE = 'questboard-v4-35';
+const CACHE = 'questboard-v4-36';
 const ASSETS = ['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./apple-touch-icon-180.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -25,6 +25,7 @@ self.addEventListener('fetch', e => {
   // cache-first for static assets (icons, manifest)
   e.respondWith(
     caches.match(req).then(r => r || fetch(req).then(resp => {
+      if (!resp || !resp.ok) return resp; // 404 などは保存しない（あとで画像を置いたときに表示されるように）
       const copy = resp.clone();
       caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
       return resp;
