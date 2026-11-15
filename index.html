@@ -41,6 +41,11 @@
   .zoom-copy{margin-left:auto;border:none;background:#2d8cff;color:#fff;font-weight:800;border-radius:8px;padding:6px 10px;font-size:.8rem}
   .hwcard{border:2px solid #7a5aa6;background:#f3eefb}
   .phwcard{border:2px solid #2b7bb9;background:#eef6fc}
+  .ps-rel{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0 4px}
+  .ps-rel input{width:76px;font-size:1.1rem;font-weight:900;text-align:center;padding:6px;border-radius:10px;border:2px solid #f0c75e}
+  .ps-rel span{font-weight:900}
+  .ps-chip2{border:1.5px solid #e0c890;background:#fff;border-radius:999px;padding:5px 10px;font-weight:800;font-size:.8rem;font-family:inherit}
+  .ps-link2{display:block;margin:6px auto 0;border:none;background:none;color:#8a6a2a;text-decoration:underline;font-weight:800;font-size:.8rem;font-family:inherit}
   .dtcard{border:2px solid #2ec5b6;background:#effbf8}
   .dtcard .quest{margin:6px 0 0;background:#fff}
   .dtcard .quest.dt:not([onclick]){cursor:default}
@@ -731,7 +736,7 @@ function defaultPicks(){
   return res;
 }
 function rollover(){
-  if(S.day.date!==today()){chFixApply();S.day={date:today(),picks:defaultPicks(),me:{},pa:{},seeded:true};return;}
+  if(S.day.date!==today()){chFixApply();bankCarry(S.day.date);S.day={date:today(),picks:defaultPicks(),me:{},pa:{},seeded:true};return;}
   if(!S.day.seeded&&(!S.day.picks||S.day.picks.length===0)){S.day.picks=defaultPicks();S.day.seeded=true;}
 }
 
@@ -1322,7 +1327,7 @@ function renderRules(){var el=document.getElementById('rulesCard');if(!el)return
     +'<div class="rl-h">🎯 コミットライン：3つのわく</div>'+t1
     +'<div class="rl-n">🔁 <b>日替わり</b>：きのう②で英単語だけやったら、今日は語彙だけ数えるよ（反対も同じ）。③の漢字と読書も同じ。きのう両方やった日・どちらもやらなかった日は、どちらでもOK。</div>'
     +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋宿題1つ＋毎日タスク1つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋毎日タスク全部＋宿題2つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋毎日タスク全部＋宿題3つ<br>※ 宿題は、ゆうや先生の宿題と🧔パパの宿題（計算シリーズ）のどちらも1つに数えるよ。<br>※ 毎日タスク（がんばりタスク）＝📘語彙トレ・👨‍🏫先生の宿題・🧔パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。1つ ✓ でアバターの経験値 +10、3つ全部でシーズンの1日クリアだよ</div>'
-    +(bon?'<div class="rl-h">📱 スマホ時間のため方</div>'+t2+'<div class="rl-n">たまった時間は「📱 パパにお願いする」でパパに送ってね。</div>':'')+'</div>';}
+    +(bon?'<div class="rl-h">📱 スマホ時間のため方</div>'+t2+'<div class="rl-n">たまった時間は「📱 パパにお願いする」でパパに送ってね。使わなかった時間は <b>貯金</b> になって、次の日に持ちこせるよ（一部だけお願いすることもできる）。</div>':'')+'</div>';}
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
 var _bonusN=0,_bonusAll=false,_bonusRows=3;
 function bonusDay(){var b=(S.day&&S.day.date===today()&&S.day.bonus)||{};return {req:_num(b.req),reqAt:_num(b.reqAt),grant:_num(b.grant),grantAt:_num(b.grantAt),nt:b.nt};}
@@ -1412,26 +1417,39 @@ function dtCardHTML(){var l=dtList(),tp=+S.cfg.taskPer||0,av=l.filter(function(x
 function qbTaskDone(){try{if(!meReady())return 0;return meQuests().filter(function(q){return S.day.me[q.key];}).length;}catch(e){return 0;}}
 function bonusBreak(n,all){var w=bonusHw(),p=[];if(w.n)p.push('宿題 '+w.n+'つ +'+(w.n*(+S.cfg.hwPer||0))+'分');if(w.all&&+S.cfg.hwAll)p.push('宿題ぜんぶ +'+S.cfg.hwAll+'分');if(n)p.push('コミットライン '+n+'つ +'+(n*(+S.cfg.bonusPer||0))+'分');if(all&&+S.cfg.bonusAll)p.push('コミットライン全部 +'+S.cfg.bonusAll+'分');var pb=qbPbToday();if(pb&&+S.cfg.pbPer)p.push('計算ベスト更新 '+pb+'回 +'+(pb*(+S.cfg.pbPer))+'分');if(dtGoiN()&&+S.cfg.taskPer)p.push('語彙トレ +'+(+S.cfg.taskPer)+'分');var kj=qbKanjiToday();if(kj.min)p.push('漢字 '+(kj.c?'正解'+kj.c:'')+(kj.c&&kj.f?'・':'')+(kj.f?'直し'+kj.f:'')+(kj.d?(kj.c||kj.f?'・':'')+'パートクリア'+kj.d+'回':'')+' +'+kj.min+'分');return p.join('・');}
 function bonusLogSet(e,g){S.bonusLog=S.bonusLog||{};S.bonusLog[today()]={e:e,g:g};var ks=Object.keys(S.bonusLog).sort();while(ks.length>400)delete S.bonusLog[ks.shift()];}
+/* ===== 📱 スマホ時間の貯金：解放しなかった分は次の日に持ちこす =====
+   S.bank={m:その日の朝の貯金(分), d:日付}。日付が変わるとき「朝の貯金＋その日たまった分−解放した分」を次の日の貯金にする */
+function bankStart(){var b=S.bank;return b?_num(b.m):0;}
+function bankCarry(od){if(!od||!S.cfg.bonusOn)return;var L=(S.bonusLog||{})[od];if(!L&&!(S.bank&&S.bank.m))return;L=L||{};
+  var start=(S.bank&&S.bank.d===od)?_num(S.bank.m):bankStart(),m=Math.max(0,start+_num(L.e)-_num(L.g));S.bank={m:m,d:today(),prev:od};}
+function bonusAvail(e){var b=bonusDay();return Math.max(0,bankStart()+e-b.grant);}
 function bonusHTML(n,all,isPapa){_bonusN=n;_bonusAll=all;if(!S.cfg.bonusOn)return '';
-  var e=bonusEarned(n,all),b=bonusDay(),left=Math.max(0,e-b.req-b.grant),per=+S.cfg.bonusPer||0,ab=+S.cfg.bonusAll||0,h='',cls='ps-bonus';
-  if(isPapa){var amt=Math.max(b.req,e-b.grant,0),brk=bonusBreak(n,all);
-    if(b.req>0&&amt>0){cls+=' req';h='<div class="ps-bh">🔔 娘から申請：+'+amt+'分</div><div class="ps-bs">'+(brk?'今日の内訳：'+brk+'<br>':'')+'Family Link →「スクリーンタイム」→「ボーナス時間」で +'+amt+'分 を追加してから押してください'+ntfyLine(b.nt)+'</div><button class="ps-btn ok" onclick="bonusGrant()">✅ +'+amt+'分 付与した</button>';}
-    else if(amt>0){h='<div class="ps-bh">📱 達成分 +'+amt+'分（まだ申請なし）</div>'+(brk?'<div class="ps-bs">今日の内訳：'+brk+'</div>':'')+'<button class="ps-btn ok" onclick="bonusGrant()">✅ +'+amt+'分 付与した</button>';}
-    else if(b.grant>0)h='<div class="ps-bh">📱 今日のボーナス：+'+b.grant+'分 付与済み</div>'+(e<b.grant?'<div class="ps-bs">（その後の判定変更で、いまの達成分は +'+e+'分）</div>':'');
+  var e=bonusEarned(n,all),b=bonusDay(),bk=bankStart(),av=bonusAvail(e),left=Math.max(0,av-b.req),per=+S.cfg.bonusPer||0,ab=+S.cfg.bonusAll||0,h='',cls='ps-bonus';
+  try{if(S.day&&S.day.date===today()){var L=(S.bonusLog||{})[today()];if(!L||_num(L.e)!==e){bonusLogSet(e,b.grant);save();}}}catch(_e){}
+  var src=(bk?'貯金 '+bk+'分＋':'')+'今日 '+e+'分'+(b.grant?'−解放ずみ '+b.grant+'分':'');
+  if(isPapa){var brk=bonusBreak(n,all),def=b.req>0?Math.min(b.req,av):av;
+    if(av>0){if(b.req>0)cls+=' req';
+      h='<div class="ps-bh">'+(b.req>0?'🔔 娘から申請：+'+b.req+'分':'📱 使える時間 '+av+'分（まだ申請なし）')+'</div>'
+       +'<div class="ps-bs">使える時間 '+av+'分（'+src+'）'+(brk?'<br>今日の内訳：'+brk:'')+'<br>Family Link で追加した分だけ入れて「解放した」を押してください。のこりは貯金になります'+(b.req>0?ntfyLine(b.nt):'')+'</div>'
+       +'<div class="ps-rel"><input id="relMin" type="number" min="1" max="'+av+'" value="'+def+'" inputmode="numeric"><span>分</span>'
+       +[30,60].filter(function(x){return x<av;}).map(function(x){return '<button class="ps-chip2" onclick="document.getElementById(\'relMin\').value='+x+'">'+x+'分</button>';}).join('')
+       +'<button class="ps-chip2" onclick="document.getElementById(\'relMin\').value='+av+'">全部</button></div>'
+       +'<button class="ps-btn ok" onclick="bonusGrant()">✅ 解放した（のこりは貯金）</button>';}
     else h='<div class="ps-bh">📱 今日のボーナス：'+(e?('+'+e+'分 たまった'):'まだなし')+'</div>';
-    if(b.grant>0&&amt>0)h+='<div class="ps-bs">今日 付与済み +'+b.grant+'分</div>';
+    if(b.grant>0)h+='<div class="ps-bs" style="color:#2f7d45">✅ 今日 解放ずみ +'+b.grant+'分</div>';
     var ks=Object.keys(S.bonusLog||{}).sort().filter(function(k){return _num(S.bonusLog[k].g)>0;}).slice(-7);if(ks.length)h+='<div class="ps-log">直近：'+ks.map(function(k){var p=k.split('-');return (+p[1])+'/'+(+p[2])+' +'+_num(S.bonusLog[k].g)+'分';}).join('・')+'</div>';
   }else{
-    if(left>0)h='<div class="ps-bh">📱 スマホ時間 +'+left+'分 たまったよ</div><button class="ps-btn" onclick="bonusRequest()">📱 パパにお願いする（+'+left+'分）</button>';
+    if(left>0)h='<div class="ps-bh">📱 スマホ時間 '+left+'分 たまってるよ</div>'+(bk||b.grant?'<div class="ps-bs">'+src+'</div>':'')+'<button class="ps-btn" onclick="bonusRequest()">📱 パパにお願いする（+'+left+'分）</button><button class="ps-link2" onclick="bonusRequest(1)">✂️ 一部だけお願いする（のこりは貯金）</button>';
     else if(b.req>0){cls+=' req';h='<div class="ps-bh">⏳ +'+b.req+'分 パパの承認待ち</div>'+(_ntfyMsg?'<div class="ps-bs">'+_ntfyMsg+'</div>':'')+((ntfyTopic()&&Date.now()-_ntfyLast>120000)?'<button class="ps-btn" style="background:#f0a24a;box-shadow:0 3px 0 #c97f2c" onclick="bonusRenotify()">🔔 もう一度パパに知らせる</button>':'');}
-    else if(e===0)h='<div class="ps-bh">📱 スマホ時間をためよう</div><div class="ps-bs">ため方は いちばん下の📋ルール表を見てね</div>';
-    if(b.grant>0)h+='<div class="ps-bs" style="color:#2f7d45">✅ 今日もらった時間 +'+b.grant+'分</div>';
+    else if(av===0&&e===0)h='<div class="ps-bh">📱 スマホ時間をためよう</div><div class="ps-bs">ため方は いちばん下の📋ルール表を見てね</div>';
+    if(b.grant>0)h+='<div class="ps-bs" style="color:#2f7d45">✅ 今日もらった時間 +'+b.grant+'分'+(av>0?'・貯金 '+av+'分':'')+'</div>';
     if(!h)h='<div class="ps-bh">📱 スマホ時間ボーナス</div>';
     if(e>0&&!all)h+='<div class="ps-bs">コミットラインあと1つで +'+(per+((n+1===_bonusRows)?ab:0))+'分</div>';
   }
   return '<div class="'+cls+'">'+h+'</div>';}
-function bonusRequest(){var e=bonusEarned(_bonusN,_bonusAll),b=bonusDay(),left=Math.max(0,e-b.req-b.grant);if(left<=0)return;
-  rollover();S.day.bonus={req:b.req+left,reqAt:Date.now(),grant:b.grant,grantAt:b.grantAt};bonusLogSet(e,b.grant);save();maybeSync();render();showCheer('📱 パパにお願いしたよ！（+'+(b.req+left)+'分）');sTick();bonusNotify(b.req+left);}
+function bonusRequest(part){var e=bonusEarned(_bonusN,_bonusAll),b=bonusDay(),left=Math.max(0,bonusAvail(e)-b.req);if(left<=0)return;
+  var amt=left;if(part){var v=prompt('何分お願いする？（のこりは貯金して、あした以降に使えるよ）',String(Math.min(left,30)));if(v===null)return;amt=Math.max(1,Math.min(left,parseInt(v,10)||0));if(!(amt>0))return;}
+  rollover();S.day.bonus={req:b.req+amt,reqAt:Date.now(),grant:b.grant,grantAt:b.grantAt,last:(S.day.bonus&&S.day.bonus.last)||null};bonusLogSet(e,b.grant);save();maybeSync();render();showCheer('📱 パパにお願いしたよ！（+'+(b.req+amt)+'分）'+(amt<left?' のこり '+(left-amt)+'分は貯金':''));sTick();bonusNotify(b.req+amt);}
 /* プッシュ通知（ntfy.sh）：トピック名を購読したパパのスマホに即時通知。失敗しても申請自体はボードに残る */
 var _ntfyMsg='',_ntfyLast=0;
 /* 通知先トピックは S.cfg（同期で上書きされ得る）に加え、端末キャッシュ qb_ntfy と専用ノード rooms/<room>/notify にも持つ */
@@ -1473,10 +1491,10 @@ function renderFlJump(){var el=document.getElementById('flJump');if(!el)return;i
 function genNtfy(){var r='';for(var i=0;i<3;i++)r+=Math.random().toString(36).slice(2,8);document.getElementById('d_ntfy').value='qb-'+r;}
 function testNtfy(){var t=(document.getElementById('d_ntfy').value||'').trim();if(!t){alert('先にトピック名を入れてください');return;}var keep=S.cfg.ntfyTopic;S.cfg.ntfyTopic=t;
   qbNotify('🔔 テスト通知','クエストボードからのテスト通知です。届いていれば設定完了！').then(function(ok){if(ok){ntfyCache(t);ntfyPush(t);save();maybeSync();alert('送信しました。通知先も保存しました（娘の端末にも自動で反映されます）。スマホに通知が届いたか確認してください');}else{S.cfg.ntfyTopic=keep;alert('送信できませんでした（'+_ntfyErr+'）。通信状態を確認してください');}});}
-function bonusGrant(){var e=bonusEarned(_bonusN,_bonusAll),b=bonusDay(),amt=Math.max(b.req,e-b.grant,0);if(amt<=0)return;
-  if(!confirm('Family Link で +'+amt+'分 のボーナス時間を追加しましたか？'))return;
-  rollover();S.day.bonus={req:0,reqAt:b.reqAt,grant:b.grant+amt,grantAt:Date.now()};bonusLogSet(e,b.grant+amt);save();maybeSync();render();}
-function bonusCheer(isPapa){if(isPapa)return;try{var b=bonusDay();if(!b.grantAt)return;var k='qb_bonusseen',v=localStorage.getItem(k);if(String(b.grantAt)===v)return;if(document.getElementById('cheer').style.display==='flex')return;localStorage.setItem(k,String(b.grantAt));showCheer('📱 スマホ時間 +'+b.grant+'分 もらえたよ！');sWin();burst();}catch(e){}}
+function bonusGrant(){var e=bonusEarned(_bonusN,_bonusAll),b=bonusDay(),av=bonusAvail(e),el=document.getElementById('relMin'),amt=Math.min(av,Math.max(0,parseInt(el&&el.value,10)||0));if(amt<=0){alert('解放する分を入れてください（1〜'+av+'分）');return;}
+  if(!confirm('Family Link で +'+amt+'分 を追加しましたか？\n（'+av+'分のうち '+amt+'分 を解放。のこり '+(av-amt)+'分は貯金）'))return;
+  rollover();S.day.bonus={req:0,reqAt:b.reqAt,grant:b.grant+amt,grantAt:Date.now(),last:{g:amt,of:av,left:av-amt}};bonusLogSet(e,b.grant+amt);save();maybeSync();render();}
+function bonusCheer(isPapa){if(isPapa)return;try{var b=bonusDay();if(!b.grantAt)return;var k='qb_bonusseen',v=localStorage.getItem(k);if(String(b.grantAt)===v)return;if(document.getElementById('cheer').style.display==='flex')return;localStorage.setItem(k,String(b.grantAt));var ls=(S.day.bonus&&S.day.bonus.last)||null;showCheer(ls&&ls.left>0?('📱 '+ls.of+'分のうち '+ls.g+'分 解放したよ！のこり '+ls.left+'分は貯金してあるよ'):('📱 スマホ時間 +'+(ls?ls.g:b.grant)+'分 もらえたよ！'));sWin();burst();}catch(e){}}
 /* 宿題の入れ替え：完了済みは消し、未完了はそのまま残し、新しい宿題を後ろに追加（同じ文面は重複させない） */
 function hwParse(txt){return String(txt||'').split('\n').map(function(x){return x.replace(/[\s　]+/g,' ').trim();}).filter(function(x){return x&&!/^【[^】]*】/.test(x);});}
 function hwReplace(){var el=document.getElementById('d_hwnew');var nw=hwParse(el&&el.value);if(!nw.length){alert('新しい宿題を貼り付けてください');return;}
@@ -1668,7 +1686,7 @@ function restoreAuto(){var b;try{b=JSON.parse(localStorage.getItem('qb_backup')|
 function restoreUndo(){var u;try{u=JSON.parse(localStorage.getItem('qb_undo')||'null');}catch(e){}if(!u||!u.s){alert('取り消せる操作がありません');return;}if(!confirm('直前の状態（'+_fmtTs(u.t)+'）に戻します。よろしいですか？'))return;if(restoreFrom(u.s)){alert('直前の状態に戻しました');dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,phw:S.phw,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,kj:S.kj,rd:S.rd,cday:S.cday,cfgVer:S.cfgVer};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,phw:S.phw,bank:S.bank,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,kj:S.kj,rd:S.rd,cday:S.cday,cfgVer:S.cfgVer};}
 function maybeSync(){
   if(!SYNC.on||SYNC.applying||!SYNC.ref||!SYNC.stateReady)return;
   const snap=JSON.stringify(snapshotState());
@@ -1701,7 +1719,7 @@ function initSync(){
       if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
       if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');maybeSync();return;}
       SYNC.applying=true;
-      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','phw','hwAllSig','bonusLog','clog','clp','kj','rd','cday','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
+      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','phw','bank','hwAllSig','bonusLog','clog','clp','kj','rd','cday','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
       normalize();
       var _mig=false;if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;_mig=true;}
       SYNC.applying=false;
