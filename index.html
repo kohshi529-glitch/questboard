@@ -521,11 +521,11 @@
 
   <div class="sec">
     <h3>🧔 パパの宿題（計算）</h3>
-    <p class="hint">先生の宿題とは別に、パパが出す宿題です。つねに3つ表示し、写真→パパOKで先生の宿題と同じく＋時間・宿題の数に1つ数えます。OKした分は次の日に消えて、次の項目が足されます（第3回①〜⑦ → 第4回①〜④ → 第4回⑤〜⑦ → 第5回①〜④ …）。</p>
+    <p class="hint">先生の宿題とは別に、パパが出す宿題です。写真→パパOKで先生の宿題と同じく＋時間・宿題の数に1つ数えます。OKした分は次の日に消えて、次の項目が足されます（各回の①〜⑦を3ページずつ区切って、回をまたいで続けます：第4回①〜③ → 第4回④〜⑥ → 第4回⑦＋第5回①② → 第5回③〜⑤ …。つねに3つ表示）。</p>
     <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="d_phwOn" style="width:auto"> 表示する</label>
     <label>教材名</label><input id="d_phwBook" placeholder="四谷大塚 計算 4年上">
     <label>次に足す項目（変えると、まだ終わっていない項目をここから並べ直します）</label>
-    <div class="two"><div><input id="d_phwKai" type="number" min="1" placeholder="回"></div><div><select id="d_phwHalf"><option value="0">①〜④</option><option value="1">⑤〜⑦</option></select></div></div>
+    <div class="two"><div><input id="d_phwKai" type="number" min="1" placeholder="回"></div><div><select id="d_phwHalf"><option value="0">①</option><option value="1">②</option><option value="2">③</option><option value="3">④</option><option value="4">⑤</option><option value="5">⑥</option><option value="6">⑦</option></select></div></div>
     <label>最後の回（ここまで終わったら、次のテキストに切りかえ。教材名と「次に足す項目」を第1回に変えて保存）</label><input id="d_phwMax" type="number" min="1">
     <button class="btn gray" style="margin-top:8px" onclick="phwSave()">💾 パパの宿題を保存</button>
   </div>
@@ -836,16 +836,32 @@ function hwUnok(i){var it=S.homework[i];if(!it)return;rollover();if(it.okDate===
   if(S.day.hwAll&&S.hwAllSig===hwSig()){S.day.hwAll=0;S.hwAllSig='';}
   it.st='';it.done=false;delete it.okDate;save();maybeSync();render();}
 function viewHwPhoto(id){var d=HWPH[id];if(!d)return;kjZoom(d);}
-/* ===== 🧔 パパの宿題（四谷大塚 計算 4年上）：つねに3項目を表示。写真→パパOKで宿題1つに数える。OKした分は次の日に消え、次の項目が足される =====
-   並び：第3回①〜⑦ → 第4回①〜④ → 第4回⑤〜⑦ → 第5回①〜④ → 第5回⑤〜⑦ → … */
-function phwS(){var p=S.phw;if(!p||p.v!==2){p=S.phw={v:2,on:1,book:'四谷大塚 計算 4年上',items:[{id:'p3a',k:3,h:-1,st:''}],nk:4,nh:0,max:20,log:{}};}p.items=p.items||[];return p;}
-function phwFinished(){var p=phwS();return p.nk>(+p.max||20)&&!p.items.some(function(x){return x.st!=='ok';});}
-var PHW_H=['①〜④','⑤〜⑦'];
-function phwLabel(it,p){p=p||phwS();return (p.book||'計算')+' 第'+it.k+'回'+(it.h<0?'①〜⑦':PHW_H[it.h]||'');}
+/* ===== 🧔 パパの宿題（四谷大塚 計算 4年上）：写真→パパOKで宿題1つに数える =====
+   並び（11-16〜）：各回は①〜⑦。3ページずつ区切り、回をまたいで続ける。
+   第4回①〜③ → 第4回④〜⑥ → 第4回⑦＋第5回①② → 第5回③〜⑤ → 第5回⑥⑦＋第6回① → 第6回②〜④ …（つねに3項目を表示。OKした分は次の日に消えて次が足される）
+   ページの通し番号 g＝(回−1)×7＋(番号−1)。項目は {g:最初のページ, n:ページ数, t:4}。第3回までの ①〜⑦、旧方式の ①〜④／⑤〜⑦ の表示も残す */
+var PHW_PP=7,PHW_N=3,PHW_C='①②③④⑤⑥⑦⑧⑨⑩';
+function phwS(){var p=S.phw;if(!p||(p.v!==2&&p.v!==3&&p.v!==4)){p=S.phw={v:4,on:1,book:'四谷大塚 計算 4年上',items:[],ng:21,max:20,log:{}};}p.items=p.items||[];
+  /* 2026-11-16：3ページずつの区切りに切りかえ。まだ終わっていない第4回以降の古い項目を消して、その位置から並べ直す */
+  if(p.v!==4){var st0=function(x){return x.t===3?(x.k-1)*PHW_PP:(x.h===1?(x.k-1)*PHW_PP+4:(x.k-1)*PHW_PP);};
+    var rm=p.items.filter(function(x){return x.k>=4&&x.st!=='ok'&&x.st!=='sub';}),ng=null;
+    rm.forEach(function(x){if(x.ph)hwPhDel(x.ph);var g=st0(x);if(ng===null||g<ng)ng=g;});
+    p.items=p.items.filter(function(x){return rm.indexOf(x)<0;});
+    if(ng===null)ng=(Math.max(4,+p.nk||4)-1)*PHW_PP;if(ng<21)ng=21;p.ng=ng;delete p.nk;delete p.nh;p.v=4;}
+  return p;}
+function phwLast(p){return (+p.max||20)*PHW_PP-1;}
+function phwFinished(){var p=phwS();return p.ng>phwLast(p)&&!p.items.some(function(x){return x.st!=='ok';});}
+var PHW_H=['①','②','③'],PHW_H2=['①〜④','⑤〜⑦'];
+function phwPg(g){return {k:Math.floor(g/PHW_PP)+1,i:g%PHW_PP};}
+function phwRange(g0,n){var out=[],cur=null;for(var g=g0;g<g0+n;g++){var q=phwPg(g);if(!cur||cur.k!==q.k){cur={k:q.k,a:[]};out.push(cur);}cur.a.push(q.i);}
+  return out.map(function(r){var t=r.a.length>=3?PHW_C.charAt(r.a[0])+'〜'+PHW_C.charAt(r.a[r.a.length-1]):r.a.map(function(i){return PHW_C.charAt(i);}).join('');return '第'+r.k+'回'+t;}).join('＋');}
+function phwLabel(it,p){p=p||phwS();var b=(p.book||'計算')+' ';
+  if(it.t===4)return b+phwRange(it.g,it.n);
+  return b+'第'+it.k+'回'+(it.h<0?'①〜⑦':((it.t===3?PHW_H:PHW_H2)[it.h]||''));}
 function phwOpen(){return phwS().items.filter(function(x){return x.st!=='ok';});}
 function phwFill(){var p=phwS(),td=today(),ch=false;
   var keep=p.items.filter(function(x){return !(x.st==='ok'&&x.okDate&&x.okDate<td);});if(keep.length!==p.items.length){p.items=keep;ch=true;}
-  var mx=+p.max||20;while(phwOpen().length<3&&p.nk<=mx){p.items.push({id:'p'+p.nk+(p.nh?'b':'a'),k:p.nk,h:p.nh,st:''});p.nh++;if(p.nh>1){p.nh=0;p.nk++;}ch=true;}
+  var last=phwLast(p);while(phwOpen().length<3&&p.ng<=last){var n=Math.min(PHW_N,last-p.ng+1);p.items.push({id:'g'+p.ng,g:p.ng,n:n,t:4,k:phwPg(p.ng).k,st:''});p.ng+=n;ch=true;}
   if(ch){save();maybeSync();}}
 function phwRoll(){phwFill();}
 function phwFind(id){return phwS().items.find(function(x){return x.id===id;});}
@@ -874,13 +890,14 @@ function renderPhw(){var el=document.getElementById('phwCard');if(!el)return;var
     else if(st==='ng')info='<div class="hw-st ng">↩ やり直し：'+esc(it.note||'もう一度やってみよう')+'</div>';
     else if(st==='ok'&&per&&S.cfg.bonusOn)info='<div class="hw-st ok">+'+per+'分 ゲット！</div>';
     return '<div class="hw-item'+cls+'" onclick="phwTap('+idq+')"><div class="hw-box">'+box+'</div><div class="hw-body"><div class="hw-txt">'+esc(phwLabel(it,p))+'</div>'+info+'</div></div>';}).join('');
-  var tip=isPapa?(pend?'<div class="hw-tip">🔔 確認待ちが '+pend+'件 あります。写真を見て OK／やり直し を押してください</div>':'<div class="hw-tip">つねに3つ表示。OKした分は次の日に消えて、次の回が足されます</div>')
+  var tip=isPapa?(pend?'<div class="hw-tip">🔔 確認待ちが '+pend+'件 あります。写真を見て OK／やり直し を押してください</div>':'<div class="hw-tip">つねに3つ表示。OKした分は次の日に消えて、次の3ページが足されます</div>')
     :'<div class="hw-tip">📷 1つ終わったら タップして写真をとってパパに送ろう'+(S.cfg.bonusOn&&per?'（OKで +'+per+'分・宿題1つに数えるよ）':'（宿題1つに数えるよ）')+'</div>';
   var fin=phwFinished()?'<div class="hw-tip" style="margin-top:8px;font-weight:900">🎉 第'+(+p.max||20)+'回まで ぜんぶ終わったよ！'+(isPapa?'（次のテキストは保護者メニューで教材名・回を設定してください）':'つぎのテキストはパパが用意するね')+'</div>':'';
   el.innerHTML='<div class="card hwcard phwcard"><div class="hw-h"><span>🧔 パパの宿題</span><span class="hw-count">今日OK '+okN+(pend?' ・確認待ち '+pend:'')+'</span></div>'+tip+'<div class="hw-list">'+items+'</div>'+fin+'</div>';}
-function phwSave(){var p=phwS(),g=function(id){return document.getElementById(id);};var k=parseInt(g('d_phwKai').value)||p.nk,h=+g('d_phwHalf').value||0;
+function phwSave(){var p=phwS(),g=function(id){return document.getElementById(id);};var _q=phwPg(p.ng),k=parseInt(g('d_phwKai').value)||_q.k,h=+g('d_phwHalf').value||0;
   p.on=g('d_phwOn').checked?1:0;p.book=(g('d_phwBook').value||'').trim()||'四谷大塚 計算 4年上';p.max=parseInt(g('d_phwMax').value)||20;
-  if(k!==p.nk||h!==p.nh){if(confirm('まだ終わっていない項目を消して、第'+k+'回'+PHW_H[h]+' から並べ直しますか？')){p.items=p.items.filter(function(x){if(x.st!=='ok'&&x.ph)hwPhDel(x.ph);return x.st==='ok';});p.nk=k;p.nh=h;}}
+  var ng=(k-1)*PHW_PP+Math.max(0,Math.min(PHW_PP-1,h));
+  if(ng!==p.ng){if(confirm('まだ終わっていない項目を消して、第'+k+'回'+PHW_C.charAt(ng%PHW_PP)+' から並べ直しますか？')){p.items=p.items.filter(function(x){if(x.st!=='ok'&&x.ph)hwPhDel(x.ph);return x.st==='ok';});p.ng=ng;}}
   phwFill();save();maybeSync();render();alert('パパの宿題を保存しました'+(p.on?'':'（お休み中）'));}
 /* 写真の確認（OK・やり直し・丸つけ）をした回数：パパタスク「丸つけ・OKをその日のうちに」の判定に使う */
 function qbRv(){rollover();S.day.rv=_num(S.day.rv)+1;}
@@ -1653,7 +1670,7 @@ function render(){
   dl.addEventListener('contextmenu',e=>e.preventDefault());
 })();
 function fillExport(){document.getElementById('d_export').value=cfgExport();}
-function dadOpen(){try{var _p=phwS();document.getElementById('d_phwOn').checked=!!_p.on;document.getElementById('d_phwBook').value=_p.book||'';document.getElementById('d_phwKai').value=_p.nk;document.getElementById('d_phwHalf').value=String(_p.nh||0);document.getElementById('d_phwMax').value=_p.max||20;}catch(e){}try{var _cd=document.getElementById('d_clDate');_cd.value=yesterday();_cd.max=yesterday();document.getElementById('d_clLv').value=String(clLevel(yesterday()));_cd.onchange=function(){document.getElementById('d_clLv').value=String(clLevel(_cd.value));};}catch(e){}
+function dadOpen(){try{var _p=phwS();document.getElementById('d_phwOn').checked=!!_p.on;document.getElementById('d_phwBook').value=_p.book||'';var _q=phwPg(_p.ng);document.getElementById('d_phwKai').value=_q.k;document.getElementById('d_phwHalf').value=String(_q.i);document.getElementById('d_phwMax').value=_p.max||20;}catch(e){}try{var _cd=document.getElementById('d_clDate');_cd.value=yesterday();_cd.max=yesterday();document.getElementById('d_clLv').value=String(clLevel(yesterday()));_cd.onchange=function(){document.getElementById('d_clLv').value=String(clLevel(_cd.value));};}catch(e){}
   document.getElementById('d_meName').value=S.me.name;document.getElementById('d_meEmoji').value=S.me.emoji;
   document.getElementById('d_paName').value=S.pa.name;document.getElementById('d_paEmoji').value=S.pa.emoji;
   document.getElementById('d_fixed').value=S.cfg.fixed.join('\n');
