@@ -323,11 +323,12 @@
   .legend .l-amethyst{background:radial-gradient(circle at 30% 25%,#f5e8ff 0,#c084fc 35%,#7b2ff7 80%);border-color:#6d28d9}
   .ps-msg.am{background:linear-gradient(90deg,#f3e8ff,#fce7f3);color:#6b21a8}
   /* 👑 GOD 神セレブレーション（アメジストの紫と重ならない、透明感のある天空ブルー〜アクア） */
-  .hcell.god{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 28%,#ffffff 0,#cffafe 18%,#5ee0f5 38%,#0ea5e9 58%,#0b4a8f 82%,#06204a 100%);border-color:#a5f3fc;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:900;line-height:1;text-shadow:0 0 3px #04224a,0 0 2px #04224a;animation:godGlow 2.4s ease-in-out infinite}
+  .hcell.god{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 28%,#ffffff 0,#cffafe 18%,#5ee0f5 38%,#0ea5e9 58%,#0b4a8f 82%,#06204a 100%);border-color:#f472b6;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:900;line-height:1;text-shadow:0 0 3px #04224a,0 0 2px #04224a;animation:godGlow 2.4s ease-in-out infinite;transform:scale(1.18);z-index:1}
   .hcell.god::after{content:'';position:absolute;inset:-50%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.85) 50%,transparent 58%);animation:godShine 2.8s linear infinite}
-  @keyframes godGlow{0%,100%{box-shadow:0 0 0 1px #e0fbff inset,0 0 6px rgba(103,232,249,.85),0 0 10px rgba(14,165,233,.5)}50%{box-shadow:0 0 0 1px #ffffff inset,0 0 12px rgba(165,243,252,1),0 0 20px rgba(56,189,248,.85)}}
+  /* わく（フレーム）はピンク。わくと光のぼかしで小さく見える分、ほかのマークより少し大きく（scale 1.18） */
+  @keyframes godGlow{0%,100%{box-shadow:0 0 0 1px #ffd6ea inset,0 0 6px rgba(244,114,182,.85),0 0 10px rgba(236,72,153,.5)}50%{box-shadow:0 0 0 1px #ffffff inset,0 0 12px rgba(249,168,212,1),0 0 20px rgba(236,72,153,.85)}}
   @keyframes godShine{from{transform:translateX(-55%)}to{transform:translateX(55%)}}
-  .legend .l-god{background:radial-gradient(circle at 50% 30%,#fff 0,#a5f3fc 30%,#0ea5e9 62%,#0b4a8f 100%);border-color:#a5f3fc;box-shadow:0 0 4px rgba(103,232,249,.95)}
+  .legend .l-god{background:radial-gradient(circle at 50% 30%,#fff 0,#a5f3fc 30%,#0ea5e9 62%,#0b4a8f 100%);border-color:#f472b6;box-shadow:0 0 0 1px #ffd6ea inset,0 0 4px rgba(244,114,182,.95);transform:scale(1.18)}
   .ps-msg.god{background:linear-gradient(135deg,#041a3d,#0b4a8f 45%,#041a3d);color:#e0fbff;border:1.5px solid #67e8f9;box-shadow:0 0 14px rgba(103,232,249,.5),inset 0 0 18px rgba(165,243,252,.25);text-shadow:0 0 8px rgba(103,232,249,.85);letter-spacing:.04em}
   .ps-msg.god span{color:#cffafe;font-size:.8rem;text-shadow:none}
   #godparty{position:fixed;inset:0;z-index:69;pointer-events:none;overflow:hidden;display:flex;align-items:center;justify-content:center;animation:godFade 6.4s ease forwards}
@@ -1179,13 +1180,17 @@ function partyTrack(lvl,hwN){if(lvl<3)return;if(SYNC.on&&!SYNC.astatReady)return
   try{var seen=JSON.parse(localStorage.getItem('qb_partyseen')||'{}');if(seen.d!==td)seen={d:td,n:0};if(r.n>seen.n){seen.n=r.n;localStorage.setItem('qb_partyseen',JSON.stringify(seen));setTimeout(function(){partyFire(r.n);},Math.max(50,_fxUntil-Date.now()));_fxUntil=Math.max(_fxUntil,Date.now())+3200;}}catch(e){}}
 /* 演出の順番待ち（フラッグ → パーティ → アメジスト が重ならないように） */
 var _fxUntil=0;
-/* 🌟パーフェクト達成：大きなレインボーフラッグを1回（端末ごとに1日1回） */
+/* 🌟パーフェクト達成：大きな金色の星の旗を1回（端末ごとに1日1回）。レインボーの虹色は使わない */
 function flagCheck(lvl){if(lvl<2)return;if(SYNC.on&&!SYNC.astatReady)return;var td=today();try{if(localStorage.getItem('qb_flagseen')===td)return;localStorage.setItem('qb_flagseen',td);}catch(e){return;}
   var w=Math.max(50,_fxUntil-Date.now());_fxUntil=Math.max(_fxUntil,Date.now())+2800;setTimeout(flagFire,w);}
 function flagFire(){var o=document.getElementById('rbflag');if(o)o.remove();o=document.createElement('div');o.id='rbflag';
-  var cols=['#ff4d4d','#ff9a3c','#ffd93b','#4cc96a','#3fa2ff','#9b5cff'],st='';cols.forEach(function(c,i){st+='<rect x="0" y="'+(i*20)+'" width="200" height="20" fill="'+c+'"/>';});
+  var star=function(cx,cy,R,r){var pt=[];for(var i=0;i<10;i++){var a=Math.PI/2*3+i*Math.PI/5,rr=i%2?r:R;pt.push((cx+rr*Math.cos(a)).toFixed(1)+','+(cy+rr*Math.sin(a)).toFixed(1));}return pt.join(' ');};
+  var st='<defs><linearGradient id="pfG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".45" stop-color="#ffd93b"/><stop offset="1" stop-color="#f0a500"/></linearGradient></defs>'
+    +'<rect x="0" y="0" width="200" height="120" rx="6" fill="url(#pfG)" stroke="#e09400" stroke-width="3"/>'
+    +'<polygon points="'+star(100,62,44,18)+'" fill="#fff" stroke="#f0a500" stroke-width="3" stroke-linejoin="round"/>'
+    +'<polygon points="'+star(32,28,13,5.5)+'" fill="#fffbe6"/><polygon points="'+star(170,30,11,4.5)+'" fill="#fffbe6"/><polygon points="'+star(28,96,9,3.8)+'" fill="#fffbe6"/><polygon points="'+star(172,96,13,5.5)+'" fill="#fffbe6"/>';
   o.innerHTML='<div class="rbf-wrap"><svg class="rbf" viewBox="0 0 230 200" width="300" height="260"><rect x="8" y="4" width="8" height="196" rx="4" fill="#8a6a3a"/><circle cx="12" cy="6" r="7" fill="#ffd93b"/><g class="rbf-cloth" transform="translate(16,14)">'+st+'</g></svg><div class="rbf-t">🌟 パーフェクト！</div></div>';
-  document.body.appendChild(o);sBig();burst(36,true,['🌈','⭐','✨','🌟']);setTimeout(function(){try{o.remove();}catch(e){}},2700);}
+  document.body.appendChild(o);sBig();burst(36,true,['⭐','✨','🌟','💛']);setTimeout(function(){try{o.remove();}catch(e){}},2700);}
 /* 💜アメジスト到達：デコレーションシャワー（端末ごとに1日1回） */
 var AM_EM=['💫','💜','✨','💞','💖','🏆'];
 function amTrack(lvl){if(lvl<4)return;if(SYNC.on&&!SYNC.astatReady)return;var td=today();try{if(localStorage.getItem('qb_amseen')===td)return;localStorage.setItem('qb_amseen',td);}catch(e){return;}
