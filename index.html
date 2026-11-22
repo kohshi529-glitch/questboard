@@ -411,6 +411,16 @@
   .sec{background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px;margin-top:14px}
   .sec h3{margin:0 0 6px;font-size:.95rem}
 .pface{width:1.35em;height:1.35em;vertical-align:-0.3em;display:inline-block;object-fit:contain}
+.kj-book{margin:8px 0 4px;padding:10px 12px;border-radius:12px;background:#fff7f0;border:1.5px solid #f3cdb3}
+.kj-bk-h{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 8px;font-size:.82rem;font-weight:800;color:#7a4a46}
+.kj-bk-h b{color:#c0302c;font-variant-numeric:tabular-nums}
+.kj-bk-bar{height:9px;border-radius:9px;background:#f3e2d6;overflow:hidden;margin:6px 0}
+.kj-bk-bar i{display:block;height:100%;background:linear-gradient(90deg,#f0a24a,#2f9e5e);border-radius:9px}
+.kj-bk-chips{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.kj-bk-chips span{font-size:.72rem;font-weight:800;text-align:center;border-radius:6px;padding:3px 0;background:#fff;border:1px solid #ecd3c2;color:#b89a8a;font-variant-numeric:tabular-nums}
+.kj-bk-chips span.on{background:#2f9e5e;border-color:#2f9e5e;color:#fff}
+.kj-bk-chips.sg{grid-template-columns:repeat(4,1fr)}
+.kj-sw{width:100%;font:inherit;font-size:1rem;padding:8px 10px;border:2px solid #f0b8b3;border-radius:10px;margin:6px 0}
 </style>
 </head>
 <body>
@@ -1013,10 +1023,25 @@ function kjPassHTML(ui,ans){var P=kjPass(ui);if(!P)return '';var i=0;
   return esc(P.raw).replace(/\{([^|}]+)\|([^|}]+)(?:\|([^}]+))?\}/g,function(_,a,k){var n=kjNum(i++);return '<span class="kj-nw">'+(ans?'<b class="kj-ans">'+a+'</b>':'<span class="kj-blank">［'+k+'］</span>')+'<sup>'+n+'</sup></span>';})
     .replace(/〈([^〉]+)〉/g,'<span class="kj-conj">$1</span>');}
 /* 1テストの各問：{c:字,a:答え,q:問題} */
-function kjItems(t){if(t&&t.mode==='p'){var P=kjPass(t.u);if(P)return P.b.map(function(x){return {c:x.c,a:x.a,q:'［'+x.k+'］',k:x.k};});}var D=kjDict();return (t.q||[]).map(function(c){return D.d[c]||{c:c,q:c,a:c};});}
+function kjItems(t){if(t&&t.mode==='s')return (t.q||[]).map(function(w){return {c:w,a:w,q:'［'+w+'］',k:w};});if(t&&t.mode==='p'){var P=kjPass(t.u);if(P)return P.b.map(function(x){return {c:x.c,a:x.a,q:'［'+x.k+'］',k:x.k};});}var D=kjDict();return (t.q||[]).map(function(c){return D.d[c]||{c:c,q:c,a:c};});}
 function kjUD(){var K=kjS();K.ud=K.ud||{};return K.ud;}
 function kjNextPart(){var U=window.KANJI_UNITS||[],ud=kjUD();for(var i=0;i<U.length;i++){if(!ud[i]&&kjPass(i))return i;}return -1;}
-function kjFinish(t){t.st='done';t.dd=today();if(t.mode==='p'){var ud=kjUD();if(!ud[t.u])ud[t.u]=t.dd;}}
+function kjFinish(t){t.st='done';t.dd=today();if(t.mode==='p'){var ud=kjUD();if(!ud[t.u])ud[t.u]=t.dd;}if(t.mode==='s'){var sd=kjSD();if(!sd[t.n])sd[t.n]=t.dd;}}
+/* 5回ごとの総合（第5回・第10回・第15回…）：収録している回の番号のすき間から自動で決める。範囲＝直前の4回 */
+function kjSD(){var K=kjS();K.sd=K.sd||{};return K.sd;}
+function kjSougou(){var U=window.KANJI_UNITS||[],has={},mx=0;U.forEach(function(u){var m=String(u.u).match(/\d+/);if(m){has[+m[0]]=1;mx=Math.max(mx,+m[0]);}});var o=[];for(var n=5;n<=mx;n+=5){if(!has[n])o.push(n);}return o;}
+function kjSName(n){return '第'+n+'回 総合';}
+function kjStartS(n){if(!kjOn())return;if(kjBusy()){alert('いまのテストを先に出してね');return;}var K=kjS();
+  K.tests.push({id:'t'+Date.now().toString(36),d:today(),st:'take',mode:'s',n:n,q:[],at:Date.now()});while(K.tests.length>40)K.tests.shift();
+  save();maybeSync();renderKanji();sTick();setTimeout(function(){var e=document.getElementById('kjCard');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});},50);}
+function kjGradeS(id){var t=kjFind(id);if(!t||t.st!=='sub')return;var el=document.getElementById('kjsw_'+id),raw=(el&&el.value||'').trim();
+  var ws=raw?raw.split(/[\s、,，・／\/]+/).filter(Boolean):[];
+  if(!confirm(ws.length?('まちがえた漢字 '+ws.length+'こ（'+ws.join('・')+'）で確定しますか？'):'ぜんぶ○で確定しますか？'))return;
+  rollover();var D=kjDict();t.q=ws;t.res=[];t.gd=today();t.ga=Date.now();qbRv();
+  ws.forEach(function(w){w.split('').forEach(function(c){if(D.d[c])kjProg(c,false);});});
+  if(t.ph)hwPhDel(t.ph);delete t.ph;delete t.nt;
+  if(!ws.length)kjFinish(t);else{t.st='graded';t.fx={};ws.forEach(function(w,i){t.fx[i]={st:'',ng:0};});}
+  save();maybeSync();render();}
 function kjActive(){return kjS().tests.filter(function(t){return t.st!=='done';});}
 function kjBusy(){return kjS().tests.some(function(t){return t.st==='take'||t.st==='sub';});}
 function kjMastered(){var p=kjS().prog,n=0,k;for(k in p){if(p[k]&&p[k].m)n++;}return n;}
@@ -1030,9 +1055,9 @@ function kjPick(ui){var D=kjDict(),p=kjS().prog,td=today(),out=[],used={};
   D.order.filter(function(c){var r=p[c];return r&&!r.m;}).sort(function(a,b){return (p[a].due||'')<(p[b].due||'')?-1:1;}).forEach(add);
   D.order.slice().sort(function(){return Math.random()-.5;}).forEach(add);
   return out;}
-function kjUnitPick(v){var K=kjS();K.unit=+v||0;save();renderKanji();}
+function kjUnitPick(v){var K=kjS();if(String(v).charAt(0)==='s'){K.selS=+String(v).slice(1);}else{K.selS=null;K.unit=+v||0;}save();renderKanji();}
 function kjStart(){if(!kjOn())return;if(kjBusy()){alert('いまのテストを先に出してね');return;}var sel=document.getElementById('kjUnit'),ui=sel?(+sel.value||0):kjDefaultUnit();
-  var K=kjS(),P=kjPass(ui);K.unit=ui;var t={id:'t'+Date.now().toString(36),d:today(),st:'take',q:P?P.b.map(function(x){return x.c;}):kjPick(ui),at:Date.now()};if(P){t.mode='p';t.u=ui;}K.tests.push(t);while(K.tests.length>40)K.tests.shift();
+  var K=kjS(),P=kjPass(ui);K.unit=ui;K.selS=null;var t={id:'t'+Date.now().toString(36),d:today(),st:'take',q:P?P.b.map(function(x){return x.c;}):kjPick(ui),at:Date.now()};if(P){t.mode='p';t.u=ui;}K.tests.push(t);while(K.tests.length>40)K.tests.shift();
   save();maybeSync();renderKanji();sTick();setTimeout(function(){var e=document.getElementById('kjCard');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});},50);}
 function kjCancel(id){var t=kjFind(id);if(!t||t.st!=='take')return;if(!confirm('このテストをやめますか？（まだ何も記録されません）'))return;var K=kjS();K.tests=K.tests.filter(function(x){return x.id!==id;});save();maybeSync();renderKanji();}
 function kjFind(id){return kjS().tests.find(function(t){return t.id===id;});}
@@ -1045,7 +1070,7 @@ function kjPhotoPicked(ev){_kjCam=false;var f=ev.target.files&&ev.target.files[0
 function kjSubmit(id,kind,data){var t=kjFind(id);if(!t)return;var pid='k'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
   HWPH[pid]=data;hwPhSave();var r=hwPhRef();if(r){try{r.child(pid).set(data);}catch(e){}}
   var title,body,per=(+S.cfg.kanjiPer||0);
-  if(kind==='test'){if(t.ph&&t.ph!==pid)hwPhDel(t.ph);t.ph=pid;t.st='sub';t.sat=Date.now();t.nt=0;delete t.note;title='✍️ 漢字テストの丸つけ';body=(t.mode==='p'?'漢字の文章テスト（'+((window.KANJI_UNITS[t.u]||{}).u||'')+'）':'漢字テスト10問')+'の写真が届きました。ボードで丸つけしてください。';showCheer('📷 パパに送ったよ！丸つけを待ってね');}
+  if(kind==='test'){if(t.ph&&t.ph!==pid)hwPhDel(t.ph);t.ph=pid;t.st='sub';t.sat=Date.now();t.nt=0;delete t.note;title='✍️ 漢字テストの丸つけ';body=(t.mode==='s'?'漢字の総合テスト（'+kjSName(t.n)+'）':t.mode==='p'?'漢字の文章テスト（'+((window.KANJI_UNITS[t.u]||{}).u||'')+'）':'漢字テスト10問')+'の写真が届きました。ボードで丸つけしてください。';showCheer('📷 パパに送ったよ！丸つけを待ってね');}
   else{var n=0;t.fx=t.fx||{};Object.keys(t.fx).forEach(function(i){var x=t.fx[i];if(x.st===''||x.st==='ng'){x.st='sub';delete x.note;n++;}});if(!n){hwPhDel(pid);return;}if(t.fxph&&t.fxph!==pid)hwPhDel(t.fxph);t.fxph=pid;t.fxnt=0;title='✍️ 漢字の直し';body='漢字の直し（'+n+'問分）の写真が届きました。ボードで OK／やり直し を押してください。';showCheer('📷 直しをパパに送ったよ！'+(S.cfg.bonusOn&&per?'OKで 1問 +'+per+'分':''));}
   save();maybeSync();renderKanji();sTick();
   qbNotify(title,body).then(function(ok){var x=kjFind(id);if(!x)return;var v=ok?1:(_ntfyErr||'不明');if(kind==='test'){if(x.st==='sub'){x.nt=v;}}else x.fxnt=v;save();maybeSync();renderKanji();});}
@@ -1116,9 +1141,22 @@ function renderKanji(){var el=document.getElementById('kanjiCard');if(!el)return
   var h='<div class="card kjcard" id="kjCard"><div class="v-h"><span>✍️ 漢字クエスト</span><span class="v-count">パート '+Object.keys(kjUD()).length+' / '+U.length+' クリア</span></div>'
     +'<div class="v-bar"><div class="v-fill" style="width:'+Math.round(tested/total*100)+'%;background:linear-gradient(90deg,#f0a24a,#d6504e)"></div></div>'
     +'<div class="v-sub" style="color:#7a4a46">テストした字 '+tested+' / '+total+'字・にがて '+nig+'字'+(qbRotOff().k?'<br>🔁 今日は📕 読書の日（漢字は昨日やったので、パーフェクトカウント外）'+(kt.d?'・パートクリア'+(kt.d>1?kt.d+'回':''):''):(kt.d?'<br>🎯 今日のパート <b>クリア！</b>'+(kt.d>1?'（'+kt.d+'回）':''):'<br>🎯 今日のパート：まだ（パートをクリアするとコミットラインの③クリア）'))+'</div>';
+  /* 📘 テキスト「漢字とことば 4年上」の完了進捗（パートクリア＝10字） */
+  var _ud=kjUD(),_dn=U.filter(function(u,i){return _ud[i];}).length,_pc=Math.round(_dn/U.length*100);
+  h+='<div class="kj-book"><div class="kj-bk-h"><span>📘 予習シリーズ 漢字とことば 4年上</span><b>'+_dn+' / '+U.length+' 回・'+(_dn*10)+' / '+(U.length*10)+'字（'+_pc+'%）</b></div>'
+    +'<div class="kj-bk-bar"><i style="width:'+_pc+'%"></i></div>'
+    +'<div class="kj-bk-chips">'+U.map(function(u,i){return '<span class="'+(_ud[i]?'on':'')+'" title="'+u.u+'">'+u.u.replace(/[第回]/g,'')+'</span>';}).join('')+'</div>'
+    +(function(){var SG=kjSougou(),sd=kjSD();if(!SG.length)return '';var dn=SG.filter(function(n){return sd[n];}).length;
+      return '<div class="kj-bk-h" style="margin-top:8px"><span>🏁 総合テスト（5回ごと）</span><b>'+dn+' / '+SG.length+' 回</b></div><div class="kj-bk-chips sg">'+SG.map(function(n){return '<span class="'+(sd[n]?'on':'')+'">'+n+' 総合</span>';}).join('')+'</div>';})()+'</div>';
   var act=kjActive().slice().reverse();
   act.forEach(function(t){var qs=kjItems(t),PM=t.mode==='p',PN=PM?((U[t.u]||{}).u||'')+' 文章テスト':'書き取りテスト（10問）';
-    if(t.st==='take'&&PM){var PP=kjPass(t.u);
+    if(t.mode==='s'&&t.st==='take'){
+      h+='<div class="kj-test"><div class="kj-th">✍️ '+kjSName(t.n)+'（第'+(t.n-4)+'〜'+(t.n-1)+'回のまとめ）'+(t.d!==today()?' <span class="kj-mini">'+t.d.slice(5).replace('-','/')+' から</span>':'')+'</div>'
+        +(t.note?'<div class="hw-st ng">↩ '+esc(t.note)+'</div>':'')
+        +'<div class="kj-rule">📘 テキスト「漢字とことば」の <b>'+kjSName(t.n)+'</b> の問題を解いてね。解いたページの写真をパパに送ろう</div>'
+        +(isPapa?'<div class="kj-mini">娘が総合の問題を解いています。写真が届くと丸つけできます。</div>':'<button class="kj-btn" onclick="kjSnap(\''+t.id+'\',\'test\')">📷 解けたら写真をとってパパに送る</button><button class="kj-link" onclick="kjCancel(\''+t.id+'\')">やめる</button>')
+        +'</div>';}
+    else if(t.st==='take'&&PM){var PP=kjPass(t.u);
       h+='<div class="kj-test"><div class="kj-th">✍️ '+PN+(t.d!==today()?' <span class="kj-mini">'+t.d.slice(5).replace('-','/')+' から</span>':'')+'</div>'
         +(t.note?'<div class="hw-st ng">↩ '+esc(t.note)+'</div>':'')
         +'<div class="kj-rule">📓 この文章を <b>ぜんぶノートに書き写してね</b>。<b>［　］の中は漢字</b>で（送りがなも）。小さい番号は書かなくていいよ</div>'
@@ -1134,28 +1172,33 @@ function renderKanji(){var el=document.getElementById('kanjiCard');if(!el)return
         +(isPapa?'<div class="kj-mini">娘がノートに書いています。写真が届くと丸つけできます。</div>':'<button class="kj-btn" onclick="kjSnap(\''+t.id+'\',\'test\')">📷 書けたら写真をとってパパに送る</button><button class="kj-link" onclick="kjCancel(\''+t.id+'\')">やめる</button>')
         +'</div>';}
     else if(t.st==='sub'){
-      if(isPapa){var g=KJG[t.id]||{},nx=Object.keys(g).filter(function(i){return g[i];}).length;
+      if(isPapa&&t.mode==='s'){h+='<div class="kj-test req"><div class="kj-th">🔔 丸つけ（'+kjSName(t.n)+'）</div>'+kjTimeLine(t)+kjThumb(t.ph,'写真を拡大して、テキストの答えと見くらべてください',t.id)+ntfyLine(t.nt)
+          +'<div class="kj-rule">まちがえた漢字（ことば）を入れてください。スペースか「、」で区切ります（例：観察　願い　議会）。ぜんぶ○なら空のままで確定</div>'
+          +'<input id="kjsw_'+t.id+'" class="kj-sw" type="text" placeholder="例：観察 願い 議会">'
+          +'<button class="kj-btn ok" onclick="kjGradeS(\''+t.id+'\')">✅ この内容で確定</button><button class="kj-link" onclick="kjRetake(\''+t.id+'\')">📷 写真をとり直してもらう</button></div>';}
+      else if(isPapa){var g=KJG[t.id]||{},nx=Object.keys(g).filter(function(i){return g[i];}).length;
         h+='<div class="kj-test req"><div class="kj-th">🔔 丸つけ（'+(PM?PN:'10問')+'）</div>'+kjTimeLine(t)+kjThumb(t.ph,'写真を拡大すると、下に正解の'+(PM?'文章':'文')+'が出ます。見くらべながら×をつけられます',t.id)+ntfyLine(t.nt)
           +(PM?'<div class="kj-pa">'+kjPassHTML(t.u,1)+'</div>':'')
           +'<div class="kj-rule">'+(PM?'書けなかった字だけタップして ×にしてください':'まちがえた問題だけタップして ×にしてください（正解の文）')+'</div><div class="kj-grade">'+kjGradeRows(t)
           +'</div><button class="kj-btn ok" onclick="kjGrade(\''+t.id+'\')">✅ '+(nx?'×'+nx+(PM?'字':'問')+'で':'ぜんぶ○で')+' 確定</button><button class="kj-link" onclick="kjRetake(\''+t.id+'\')">📷 写真をとり直してもらう</button></div>';}
-      else h+='<div class="kj-test"><div class="kj-th">📷 パパの丸つけ待ち（'+(PM?PN:'10問')+'）</div>'+((t.nt&&t.nt!==1)?'<div class="hw-st ng">⚠️ パパに通知できなかったよ。直接「漢字の写真送ったよ」と伝えてね</div>':'<div class="kj-mini">丸つけが終わると、ここに結果が出るよ</div>')+'</div>';}
+      else h+='<div class="kj-test"><div class="kj-th">📷 パパの丸つけ待ち（'+(t.mode==='s'?kjSName(t.n):PM?PN:'10問')+'）</div>'+((t.nt&&t.nt!==1)?'<div class="hw-st ng">⚠️ パパに通知できなかったよ。直接「漢字の写真送ったよ」と伝えてね</div>':'<div class="kj-mini">丸つけが終わると、ここに結果が出るよ</div>')+'</div>';}
     else if(t.st==='graded'&&!isPapa&&kjTaking()){h+='<div class="kj-test"><div class="kj-th">📝 前のテストの直し</div><div class="kj-mini">🙈 テスト中は答えが見えないようにかくしています。テストを出したら、また見られるよ</div></div>';}
     else if(t.st==='graded'){var fx=t.fx||{},ks=Object.keys(fx).map(Number).sort(function(a,b){return a-b;}),okN=t.res.filter(Boolean).length,need=ks.filter(function(i){return fx[i].st===''||fx[i].st==='ng';}),subN=ks.filter(function(i){return fx[i].st==='sub';});
-      h+='<div class="kj-test'+(isPapa&&subN.length?' req':'')+'"><div class="kj-th">📝 '+(PM?((U[t.u]||{}).u||'')+' ':'')+'けっか：○ '+okN+(PM?'字':'問')+'・直し '+ks.length+(PM?'字':'問')+'（クリア '+kjTestScore(t)+'/10）</div>';
+      h+='<div class="kj-test'+(isPapa&&subN.length?' req':'')+'"><div class="kj-th">📝 '+(t.mode==='s'?kjSName(t.n)+' けっか：直し '+ks.length+'こ（OK '+ks.filter(function(i){return fx[i].st==='ok';}).length+'/'+ks.length+'）':(PM?((U[t.u]||{}).u||'')+' ':'')+'けっか：○ '+okN+(PM?'字':'問')+'・直し '+ks.length+(PM?'字':'問')+'（クリア '+kjTestScore(t)+'/10）')+'</div>';
       if(isPapa&&subN.length)h+=kjThumb(t.fxph,'直しの写真（'+subN.length+'問分）')+ntfyLine(t.fxnt);
       h+='<div class="kj-fx">'+ks.map(function(i){var x=fx[i],d=qs[i],st=x.st,lab=st==='ok'?'✅ OK':st==='sub'?'📷 確認待ち':st==='ng'?'↩ やり直し'+(x.ng>1?'（'+x.ng+'回目）':''):'✏️ まだ';
         var acts=(isPapa&&st==='sub')?'<div class="hw-act"><button class="hw-ab" onclick="kjFixOk(\''+t.id+'\','+i+')">✅ OK</button><button class="hw-ab ng" onclick="kjFixNg(\''+t.id+'\','+i+')">↩ やり直し</button></div>':'';
         return '<div class="kj-fi '+(st||'todo')+'"><div><span class="kj-no">'+kjNum(i)+'</span> ［<span class="kj-big">'+esc(d.a)+'</span>］を <b>5回</b> 書く <span class="kj-st">'+lab+'</span></div>'+(st==='ng'&&x.note?'<div class="hw-st ng">'+esc(x.note)+'</div>':'')+acts+'</div>';}).join('')+'</div>';
-      if(!isPapa){if(need.length)h+='<div class="kj-rule">📓 ノートに '+(PM?'<b>書けなかったことば</b>':'<b>番号</b> と <b>［　］の中</b>')+' を <b>5回ずつ</b> 書いて、まとめて写真を1まいとってね</div><button class="kj-btn" onclick="kjSnap(\''+t.id+'\',\'fix\')">📷 直し（'+need.length+(PM?'字':'問')+'分）の写真を送る</button>';else if(subN.length)h+='<div class="kj-mini">📷 パパの確認待ち（'+subN.length+'問）'+((t.fxnt&&t.fxnt!==1)?'・⚠️ 通知できなかったので、直接パパに伝えてね':'')+'</div>';}
+      if(!isPapa){if(need.length)h+='<div class="kj-rule">📓 ノートに '+(t.mode==='s'?'<b>まちがえた漢字（ことば）</b>':PM?'<b>書けなかったことば</b>':'<b>番号</b> と <b>［　］の中</b>')+' を <b>5回ずつ</b> 書いて、まとめて写真を1まいとってね</div><button class="kj-btn" onclick="kjSnap(\''+t.id+'\',\'fix\')">📷 直し（'+need.length+(PM?'字':'問')+'分）の写真を送る</button>';else if(subN.length)h+='<div class="kj-mini">📷 パパの確認待ち（'+subN.length+'問）'+((t.fxnt&&t.fxnt!==1)?'・⚠️ 通知できなかったので、直接パパに伝えてね':'')+'</div>';}
       h+='</div>';}});
   var doneToday=K.tests.filter(function(t){return t.st==='done'&&t.dd===today();});
   if(doneToday.length)h+='<div class="kj-done">🎉 今日 パートクリア '+doneToday.length+'回'+((S.cfg.bonusOn&&kt.min)?'・漢字で <b>＋'+kt.min+'分</b>':'')+'</div>';
-  if(!kjBusy()){var ud=kjUD(),nx=kjNextPart(),du=(K.unit!=null&&K.unit<U.length&&!ud[K.unit]&&kjPass(K.unit))?K.unit:(nx>=0?nx:kjDefaultUnit());
-    h+='<div class="kj-start"><div class="kj-steps">📚 <b>パートの進め方</b><br>① 📖 漢字カードで、そのパートの10字を覚える<br>② ✍️ 文章テスト：出てきた文章を、［　］の中を漢字にして <b>ぜんぶノートに書く</b><br>③ 📷 写真をパパに送る → 書けなかった字は <b>5回ずつ</b> 書いて送る<br>④ ✅ パパのOKが全部そろったら <b>パートクリア</b>！</div>'
-      +'<label>どのパート？</label><select id="kjUnit" onchange="kjUnitPick(this.value)">'+U.map(function(u,i){if(!kjPass(i)&&!ud[i])return '';return '<option value="'+i+'"'+(i===du?' selected':'')+'>'+u.u+'（'+u.k.map(function(x){return x[0];}).join('')+'）'+(ud[i]?' ✅':'')+'</option>';}).join('')+'</select>'
-      +(isPapa?'':'<a class="v-open" style="background:#fff;color:#c0302c;border:2px solid #f0b8b3;box-shadow:none;margin-top:8px" href="./kanji.html?u='+du+'" id="kjCardLink">📖 ① このパートの10字を漢字カードで覚える</a>')
-      +(kjPass(du)?'<button class="kj-btn" onclick="kjStart()">✍️ ② '+(ud[du]?'もう一度 ':'')+'文章テストをはじめる</button>':'')+'</div>';}
+  if(!kjBusy()){var selS=(K.selS&&kjSougou().indexOf(K.selS)>=0)?K.selS:null,ud=kjUD(),nx=kjNextPart(),du=(K.unit!=null&&K.unit<U.length&&!ud[K.unit]&&kjPass(K.unit))?K.unit:(nx>=0?nx:kjDefaultUnit());
+    h+='<div class="kj-start"><label>どのパート？</label><select id="kjUnit" onchange="kjUnitPick(this.value)">'+U.map(function(u,i){if(!kjPass(i)&&!ud[i])return '';return '<option value="'+i+'"'+(i===du&&!selS?' selected':'')+'>'+u.u+'（'+u.k.map(function(x){return x[0];}).join('')+'）'+(ud[i]?' ✅':'')+'</option>';}).join('')
+      +kjSougou().map(function(n){return '<option value="s'+n+'"'+(selS===n?' selected':'')+'>🏁 '+kjSName(n)+'（第'+(n-4)+'〜'+(n-1)+'回のまとめ）'+(kjSD()[n]?' ✅':'')+'</option>';}).join('')+'</select>'
+      +(selS?(isPapa?'':'<button class="kj-btn" onclick="kjStartS('+selS+')">🏁 '+(kjSD()[selS]?'もう一度 ':'')+kjSName(selS)+'をはじめる</button>')+'</div>':''
+      +(selS?'':(isPapa?'':'<a class="v-open" style="background:#fff;color:#c0302c;border:2px solid #f0b8b3;box-shadow:none;margin-top:8px" href="./kanji.html?u='+du+'" id="kjCardLink">📖 ① このパートの10字を漢字カードで覚える</a>')
+      +(kjPass(du)?'<button class="kj-btn" onclick="kjStart()">✍️ ② '+(ud[du]?'もう一度 ':'')+'文章テストをはじめる</button>':'')+'</div>'));}
   h+=((!isPapa&&kjTaking())||(!kjBusy()&&!isPapa)?'':'<a class="v-open" style="background:#d6504e;box-shadow:0 3px 0 #b23a37" href="./kanji.html">📖 漢字カードで覚える</a>')+bon+'</div>';
   el.innerHTML=h;}
 /* 1日のコミットライン：英単語・語彙＝新しく覚えた語数＋検問の点数（その日の最高記録）／計算＝全演算＋ミックスを全問正解 */
