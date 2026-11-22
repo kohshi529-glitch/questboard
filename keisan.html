@@ -168,7 +168,7 @@ window.QB_APP='keisan';
   .btn:active{transform:translateY(2px)}
 
   /* 入力のえらび（タップ／手書き） */
-  .inrow{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+  .inrow{display:flex;gap:8px;justify-content:center;margin:0 0 12px;flex-wrap:wrap}
   .inp{border:1.5px solid var(--line2);background:var(--card);color:var(--ink-soft);border-radius:999px;padding:9px 16px;font-family:var(--jp);font-weight:800;font-size:14px;cursor:pointer}
   .inp.on{background:var(--warm);border-color:var(--warm);color:#fff}
   /* 手書き */
@@ -183,6 +183,47 @@ window.QB_APP='keisan';
   #play.hw .ans{min-height:76px}
   .ans .dq{color:var(--warm);text-decoration:underline wavy;text-underline-offset:6px;text-decoration-thickness:2px}
   .hwnote{text-align:center;font-size:12.5px;color:var(--ink-faint);font-weight:800;min-height:18px}
+  /* 📝 ノート（筆算） */
+  #play.note .q{font-size:clamp(30px,9vw,44px)}
+  #play.note .playmid{justify-content:flex-start;gap:12px;margin-top:10px}
+  .notebox{display:flex;flex-direction:column;gap:10px}
+  .nnote{background:var(--card);border:1.5px solid var(--line2);border-radius:18px;box-shadow:var(--shadow);padding:10px 8px 14px;background-image:repeating-linear-gradient(transparent 0 31px,var(--line) 31px 32px)}
+  #ngrid{display:flex;flex-direction:column;align-items:center;gap:4px;--cw:58px}
+  #ngrid.shake{animation:nshake .35s}
+  @keyframes nshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+  #ngrid.okflash .na.fix{background:var(--good-flash);border-color:var(--good)}
+  .nrow{display:flex;gap:6px}
+  .nc{width:var(--cw);height:calc(var(--cw)*1.08);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:calc(var(--cw)*.72);color:var(--ink);position:relative;font-variant-numeric:tabular-nums}
+  .nc.op{color:var(--ink-soft)}
+  .plrow .nc{height:18px;font-family:var(--jp);font-size:12px;color:var(--ink-faint);font-weight:800}
+  .plrow .nc.now{color:var(--accent-d)}
+  .nc.dg.cross{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--warm);text-decoration-thickness:3px}
+  .bwrow .nc{height:calc(var(--cw)*.6)}
+  .nc.bwc{border:2px dashed var(--line2);border-radius:10px;font-size:calc(var(--cw)*.42);color:var(--warm)}
+  .nc.bwc.none{border:none}
+  .nc.bwc.has{border-style:solid;border-color:var(--warm);background:var(--warm-soft)}
+  .brow{border-bottom:3.5px solid var(--ink);padding-bottom:4px;margin-bottom:4px}
+  .nc.na{border:2.5px dashed var(--line2);border-radius:12px;background:var(--card)}
+  .nc.na.none{border:none;background:none}
+  .nc.na.now{border-color:var(--accent);border-style:solid;box-shadow:0 0 0 3px var(--accent-soft)}
+  .nc.na.fix{border-style:solid;border-color:var(--line2)}
+  .nc.na.fix .big{color:var(--accent-d)}
+  .nc.auto .big,.nc.bwc.auto{color:var(--bad)!important}
+  .nc.na .sm{position:absolute;left:4px;top:1px;font-size:calc(var(--cw)*.36);color:var(--warm);line-height:1}
+  .nc .sm.badv{left:auto;right:3px;top:auto;bottom:1px;color:var(--bad);text-decoration:line-through;position:absolute;font-size:calc(var(--cw)*.36);line-height:1}
+  .nc.badc{border-color:var(--bad)!important;background:var(--bad-soft)!important}
+  [data-drop].over{border-color:var(--warm)!important;background:var(--warm-soft)!important}
+  .nmsg{text-align:center;font-family:var(--jp);font-size:14px;font-weight:800;color:var(--ink-soft);min-height:40px;line-height:1.45}
+  .nmsg .ng{color:var(--bad)} .nmsg .ok{color:var(--good)}
+  .nkeys{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;touch-action:none}
+  .nkey{height:clamp(52px,8vh,64px);border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:14px;font-family:var(--disp);font-weight:700;font-size:30px;box-shadow:var(--shadow);touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+  .nkey.sel{background:var(--warm);color:#fff;border-color:var(--warm)}
+  .nbtns{display:grid;grid-template-columns:1fr 1.4fr;gap:10px}
+  .nbtns .key{height:52px;font-size:16px}
+  .nbtns .key:disabled{opacity:.4}
+  .nghost{position:fixed;z-index:60;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:14px;background:var(--warm);color:#fff;font-family:var(--disp);font-weight:700;font-size:34px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+  .nghost.on{opacity:.95}
+  .mode.off{opacity:.35}
 </style>
 
 <div class="wrap">
@@ -202,6 +243,7 @@ window.QB_APP='keisan';
     <div class="inrow">
       <button class="inp" data-i="tap" onclick="setInput('tap')">👆 タップで答える</button>
       <button class="inp" data-i="hw" onclick="setInput('hw')">✍️ 手書きで答える</button>
+      <button class="inp" data-i="note" onclick="setInput('note')">📝 ノート（筆算）</button>
     </div>
     <div class="stat-strip">
       <span class="pill">今日 <span id="todayN">0</span> 問</span>
@@ -246,6 +288,12 @@ window.QB_APP='keisan';
       <button class="key" onclick="press('0')">0</button>
       <button class="key go" onclick="submit()">こたえる</button>
     </div>
+    <div class="notebox" id="notebox" hidden>
+      <div class="nnote"><div id="ngrid"></div></div>
+      <div class="nmsg" id="nmsg"></div>
+      <div class="nkeys"><button class="nkey" data-d="1">1</button><button class="nkey" data-d="2">2</button><button class="nkey" data-d="3">3</button><button class="nkey" data-d="4">4</button><button class="nkey" data-d="5">5</button><button class="nkey" data-d="6">6</button><button class="nkey" data-d="7">7</button><button class="nkey" data-d="8">8</button><button class="nkey" data-d="9">9</button><button class="nkey" data-d="0">0</button></div>
+      <div class="nbtns"><button class="key del" id="nundo" onclick="noteUndo()">1つもどす</button><button class="key go" id="nnext" onclick="noteNext()" hidden>つぎへ ▶</button></div>
+    </div>
     <div class="hwbox" id="hwbox" hidden>
       <div class="hwwrap"><canvas id="hwc"></canvas><div class="hwhint" id="hwhint">ここに 答えを 書いてね ✍️<br><small>数字は 1字ずつ すこし はなして</small></div></div>
       <div class="hwnote" id="hwnote"></div>
@@ -279,12 +327,12 @@ window.QB_APP='keisan';
 <script>
 const SETSIZE=20;
 const MODE_NAME={add:"たし算",sub:"ひき算",mul:"かけ算",div:"わり算",mix:"ミックス"};
-var diff=1, mode='add', problems=[], pi=0, correct=0, cur="", t0=0, timerId=null, locked=false;
+var diff=1, mode='add', problems=[], pi=0, correct=0, cur="", t0=0, timerId=null, locked=false, SZ=SETSIZE;
 var stats=loadStats();
-var inMode=(function(){try{return localStorage.getItem('keisan_input')==='hw'?'hw':'tap';}catch(e){return 'tap';}})();
+var inMode=(function(){try{var v=localStorage.getItem('keisan_input');return (v==='hw'||v==='note')?v:'tap';}catch(e){return 'tap';}})();
 /* ベスト記録のキー：手書きは別に記録（例 add1h）。タップより時間がかかるので、くらべないため */
-function bkey(m){return m+diff+(inMode==='hw'?'h':'');}
-function setInput(i){inMode=(i==='hw')?'hw':'tap';try{localStorage.setItem('keisan_input',inMode);}catch(e){}renderHome();}
+function bkey(m){return m+diff+(inMode==='hw'?'h':inMode==='note'?'n':'');}
+function setInput(i){inMode=(i==='hw'||i==='note')?i:'tap';try{localStorage.setItem('keisan_input',inMode);}catch(e){}renderHome();}
 
 function todayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 function loadStats(){var s;try{s=JSON.parse(localStorage.getItem('keisan_stats')||'null');}catch(e){}if(!s||typeof s!=='object')s={};if(s.date!==todayStr()){s.date=todayStr();s.today=0;}s.best=s.best||{};s.hist=s.hist||{};
@@ -308,7 +356,7 @@ function genOne(m){
   else{var dv,q;if(diff===0){dv=rnd(2,5);q=rnd(1,5);}else if(diff===1){dv=rnd(2,9);q=rnd(2,9);}else{dv=rnd(2,9);q=rnd(11,99);}a=dv*q;b=dv;op='÷';ans=q;}
   return {text:a+' '+op+' '+b+' =',ans:ans};
 }
-function buildSet(){problems=[];for(var i=0;i<SETSIZE;i++)problems.push(genOne(mode));}
+function buildSet(){problems=[];SZ=(inMode==='note')?NOTE_SET:SETSIZE;for(var i=0;i<SZ;i++)problems.push(inMode==='note'?noteGen(mode):genOne(mode));}
 
 function setDiff(d){diff=d;document.querySelectorAll('.diff').forEach(function(b){b.classList.toggle('on',+b.dataset.d===d);});}
 function fmt(ms){var s=Math.floor(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
@@ -317,7 +365,7 @@ function fmtBest(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0
 function renderHome(){
   stats=loadStats();
   document.getElementById('todayN').textContent=stats.today||0;
-  document.getElementById('setN').textContent=SETSIZE;
+  document.getElementById('setN').textContent=(inMode==='note')?NOTE_SET:SETSIZE;
   ['add','sub','mul','div','mix'].forEach(function(m){
     var el=document.getElementById('best'+m);if(!el)return;
     var key=bkey(m);var bv=stats.best[key];
@@ -327,12 +375,15 @@ function renderHome(){
   });
   var cn=document.getElementById('commitN');if(cn)cn.textContent=['add','sub','mul','div','mix'].filter(modeDone).length;
   document.querySelectorAll('.inp').forEach(function(b){b.classList.toggle('on',b.dataset.i===inMode);});
+  ['mul','div'].forEach(function(m){var b=document.getElementById('best'+m);if(b&&b.parentElement){b.parentElement.classList.toggle('off',inMode==='note');if(inMode==='note')b.textContent='ノートは たし・ひき だけ';}});
+  var bm=document.getElementById('bestmix');if(bm&&inMode==='note'&&!stats.best[bkey('mix')])bm.textContent='たし算・ひき算を まぜて筆算';
 }
 function show(id){['home','play','result'].forEach(function(v){document.getElementById(v).hidden=(v!==id);});}
 
-function start(m){mode=m;buildSet();pi=0;correct=0;cur="";locked=false;
-  show('play');document.getElementById('h1').textContent=MODE_NAME[m]+(inMode==='hw'?' ✍️':' ⚡');
-  document.querySelector('.pad').hidden=(inMode==='hw');document.getElementById('play').classList.toggle('hw',inMode==='hw');document.getElementById('hwbox').hidden=(inMode!=='hw');
+function start(m){if(inMode==='note'&&(m==='mul'||m==='div')){alert('ノート（筆算）は たし算・ひき算・ミックス です');return;}mode=m;buildSet();pi=0;correct=0;cur="";locked=false;
+  show('play');document.getElementById('h1').textContent=MODE_NAME[m]+(inMode==='hw'?' ✍️':inMode==='note'?' 📝':' ⚡');
+  document.querySelector('.pad').hidden=(inMode!=='tap');document.getElementById('play').classList.toggle('hw',inMode==='hw');document.getElementById('hwbox').hidden=(inMode!=='hw');
+  document.getElementById('play').classList.toggle('note',inMode==='note');document.getElementById('notebox').hidden=(inMode!=='note');document.getElementById('ans').hidden=(inMode==='note');document.getElementById('ngmsg').hidden=(inMode==='note');
   if(inMode==='hw')hwSize();
   t0=Date.now();if(timerId)clearInterval(timerId);timerId=setInterval(tick,200);tick();
   showProblem();window.scrollTo(0,0);
@@ -344,10 +395,11 @@ function showProblem(){
   document.getElementById('ngmsg').textContent='';
   if(inMode==='hw')hwClear();
   document.getElementById('q').textContent=problems[pi].text;
-  document.getElementById('qnum').textContent=(pi+1)+' / '+SETSIZE;
-  document.getElementById('track').style.width=(pi/SETSIZE*100)+'%';
+  document.getElementById('qnum').textContent=(pi+1)+' / '+SZ;
+  document.getElementById('track').style.width=(pi/SZ*100)+'%';
+  if(inMode==='note')setupFromProblem();
 }
-function press(n){if(locked||inMode==='hw')return;if(cur.length>=6)return;cur+=n;paint();}
+function press(n){if(locked||inMode!=='tap')return;if(cur.length>=6)return;cur+=n;paint();}
 function del(){if(locked)return;cur=cur.slice(0,-1);paint();}
 function paint(){var a=document.getElementById('ans');
   if(inMode==='hw'&&HW.res.length){a.innerHTML=HW.res.slice(0,6).map(function(r){return r.p<0.6?'<span class="dq">'+r.d+'</span>':String(r.d);}).join('');return;}
@@ -406,25 +458,26 @@ function submit(){
     setTimeout(nextProblem,1100);
   }
 }
-function nextProblem(){pi++;if(pi>=SETSIZE){finish();}else{showProblem();}}
+function nextProblem(){pi++;if(pi>=SZ){finish();}else{showProblem();}}
 function finish(){
   if(timerId)clearInterval(timerId);
-  var ms=Date.now()-t0, sec=Math.round(ms/1000), acc=Math.round(correct/SETSIZE*100);
+  var ms=Date.now()-t0, sec=Math.round(ms/1000), acc=Math.round(correct/SZ*100),isNote=(inMode==='note');
   var key=bkey(mode), prevBest=stats.best[key], isBest=false, hwFirst=false;
-  if(correct===SETSIZE){ if(!prevBest||sec<prevBest){stats.best[key]=sec;isBest=true;} }
+  if(correct===SZ){ if(!prevBest||sec<prevBest){stats.best[key]=sec;isBest=true;} }
   /* 手書きの はじめての記録は「記録づくり」。ベスト更新のごほうびは 2回目から */
   if(isBest&&inMode==='hw'&&!prevBest){isBest=false;hwFirst=true;}
   /* ベスト更新のボーナスは、その日・その種目（例：たし算・ふつう）で1回だけ。タップと手書きのどちらで更新しても同じ */
   var kind=mode+diff,pbDup=false;
-  if(isBest){var _pd=todayStr();if(!stats.pbs||stats.pbs.d!==_pd)stats.pbs={d:_pd,n:0,k:{}};stats.pbs.k=stats.pbs.k||{};
+  /* ノート（筆算）は 練習用：ベストは記録するが ボーナス・コミットラインには数えない */
+  if(isBest&&!isNote){var _pd=todayStr();if(!stats.pbs||stats.pbs.d!==_pd)stats.pbs={d:_pd,n:0,k:{}};stats.pbs.k=stats.pbs.k||{};
     if(stats.pbs.k[kind])pbDup=true;else{stats.pbs.k[kind]=1;stats.pbs.n=(stats.pbs.n||0)+1;}}
-  if(correct===SETSIZE){var _td=todayStr();if(!stats.perf||stats.perf.d!==_td)stats.perf={d:_td,m:{}};stats.perf.m[mode]=Math.max(stats.perf.m[mode]||0,diff+1);}
-  var _hh=histDay();_hh.s=(_hh.s||0)+1;if(correct===SETSIZE)_hh.f=(_hh.f||0)+1;
-  if(isBest){_hh.b=(_hh.b||0)+1;stats.pbl=stats.pbl||{};stats.pbl[Date.now()]=[key,sec,prevBest||0];var _pk=Object.keys(stats.pbl).sort(function(a,b){return a-b;});while(_pk.length>500)delete stats.pbl[_pk.shift()];}
+  if(correct===SZ&&!isNote){var _td=todayStr();if(!stats.perf||stats.perf.d!==_td)stats.perf={d:_td,m:{}};stats.perf.m[mode]=Math.max(stats.perf.m[mode]||0,diff+1);}
+  var _hh=histDay();if(!isNote){_hh.s=(_hh.s||0)+1;if(correct===SZ)_hh.f=(_hh.f||0)+1;}
+  if(isBest&&!isNote){_hh.b=(_hh.b||0)+1;stats.pbl=stats.pbl||{};stats.pbl[Date.now()]=[key,sec,prevBest||0];var _pk=Object.keys(stats.pbl).sort(function(a,b){return a-b;});while(_pk.length>500)delete stats.pbl[_pk.shift()];}
   stats.lastAcc=acc;saveStats();
   show('result');document.getElementById('h1').textContent='けっか';
   document.getElementById('rTime').textContent=fmt(ms);
-  document.getElementById('rScore').textContent=correct+'/'+SETSIZE;
+  document.getElementById('rScore').textContent=correct+'/'+SZ;
   document.getElementById('rAcc').textContent=acc+'%';
   var em,ti;
   if(acc===100){em='🏆';ti='全問せいかい！';}else if(acc>=80){em='🎉';ti='よくできた！';}else if(acc>=50){em='💪';ti='その調子！';}else{em='🌱';ti='れんしゅうしよう';}
@@ -433,23 +486,149 @@ function finish(){
   var bl=document.getElementById('rBest');
   if(isBest){var _qc={};try{_qc=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}var _pp=(_qc.pbPer===undefined)?5:(+_qc.pbPer||0);
     var _bon=(_qc.bonusOn!==0&&_pp&&(localStorage.getItem('qb_calc_owner')!=='papa'));
-    bl.textContent=(inMode==='hw'?'⭐ 手書きベスト更新！（':'⭐ ベスト更新！（')+fmtBest(sec)+'）'+(_bon?(pbDup?' きょうの'+MODE_NAME[mode]+'のボーナスは もらいずみ':' 📱+'+_pp+'分ゲット！'):'');}
+    bl.textContent=(inMode==='hw'?'⭐ 手書きベスト更新！（':isNote?'⭐ ノートのベスト更新！（':'⭐ ベスト更新！（')+fmtBest(sec)+'）'+(_bon&&!isNote?(pbDup?' きょうの'+MODE_NAME[mode]+'のボーナスは もらいずみ':' 📱+'+_pp+'分ゲット！'):'');}
   else if(hwFirst)bl.textContent='✍️ 手書きの はじめての記録！（'+fmtBest(sec)+'）次はこれをこえよう';
-  else if(stats.best[key])bl.textContent=(inMode==='hw'?'✍️ 手書きベスト ':'ベスト ')+fmtBest(stats.best[key]);
+  else if(stats.best[key])bl.textContent=(inMode==='hw'?'✍️ 手書きベスト ':isNote?'📝 ノートのベスト ':'ベスト ')+fmtBest(stats.best[key]);
   else bl.textContent='全問せいかいでベスト記録に挑戦！';
   var cl=document.getElementById('rCommit');if(cl){var mm=['add','sub','mul','div','mix'],left=mm.filter(function(x){return !modeDone(x);});
-    cl.textContent=((correct===SETSIZE&&modeDone(mode))?('✅ 今日の'+MODE_NAME[mode]+' クリア！ '):'')+(left.length?('コミットライン：あと '+left.map(function(x){return MODE_NAME[x];}).join('・')):'🎯 計算のコミットライン 全部クリア！');}
+    cl.textContent=isNote?'📝 ノート（筆算）は れんしゅう用。コミットラインには数えないよ':((correct===SZ&&modeDone(mode))?('✅ 今日の'+MODE_NAME[mode]+' クリア！ '):'')+(left.length?('コミットライン：あと '+left.map(function(x){return MODE_NAME[x];}).join('・')):'🎯 計算のコミットライン 全部クリア！');}
 }
 function again(){start(mode);}
 function goHome(){show('home');document.getElementById('h1').textContent='計算クエスト ⚡';renderHome();window.scrollTo(0,0);}
 function quit(){if(timerId)clearInterval(timerId);goHome();}
 
 document.addEventListener('keydown',function(e){
-  if(document.getElementById('play').hidden)return;
+  if(document.getElementById('play').hidden||inMode==='note')return;
   if(e.key>='0'&&e.key<='9')press(e.key);
   else if(e.key==='Backspace'){if(inMode==='hw')hwUndo();else del();}
   else if(e.key==='Enter')submit();
 });
+
+/* ---- 📝 ノート（筆算）モード ----
+   上：問題 ／ まん中：筆算のノート ／ 下：数字キー（指でノートへ運ぶ）
+   たし算：一の位から。答えの数字はいまの位へ（大きく＝確定）。くり上がりの1は 左となりの位へ（小さく＝仮）。
+           仮の1は、その位の答えを運んだときに消えて答えにまとまる。いちばん左の仮の1は最後に自動で確定（正規化）。
+   ひき算：たりない位は、左の位の上の小さいマスへ「くり下がったあとの数」を運ぶ（例 72−38 → 十の位の上に 6）。
+   まちがった数を運んだら その問題は誤答。正しい筆算を見せて「つぎへ」。 */
+var NOTE_SET=5,NT=null;
+function ndig(x){return String(x).split('').reverse().map(Number);}
+function noteGen(m){
+  if(m==='mix')m=['add','sub'][rnd(0,1)];
+  var a,b,ok,tries=0;
+  do{tries++;
+    if(m==='add'){
+      if(diff===0){a=rnd(11,89);b=rnd(2,9);}else if(diff===1){a=rnd(15,99);b=rnd(15,99);}else{a=rnd(105,989);b=rnd(105,989);}
+      var A=ndig(a),B=ndig(b),c=0,nc=0;for(var i=0;i<Math.max(A.length,B.length);i++){var s=(A[i]||0)+(B[i]||0)+c;c=s>=10?1:0;nc+=c;}
+      ok=nc>=(diff===2?2:1);
+    }else{
+      if(diff===0){a=rnd(21,98);b=rnd(2,9);}else if(diff===1){a=rnd(31,99);b=rnd(12,a-5);}else{a=rnd(201,999);b=rnd(55,a-30);}
+      var A2=ndig(a),B2=ndig(b),nb=0;for(var j=0;j<B2.length;j++)if(A2[j]<B2[j])nb++;
+      ok=b<a&&nb>=1&&(diff<2||nb>=1);
+      if(diff===2&&ok&&tries<40&&Math.random()<0.35&&A2[1]!==0)ok=false; /* 3けたは ときどき 十の位が0（403−158 など）を出す */
+      if(diff===2&&!ok&&tries>=40)ok=b<a;
+    }
+  }while(!ok&&tries<80);
+  var op=m==='add'?'+':'−',ans=m==='add'?a+b:a-b;
+  return {text:a+' '+op+' '+b+' =',ans:ans,a:a,b:b,op:op,m:m};}
+function noteSetup(p){
+  var A=ndig(p.a),B=ndig(p.b),R=ndig(p.ans),n=Math.max(A.length,B.length,R.length),c=[0],lent={},bv={},brw={};
+  if(p.m==='add'){for(var i=0;i<n;i++){var s=(A[i]||0)+(B[i]||0)+c[i];c[i+1]=s>=10?1:0;}}
+  else{var eff=A.slice();for(var j=0;j<A.length;j++){if(eff[j]<(B[j]||0)){brw[j]=1;eff[j]+=10;eff[j+1]-=1;lent[j+1]=1;}}
+    Object.keys(lent).forEach(function(k){k=+k;bv[k]=A[k]>=1?A[k]-1:9;});}
+  NT={p:p,A:A,B:B,R:R,n:n,c:c,lent:lent,bv:bv,brw:brw,f:{},t:{},bw:{},auto:{},hist:[],bad:null,done:false,sel:null,why:''};}
+function noteCur(){for(var i=0;i<NT.R.length;i++)if(NT.f[i]==null)return i;return -1;}
+var PLACE=['一','十','百','千'];
+function noteRender(){var N=NT;if(!N)return;var el=document.getElementById('ngrid');var cols=N.n,cur=noteCur(),sub=N.p.m==='sub';
+  var cw=Math.min(64,Math.floor((Math.min(window.innerWidth,520)-60)/(cols+1)));el.style.setProperty('--cw',cw+'px');
+  function row(cls,cells){return '<div class="nrow '+cls+'">'+cells.join('')+'</div>';}
+  var h='',i,cs;
+  /* 位の名前 */
+  cs=['<div class="nc op"></div>'];for(i=cols-1;i>=0;i--)cs.push('<div class="nc pl'+(i===cur&&!N.done&&!N.bad?' now':'')+'">'+(PLACE[i]?PLACE[i]+'の位':'')+'</div>');h+=row('plrow',cs);
+  /* ひき算：くり下がりのマス */
+  if(sub){cs=['<div class="nc op"></div>'];for(i=cols-1;i>=0;i--){var can=i>=1&&i<N.A.length,v=N.bw[i];
+      cs.push(can?'<div class="nc bwc'+(v!=null?' has':'')+(N.auto['b'+i]?' auto':'')+'" data-drop="b'+i+'">'+(v!=null?v:'')+(N.bad&&N.bad.k==='b'&&N.bad.j===i?'<span class="sm badv">'+N.bad.d+'</span>':'')+'</div>':'<div class="nc bwc none"></div>');}
+    h+=row('bwrow',cs);}
+  /* 上の数 */
+  cs=['<div class="nc op"></div>'];for(i=cols-1;i>=0;i--)cs.push('<div class="nc dg'+(sub&&N.bw[i]!=null?' cross':'')+'">'+(N.A[i]!=null?N.A[i]:'')+'</div>');h+=row('',cs);
+  /* 下の数 */
+  cs=['<div class="nc op">'+N.p.op+'</div>'];for(i=cols-1;i>=0;i--)cs.push('<div class="nc dg">'+(N.B[i]!=null?N.B[i]:'')+'</div>');h+=row('brow',cs);
+  /* 答え */
+  cs=['<div class="nc op"></div>'];for(i=cols-1;i>=0;i--){var inR=i<N.R.length,fv=N.f[i],tv=N.t[i],cls='nc na';
+      if(!inR){cs.push('<div class="nc na none"></div>');continue;}
+      if(fv!=null)cls+=' fix'+(N.auto['f'+i]?' auto':'');else if(i===cur&&!N.done&&!N.bad)cls+=' now';
+      if(N.bad&&N.bad.j===i&&N.bad.k==='f')cls+=' badc';
+      var inner=fv!=null?'<span class="big">'+fv+'</span>':(tv!=null?'<span class="sm">'+tv+'</span>':'');
+      if(N.bad&&N.bad.j===i&&(N.bad.k==='f'||N.bad.k==='t'))inner+='<span class="sm badv">'+N.bad.d+'</span>';
+      cs.push('<div class="'+cls+'" data-drop="f'+i+'">'+inner+'</div>');}
+  h+=row('arow',cs);
+  el.innerHTML=h;
+  var msg=document.getElementById('nmsg');
+  if(N.bad)msg.innerHTML='<span class="ng">✖ '+N.why+'</span>';
+  else if(N.done)msg.innerHTML='<span class="ok">⭕ せいかい！ '+N.p.ans+'</span>';
+  else if(cur>=0)msg.textContent=(PLACE[cur]||'')+'の位 を計算して、数字をノートへ運ぼう'+(N.sel!=null?'（'+N.sel+' をえらび中：マスをタップ）':'');
+  document.getElementById('nnext').hidden=!N.bad;
+  document.getElementById('nundo').disabled=!N.hist.length||N.done||!!N.bad;
+  document.querySelectorAll('.nkey').forEach(function(k){k.classList.toggle('sel',N.sel!=null&&+k.dataset.d===N.sel);});}
+function noteExplain(j){var N=NT,A=N.A,B=N.B,pl=(PLACE[j]||'')+'の位：';
+  if(N.p.m==='add'){var a=A[j]||0,b=B[j]||0,c=N.c[j],s=a+b+c;
+    if(j>=Math.max(A.length,B.length))return pl+'くり上がりの 1 がそのまま答えになるよ（せいかい '+N.p.ans+'）';
+    return pl+a+'＋'+b+(c?'＋くり上がり1':'')+'＝'+s+(s>=10?' → '+(s%10)+' を書いて、1 は '+(PLACE[j+1]||'')+'の位へ':'')+'（せいかい '+N.p.ans+'）';}
+  var top=A[j]-(N.lent[j]?1:0),bb=B[j]||0;
+  if(N.lent[j]&&A[j]===0)top=9;
+  return pl+(N.brw[j]?(top+' から '+bb+' はひけないので、'+(PLACE[j+1]||'')+'の位から 1 かりて '+(top+10)+'−'+bb+'＝'+(top+10-bb)):(top+'−'+bb+'＝'+(top-bb)))+'（せいかい '+N.p.ans+'）';}
+function noteWrong(j,k,d,why){var N=NT;N.bad={j:j,k:k,d:d};N.why=why;locked=true;
+  /* 正しい筆算をぜんぶ見せる */
+  for(var i=0;i<N.R.length;i++){if(N.f[i]==null){N.f[i]=N.R[i];N.auto['f'+i]=1;}}N.t={};
+  if(N.p.m==='sub')Object.keys(N.bv).forEach(function(x){if(N.bw[x]==null){N.bw[x]=N.bv[x];N.auto['b'+x]=1;}});
+  noteRender();var a=document.getElementById('ngrid');a.classList.remove('shake');void a.offsetWidth;a.classList.add('shake');}
+function noteDrop(tgt,d){var N=NT;if(!N||N.done||N.bad||locked)return;var cur=noteCur(),k=tgt.charAt(0),j=+tgt.slice(1);
+  if(k==='b'){ /* ひき算 くり下がり */
+    if(N.bw[j]!=null)return;
+    if(!N.lent[j])return noteWrong(j,'b',d,(PLACE[j]||'')+'の位は くり下がらないよ。'+noteExplain(cur>=0?cur:0));
+    if(d!==N.bv[j])return noteWrong(j,'b',d,(PLACE[j]||'')+'の位は 1 かしたあと '+N.bv[j]+' になるよ。'+noteExplain(j-1));
+    N.bw[j]=d;N.hist.push('b'+j);noteRender();return;}
+  if(j===cur){
+    if(d===N.R[j]){N.f[j]=d;delete N.t[j];N.hist.push('f'+j);
+      /* ひき算：かりた位のしるしがまだなら 自動で書く */
+      if(N.p.m==='sub'&&N.brw[j]){var q=j+1;while(N.lent[q]){if(N.bw[q]==null){N.bw[q]=N.bv[q];N.auto['b'+q]=1;}if(N.A[q]===0&&N.brw[q])q++;else break;}}
+      var nc=noteCur();
+      /* 正規化：残りが くり上がりだけの位で、仮の1が置いてあれば確定 */
+      if(nc>=0&&N.p.m==='add'&&nc>=Math.max(N.A.length,N.B.length)&&N.t[nc]===N.R[nc]){N.f[nc]=N.R[nc];delete N.t[nc];N.hist.push('f'+nc);}
+      if(noteCur()<0)return noteDone();
+      noteRender();return;}
+    if(N.p.m==='add'&&N.t[j]==null&&N.c[j]===1&&d===1){N.t[j]=1;N.hist.push('t'+j);noteRender();return;} /* 先に答えを運んでから くり上がりの1を置いたとき */
+    return noteWrong(j,'f',d,noteExplain(j));}
+  if(N.p.m==='add'&&cur>=0&&j===cur+1&&j<N.R.length&&N.f[j]==null){ /* くり上がり（仮） */
+    if(N.t[j]!=null)return;
+    if(N.c[j]===1&&d===1){N.t[j]=1;N.hist.push('t'+j);noteRender();return;}
+    return noteWrong(j,'t',d,N.c[j]?noteExplain(cur):(PLACE[cur]||'')+'の位は くり上がらないよ。'+noteExplain(cur));}
+  var m=document.getElementById('nmsg');m.textContent='いまは '+(PLACE[cur]||'')+'の位 だよ（右から じゅんばんに）';}
+function noteDone(){var N=NT;N.done=true;locked=true;correct++;stats.today=(stats.today||0)+1;var _hq=histDay();_hq.q=Math.max((_hq.q||0)+1,stats.today);saveStats();
+  noteRender();var g=document.getElementById('ngrid');g.classList.add('okflash');setTimeout(function(){g.classList.remove('okflash');nextProblem();},1100);}
+function noteUndo(){var N=NT;if(!N||N.done||N.bad||!N.hist.length)return;var h=N.hist.pop(),k=h.charAt(0),j=+h.slice(1);
+  if(k==='f'){delete N.f[j];}else if(k==='t'){delete N.t[j];}else{delete N.bw[j];}noteRender();}
+function noteNext(){if(!NT||!NT.bad)return;nextProblem();}
+function noteShow(){setupFromProblem();}
+function setupFromProblem(){noteSetup(problems[pi]);noteRender();}
+/* 数字キー：指でドラッグして運ぶ（タップ→マスをタップ でもOK） */
+(function(){var G=null;
+  function cells(){return Array.prototype.slice.call(document.querySelectorAll('#ngrid [data-drop]'));}
+  function hit(x,y){var best=null,bd=1e9;cells().forEach(function(c){var r=c.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+      var inside=x>=r.left-6&&x<=r.right+6&&y>=r.top-6&&y<=r.bottom+6,d=Math.hypot(x-cx,y-cy);
+      if(inside)d=0;if(d<bd&&d<Math.max(r.width,r.height)*0.9){bd=d;best=c;}});return best;}
+  function mark(c){cells().forEach(function(x){x.classList.toggle('over',x===c);});}
+  document.addEventListener('pointerdown',function(e){var k=e.target.closest&&e.target.closest('.nkey');if(!k||!NT||locked)return;e.preventDefault();
+    var d=+k.dataset.d,gh=document.createElement('div');gh.className='nghost';gh.textContent=d;document.body.appendChild(gh);
+    G={d:d,id:e.pointerId,x0:e.clientX,y0:e.clientY,gh:gh,mv:false};gh.style.left=e.clientX+'px';gh.style.top=e.clientY+'px';});
+  document.addEventListener('pointermove',function(e){if(!G||e.pointerId!==G.id)return;e.preventDefault();
+    if(Math.hypot(e.clientX-G.x0,e.clientY-G.y0)>8)G.mv=true;G.gh.style.left=e.clientX+'px';G.gh.style.top=(e.clientY-34)+'px';G.gh.classList.toggle('on',G.mv);mark(G.mv?hit(e.clientX,e.clientY-34):null);},{passive:false});
+  function end(e){if(!G||e.pointerId!==G.id)return;var g=G;G=null;g.gh.remove();mark(null);
+    if(!g.mv){NT.sel=(NT.sel===g.d)?null:g.d;noteRender();return;}
+    var c=hit(e.clientX,e.clientY-34);NT.sel=null;if(c)noteDrop(c.dataset.drop,g.d);else noteRender();}
+  document.addEventListener('pointerup',end);document.addEventListener('pointercancel',function(e){if(G&&e.pointerId===G.id){G.gh.remove();G=null;mark(null);}});
+  document.addEventListener('click',function(e){var c=e.target.closest&&e.target.closest('#ngrid [data-drop]');if(!c||!NT||NT.sel==null)return;var d=NT.sel;NT.sel=null;noteDrop(c.dataset.drop,d);});
+  window.addEventListener('resize',function(){if(NT&&inMode==='note'&&!document.getElementById('play').hidden)noteRender();});
+})();
 
 renderHome();
 </script>
