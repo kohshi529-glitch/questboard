@@ -410,6 +410,7 @@
   .hint{font-size:.75rem;color:var(--soft);margin-top:2px}
   .sec{background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px;margin-top:14px}
   .sec h3{margin:0 0 6px;font-size:.95rem}
+.pface{width:1.35em;height:1.35em;vertical-align:-0.3em;display:inline-block;object-fit:contain}
 </style>
 </head>
 <body>
@@ -521,7 +522,7 @@
   </div>
 
   <div class="sec">
-    <h3>🧔 パパの宿題（計算）</h3>
+    <h3><img class="pface" src="./papa-face.png" alt=""> パパの宿題（計算）</h3>
     <p class="hint">先生の宿題とは別に、パパが出す宿題です。写真→パパOKで先生の宿題と同じく＋時間・宿題の数に1つ数えます。OKした分は次の日に消えて、次の項目が足されます（各回の①〜⑦を3ページずつ区切って、回をまたいで続けます：第4回①〜③ → 第4回④〜⑥ → 第4回⑦＋第5回①② → 第5回③〜⑤ …。つねに3つ表示）。</p>
     <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="d_phwOn" style="width:auto"> 表示する</label>
     <label>教材名</label><input id="d_phwBook" placeholder="四谷大塚 計算 4年上">
@@ -875,7 +876,7 @@ function phwSubmit(data,id){id=id||_phwId;var it=phwFind(id);if(!it)return;var o
   HWPH[pid]=data;hwPhSave();var r=hwPhRef();if(r){try{r.child(pid).set(data);}catch(e){}}if(old&&old!==pid)hwPhDel(old);
   it.st='sub';it.ph=pid;it.at=Date.now();delete it.note;it.nt=0;save();maybeSync();renderPhw();
   var per=+S.cfg.hwPer||0;showCheer('📷 パパに送ったよ！'+(S.cfg.bonusOn&&per?'OKが出たら +'+per+'分':''));sTick();
-  qbNotify('🧔 パパの宿題の写真','「'+phwLabel(it)+'」の写真が届きました。ボードで OK／やり直し を押してください。').then(function(ok){var x=phwFind(id);if(x&&x.ph===pid&&x.st==='sub'){x.nt=ok?1:(_ntfyErr||'不明');save();maybeSync();renderPhw();}});}
+  qbNotify('🐮 パパの宿題の写真','「'+phwLabel(it)+'」の写真が届きました。ボードで OK／やり直し を押してください。').then(function(ok){var x=phwFind(id);if(x&&x.ph===pid&&x.st==='sub'){x.nt=ok?1:(_ntfyErr||'不明');save();maybeSync();renderPhw();}});}
 function phwOk(id){var p=phwS(),it=phwFind(id);if(!it)return;rollover();if(it.ph)hwPhDel(it.ph);it.st='ok';it.okDate=today();p.log=p.log||{};(p.log[today()]=p.log[today()]||[]).push(phwLabel(it));var ks=Object.keys(p.log).sort();while(ks.length>120)delete p.log[ks.shift()];
   delete it.ph;delete it.note;delete it.nt;S.day.hwOk=_num(S.day.hwOk)+1;qbRv();save();maybeSync();render();}
 function phwNg(id){var it=phwFind(id);if(!it)return;var note=prompt('やり直しの理由（娘に表示されます）','まちがえたところを直して、もう一度写真をとってね');if(note===null)return;
@@ -894,7 +895,7 @@ function renderPhw(){var el=document.getElementById('phwCard');if(!el)return;var
   var tip=isPapa?(pend?'<div class="hw-tip">🔔 確認待ちが '+pend+'件 あります。写真を見て OK／やり直し を押してください</div>':'<div class="hw-tip">つねに3つ表示。OKした分は次の日に消えて、次の3ページが足されます</div>')
     :'<div class="hw-tip">📷 1つ終わったら タップして写真をとってパパに送ろう'+(S.cfg.bonusOn&&per?'（OKで +'+per+'分・宿題1つに数えるよ）':'（宿題1つに数えるよ）')+'</div>';
   var fin=phwFinished()?'<div class="hw-tip" style="margin-top:8px;font-weight:900">🎉 第'+(+p.max||20)+'回まで ぜんぶ終わったよ！'+(isPapa?'（次のテキストは保護者メニューで教材名・回を設定してください）':'つぎのテキストはパパが用意するね')+'</div>':'';
-  el.innerHTML='<div class="card hwcard phwcard"><div class="hw-h"><span>🧔 パパの宿題</span><span class="hw-count">今日OK '+okN+(pend?' ・確認待ち '+pend:'')+'</span></div>'+tip+'<div class="hw-list">'+items+'</div>'+fin+'</div>';}
+  el.innerHTML='<div class="card hwcard phwcard"><div class="hw-h"><span><img class="pface" src="./papa-face.png" alt=""> パパの宿題</span><span class="hw-count">今日OK '+okN+(pend?' ・確認待ち '+pend:'')+'</span></div>'+tip+'<div class="hw-list">'+items+'</div>'+fin+'</div>';}
 function phwSave(){var p=phwS(),g=function(id){return document.getElementById(id);};var _q=phwPg(p.ng),k=parseInt(g('d_phwKai').value)||_q.k,h=+g('d_phwHalf').value||0;
   p.on=g('d_phwOn').checked?1:0;p.book=(g('d_phwBook').value||'').trim()||'四谷大塚 計算 4年上';p.max=parseInt(g('d_phwMax').value)||20;
   var ng=(k-1)*PHW_PP+Math.max(0,Math.min(PHW_PP-1,h));
@@ -977,8 +978,14 @@ function renderCalc(){
     +'<div class="c-cap">'+cap+'</div>'+grid+_pbh+_clh
     +'<a class="c-open" href="./keisan.html">▶ 計算をはじめる</a></div>';
 }
-function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('vocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
-function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('jvocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl=_td?('<br>今日 覚えた '+_td+'語'):'';var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';renderKanji();renderRead();}
+/* カードの「今日の検問」：その日のいちばん良い点（何回受けたか・合格ラインをこえたか） */
+function qbQuizTodayTxt(key){var r=qbQuizToday(key);if(!r.length)return '・📝 今日の検問 まだ';
+  var pct=+S.cfg.passPct||50,min=+S.cfg.passMin||10,b=r[0];
+  r.forEach(function(a){var pa=a[0]/a[1],pb=b[0]/b[1];if(pa>pb||(pa===pb&&a[1]>b[1]))b=a;});
+  var p=Math.round(b[0]/b[1]*100),ok=b[1]>=min&&p>=pct;
+  return '・📝 今日の検問 <b>'+b[0]+'/'+b[1]+'問（'+p+'%）</b>'+(ok?' ✅':'')+(r.length>1?'（'+r.length+'回）':'');}
+function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('vocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl='<br>今日 覚えた '+_td+'語'+qbQuizTodayTxt('vocab');var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
+function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('jvocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl='<br>今日 覚えた '+_td+'語'+qbQuizTodayTxt('jvocab');var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';renderKanji();renderRead();}
 /* ===== 漢字クエスト（書き取りテスト） =====
    流れ：娘がテスト開始（10問）→ ノートに書く → 写真で提出 → パパが丸つけ（×だけタップ）
          → ×の問題は［］の中を5回書いて写真で提出 → パパが1問ずつ OK／やり直し → 10問ぜんぶクリアで完了
@@ -1296,11 +1303,11 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
   _bonusRows=3;var all=(n===3);
   /* カレンダーの段階（2026-11-15 改定②）
      👍ナイス＝わく2つ ／ 🌟パーフェクト＝わく3つ
-     パーフェクトのあとの「プラス4つ」＝👨‍🏫先生の宿題・🧔パパの宿題・②ことばの のこり片方・③漢字か読書の のこり片方（読書は1日の最後になりやすいので、どれからでもOK）
+     パーフェクトのあとの「プラス4つ」＝👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題・②ことばの のこり片方・③漢字か読書の のこり片方（読書は1日の最後になりやすいので、どれからでもOK）
      🌈レインボー＝🌟＋プラス2つ ／ 💜アメジスト＝🌟＋プラス3つ ／ 👑GOD＝🌟＋プラス4つぜんぶ（出ている宿題がない方は数えない。GODはプラス3つ以上かつ、数えるものぜんぶ） */
   var _hwN=bonusHw().n,_dl=dtList(),EX=[];
   if(_dl[1].av)EX.push({n:'👨‍🏫先生の宿題',d:!!_dl[1].done});
-  if(_dl[2].av)EX.push({n:'🧔パパの宿題',d:!!_dl[2].done});
+  if(_dl[2].av)EX.push({n:'<img class="pface" src="./papa-face.png" alt="">パパの宿題',d:!!_dl[2].done});
   EX.push({n:'②の のこり（'+(Q.v.done?QNAME.j:Q.j.done?QNAME.v:QNAME.v+'か'+QNAME.j)+'）',d:Q.v.done&&Q.j.done});
   if(kon)EX.push({n:'③の のこり（'+(Q.k.done?QNAME.r:Q.r.done?QNAME.k:QNAME.k+'か'+QNAME.r)+'）',d:Q.k.done&&Q.r.done});
   var _exN=EX.filter(function(x){return x.d;}).length,_exRem=EX.filter(function(x){return !x.d;}),_exT=_exRem.map(function(x){return x.n;}).join('・');
@@ -1357,7 +1364,7 @@ function renderRules(){var el=document.getElementById('rulesCard');if(!el)return
   var t2='<table class="rl-t"><tr><th>できたこと</th><th>📱</th></tr>'
     +'<tr><td>コミットラインのわく 1つ</td><td class="mn">'+m(c.bonusPer)+'</td></tr>'
     +'<tr><td>わく 3つ全部（おまけ）</td><td class="mn">'+m(c.bonusAll)+'</td></tr>'
-    +'<tr><td>📒 宿題 1つ（先生の宿題・🧔パパの宿題　写真→パパOK）</td><td class="mn">'+m(c.hwPer)+'</td></tr>'
+    +'<tr><td>📒 宿題 1つ（先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題　写真→パパOK）</td><td class="mn">'+m(c.hwPer)+'</td></tr>'
     +(+c.hwAll?'<tr><td>📒 宿題ぜんぶ（おまけ）</td><td class="mn">'+m(c.hwAll)+'</td></tr>':'')
     +'<tr><td>📘 語彙トレ（毎日タスク）</td><td class="mn">'+m(c.taskPer)+'</td></tr>'
     +'<tr><td>⚡ 計算ベスト更新 1回</td><td class="mn">'+m(c.pbPer)+'</td></tr>'
@@ -1365,7 +1372,7 @@ function renderRules(){var el=document.getElementById('rulesCard');if(!el)return
   el.innerHTML='<div class="card rlcard"><div class="v-h"><span>📋 ルール表</span></div>'
     +'<div class="rl-h">🎯 コミットライン：3つのわく</div>'+t1
     +'<div class="rl-n">🔁 <b>日替わり</b>：きのう②で英単語だけやったら、今日は語彙だけ数えるよ（反対も同じ）。③の漢字と読書も同じ。きのう両方やった日・どちらもやらなかった日は、どちらでもOK。</div>'
-    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋プラス2つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋プラス3つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋プラス4つぜんぶ<br>※ プラス4つ＝👨‍🏫先生の宿題・🧔パパの宿題・②ことばの のこり片方・③漢字か読書の のこり片方。どれからでもOK。宿題はその日に1つOKで ✓。出ている宿題がない方は数えないよ。<br>※ 毎日タスク（がんばりタスク）＝📘語彙トレ・👨‍🏫先生の宿題・🧔パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。1つ ✓ でアバターの経験値 +10、3つ全部でシーズンの1日クリアだよ</div>'
+    +'<div class="rl-h">📅 がんばりカレンダー</div><div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋プラス2つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋プラス3つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋プラス4つぜんぶ<br>※ プラス4つ＝👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題・②ことばの のこり片方・③漢字か読書の のこり片方。どれからでもOK。宿題はその日に1つOKで ✓。出ている宿題がない方は数えないよ。<br>※ 毎日タスク（がんばりタスク）＝📘語彙トレ・👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。1つ ✓ でアバターの経験値 +10、3つ全部でシーズンの1日クリアだよ</div>'
     +(bon?'<div class="rl-h">📱 スマホ時間のため方</div>'+t2+'<div class="rl-n">たまった時間は「📱 パパにお願いする」でパパに送ってね。使わなかった時間は <b>貯金</b> になって、次の日に持ちこせるよ（一部だけお願いすることもできる）。</div>':'')+'</div>';}
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
 var _bonusN=0,_bonusAll=false,_bonusRows=3;
@@ -1384,7 +1391,7 @@ function qbJvocabDone(){var pct=+S.cfg.passPct||50,min=+S.cfg.passMin||10,nminJ=
 function dtList(){var td=today(),hw=S.homework||[],p=phwS();
   var tDone=hw.some(function(h){return h.st==='ok'&&h.okDate===td;}),tAv=tDone||hw.some(function(h){return h.st!=='ok';});
   var pDone=phwOkToday()>0,pAv=!!p.on&&(pDone||p.items.some(function(x){return x.st!=='ok';}));
-  return [{k:'g',e:'📘',n:'語彙トレ',done:qbJvocabDone(),av:true,auto:'語彙クエストで 新しく'+(+S.cfg.newMinJ||14)+'語＋検問合格 したら自動で ✓'},{k:'t',e:'👨‍🏫',n:'ゆうや先生の宿題',done:tDone,av:tAv},{k:'p',e:'🧔',n:'パパの宿題',done:pDone,av:pAv}];}
+  return [{k:'g',e:'📘',n:'語彙トレ',done:qbJvocabDone(),av:true,auto:'語彙クエストで 新しく'+(+S.cfg.newMinJ||14)+'語＋検問合格 したら自動で ✓'},{k:'t',e:'👨‍🏫',n:'ゆうや先生の宿題',done:tDone,av:tAv},{k:'p',e:'<img class="pface" src="./papa-face.png" alt="">',n:'パパの宿題',done:pDone,av:pAv}];}
 function dtDone(){return dtList().filter(function(x){return x.av&&x.done;}).length;}
 function dtAll(){var l=dtList().filter(function(x){return x.av;});return l.length>0&&l.every(function(x){return x.done;});}
 function dtGoiN(){return qbJvocabDone()?1:0;}
@@ -1462,7 +1469,7 @@ function dtCardHTML(){var l=dtList(),tp=+S.cfg.taskPer||0,av=l.filter(function(x
   return '<div class="card dtcard"><div class="v-h"><span>📅 毎日やるタスク</span><span class="v-count">'+dn+' / '+av.length+(dn&&dn===av.length?' 🎉':'')+'</span></div>'
     +l.map(function(x){var sub=x.auto?(x.done?'今日のノルマ クリア！'+((S.cfg.bonusOn&&tp)?'（+'+tp+'分）':''):x.auto+((S.cfg.bonusOn&&tp)?'（+'+tp+'分）':'')):(!x.av?'今日は出ている宿題がないよ（数えない）':x.done?'今日OKが出たよ':'下のカードで1つOKが出たら自動で ✓');
       return '<div class="quest dt'+(x.done?' done':'')+(x.av?'':' off')+'"'+(x.self?' onclick="dtToggle()"':'')+'><div class="chk">'+(x.done?'✓':'')+'</div><div>'+x.e+' '+x.n+'<span class="dt-sub">'+sub+'</span></div></div>';}).join('')
-    +'<div class="dt-note">👨‍🏫先生と🧔パパの宿題は、パーフェクトのあとの「プラス」に入るよ（🌈2つ・💜3つ・👑4つ）。⭐ がんばりクエストは、アバターのレベルアップ用だよ</div></div>';}
+    +'<div class="dt-note">👨‍🏫先生と<img class="pface" src="./papa-face.png" alt="">パパの宿題は、パーフェクトのあとの「プラス」に入るよ（🌈2つ・💜3つ・👑4つ）。⭐ がんばりクエストは、アバターのレベルアップ用だよ</div></div>';}
 function qbTaskDone(){try{if(!meReady())return 0;return meQuests().filter(function(q){return S.day.me[q.key];}).length;}catch(e){return 0;}}
 function bonusBreak(n,all){var w=bonusHw(),p=[];if(w.n)p.push('宿題 '+w.n+'つ +'+(w.n*(+S.cfg.hwPer||0))+'分');if(w.all&&+S.cfg.hwAll)p.push('宿題ぜんぶ +'+S.cfg.hwAll+'分');if(n)p.push('コミットライン '+n+'つ +'+(n*(+S.cfg.bonusPer||0))+'分');if(all&&+S.cfg.bonusAll)p.push('コミットライン全部 +'+S.cfg.bonusAll+'分');var pb=qbPbToday();if(pb&&+S.cfg.pbPer)p.push('計算ベスト更新 '+pb+'回 +'+(pb*(+S.cfg.pbPer))+'分');if(dtGoiN()&&+S.cfg.taskPer)p.push('語彙トレ +'+(+S.cfg.taskPer)+'分');var kj=qbKanjiToday();if(kj.min)p.push('漢字 '+(kj.c?'正解'+kj.c:'')+(kj.c&&kj.f?'・':'')+(kj.f?'直し'+kj.f:'')+(kj.d?(kj.c||kj.f?'・':'')+'パートクリア'+kj.d+'回':'')+' +'+kj.min+'分');return p.join('・');}
 function bonusLogSet(e,g){S.bonusLog=S.bonusLog||{};S.bonusLog[today()]={e:e,g:g};var ks=Object.keys(S.bonusLog).sort();while(ks.length>400)delete S.bonusLog[ks.shift()];}
