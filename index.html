@@ -35,6 +35,46 @@
   .rw-badges{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:6px}
   .rw-sub{font-weight:800;font-size:.85rem;margin:12px 0 4px;color:var(--ink)}
   .calrule{background:#fffaf0;border-style:dashed}
+  #ksView{display:none;position:fixed;inset:0;z-index:70;background:rgba(58,50,38,.35);overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .ks-wrap{max-width:520px;margin:0 auto;min-height:100%;background:var(--paper);padding:10px 12px calc(30px + env(safe-area-inset-bottom))}
+  .ks-head{display:flex;justify-content:space-between;align-items:center;font-size:1.1rem;padding:4px 2px 8px}
+  .ks-head button{border:none;background:#fff;border-radius:50%;width:38px;height:38px;font-size:1rem;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  .ks-prev{border-radius:18px;height:300px;display:flex;align-items:center;justify-content:center;border:2px solid var(--line)}
+  .ks-prev img{height:290px;width:auto}
+  .ks-note{font-size:.8rem;font-weight:800;color:#8a5a00;background:#fff6dc;border-radius:10px;padding:6px 10px;margin-top:8px}
+  .ks-spin{margin-top:10px;background:linear-gradient(90deg,#ff9ac2,#b39bff)!important;color:#fff!important}
+  .ks-spin:disabled{opacity:.45}
+  .ks-tabs{display:flex;gap:4px;margin-top:12px}
+  .ks-tabs button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:6px 0;font-size:1.2rem;display:flex;flex-direction:column;align-items:center;font-family:inherit}
+  .ks-tabs button span{font-size:.66rem;font-weight:800;color:var(--soft)}
+  .ks-tabs button.on{background:#fff0d6;border-color:#f0b860}
+  .ks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+  .ks-it{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:inherit;min-height:74px;color:var(--ink)}
+  .ks-it b{font-size:1.5rem;line-height:1.2}
+  .ks-it span{font-size:.7rem;font-weight:800;text-align:center;line-height:1.25}
+  .ks-it i{font-style:normal;font-size:.6rem;color:var(--soft)}
+  .ks-it.on{border-color:#ff7a59;background:#fff1ea;box-shadow:0 0 0 2px #ffd2c2}
+  .ks-it.lock{opacity:.55;background:#f6f1e7}
+  .ks-col{margin-top:10px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:8px}
+  .ks-col-h{font-size:.82rem;font-weight:900;margin-bottom:4px}
+  .ks-sws{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .ks-sw{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:4px 10px;font-size:.72rem;font-weight:800;font-family:inherit;color:var(--ink)}
+  .ks-sw.on{border-color:#ff7a59;background:#fff1ea}
+  .ks-fam{display:flex;align-items:center;gap:3px;border:1px solid var(--line);border-radius:999px;padding:2px 6px 2px 8px;font-size:.66rem;font-weight:800}
+  .ks-fam.lock{opacity:.45}
+  .ks-dot{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #c9bca3;padding:0}
+  .ks-dot.on{box-shadow:0 0 0 3px #ff7a59}
+  #ksGacha{display:none;position:fixed;inset:0;z-index:80;background:rgba(40,30,60,.6);align-items:center;justify-content:center;flex-direction:column;color:#fff;text-align:center}
+  .ksg-cap{font-size:4rem;animation:ksgShake .5s infinite}
+  @keyframes ksgShake{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+  .ksg-in{background:#fffdf7;color:var(--ink);border-radius:20px;padding:18px 20px;width:min(300px,86vw)}
+  .ksg-e{font-size:3.4rem}
+  .ksg-t{font-weight:900;font-size:1.1rem}
+  .ksg-n{font-weight:900;font-size:1.2rem;margin:4px 0 10px;color:#c0392b}
+  .ksg-sw{display:flex;gap:6px;justify-content:center;margin-bottom:10px}
+  .ksg-sw i{width:26px;height:26px;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px #c9bca3}
+  .ks-open{margin-top:8px;background:linear-gradient(90deg,#ff9ac2,#b39bff)!important;color:#fff!important}
+  .kse-box{margin-top:10px;background:#fff3fb;border:1.5px dashed #f0b6dc;border-radius:12px;padding:8px 10px;font-size:.88rem}
   h1{font-size:1.35rem;text-align:center;margin:.2em 0 .05em}
   .sub{text-align:center;color:var(--soft);font-size:.8rem;margin-bottom:12px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
   .card{background:var(--card);border:2.5px dashed var(--line);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:3px 4px 0 rgba(0,0,0,.05)}
@@ -478,6 +518,7 @@
     </div>
     <div id="freezeArea"></div>
     <div id="gachaArea"></div>
+    <div id="kseArea"></div>
     <div id="rewardLog"></div>
   </div>
   <div id="flJump"></div>
@@ -526,6 +567,8 @@
 <input type="file" id="hwFile" accept="image/*" capture="environment" style="display:none" onchange="hwPhotoPicked(event)">
 <input type="file" id="kjFile" accept="image/*" capture="environment" style="display:none" onchange="kjPhotoPicked(event)">
 <div id="zoomView" class="zv"><div class="zv-bar"><button onclick="zvStep(-0.5)">－</button><span id="zvPct">100%</span><button onclick="zvStep(0.5)">＋</button><button class="zv-x" onclick="zvClose()">✕ とじる</button></div><div id="zvBox" class="zv-box"><img id="zvImg" alt=""></div><div id="zvKey" class="zv-key"></div><div class="zv-tip">2本指で広げる／ダブルタップで拡大・もどす</div></div>
+<div id="ksView"><div class="ks-wrap"><div class="ks-head"><b>👗 きせかえ</b><button onclick="ksClose()">✖</button></div><div id="ksBody"></div></div></div>
+<div id="ksGacha" onclick="ksGachaClose()"></div>
 <div class="cheer" id="cheer" onclick="this.style.display='none'"><div class="msg" id="cheerMsg"></div><div style="color:#fff;margin-top:14px;font-size:.9rem">タップで閉じる</div></div>
 <div class="cheer" id="photoView" onclick="this.style.display='none'"><img id="pvImg" style="max-width:90%;max-height:78%;border-radius:12px" alt=""><div style="color:#fff;margin-top:10px;font-size:.9rem">タップで閉じる</div></div>
 <div class="cheer" id="reactSend"><div class="msg" style="max-width:340px;text-align:left" onclick="event.stopPropagation()"><div style="font-weight:800;text-align:center;margin-bottom:8px">💌 娘への応援（今日の達成に）</div><div id="stampRow"></div><div id="phraseRow" style="margin-top:6px"></div><button class="btn" style="margin-top:10px" onclick="sendReaction()">💌 応援を送る</button><button class="btn gray" style="margin-top:8px" onclick="closeReactSend()">とじる</button><div class="hint" id="reactState" style="margin-top:6px;text-align:center"></div></div></div>
@@ -1321,11 +1364,119 @@ function qbPbToday(){var rem=SYNC.astatRemote||{},cache=_lsGet('qb_appstats')||{
 /* がんばりカレンダー：その日のコミットライン結果を記録（1=ナイス〔合格〕・2=パーフェクト〔全部コンプ〕）。
    今日のマスは常に「今のコミットライン判定」と同じにする（設定変更などで下がった場合も合わせる）。過去の日はその日の最終結果のまま。
    同期中の端末は、学習データ（appstats）を受信するまでは書き込まない（古いデータで上書きしないため） */
-function clRecord(l){S.clog=S.clog||{};var td=today();if(SYNC.on&&!SYNC.astatReady)return;if(l!==(+S.clog[td]||0)){if(l)S.clog[td]=l;else delete S.clog[td];var ks=Object.keys(S.clog).sort();while(ks.length>400)delete S.clog[ks.shift()];save();maybeSync();setTimeout(function(){try{render();}catch(e){}},0);}}
+/* ===== 👗 きせかえガチャ券（2026-11-22〜）：カレンダー段階で たまる。🌟1・🌈2・💜3・👑4（その日の最高段階、下がっても減らない） ===== */
+var KSE_START='2026-11-22';
+function kseS(){S.kse=S.kse||{};S.kse.g=S.kse.g||{};S.kse.used=+S.kse.used||0;return S.kse;}
+function kseGrant(d,l){if(!d||d<KSE_START)return false;var k=kseS(),n=Math.max(0,(+l||0)-1);if(n>(+k.g[d]||0)){var add=n-(+k.g[d]||0);k.g[d]=n;return add;}return false;}
+function kseTotal(){var k=kseS(),t=0;for(var d in k.g)t+=(+k.g[d]||0);return t;}
+function kseLeft(){return Math.max(0,kseTotal()-ksUsed());}
+/* ===== 👗 きせかえ（2026-11-22〜）=====
+   もと絵（クラスごと）に、かお・ふく・うわぎ・ぼうし の部品（透明PNG）を重ねて1枚にする。色は系統色で塗り直す。
+   部品は ks-<モデル>-<部品>.png。ガチャ券はカレンダー段階でたまる（kseGrant）。 */
+var KS_FAM=[
+ {k:'red',n:'赤系',sh:[['赤',2,.8,.82],['えんじ',350,.75,.5],['ローズ',345,.5,.92]]},
+ {k:'ora',n:'橙系',sh:[['オレンジ',28,.85,.95],['テラコッタ',15,.65,.65],['アプリコット',30,.45,.97]]},
+ {k:'yel',n:'黄系',sh:[['レモン',52,.75,.97],['からし',45,.8,.72],['クリーム',48,.25,.98]]},
+ {k:'gre',n:'緑系',sh:[['若草',95,.6,.8],['深緑',140,.65,.45],['ミント',155,.35,.88]]},
+ {k:'blu',n:'青系',sh:[['空色',200,.55,.92],['青',218,.75,.75],['紺',228,.7,.4]]},
+ {k:'pur',n:'紫系',sh:[['ラベンダー',265,.35,.9],['むらさき',275,.6,.65],['ぶどう',290,.65,.42]]},
+ {k:'pin',n:'桃系',sh:[['ピンク',330,.5,.95],['さくら',345,.25,.98],['ベリー',330,.7,.6]]},
+ {k:'mono',n:'モノトーン',sh:[['白',0,0,.97],['グレー',0,0,.62],['黒',0,0,.25]]}];
+var KS_CAT=[{k:'face',n:'かお',e:'😊'},{k:'hat',n:'ぼうし',e:'🧢'},{k:'cape',n:'うわぎ',e:'🧥'},{k:'wear',n:'ふく',e:'👕'},{k:'bg',n:'はいけい',e:'🏞️'}];
+var KS_ITEMS=[
+ {id:'f_happy',cat:'face',n:'喜（にっこり）',e:'😄'},{id:'f_angry',cat:'face',n:'怒（ぷんぷん）',e:'😠'},{id:'f_sad',cat:'face',n:'哀（しょんぼり）',e:'😢'},{id:'f_fun',cat:'face',n:'楽（わくわく）',e:'🤩'},
+ {id:'h_cap',cat:'hat',n:'野球帽',e:'🧢',fam:'red',band:[330,25]},{id:'h_beanie',cat:'hat',n:'ニット帽',e:'🧶',fam:'blu',band:[190,250]},{id:'h_safari',cat:'hat',n:'探検隊の帽子',e:'🤠',fam:'yel',band:[15,65],ms:.12},
+ {id:'h_goggle',cat:'hat',n:'ゴーグル付きキャップ',e:'🥽'},{id:'h_band',cat:'hat',n:'ヘアバンド',e:'🎽'},{id:'h_tiara',cat:'hat',n:'星のティアラ',e:'👑'},
+ {id:'c_varsity',cat:'cape',n:'スタジャン',e:'🧥',fam:'blu',band:[205,265]},{id:'c_denim',cat:'cape',n:'デニムジャケット',e:'👖'},{id:'c_poncho',cat:'cape',n:'レインポンチョ',e:'☔'},{id:'c_hero',cat:'cape',n:'ヒーローマント',e:'🦸'},{id:'c_star',cat:'cape',n:'星空のケープ',e:'🌌'},
+ {id:'w_adv',cat:'wear',n:'冒険者の服（マントつき）',e:'🗡️',fam:'blu',band:[190,250]},{id:'w_border',cat:'wear',n:'ボーダーシャツ',e:'👕'},{id:'w_overall',cat:'wear',n:'オーバーオール',e:'👖'},{id:'w_jersey',cat:'wear',n:'ジャージ',e:'🏃'},{id:'w_explorer',cat:'wear',n:'探検服',e:'🧭'},{id:'w_hero',cat:'wear',n:'ヒーロースーツ',e:'⭐'},
+ {id:'b_town',cat:'bg',n:'夕焼けの商店街',e:'🌇'},{id:'b_night',cat:'bg',n:'夜の町と星空',e:'🌃'},{id:'b_park',cat:'bg',n:'雨上がりの公園',e:'🌈'},{id:'b_forest',cat:'bg',n:'森のひみつ基地',e:'🌲'},{id:'b_hill',cat:'bg',n:'自転車で走る丘',e:'🚲'},{id:'b_cave',cat:'bg',n:'ふしぎな洞くつ',e:'💎'},
+ {id:'b_sakura',cat:'bg',n:'桜の道',e:'🌸'},{id:'b_matsuri',cat:'bg',n:'夏祭り',e:'🏮'},{id:'b_snow',cat:'bg',n:'雪の町',e:'⛄'},{id:'b_space',cat:'bg',n:'宇宙',e:'🪐'},{id:'b_beach',cat:'bg',n:'海辺の朝',e:'🏖️'},{id:'b_temple',cat:'bg',n:'神殿',e:'🏛️'}];
+/* クラスごとのモデル（部品がそろった順に追加）。tier＝HERO の段階番号（0から） */
+var KS_MODELS=[{id:'capy2',who:'me',tier:1,cls:'冒険者',lv:4,pre:'ks-capy2-',parts:['f_happy','f_angry','f_sad','f_fun','h_cap','h_beanie','h_safari','c_varsity','w_adv'],start:['h_cap','w_adv']}];
+var KS_ORDER=['wear','cape','face','hat'];
+function ksItem(id){for(var i=0;i<KS_ITEMS.length;i++)if(KS_ITEMS[i].id===id)return KS_ITEMS[i];return null;}
+function ksFam(k){for(var i=0;i<KS_FAM.length;i++)if(KS_FAM[i].k===k)return KS_FAM[i];return null;}
+function ksModelFor(who,ti){for(var i=0;i<KS_MODELS.length;i++){var m=KS_MODELS[i];if(m.who===who&&m.tier===ti)return m;}return null;}
+/* きせかえ画面で使うモデル：いまのクラスにあればそれ、なければ次に用意されているクラス */
+function ksViewModel(){var ti=heroTier(lv(S.me.xp),HERO),m=ksModelFor('me',ti);if(m)return m;var best=null;KS_MODELS.forEach(function(x){if(x.who==='me'&&(!best||Math.abs(x.tier-ti)<Math.abs(best.tier-ti)))best=x;});return best;}
+function ksGl(){var k=kseS();k.gl=k.gl||{};return k.gl;}
+function ksUsed(){return Object.keys(ksGl()).length;}
+function ksOwnSet(){var o={};KS_MODELS.forEach(function(m){(m.start||[]).forEach(function(id){o[id]=1;});});var g=ksGl();for(var t in g)o[g[t]]=1;return o;}
+function ksOwned(id){return !!ksOwnSet()[id];}
+function ksLook(){var k=kseS();if(!k.look){var m=ksViewModel(),l={};(m&&m.start||[]).forEach(function(id){var it=ksItem(id);if(it)l[it.cat]=id;});k.look=l;}return k.look;}
+/* 色の指定："fam:番号"。"" はもとの色 */
+function ksColorOf(cat){return (ksLook()[cat+'C'])||'';}
+var KSIMG={},KSC={},KSST={};
+function ksLoad(src){if(KSIMG[src])return KSIMG[src];KSIMG[src]=new Promise(function(res){var im=new Image();im.onload=function(){res(im);};im.onerror=function(){res(null);};im.src=src;});return KSIMG[src];}
+function ksRgb2hsv(r,g,b){var mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,h=0;if(d){if(mx===r)h=((g-b)/d)%6;else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;if(h<0)h+=360;}return [h,mx?d/mx:0,mx];}
+function ksHsv2rgb(h,s,v){var c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c,r=0,g=0,b=0;if(h<60){r=c;g=x;}else if(h<120){r=x;g=c;}else if(h<180){g=c;b=x;}else if(h<240){g=x;b=c;}else if(h<300){r=x;b=c;}else{r=c;b=x;}return [r+m,g+m,b+m];}
+function ksInBand(h,b){return b[0]<=b[1]?(h>=b[0]&&h<=b[1]):(h>=b[0]||h<=b[1]);}
+/* 部品を、指定の系統色の1色に塗り直した canvas を返す */
+function ksTint(im,it,col){var c=document.createElement('canvas');c.width=im.width;c.height=im.height;var g=c.getContext('2d');g.drawImage(im,0,0);if(!col||!it||!it.band)return c;
+  var p=col.split(':'),f=ksFam(p[0]);if(!f)return c;var sh=f.sh[+p[1]||0],d=g.getImageData(0,0,c.width,c.height),a=d.data,ms=it.ms||.15,n=0,ss=0,vv=0,i,hsv;
+  for(i=0;i<a.length;i+=4){if(a[i+3]<40)continue;hsv=ksRgb2hsv(a[i]/255,a[i+1]/255,a[i+2]/255);if(hsv[1]>ms&&ksInBand(hsv[0],it.band)){n++;ss+=hsv[1];vv+=hsv[2];}}
+  if(!n)return c;ss/=n;vv/=n;
+  for(i=0;i<a.length;i+=4){if(!a[i+3])continue;hsv=ksRgb2hsv(a[i]/255,a[i+1]/255,a[i+2]/255);if(!(hsv[1]>ms&&ksInBand(hsv[0],it.band)))continue;
+    var s=Math.min(1,hsv[1]/ss*sh[2]),v=Math.min(1,hsv[2]/vv*sh[3]),rgb=ksHsv2rgb(sh[1],s,v);a[i]=rgb[0]*255;a[i+1]=rgb[1]*255;a[i+2]=rgb[2]*255;}
+  g.putImageData(d,0,0);return c;}
+function ksKey(m,l){var o=[m.id];KS_ORDER.forEach(function(c){o.push(c+'='+(l[c]||'')+'/'+(l[c+'C']||''));});return o.join('|');}
+/* 1枚に重ねて dataURL を返す（同じ組み合わせは使い回す） */
+function ksCompose(m,l){var key=ksKey(m,l);if(KSC[key])return Promise.resolve(KSC[key]);
+  var ids=['base'].concat(KS_ORDER.map(function(c){return (l[c]&&m.parts.indexOf(l[c])>=0)?l[c]:'';}));
+  return Promise.all(ids.map(function(id){return id?ksLoad(m.pre+id+'.png'):Promise.resolve(null);})).then(function(ims){
+    if(!ims[0])return null;var c=document.createElement('canvas');c.width=ims[0].width;c.height=ims[0].height;var g=c.getContext('2d');g.drawImage(ims[0],0,0);
+    for(var i=1;i<ims.length;i++){if(!ims[i])continue;var cat=KS_ORDER[i-1];g.drawImage(ksTint(ims[i],ksItem(ids[i]),l[cat+'C']),0,0);}
+    var u=c.toDataURL('image/png');KSC[key]=u;return u;});}
+/* ボードのアバター：いまのクラスにモデルがあれば重ね着の絵にする */
+function ksHeroSrc(ti){var m=ksModelFor('me',ti);if(!m)return '';var l=ksLook(),key=ksKey(m,l);if(KSC[key])return KSC[key];
+  ksCompose(m,l).then(function(u){if(!u)return;var e=document.getElementById('ksHeroImg');if(e)e.src=u;});return '';}
+/* ===== ガチャ ===== */
+function ksPool(){var m=ksViewModel();if(!m)return [];var own=ksOwnSet(),p=[];
+  m.parts.forEach(function(id){var it=ksItem(id);if(!it)return;if(!own[id])p.push({id:id,w:3});else if(it.band)KS_FAM.forEach(function(f){if(f.k!==it.fam&&!own[id+'@'+f.k])p.push({id:id+'@'+f.k,w:1});});});
+  return p;}
+function ksEntryName(e){var p=e.split('@'),it=ksItem(p[0]);if(!it)return e;return p[1]?(it.n+' の '+ksFam(p[1]).n):it.n;}
+function ksSpin(){var left=Math.max(0,kseTotal()-ksUsed()),pool=ksPool();if(left<=0){alert('ガチャ券がないよ。🌟パーフェクト以上の日にたまるよ');return;}if(!pool.length){alert('いま出せるものは ぜんぶ持ってるよ！ 新しい部品を じゅんび中');return;}
+  var tw=pool.reduce(function(s,x){return s+x.w;},0),r=Math.random()*tw,pick=pool[0];for(var i=0;i<pool.length;i++){r-=pool[i].w;if(r<=0){pick=pool[i];break;}}
+  ksGl()[Date.now().toString(36)+Math.random().toString(36).slice(2,4)]=pick.id;save();maybeSync();
+  var box=document.getElementById('ksGacha');box.innerHTML='<div class="ksg-cap">🎰</div><div class="ksg-t">ガチャガチャ…</div>';box.style.display='flex';try{sTick();}catch(e){}
+  setTimeout(function(){var p=pick.id.split('@'),it=ksItem(p[0]);box.innerHTML='<div class="ksg-in" onclick="event.stopPropagation()"><div class="ksg-e">'+(it?it.e:'🎁')+'</div><div class="ksg-t">でた！</div><div class="ksg-n">'+esc(ksEntryName(pick.id))+'</div>'
+      +(p[1]?'<div class="ksg-sw">'+ksFam(p[1]).sh.map(function(s){return '<i style="background:'+ksSwatch(s)+'"></i>';}).join('')+'</div>':'')
+      +'<button class="btn" onclick="ksTry(\''+pick.id+'\')">👗 きてみる</button><button class="btn gray" style="margin-top:6px" onclick="ksGachaClose()">とじる</button></div>';
+    try{sWin();burst();}catch(e){}ksOpenRender();},1100);}
+function ksGachaClose(){document.getElementById('ksGacha').style.display='none';ksOpenRender();}
+function ksTry(id){var p=id.split('@'),it=ksItem(p[0]);if(!it)return;var l=ksLook();l[it.cat]=it.id;l[it.cat+'C']=p[1]?p[1]+':0':(l[it.cat+'C']&&l[it.cat]===it.id?l[it.cat+'C']:'');save();maybeSync();ksGachaClose();_ksTab=it.cat;ksOpenRender();render();}
+function ksSwatch(s){var c=ksHsv2rgb(s[1],s[2],s[3]);return 'rgb('+Math.round(c[0]*255)+','+Math.round(c[1]*255)+','+Math.round(c[2]*255)+')';}
+/* ===== きせかえ画面 ===== */
+var _ksTab='face';
+function ksOpen(){_ksTab=_ksTab||'face';document.getElementById('ksView').style.display='block';document.body.style.overflow='hidden';ksOpenRender();}
+function ksClose(){document.getElementById('ksView').style.display='none';document.body.style.overflow='';render();}
+function ksSet(cat,id){var l=ksLook();if(l[cat]===id&&cat!=='face'&&cat!=='bg')return;l[cat]=id;if(cat!=='face'&&cat!=='bg')l[cat+'C']='';save();maybeSync();ksOpenRender();}
+function ksSetC(cat,v){var l=ksLook();l[cat+'C']=v;save();maybeSync();ksOpenRender();}
+function ksOpenRender(){var el=document.getElementById('ksBody');if(!el||document.getElementById('ksView').style.display!=='block')return;
+  var m=ksViewModel(),l=ksLook(),own=ksOwnSet(),left=Math.max(0,kseTotal()-ksUsed()),ti=heroTier(lv(S.me.xp),HERO),g=HERO[m?m.tier:ti]||HERO[0];
+  if(!m){el.innerHTML='<div class="ks-note">きせかえは じゅんび中だよ</div>';return;}
+  var note=(m.tier!==ti)?'<div class="ks-note">🔜 Lv.'+m.lv+'「'+m.cls+'」になると、ボードのアバターも この姿になるよ</div>':'';
+  var pool=ksPool().length;
+  var h='<div class="ks-prev" style="background:'+g.bg+'"><img id="ksPrevImg" alt=""></div>'+note
+    +'<button class="btn ks-spin"'+(left&&pool?'':' disabled')+' onclick="ksSpin()">🎰 ガチャをまわす（券 '+left+'まい）</button>'
+    +'<div class="ks-tabs">'+KS_CAT.map(function(c){return '<button class="'+(_ksTab===c.k?'on':'')+'" onclick="_ksTab=\''+c.k+'\';ksOpenRender()">'+c.e+'<span>'+c.n+'</span></button>';}).join('')+'</div>';
+  var items=KS_ITEMS.filter(function(it){return it.cat===_ksTab;}),cur=l[_ksTab]||'';
+  var none=(_ksTab==='face')?'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\'face\',\'\')"><b>🙂</b><span>ふつう</span></button>':(_ksTab==='bg'?'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\'bg\',\'\')"><b>🎨</b><span>クラスの色</span></button>':'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\''+_ksTab+'\',\'\')"><b>✖</b><span>なし</span></button>');
+  h+='<div class="ks-grid">'+none+items.map(function(it){var ready=m.parts.indexOf(it.id)>=0,ok=own[it.id]&&ready;
+      if(ok)return '<button class="ks-it'+(cur===it.id?' on':'')+'" onclick="ksSet(\''+_ksTab+'\',\''+it.id+'\')"><b>'+it.e+'</b><span>'+esc(it.n)+'</span></button>';
+      return '<div class="ks-it lock"><b>'+(ready?'🔒':'⏳')+'</b><span>'+(ready?'？？？':esc(it.n))+'</span><i>'+(ready?'ガチャで出るよ':'じゅんび中')+'</i></div>';}).join('')+'</div>';
+  var it=ksItem(cur);
+  if(it&&it.band){var cv=l[_ksTab+'C']||'';h+='<div class="ks-col"><div class="ks-col-h">🎨 '+esc(it.n)+' の色</div><div class="ks-sws"><button class="ks-sw'+(cv?'':' on')+'" onclick="ksSetC(\''+_ksTab+'\',\'\')">もとの色</button>'
+      +KS_FAM.filter(function(f){return f.k!==it.fam;}).map(function(f){var have=own[it.id+'@'+f.k];return '<div class="ks-fam'+(have?'':' lock')+'"><span>'+f.n+(have?'':' 🔒')+'</span>'+(have?f.sh.map(function(s,i){var v=f.k+':'+i;return '<button class="ks-dot'+(cv===v?' on':'')+'" title="'+s[0]+'" style="background:'+ksSwatch(s)+'" onclick="ksSetC(\''+_ksTab+'\',\''+v+'\')"></button>';}).join(''):'')+'</div>';}).join('')+'</div></div>';}
+  if(_ksTab==='bg')h+='<div class="ks-note">🏞️ はいけいの絵は じゅんび中。できたら ガチャに入るよ</div>';
+  el.innerHTML=h;
+  ksCompose(m,l).then(function(u){var e=document.getElementById('ksPrevImg');if(e&&u)e.src=u;});}
+
+function clRecord(l){S.clog=S.clog||{};var td=today();if(SYNC.on&&!SYNC.astatReady)return;var _ka=kseGrant(td,l);if(_ka){save();maybeSync();setTimeout(function(){try{showCheer('👗 きせかえガチャ券 +'+_ka+'まい ゲット！');}catch(e){}},900);}if(l!==(+S.clog[td]||0)){if(l)S.clog[td]=l;else delete S.clog[td];var ks=Object.keys(S.clog).sort();while(ks.length>400)delete S.clog[ks.shift()];save();maybeSync();setTimeout(function(){try{render();}catch(e){}},0);}}
 /* パパの手直し：過去の日のカレンダー判定を書きかえる（今日は自動判定のまま） */
 function clEdit(){var k=(document.getElementById('d_clDate').value||'').trim(),lv=+document.getElementById('d_clLv').value||0;if(!/^\d{4}-\d{2}-\d{2}$/.test(k)){alert('日付をえらんでください');return;}
   if(k>=today()){alert('今日の分は、その日の達成状況で自動で決まります');return;}var nm=['お休み','👍 ナイス','🌟 パーフェクト','🌈 レインボー','💜 アメジスト','👑 GOD 神セレブレーション'][lv];if(!confirm(k+' を「'+nm+'」に書きかえますか？'))return;
-  S.clog=S.clog||{};S.clp=S.clp||{};if(lv)S.clog[k]=lv;else delete S.clog[k];if(lv>=3){if(!S.clp[k])S.clp[k]={h0:0,n:1};}else delete S.clp[k];
+  S.clog=S.clog||{};S.clp=S.clp||{};if(lv)S.clog[k]=lv;else delete S.clog[k];kseGrant(k,lv);if(lv>=3){if(!S.clp[k])S.clp[k]={h0:0,n:1};}else delete S.clp[k];
   save();maybeSync();render();alert(k+' を「'+nm+'」にしました');}
 function clLevel(k){return +((S.clog||{})[k])||0;}
 /* 🌈レインボー（パーフェクト＋宿題1つ以上）でパーティモード。到達した瞬間＋その後宿題が1つ増えるたびに1回。回数は日ごとに記録 */
@@ -1599,7 +1750,7 @@ function heroHTML(who){var pa=who==='pa',P=pa?S.pa:S.me,T=pa?HERO_PA:HERO,l=lv(P
   var fb='<div class="fb">'+(g.cape?'<div class="hero-cape" style="background:'+g.cape+'"></div>':'')+'<div class="hero-av" style="box-shadow:0 0 0 3px '+(g.ring||'#d6ccb4')+'">'+fbAv+(g.hd?'<span class="hero-hd">'+g.hd+'</span>':'')+'</div><span class="hero-wp">'+g.w+'</span>'+(g.sh?'<span class="hero-sh">'+g.sh+'</span>':'')+(g.tl?'<span class="hero-tl">'+g.tl+'</span>':'')+'</div>';
   var st=pa?('<span>📅 がんばった日 '+Object.keys(S.papaHistory||{}).length+'日</span>'):(function(s){return '<span>⚔️ こうげき（計算） '+s.atk+'</span><span>🧠 まりょく（英単語・語彙） '+s.mag+'</span><span>🛡️ ぼうぎょ（漢字） '+s.def+'</span><span>❤️ HP（つづける力） '+s.hp+'</span>';})(heroStats());
   return '<div class="hero'+(pa?' pa':'')+'" id="'+id+'" onclick="heroToggle(\''+id+'\')" style="background:'+(pa?'linear-gradient(180deg,#f7f3ea,#ebe3d2)':g.bg)+'"><div class="hero-top"><span class="hero-lv">Lv.'+l+'</span><span class="hero-cls" style="background:'+g.c+'">'+g.cls+' '+heroRank(sub)+'</span></div>'
-    +'<div class="hero-st'+(pa?' px':'')+'">'+(pa?'':'<div class="hero-ped" style="background:radial-gradient(ellipse at 50% 35%,#fff 0,'+ped+' 45%,rgba(0,0,0,.18) 100%)"></div>')+spk+heroImg('ava-'+(pa?'cow':'capy')+'-'+(ti+1)+'.png',pa)+fb+'</div>'
+    +'<div class="hero-st'+(pa?' px':'')+'">'+(pa?'':'<div class="hero-ped" style="background:radial-gradient(ellipse at 50% 35%,#fff 0,'+ped+' 45%,rgba(0,0,0,.18) 100%)"></div>')+spk+((!pa&&ksModelFor('me',ti))?'<img class="hero-img" id="ksHeroImg" src="'+(ksHeroSrc(ti)||('ava-capy-'+(ti+1)+'.png'))+'" alt="" onload="this.parentNode.classList.add(\'img\')">':heroImg('ava-'+(pa?'cow':'capy')+'-'+(ti+1)+'.png',pa))+fb+'</div>'
     +'<div class="hero-stars'+(pa?' pa':'')+'">'+heroStars(sub)+'</div>'
     +'<div class="hero-pw">戦闘力<b>'+pw.toLocaleString()+'</b></div><div class="hero-bar"><i style="width:'+pct+'%"></i></div><div class="hero-next">'+nxt+'</div>'
     +'<div class="hero-sts">'+st+(pa?'':'<span class="hero-eq">台座：'+pedName+'（Ⅰ銅→Ⅱ銀→Ⅲ金）</span>')+'<span class="hero-eq">装備：'+g.wn+'・'+g.a+(g.tn?'・'+g.tn:'')+'</span><span class="hero-eq">経験値 '+P.xp+'</span></div></div>';}
@@ -1837,6 +1988,7 @@ function render(){
   }
   document.getElementById('rewardLog').innerHTML=rewardCardHTML();
   var _ga=document.getElementById('gachaArea');if(_ga)_ga.innerHTML='<div style="text-align:center;margin-top:8px"><button class="btn gacha-btn" '+(S.prog.gacha<=0?'disabled':'')+' onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：'+S.prog.gacha+'回）</div></div>';
+  var _ke=document.getElementById('kseArea');if(_ke)_ke.innerHTML='<div class="kse-box"><div><b>👗 きせかえガチャ券 '+kseLeft()+'まい</b></div><div class="mini" style="text-align:left">🌟パーフェクトで1まい・🌈で2まい・💜で3まい・👑で4まい たまるよ</div><button class="btn ks-open" onclick="ksOpen()">👗 きせかえ・ガチャ</button></div>';
   renderTabs();
   renderFlJump();renderRules();
   checkNewReaction();
@@ -1913,13 +2065,13 @@ function restoreAuto(){var b;try{b=JSON.parse(localStorage.getItem('qb_backup')|
 function restoreUndo(){var u;try{u=JSON.parse(localStorage.getItem('qb_undo')||'null');}catch(e){}if(!u||!u.s){alert('取り消せる操作がありません');return;}if(!confirm('直前の状態（'+_fmtTs(u.t)+'）に戻します。よろしいですか？'))return;if(restoreFrom(u.s)){alert('直前の状態に戻しました');dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,phw:S.phw,bank:S.bank,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,kj:S.kj,rd:S.rd,cday:S.cday,cfgVer:S.cfgVer};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,phw:S.phw,bank:S.bank,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,kj:S.kj,rd:S.rd,cday:S.cday,kse:S.kse,cfgVer:S.cfgVer};}
 /* 2026-11-22：同期の巻き戻し対策。
    以前は「最後に送った端末の状態で全部上書き」だったので、しばらく通信が切れていた端末（古い状態のまま）が
    日付が変わった時などに自動で送信すると、ほかの端末の新しい記録（パパの宿題のOKなど）が消えていた。
    いまは「前回そろった状態（base）」と「サーバーの今」と「この端末の今」をくらべ、変わった所だけを合わせて送る（3方向マージ）。
    送信はトランザクション（サーバーの最新を見てから書く仕組み）で行うので、古い状態で上書きできない。 */
-var SKEYS=['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','phw','bank','hwAllSig','bonusLog','clog','clp','kj','rd','cday','cfgVer'];
+var SKEYS=['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','phw','bank','hwAllSig','bonusLog','clog','clp','kj','rd','cday','kse','cfgVer'];
 function _sEmp(x){return x===undefined||x===null||(typeof x==='object'&&(Array.isArray(x)?x.length===0:Object.keys(x).length===0));}
 function _sObj(x){return !!x&&typeof x==='object'&&!Array.isArray(x);}
 function _sEq(a,b){if(a===b)return true;if(_sEmp(a)&&_sEmp(b))return true;if(!a||!b||typeof a!=='object'||typeof b!=='object')return false;
