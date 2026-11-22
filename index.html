@@ -119,6 +119,14 @@
   .kj-pa{font-size:.88rem;line-height:1.8;margin:4px 0 6px;padding:8px 10px;background:#fffdf5;border:1.5px solid #eadfb8;border-radius:10px;font-weight:700}
   .kj-btn{display:block;width:100%;border:none;background:#d6504e;color:#fff;padding:12px;border-radius:14px;font-weight:900;font-size:1rem;margin-top:8px;box-shadow:0 3px 0 #b23a37;font-family:inherit}
   .kj-btn.ok{background:#2f9e5e;box-shadow:0 3px 0 #22804a}
+  .kj-undo{margin-top:-4px;text-align:right}
+  .kj-undo .kj-link{display:inline-block;margin:4px 0 0}
+  .kj-undo.open{text-align:left;background:#fff;border:1.5px solid #e9c9c5;border-radius:12px;padding:8px;margin-top:6px}
+  .kj-undo-h{font-size:.8rem;font-weight:900;color:#8a3330;margin-bottom:4px}
+  .kj-undo.open>button:not(.kj-link){display:block;width:100%;text-align:left;border:1.5px solid #e9c9c5;background:#fff8f6;border-radius:10px;padding:8px 10px;margin-top:6px;font-weight:900;font-size:.85rem;color:#6a3a36;font-family:inherit}
+  .kj-undo.open>button.ng{color:#b23a37}
+  .kj-undo.open small{display:block;font-size:.7rem;font-weight:700;color:#9a7a76;margin-top:2px}
+  .kj-undo.open .kj-link{display:block;margin:8px auto 0}
   .kj-sg{margin-top:10px;background:#fff8e6;border:2px solid #f0cf7a;border-radius:14px;padding:10px}
   .kj-sg-h{font-size:.85rem;font-weight:900;color:#8a5a00}
   .kj-sg-m{font-size:.74rem;font-weight:800;color:#9a7a4a;margin-top:2px;line-height:1.5}
@@ -1056,7 +1064,7 @@ function kjGradeS(id){var t=kjFind(id);if(!t||t.st!=='sub')return;var el=documen
   var ws=raw?raw.split(/[\s、,，・／\/]+/).filter(Boolean):[];
   if(!confirm(ws.length?('まちがえた漢字 '+ws.length+'こ（'+ws.join('・')+'）で確定しますか？'):'ぜんぶ○で確定しますか？'))return;
   rollover();var D=kjDict();t.q=ws;t.res=[];t.gd=today();t.ga=Date.now();qbRv();
-  ws.forEach(function(w){w.split('').forEach(function(c){if(D.d[c])kjProg(c,false);});});
+  kjPvSave(t,ws.join('').split('').filter(function(c){return D.d[c];}));ws.forEach(function(w){w.split('').forEach(function(c){if(D.d[c])kjProg(c,false);});});
   if(t.ph)hwPhDel(t.ph);delete t.ph;delete t.nt;
   if(!ws.length)kjFinish(t);else{t.st='graded';t.fx={};ws.forEach(function(w,i){t.fx[i]={st:'',ng:0};});}
   save();maybeSync();render();}
@@ -1073,12 +1081,28 @@ function kjPick(ui){var D=kjDict(),p=kjS().prog,td=today(),out=[],used={};
   D.order.filter(function(c){var r=p[c];return r&&!r.m;}).sort(function(a,b){return (p[a].due||'')<(p[b].due||'')?-1:1;}).forEach(add);
   D.order.slice().sort(function(){return Math.random()-.5;}).forEach(add);
   return out;}
-function kjUnitPick(v){var K=kjS();if(String(v).charAt(0)==='s'){K.selS=+String(v).slice(1);}else{K.selS=null;K.unit=+v||0;}save();renderKanji();}
+function kjUnitPick(v){try{var _a=document.activeElement;if(_a&&_a.blur)_a.blur();}catch(e){}var K=kjS();if(String(v).charAt(0)==='s'){K.selS=+String(v).slice(1);}else{K.selS=null;K.unit=+v||0;}save();renderKanji();}
 function kjStart(){if(!kjOn())return;if(kjBusy()){alert('いまのテストを先に出してね');return;}var sel=document.getElementById('kjUnit'),ui=sel?(+sel.value||0):kjDefaultUnit();
   var K=kjS(),P=kjPass(ui);K.unit=ui;K.selS=null;var t={id:'t'+Date.now().toString(36),d:today(),st:'take',q:P?P.b.map(function(x){return x.c;}):kjPick(ui),at:Date.now()};if(P){t.mode='p';t.u=ui;}K.tests.push(t);while(K.tests.length>40)K.tests.shift();
   save();maybeSync();renderKanji();sTick();setTimeout(function(){var e=document.getElementById('kjCard');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});},50);}
 function kjCancel(id){var t=kjFind(id);if(!t||t.st!=='take')return;if(!confirm('このテストをやめますか？（まだ何も記録されません）'))return;var K=kjS();K.tests=K.tests.filter(function(x){return x.id!==id;});save();maybeSync();renderKanji();}
 function kjFind(id){return kjS().tests.find(function(t){return t.id===id;});}
+/* パパ用「↩ 戻す」メニュー：始まったテストを取り消す／丸つけを取り消す */
+var KJU={};
+function kjPvSave(t,cs){var p=kjS().prog,pv={};(cs||[]).forEach(function(c){if(!(c in pv))pv[c]=p[c]?JSON.parse(JSON.stringify(p[c])):0;});t.pv=pv;}
+function kjPvBack(t){if(!t.pv)return;var p=kjS().prog;Object.keys(t.pv).forEach(function(c){if(t.pv[c])p[c]=t.pv[c];else delete p[c];});delete t.pv;}
+function kjUndoMenu(t){var id=t.id,q="'"+id+"'",ttl=t.mode==='s'?kjSName(t.n):t.mode==='p'?(((window.KANJI_UNITS||[])[t.u]||{}).u||'')+' 文章テスト':'書き取りテスト';
+  if(!KJU[id])return '<div class="kj-undo"><button class="kj-link" onclick="KJU[\''+id+'\']=1;renderKanji()">↩ 戻す…</button></div>';
+  var b=[];
+  if(t.st==='sub')b.push('<button onclick="kjRetake('+q+')">📷 写真をとり直してもらう<small>書いている途中に戻す</small></button>');
+  if(t.st==='graded')b.push('<button onclick="kjUngrade('+q+')">✏️ 丸つけを取り消す<small>書いている途中に戻す（写真を送り直してもらう）</small></button>');
+  b.push('<button class="ng" onclick="kjDrop('+q+')">🗑 このテストを取り消す<small>始める前（パート選び）に戻す。記録もボーナスも残りません</small></button>');
+  return '<div class="kj-undo open"><div class="kj-undo-h">↩ 「'+esc(ttl)+'」を戻す</div>'+b.join('')+'<button class="kj-link" onclick="delete KJU[\''+id+'\'];renderKanji()">とじる</button></div>';}
+function kjDrop(id){var t=kjFind(id);if(!t)return;if(!confirm('このテストを取り消して、始める前に戻しますか？\n（丸つけ・直しの記録とボーナスも消えます）'))return;
+  rollover();kjPvBack(t);if(t.ph)hwPhDel(t.ph);if(t.fxph)hwPhDel(t.fxph);var K=kjS();K.tests=K.tests.filter(function(x){return x.id!==id;});delete KJG[id];delete KJU[id];qbRv();save();maybeSync();render();}
+function kjUngrade(id){var t=kjFind(id);if(!t||t.st!=='graded')return;if(!confirm('丸つけを取り消して、書いている途中に戻しますか？\n（もう一度 写真を送ってもらいます）'))return;
+  rollover();kjPvBack(t);if(t.fxph)hwPhDel(t.fxph);delete t.fxph;delete t.fxnt;delete t.fx;delete t.res;delete t.gd;delete t.ga;if(t.mode==='s')t.q=[];
+  t.st='take';t.note='パパが丸つけを取り消したよ。もう一度 写真を送ってね';delete KJU[id];qbRv();save();maybeSync();render();}
 /* 写真：宿題と同じ保存・同期（hwphotos）を使う */
 var _kjPick=null;
 function kjSnap(id,kind){var t=kjFind(id);if(!t)return;_kjCam=true;_kjPick={id:id,kind:kind};var f=document.getElementById('kjFile');f.value='';f.click();}
@@ -1101,7 +1125,7 @@ function kjProg(c,ok){var p=kjS().prog,r=p[c]||{s:0,w:0,n:0};r.n=_num(r.n)+1;
   r.last=today();p[c]=r;}
 function kjGrade(id){var t=kjFind(id);if(!t||t.st!=='sub')return;rollover();var g=KJG[id]||{},wrong=Object.keys(g).filter(function(i){return g[i];}).map(Number);
   if(!confirm(wrong.length?('×が '+wrong.length+(t.mode==='p'?'字':'問')+'（'+wrong.map(function(i){return kjNum(i);}).join('')+'）で確定しますか？'):'ぜんぶ○で確定しますか？'))return;
-  t.res=t.q.map(function(c,i){var ok=wrong.indexOf(i)<0;kjProg(c,ok);return ok?1:0;});t.gd=today();qbRv();t.ga=Date.now();if(t.ph)hwPhDel(t.ph);delete t.ph;delete t.nt;delete KJG[id];
+  kjPvSave(t,t.q);t.res=t.q.map(function(c,i){var ok=wrong.indexOf(i)<0;kjProg(c,ok);return ok?1:0;});t.gd=today();qbRv();t.ga=Date.now();if(t.ph)hwPhDel(t.ph);delete t.ph;delete t.nt;delete KJG[id];
   if(!wrong.length){kjFinish(t);}else{t.st='graded';t.fx={};wrong.forEach(function(i){t.fx[i]={st:'',ng:0};});}
   save();maybeSync();render();}
 function kjRetake(id){var t=kjFind(id);if(!t||t.st!=='sub')return;var note=prompt('とり直しの理由（娘に表示されます）','写真が見えにくいので、もう一度とってね');if(note===null)return;
@@ -1151,7 +1175,11 @@ function kjVis(ev){var t=kjTaking();if(!t)return;var hid=document.hidden||(ev&&e
   else{if(_kjCam){_kjCam=false;if(t._hs){delete t._hs;}return;}if(t._hs){t.awayMs=_num(t.awayMs)+(Date.now()-t._hs);delete t._hs;save();maybeSync();renderKanji();}}}
 document.addEventListener('visibilitychange',kjVis);window.addEventListener('pagehide',kjVis);
 /* カード */
-function renderKanji(){var el=document.getElementById('kanjiCard');if(!el)return;var per=(S.cfg&&S.cfg.kanjiPer!=null)?+S.cfg.kanjiPer:1,all=(S.cfg&&S.cfg.kanjiAll!=null)?+S.cfg.kanjiAll:5;
+/* 選択メニュー・入力欄を使っている最中は描きかえない（iPhoneで選択の窓がすぐ閉じる不具合の対策）。使い終わったら描く */
+var _kjPend=0;
+function kjHoldFocus(){var el=document.getElementById('kanjiCard'),a=document.activeElement;return !!(el&&a&&a!==document.body&&/^(SELECT|INPUT|TEXTAREA)$/.test(a.tagName)&&el.contains(a));}
+document.addEventListener('focusout',function(){if(_kjPend)setTimeout(function(){if(_kjPend&&!kjHoldFocus()){_kjPend=0;renderKanji();}},60);});
+function renderKanji(){var el=document.getElementById('kanjiCard');if(!el)return;if(kjHoldFocus()){_kjPend=1;return;}_kjPend=0;var per=(S.cfg&&S.cfg.kanjiPer!=null)?+S.cfg.kanjiPer:1,all=(S.cfg&&S.cfg.kanjiAll!=null)?+S.cfg.kanjiAll:5;
   var bon=(S.cfg&&S.cfg.bonusOn&&(per||all))?'<div class="kj-bonus">📱 1字 <b>＋'+per+'分</b>・1パート（10字）クリアで <b>＋'+all+'分</b></div>':'';
   if(!kjOn()){el.innerHTML='<div class="card kjcard"><div class="v-h"><span>✍️ 漢字クエスト</span><span class="v-count">🔧 じゅんび中</span></div><div class="v-sub" style="color:#7a4a46">ノートに書いておぼえる漢字クエストが、もうすぐ始まるよ！</div>'+bon+'<span class="kj-soon">🔧 じゅんび中</span></div>';return;}
   var isPapa=(calcOwner()==='papa'),D=kjDict(),K=kjS(),total=D.order.length,ms=kjMastered(),kt=qbKanjiToday(),U=window.KANJI_UNITS;
@@ -1208,7 +1236,7 @@ function renderKanji(){var el=document.getElementById('kanjiCard');if(!el)return
         var acts=(isPapa&&st==='sub')?'<div class="hw-act"><button class="hw-ab" onclick="kjFixOk(\''+t.id+'\','+i+')">✅ OK</button><button class="hw-ab ng" onclick="kjFixNg(\''+t.id+'\','+i+')">↩ やり直し</button></div>':'';
         return '<div class="kj-fi '+(st||'todo')+'"><div><span class="kj-no">'+kjNum(i)+'</span> ［<span class="kj-big">'+esc(d.a)+'</span>］を <b>5回</b> 書く <span class="kj-st">'+lab+'</span></div>'+(st==='ng'&&x.note?'<div class="hw-st ng">'+esc(x.note)+'</div>':'')+acts+'</div>';}).join('')+'</div>';
       if(!isPapa){if(need.length)h+='<div class="kj-rule">📓 ノートに '+(t.mode==='s'?'<b>まちがえた漢字（ことば）</b>':PM?'<b>書けなかったことば</b>':'<b>番号</b> と <b>［　］の中</b>')+' を <b>5回ずつ</b> 書いて、まとめて写真を1まいとってね</div><button class="kj-btn" onclick="kjSnap(\''+t.id+'\',\'fix\')">📷 直し（'+need.length+(PM?'字':'問')+'分）の写真を送る</button>';else if(subN.length)h+='<div class="kj-mini">📷 パパの確認待ち（'+subN.length+'問）'+((t.fxnt&&t.fxnt!==1)?'・⚠️ 通知できなかったので、直接パパに伝えてね':'')+'</div>';}
-      h+='</div>';}});
+      h+='</div>';}if(isPapa)h+=kjUndoMenu(t);});
   var doneToday=K.tests.filter(function(t){return t.st==='done'&&t.dd===today();});
   if(doneToday.length)h+='<div class="kj-done">🎉 今日 パートクリア '+doneToday.length+'回'+((S.cfg.bonusOn&&kt.min)?'・漢字で <b>＋'+kt.min+'分</b>':'')+'</div>';
   if(!kjBusy()){var selS=null;if(K.selS)K.selS=null;var ud=kjUD(),nx=kjNextPart(),du=(K.unit!=null&&K.unit<U.length&&!ud[K.unit]&&kjPass(K.unit))?K.unit:(nx>=0?nx:kjDefaultUnit());
