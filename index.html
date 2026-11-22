@@ -1024,7 +1024,13 @@ function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)retu
 function kjOn(){return !!(window.KANJI_UNITS&&window.KANJI_UNITS.length)&&S.cfg.kjOn!==0;}
 var _KJ=null;
 function kjDict(){if(_KJ)return _KJ;var d={},order=[];(window.KANJI_UNITS||[]).forEach(function(u,ui){u.k.forEach(function(x){d[x[0]]={c:x[0],on:x[1],kun:x[2],q:x[3],a:x[4],u:ui};order.push(x[0]);});});_KJ={d:d,order:order};return _KJ;}
-function kjS(){S.kj=S.kj||{};S.kj.tests=S.kj.tests||[];S.kj.prog=S.kj.prog||{};return S.kj;}
+function kjS(){S.kj=S.kj||{};S.kj.tests=S.kj.tests||[];S.kj.prog=S.kj.prog||{};
+  /* 2026-11-22：第5回 総合は完了ずみにする（1回だけ） */
+  if(!S.kj.m5){S.kj.m5=1;S.kj.sd=S.kj.sd||{};if(!S.kj.sd[5])S.kj.sd[5]='2026-11-22';setTimeout(function(){save();maybeSync();},0);}
+  return S.kj;}
+/* パパ：総合テストの完了を手で切りかえ（チップをタップ） */
+function kjSdToggle(n){if(calcOwner()!=='papa')return;var sd=kjSD();if(sd[n]){if(!confirm(kjSName(n)+' を「まだ」に戻しますか？'))return;delete sd[n];}
+  else{if(!confirm(kjSName(n)+' を「完了」にしますか？（ボーナスはつきません）'))return;sd[n]=today();}save();maybeSync();renderKanji();}
 function kjAddDays(n){var d=new Date();d.setDate(d.getDate()+n);return dstr(d);}
 function kjQHTML(q){return esc(q).replace(/［([^］]*)］/g,'<span class="kj-blank">［$1］</span>');}
 function kjAnsHTML(a,c){return esc(a).split(c).join('<b>'+c+'</b>');}
@@ -1193,7 +1199,7 @@ function renderKanji(){var el=document.getElementById('kanjiCard');if(!el)return
     +'<div class="kj-bk-bar"><i style="width:'+_pc+'%"></i></div>'
     +'<div class="kj-bk-chips">'+U.map(function(u,i){return '<span class="'+(_ud[i]?'on':'')+'" title="'+u.u+'">'+u.u.replace(/[第回]/g,'')+'</span>';}).join('')+'</div>'
     +(function(){var SG=kjSougou(),sd=kjSD();if(!SG.length)return '';var dn=SG.filter(function(n){return sd[n];}).length;
-      return '<div class="kj-bk-h" style="margin-top:8px"><span>🏁 総合テスト（5回ごと）</span><b>'+dn+' / '+SG.length+' 回</b></div><div class="kj-bk-chips sg">'+SG.map(function(n){return '<span class="'+(sd[n]?'on':'')+'">'+n+' 総合</span>';}).join('')+'</div>';})()+'</div>';
+      return '<div class="kj-bk-h" style="margin-top:8px"><span>🏁 総合テスト（5回ごと）</span><b>'+dn+' / '+SG.length+' 回</b></div><div class="kj-bk-chips sg">'+SG.map(function(n){return '<span class="'+(sd[n]?'on':'')+'"'+(isPapa?' style="cursor:pointer" onclick="kjSdToggle('+n+')"':'')+'>'+n+' 総合</span>';}).join('')+'</div>'+(isPapa?'<div class="kj-mini" style="margin-top:4px">パパ：総合のチップをタップすると 完了／まだ を切りかえられます</div>':'');})()+'</div>';
   var act=kjActive().slice().reverse();
   act.forEach(function(t){var qs=kjItems(t),PM=t.mode==='p',PN=PM?((U[t.u]||{}).u||'')+' 文章テスト':'書き取りテスト（10問）';
     if(t.mode==='s'&&t.st==='take'){
