@@ -860,6 +860,9 @@ function phwS(){var p=S.phw;if(!p||(p.v!==2&&p.v!==3&&p.v!==4)){p=S.phw={v:4,on:
     rm.forEach(function(x){if(x.ph)hwPhDel(x.ph);var g=st0(x);if(ng===null||g<ng)ng=g;});
     p.items=p.items.filter(function(x){return rm.indexOf(x)<0;});
     if(ng===null)ng=(Math.max(4,+p.nk||4)-1)*PHW_PP;if(ng<21)ng=21;p.ng=ng;delete p.nk;delete p.nh;p.v=4;}
+  /* 同期で2台の結果を合わせた時の後かたづけ：同じ項目の重複を消し、次に足す位置を並んでいる項目より後ろにする */
+  var _sd={};p.items=p.items.filter(function(x){if(!x||_sd[x.id])return false;_sd[x.id]=1;return true;});
+  p.items.forEach(function(x){if(x.t===4){var e=(+x.g)+(+x.n||PHW_N);if(e>(+p.ng||0))p.ng=e;}});
   return p;}
 function phwLast(p){return (+p.max||20)*PHW_PP-1;}
 function phwFinished(){var p=phwS();return p.ng>phwLast(p)&&!p.items.some(function(x){return x.st!=='ok';});}
@@ -1780,7 +1783,7 @@ function doImport(){
 function nextSeason(){const n=prompt('次のシーズン名は？',S.cfg.season);if(n===null)return;const g=parseInt(prompt('目標日数は？',String(S.cfg.goal)))||S.cfg.goal;S.cfg.season=n;S.cfg.goal=g;S.season={reward:'',startClears:S.prog.clears,done:false};save();alert('次のシーズンにしました');dadClose();}
 function resetAll(){if(confirm('全部リセットする？')){try{localStorage.setItem('qb_undo',JSON.stringify({t:Date.now(),s:S}));}catch(e){}S=def();normalize();save();dadClose();}}
 function _fmtTs(t){try{var d=new Date(t);return d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());}catch(e){return '';}}
-function restoreFrom(obj){if(!obj)return false;try{S=obj;normalize();SYNC.lastSent='';save();render();maybeSync();return true;}catch(e){return false;}}
+function restoreFrom(obj){if(!obj)return false;try{S=obj;normalize();SYNC.lastSent='';SYNC.force=true;save();render();maybeSync();return true;}catch(e){return false;}}
 function backupExport(){try{return btoa(unescape(encodeURIComponent(JSON.stringify(S))));}catch(e){return '';}}
 function copyBackup(){var t=document.getElementById('d_backup');if(!t)return;t.value=backupExport();t.select();try{navigator.clipboard.writeText(t.value);}catch(e){try{document.execCommand('copy');}catch(_){}}alert('バックアップコードをコピーしました。メモ等に保存してください');}
 function importBackup(){var c=(document.getElementById('d_restore').value||'').trim();if(!c){alert('復元コードを貼り付けてください');return;}if(!confirm('このバックアップで現在のデータを置き換えます。よろしいですか？'))return;try{var obj=JSON.parse(decodeURIComponent(escape(atob(c))));if(!obj||(!obj.cfg&&!obj.prog))throw 0;try{localStorage.setItem('qb_undo',JSON.stringify({t:Date.now(),s:S}));}catch(e){}if(restoreFrom(obj)){alert('復元しました');dadClose();}else alert('復元に失敗しました');}catch(e){alert('コードが正しくないみたいです');}}
@@ -1789,13 +1792,60 @@ function restoreUndo(){var u;try{u=JSON.parse(localStorage.getItem('qb_undo')||'
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
 function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,phw:S.phw,bank:S.bank,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,kj:S.kj,rd:S.rd,cday:S.cday,cfgVer:S.cfgVer};}
+/* 2026-11-22：同期の巻き戻し対策。
+   以前は「最後に送った端末の状態で全部上書き」だったので、しばらく通信が切れていた端末（古い状態のまま）が
+   日付が変わった時などに自動で送信すると、ほかの端末の新しい記録（パパの宿題のOKなど）が消えていた。
+   いまは「前回そろった状態（base）」と「サーバーの今」と「この端末の今」をくらべ、変わった所だけを合わせて送る（3方向マージ）。
+   送信はトランザクション（サーバーの最新を見てから書く仕組み）で行うので、古い状態で上書きできない。 */
+var SKEYS=['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','phw','bank','hwAllSig','bonusLog','clog','clp','kj','rd','cday','cfgVer'];
+function _sEmp(x){return x===undefined||x===null||(typeof x==='object'&&(Array.isArray(x)?x.length===0:Object.keys(x).length===0));}
+function _sObj(x){return !!x&&typeof x==='object'&&!Array.isArray(x);}
+function _sEq(a,b){if(a===b)return true;if(_sEmp(a)&&_sEmp(b))return true;if(!a||!b||typeof a!=='object'||typeof b!=='object')return false;
+  if(Array.isArray(a)!==Array.isArray(b))return false;
+  if(Array.isArray(a)){if(a.length!==b.length)return false;for(var i=0;i<a.length;i++)if(!_sEq(a[i],b[i]))return false;return true;}
+  var ks={},k;for(k in a)ks[k]=1;for(k in b)ks[k]=1;for(k in ks)if(!_sEq(a[k],b[k]))return false;return true;}
+function _sIdArr(a){return Array.isArray(a)&&a.every(function(e){return _sObj(e)&&e.id!=null;});}
+/* b=前回そろった状態, r=サーバー, l=この端末。両方が同じ所を変えていたらサーバー側を優先 */
+function m3(b,r,l){
+  if(_sEq(r,l)||_sEq(b,l))return r;if(_sEq(b,r))return l;
+  if((_sObj(r)||_sEmp(r))&&(_sObj(l)||_sEmp(l))&&(_sObj(r)||_sObj(l))){var bo=_sObj(b)?b:{},ro=_sObj(r)?r:{},lo=_sObj(l)?l:{},o={},ks={},k;
+    for(k in bo)ks[k]=1;for(k in ro)ks[k]=1;for(k in lo)ks[k]=1;for(k in ks){var v=m3(bo[k],ro[k],lo[k]);if(v!==undefined&&v!==null)o[k]=v;}return o;}
+  if((Array.isArray(r)||_sEmp(r))&&(Array.isArray(l)||_sEmp(l))){var ra=Array.isArray(r)?r:[],la=Array.isArray(l)?l:[],ba=Array.isArray(b)?b:[];
+    if(_sIdArr(ra)&&_sIdArr(la)&&_sIdArr(ba)){var bm={},rm={},lm={},ids=[],seen={};ba.forEach(function(e){bm[e.id]=e;});ra.forEach(function(e){rm[e.id]=e;});la.forEach(function(e){lm[e.id]=e;});
+      ra.concat(la).forEach(function(e){if(!seen[e.id]){seen[e.id]=1;ids.push(e.id);}});var out=[];
+      ids.forEach(function(id){var v=m3(bm[id],rm[id],lm[id]);if(v!==undefined&&v!==null)out.push(v);});return out;}
+    var n=ba.length;if(n<=ra.length&&n<=la.length&&_sEq(ra.slice(0,n),ba)&&_sEq(la.slice(0,n),ba))return ra.concat(la.slice(n).filter(function(e){return !ra.some(function(x){return _sEq(x,e);});}));
+    if(ra.length===la.length&&ra.length===n)return ra.map(function(e,i){return m3(ba[i],e,la[i]);});
+    return r;}
+  return r;}
+function _sSt(x){var o={};if(x)SKEYS.forEach(function(k){if(x[k]!==undefined)o[k]=x[k];});return o;}
+function _sCp(x){return x==null?x:JSON.parse(JSON.stringify(x));}
+function _sRv(x){return x?((x._rev||0)+':'+(x.updatedAt||0)):'';}
+function _sLoc(){return _sCp(snapshotState());}
+function sBaseSet(v){SYNC.base=_sCp(v);try{localStorage.setItem('qb_sbase',JSON.stringify({room:SYNC.creds&&SYNC.creds.room,v:SYNC.base}));}catch(e){}}
+function sBaseLoad(){try{var o=JSON.parse(localStorage.getItem('qb_sbase')||'null');if(o&&SYNC.creds&&o.room===SYNC.creds.room)SYNC.base=o.v;else SYNC.base=null;}catch(e){SYNC.base=null;}}
+/* 合わせた結果を画面の状態 S に入れる */
+function sApply(m){SYNC.applying=true;SKEYS.forEach(function(k){if(m[k]!==undefined)S[k]=m[k];});normalize();
+  var mig=false;if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;mig=true;}SYNC.applying=false;return mig;}
 function maybeSync(){
   if(!SYNC.on||SYNC.applying||!SYNC.ref||!SYNC.stateReady)return;
   const snap=JSON.stringify(snapshotState());
   if(snap===SYNC.lastSent)return;
-  SYNC.lastSent=snap;
-  const data=JSON.parse(snap);data.updatedAt=Date.now();data.updatedBy=DEVICE;
-  SYNC.ref.set(data).catch(function(){});
+  if(SYNC.busy){SYNC.again=true;return;}
+  SYNC.busy=true;SYNC.lastSent=snap;var force=SYNC.force;SYNC.force=false;
+  SYNC.ref.transaction(function(cur){
+    var loc=_sLoc(),out;SYNC.sentLoc=loc;
+    if(!cur||force||!SYNC.base||_sRv(cur)===_sRv(SYNC.base))out=_sCp(loc);
+    else out=m3(_sSt(SYNC.base),_sSt(cur),loc);
+    out._rev=((cur&&+cur._rev)||0)+1;out.updatedAt=Date.now();out.updatedBy=DEVICE;return out;
+  },function(err,committed,sn){
+    SYNC.busy=false;
+    if(!err&&committed&&sn&&sn.val()){var v=sn.val(),loc=_sLoc(),m=m3(SYNC.sentLoc||loc,_sSt(v),loc);sBaseSet(v);
+      if(!_sEq(m,loc)){var mig=sApply(m);save();render();if(mig)SYNC.lastSent='';}
+      if(!_sEq(_sSt(m),_sSt(v)))SYNC.lastSent='';
+    }else SYNC.lastSent='';
+    if(SYNC.again||!SYNC.lastSent){SYNC.again=false;if(!err)setTimeout(maybeSync,0);}
+  },false);
 }
 function parseFbCfg(txt){const m=(txt||'').match(/\{[\s\S]*\}/);if(!m)return null;let s=m[0].replace(/([{,]\s*)([A-Za-z0-9_]+)\s*:/g,'$1"$2":').replace(/,\s*([}\]])/g,'$1').replace(/'/g,'"');try{return JSON.parse(s);}catch(e){return null;}}
 function genRoom(){document.getElementById('d_room').value='fam-'+Math.random().toString(36).slice(2,8);}
@@ -1815,18 +1865,19 @@ function initSync(){
   try{
     if(!firebase.apps.length)firebase.initializeApp(SYNC.creds.fb);
     SYNC.ref=firebase.database().ref('rooms/'+SYNC.creds.room+'/state');
-    SYNC.on=true;SYNC.stateReady=false;syncStatus('接続中… ルーム: '+SYNC.creds.room);
+    SYNC.on=true;SYNC.stateReady=false;SYNC.busy=false;sBaseLoad();syncStatus('接続中… ルーム: '+SYNC.creds.room);
     SYNC.ref.on('value',function(snap){
       const r=snap.val();SYNC.stateReady=true;
-      if(!r){SYNC.lastSent='';maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
-      if(r.updatedBy===DEVICE){syncStatus('同期中 ✓');maybeSync();return;}
-      SYNC.applying=true;
-      ['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','phw','bank','hwAllSig','bonusLog','clog','clp','kj','rd','cday','cfgVer'].forEach(function(k){if(r[k]!==undefined)S[k]=r[k];});
-      normalize();
-      var _mig=false;if(S.cfgVer!==CFGVER){S.cfg=def().cfg;S.cfgVer=CFGVER;_mig=true;}
-      SYNC.applying=false;
-      SYNC.lastSent=_mig?'':JSON.stringify(snapshotState());
-      save();render();syncStatus('同期中 ✓（更新を受信）');
+      if(!r){SYNC.lastSent='';SYNC.base=null;maybeSync();syncStatus('同期中（この端末が初期データを送信）');return;}
+      if(SYNC.busy&&r.updatedBy===DEVICE)return; /* 自分の送信の結果。送信完了の処理にまかせる */
+      if(SYNC.base&&_sRv(r)===_sRv(SYNC.base)){syncStatus('同期中 ✓');maybeSync();return;}
+      var old=(SYNC.base&&SYNC.base._rev&&!r._rev)?r.updatedBy:'';
+      var loc=_sLoc(),m=SYNC.base?m3(_sSt(SYNC.base),_sSt(r),loc):_sSt(r);
+      sBaseSet(r);
+      var mig=sApply(m);
+      SYNC.lastSent=(mig||!_sEq(m,_sSt(r)))?'':JSON.stringify(snapshotState());
+      save();render();maybeSync();
+      syncStatus(old?'⚠️ 古いバージョンのアプリの端末（'+old+'）から上書きがありました。すべての端末でアプリを開き直して最新にしてください':'同期中 ✓（更新を受信）');
     },function(err){syncStatus('接続エラー: '+((err&&err.message)||''));});
     try{SYNC.hwref=firebase.database().ref('rooms/'+SYNC.creds.room+'/hwphotos');var _hwOn=function(sn){if(typeof sn.val()==='string'){HWPH[sn.key]=sn.val();hwPhSave();renderHomework();renderKanji();}};SYNC.hwref.on('child_added',_hwOn);SYNC.hwref.on('child_changed',_hwOn);SYNC.hwref.on('child_removed',function(sn){delete HWPH[sn.key];hwPhSave();});}catch(e){}
     try{SYNC.nref=firebase.database().ref('rooms/'+SYNC.creds.room+'/notify/topic');SYNC.nref.on('value',function(sn){var v=sn.val();if(v===null){if(S.cfg.ntfyTopic)ntfyPush(S.cfg.ntfyTopic);return;}v=String(v||'').trim();ntfyCache(v);if((S.cfg.ntfyTopic||'')!==v){S.cfg.ntfyTopic=v;save();maybeSync();}});}catch(e){}
