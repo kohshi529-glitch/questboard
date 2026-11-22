@@ -74,6 +74,9 @@
   .ksg-sw{display:flex;gap:6px;justify-content:center;margin-bottom:10px}
   .ksg-sw i{width:26px;height:26px;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px #c9bca3}
   .ks-open{margin-top:8px;background:linear-gradient(90deg,#ff9ac2,#b39bff)!important;color:#fff!important}
+  .ks-herobtn{white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin:6px 0 4px;border:none;border-radius:12px;padding:8px 6px;font-family:inherit;font-weight:900;font-size:.9rem;color:#fff;background:linear-gradient(90deg,#ff9ac2,#b39bff);box-shadow:0 2px 0 #a07ee0}
+  .ks-herobtn span{font-size:.7rem;background:rgba(255,255,255,.3);border-radius:999px;padding:1px 7px}
+  .ks-herobtn span:empty{display:none}
   .kse-box{margin-top:10px;background:#fff3fb;border:1.5px dashed #f0b6dc;border-radius:12px;padding:8px 10px;font-size:.88rem}
   h1{font-size:1.35rem;text-align:center;margin:.2em 0 .05em}
   .sub{text-align:center;color:var(--soft);font-size:.8rem;margin-bottom:12px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
@@ -1973,7 +1976,7 @@ function render(){
     const rc=(S.reactions&&S.reactions[today()])?('<div class="card" style="text-align:center;background:#fff0ea;border-color:#f2c3b2"><div style="font-weight:800">💌 パパからの応援</div><div style="font-size:1.7rem;margin:4px 0">'+S.reactions[today()].e+'</div><div>'+S.reactions[today()].m+'</div></div>'):'';
     dtSync();
     stageTop.innerHTML=rc+`<div class="row">
-      <div class="player"><h3>${S.me.name}</h3>${heroHTML('me')}
+      <div class="player"><h3>${S.me.name}</h3>${heroHTML('me')}<button class="ks-herobtn" onclick="ksOpen()">👗 きせかえ<span>${kseLeft()?'券'+kseLeft():''}</span></button>
         ${dtRowsHTML()}
       </div>
       <div class="player"><h3>${S.pa.name}</h3>${heroHTML('pa')}
