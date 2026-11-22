@@ -119,6 +119,7 @@
   .kj-pa{font-size:.88rem;line-height:1.8;margin:4px 0 6px;padding:8px 10px;background:#fffdf5;border:1.5px solid #eadfb8;border-radius:10px;font-weight:700}
   .kj-btn{display:block;width:100%;border:none;background:#d6504e;color:#fff;padding:12px;border-radius:14px;font-weight:900;font-size:1rem;margin-top:8px;box-shadow:0 3px 0 #b23a37;font-family:inherit}
   .kj-btn.ok{background:#2f9e5e;box-shadow:0 3px 0 #22804a}
+  .phw-sub{font-size:.78rem;font-weight:900;color:#7a6a5a;margin:8px 2px 2px}
   .kj-undo{margin-top:-4px;text-align:right}
   .kj-undo .kj-link{display:inline-block;margin:4px 0 0}
   .kj-undo.open{text-align:left;background:#fff;border:1.5px solid #e9c9c5;border-radius:12px;padding:8px;margin-top:6px}
@@ -559,6 +560,17 @@
   </div>
 
   <div class="sec">
+    <h3><img class="pface" src="./papa-face.png" alt=""> パパの宿題（国語）</h3>
+    <p class="hint">受験研究社「基本トレーニング 読解力 7級」を、1日2セクション（2日分）ずつ出します。計算と同じく 写真→パパOKで宿題1つに数えます。つねに1つ表示。OKした分は次の日に消えて、次の2セクションが足されます（1日＋2日 → 3日＋4日 … → 29日＋30日 → 進級テスト）。</p>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="d_kzOn" style="width:auto"> 表示する</label>
+    <label>教材名</label><input id="d_kzBook" placeholder="読解力 7級">
+    <label>次に足すセクション（変えると、まだ終わっていない国語の項目をここから並べ直します）</label>
+    <select id="d_kzNext"></select>
+    <label>1回に出すセクション数</label><select id="d_kzN"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+    <button class="btn gray" style="margin-top:8px" onclick="kzSave()">💾 国語の宿題を保存</button>
+  </div>
+
+  <div class="sec">
     <h3>🎁 ごほうび（実現できる物だけ）</h3>
     <label>シーズン報酬の選択肢（娘が1つ選ぶ・1行1つ）</label><textarea id="d_rewards"></textarea>
     <label>ガチャの景品（1行1つ）</label><textarea id="d_gacha"></textarea>
@@ -879,25 +891,36 @@ function phwS(){var p=S.phw;if(!p||(p.v!==2&&p.v!==3&&p.v!==4)){p=S.phw={v:4,on:
   /* 同期で2台の結果を合わせた時の後かたづけ：同じ項目の重複を消し、次に足す位置を並んでいる項目より後ろにする */
   var _sd={};p.items=p.items.filter(function(x){if(!x||_sd[x.id])return false;_sd[x.id]=1;return true;});
   p.items.forEach(function(x){if(x.t===4){var e=(+x.g)+(+x.n||PHW_N);if(e>(+p.ng||0))p.ng=e;}});
+  /* 2026-11-22：国語（読解力）パートを追加。1日2セクションずつ、つねに1つ表示 */
+  if(!p.kz)p.kz={on:1,book:'読解力 7級',ng:0,n:2,open:1};
+  p.items.forEach(function(x){if(x.t===5){var e=(+x.g)+(+x.n||1);if(e>(+p.kz.ng||0))p.kz.ng=e;}});
   return p;}
+/* 国語：受験研究社「基本トレーニング 読解力 7級」のもくじ（1日＝2ページ、31番目は進級テスト） */
+var KZ_T=['言葉の意味','指示語をおさえる(1)','指示語をおさえる(2)','接続語をおさえる(1)','接続語をおさえる(2)','まとめテスト(1)','場面をつかむ','あらすじをとらえる','心情を読み取る','心情のうつり変わりをつかむ','原因・理由をつかむ','まとめテスト(2)','話の展開をつかむ','段落の構成をつかむ','主題を読み取る','結論をつかむ','まとめテスト(3)','物語を読む(1)','物語を読む(2)','物語を読む(3)','脚本を読む','まとめテスト(4)','説明文を読む(1)','説明文を読む(2)','説明文を読む(3)','まとめテスト(5)','詩を読む(1)','詩を読む(2)','短歌・俳句を読む','まとめテスト(6)','進級テスト'];
+function kzName(i){return i<30?(i+1)+'日 '+KZ_T[i]:KZ_T[30];}
+function kzLabel(it,p){var k=(p||phwS()).kz,g=+it.g,n=+it.n||1,nm=[],i;for(i=g;i<g+n;i++)nm.push(kzName(i));
+  var last=g+n-1,a=2*(g+1),b=last<30?2*(last+1)+1:64;return (k.book||'読解力')+' '+nm.join('＋')+'（p.'+a+'〜'+b+'）';}
+function kzFinished(){var p=phwS();return p.kz.ng>=KZ_T.length&&!p.items.some(function(x){return x.t===5&&x.st!=='ok';});}
 function phwLast(p){return (+p.max||20)*PHW_PP-1;}
-function phwFinished(){var p=phwS();return p.ng>phwLast(p)&&!p.items.some(function(x){return x.st!=='ok';});}
+function phwFinished(){var p=phwS();return p.ng>phwLast(p)&&!p.items.some(function(x){return x.t!==5&&x.st!=='ok';});}
 var PHW_H=['①','②','③'],PHW_H2=['①〜④','⑤〜⑦'];
 function phwPg(g){return {k:Math.floor(g/PHW_PP)+1,i:g%PHW_PP};}
 function phwRange(g0,n){var out=[],cur=null;for(var g=g0;g<g0+n;g++){var q=phwPg(g);if(!cur||cur.k!==q.k){cur={k:q.k,a:[]};out.push(cur);}cur.a.push(q.i);}
   return out.map(function(r){var t=r.a.length>=3?PHW_C.charAt(r.a[0])+'〜'+PHW_C.charAt(r.a[r.a.length-1]):r.a.map(function(i){return PHW_C.charAt(i);}).join('');return '第'+r.k+'回'+t;}).join('＋');}
-function phwLabel(it,p){p=p||phwS();var b=(p.book||'計算')+' ';
+function phwLabel(it,p){p=p||phwS();if(it.t===5)return kzLabel(it,p);var b=(p.book||'計算')+' ';
   if(it.t===4)return b+phwRange(it.g,it.n);
   return b+'第'+it.k+'回'+(it.h<0?'①〜⑦':((it.t===3?PHW_H:PHW_H2)[it.h]||''));}
-function phwOpen(){return phwS().items.filter(function(x){return x.st!=='ok';});}
+function phwOpen(){return phwS().items.filter(function(x){return x.st!=='ok'&&x.t!==5;});}
+function kzOpen(){return phwS().items.filter(function(x){return x.st!=='ok'&&x.t===5;});}
 function phwFill(){var p=phwS(),td=today(),ch=false;
   var keep=p.items.filter(function(x){return !(x.st==='ok'&&x.okDate&&x.okDate<td);});if(keep.length!==p.items.length){p.items=keep;ch=true;}
-  var last=phwLast(p);while(phwOpen().length<3&&p.ng<=last){var n=Math.min(PHW_N,last-p.ng+1);p.items.push({id:'g'+p.ng,g:p.ng,n:n,t:4,k:phwPg(p.ng).k,st:''});p.ng+=n;ch=true;}
+  var k=p.kz;if(k.on){while(kzOpen().length<(+k.open||1)&&k.ng<KZ_T.length){var kn=Math.min(+k.n||2,KZ_T.length-k.ng);p.items.push({id:'r'+k.ng,g:k.ng,n:kn,t:5,st:''});k.ng+=kn;ch=true;}}
+  var last=phwLast(p);if(p.on)while(phwOpen().length<3&&p.ng<=last){var n=Math.min(PHW_N,last-p.ng+1);p.items.push({id:'g'+p.ng,g:p.ng,n:n,t:4,k:phwPg(p.ng).k,st:''});p.ng+=n;ch=true;}
   if(ch){save();maybeSync();}}
 function phwRoll(){phwFill();}
 function phwFind(id){return phwS().items.find(function(x){return x.id===id;});}
 var _phwId=null;
-function phwTap(id){var p=phwS(),it=phwFind(id);if(!p.on||!it)return;
+function phwTap(id){var p=phwS(),it=phwFind(id);if(!it||!(it.t===5?p.kz.on:p.on))return;
   if(calcOwner()==='papa'){if(it.st==='sub')return;if(it.st==='ok'){if(confirm('「'+phwLabel(it)+'」を未完了に戻しますか？'))phwUnok(id);}else if(confirm('写真なしで「'+phwLabel(it)+'」を完了（OK）にしますか？'))phwOk(id);return;}
   if(it.st==='ok')return;if(it.st==='sub'&&!confirm('写真を撮り直しますか？'))return;
   _phwId=id;_hwPick=-2;var f=document.getElementById('hwFile');f.value='';f.click();}
@@ -913,18 +936,25 @@ function phwNg(id){var it=phwFind(id);if(!it)return;var note=prompt('やり直�
 function phwUnok(id){var p=phwS(),it=phwFind(id);if(!it)return;rollover();if(it.okDate===today()&&_num(S.day.hwOk)>0)S.day.hwOk=_num(S.day.hwOk)-1;
   var lg=p.log&&p.log[today()];if(lg){var k=lg.indexOf(phwLabel(it));if(k>=0)lg.splice(k,1);}it.st='';delete it.okDate;save();maybeSync();render();}
 function phwOkToday(){var td=today();return phwS().items.filter(function(x){return x.st==='ok'&&x.okDate===td;}).length;}
-function renderPhw(){var el=document.getElementById('phwCard');if(!el)return;var p=phwS();if(!p.on){el.innerHTML='';return;}
+function renderPhw(){var el=document.getElementById('phwCard');if(!el)return;var p=phwS();if(!p.on&&!p.kz.on){el.innerHTML='';return;}
   var isPapa=(calcOwner()==='papa'),per=+S.cfg.hwPer||0,td=today(),pend=p.items.filter(function(x){return x.st==='sub';}).length,okN=phwOkToday();
-  var items=p.items.map(function(it){var st=it.st||'',cls=st==='ok'?' done':st==='sub'?' sub':st==='ng'?' ng':'',box=st==='ok'?'✓':st==='sub'?'📷':st==='ng'?'↩':'',info='',idq="'"+it.id+"'";
+  var row=function(it){var st=it.st||'',cls=st==='ok'?' done':st==='sub'?' sub':st==='ng'?' ng':'',box=st==='ok'?'✓':st==='sub'?'📷':st==='ng'?'↩':'',info='',idq="'"+it.id+"'";
     if(st==='sub'){if(isPapa){var src=HWPH[it.ph];info='<div class="hw-act">'+(src?'<img class="hw-th" src="'+src+'" onclick="event.stopPropagation();viewHwPhoto(\''+it.ph+'\')">':'<span class="hw-st">📷 写真を読み込み中…</span>')+'<button class="hw-ab" onclick="event.stopPropagation();phwOk('+idq+')">✅ OK</button><button class="hw-ab ng" onclick="event.stopPropagation();phwNg('+idq+')">↩ やり直し</button></div>'+ntfyLine(it.nt);}
       else info='<div class="hw-st">📷 パパの確認待ち（OKで +'+per+'分）</div>'+((it.nt&&it.nt!==1)?'<div class="hw-st ng">⚠️ パパに通知できなかったよ。直接「写真送ったよ」と伝えてね</div>':'');}
     else if(st==='ng')info='<div class="hw-st ng">↩ やり直し：'+esc(it.note||'もう一度やってみよう')+'</div>';
     else if(st==='ok'&&per&&S.cfg.bonusOn)info='<div class="hw-st ok">+'+per+'分 ゲット！</div>';
-    return '<div class="hw-item'+cls+'" onclick="phwTap('+idq+')"><div class="hw-box">'+box+'</div><div class="hw-body"><div class="hw-txt">'+esc(phwLabel(it,p))+'</div>'+info+'</div></div>';}).join('');
-  var tip=isPapa?(pend?'<div class="hw-tip">🔔 確認待ちが '+pend+'件 あります。写真を見て OK／やり直し を押してください</div>':'<div class="hw-tip">つねに3つ表示。OKした分は次の日に消えて、次の3ページが足されます</div>')
+    return '<div class="hw-item'+cls+'" onclick="phwTap('+idq+')"><div class="hw-box">'+box+'</div><div class="hw-body"><div class="hw-txt">'+esc(phwLabel(it,p))+'</div>'+info+'</div></div>';};
+  var ic=p.items.filter(function(x){return x.t!==5;}),ik=p.items.filter(function(x){return x.t===5;}),both=p.on&&p.kz.on;
+  var items=(p.on?(both?'<div class="phw-sub">🧮 計算</div>':'')+ic.map(row).join(''):'')
+    +(p.kz.on?(both?'<div class="phw-sub">📖 国語（読解力）</div>':'')+ik.map(row).join('')+(kzFinished()?'<div class="hw-tip" style="font-weight:900">🎉 '+esc(p.kz.book||'読解力')+' ぜんぶ終わったよ！'+(isPapa?'（次の本は保護者メニューで設定）':'')+'</div>':''):'');
+  var tip=isPapa?(pend?'<div class="hw-tip">🔔 確認待ちが '+pend+'件 あります。写真を見て OK／やり直し を押してください</div>':'<div class="hw-tip">計算はつねに3つ、国語は1つ（2日分）表示。OKした分は次の日に消えて、次が足されます</div>')
     :'<div class="hw-tip">📷 1つ終わったら タップして写真をとってパパに送ろう'+(S.cfg.bonusOn&&per?'（OKで +'+per+'分・宿題1つに数えるよ）':'（宿題1つに数えるよ）')+'</div>';
-  var fin=phwFinished()?'<div class="hw-tip" style="margin-top:8px;font-weight:900">🎉 第'+(+p.max||20)+'回まで ぜんぶ終わったよ！'+(isPapa?'（次のテキストは保護者メニューで教材名・回を設定してください）':'つぎのテキストはパパが用意するね')+'</div>':'';
+  var fin=(p.on&&phwFinished())?'<div class="hw-tip" style="margin-top:8px;font-weight:900">🎉 第'+(+p.max||20)+'回まで ぜんぶ終わったよ！'+(isPapa?'（次のテキストは保護者メニューで教材名・回を設定してください）':'つぎのテキストはパパが用意するね')+'</div>':'';
   el.innerHTML='<div class="card hwcard phwcard"><div class="hw-h"><span><img class="pface" src="./papa-face.png" alt=""> パパの宿題</span><span class="hw-count">今日OK '+okN+(pend?' ・確認待ち '+pend:'')+'</span></div>'+tip+'<div class="hw-list">'+items+'</div>'+fin+'</div>';}
+function kzSave(){var p=phwS(),k=p.kz,g=function(id){return document.getElementById(id);};
+  k.on=g('d_kzOn').checked?1:0;k.book=(g('d_kzBook').value||'').trim()||'読解力 7級';k.n=+g('d_kzN').value||2;
+  var nx=+g('d_kzNext').value;if(isFinite(nx)&&nx!==k.ng){if(confirm('まだ終わっていない国語の項目を消して、「'+kzName(nx)+'」から並べ直しますか？')){p.items=p.items.filter(function(x){if(x.t===5&&x.st!=='ok'){if(x.ph)hwPhDel(x.ph);return false;}return true;});k.ng=nx;}}
+  phwFill();save();maybeSync();render();alert('国語の宿題を保存しました'+(k.on?'':'（お休み中）'));}
 function phwSave(){var p=phwS(),g=function(id){return document.getElementById(id);};var _q=phwPg(p.ng),k=parseInt(g('d_phwKai').value)||_q.k,h=+g('d_phwHalf').value||0;
   p.on=g('d_phwOn').checked?1:0;p.book=(g('d_phwBook').value||'').trim()||'四谷大塚 計算 4年上';p.max=parseInt(g('d_phwMax').value)||20;
   var ng=(k-1)*PHW_PP+Math.max(0,Math.min(PHW_PP-1,h));
@@ -1484,7 +1514,7 @@ function qbJvocabDone(){var pct=+S.cfg.passPct||50,min=+S.cfg.passMin||10,nminJ=
   var nOk=qbNewToday('jvocab')>=nminJ,qOk=qbQuizToday('jvocab').some(function(a){return a[1]>=min&&Math.round(a[0]/a[1]*100)>=pct;});return nOk&&qOk;}
 function dtList(){var td=today(),hw=S.homework||[],p=phwS();
   var tDone=hw.some(function(h){return h.st==='ok'&&h.okDate===td;}),tAv=tDone||hw.some(function(h){return h.st!=='ok';});
-  var pDone=phwOkToday()>0,pAv=!!p.on&&(pDone||p.items.some(function(x){return x.st!=='ok';}));
+  var pDone=phwOkToday()>0,pAv=!!(p.on||p.kz.on)&&(pDone||p.items.some(function(x){return x.st!=='ok';}));
   return [{k:'g',e:'📘',n:'語彙トレ',done:qbJvocabDone(),av:true,auto:'語彙クエストで 新しく'+(+S.cfg.newMinJ||14)+'語＋検問合格 したら自動で ✓'},{k:'t',e:'👨‍🏫',n:'ゆうや先生の宿題',done:tDone,av:tAv},{k:'p',e:'<img class="pface" src="./papa-face.png" alt="">',n:'パパの宿題',done:pDone,av:pAv}];}
 function dtDone(){return dtList().filter(function(x){return x.av&&x.done;}).length;}
 function dtAll(){var l=dtList().filter(function(x){return x.av;});return l.length>0&&l.every(function(x){return x.done;});}
@@ -1776,7 +1806,7 @@ function render(){
   dl.addEventListener('contextmenu',e=>e.preventDefault());
 })();
 function fillExport(){document.getElementById('d_export').value=cfgExport();}
-function dadOpen(){try{var _p=phwS();document.getElementById('d_phwOn').checked=!!_p.on;document.getElementById('d_phwBook').value=_p.book||'';var _q=phwPg(_p.ng);document.getElementById('d_phwKai').value=_q.k;document.getElementById('d_phwHalf').value=String(_q.i);document.getElementById('d_phwMax').value=_p.max||20;}catch(e){}try{var _cd=document.getElementById('d_clDate');_cd.value=yesterday();_cd.max=yesterday();document.getElementById('d_clLv').value=String(clLevel(yesterday()));_cd.onchange=function(){document.getElementById('d_clLv').value=String(clLevel(_cd.value));};}catch(e){}
+function dadOpen(){try{var _k=phwS().kz,_s=document.getElementById('d_kzNext');_s.innerHTML=KZ_T.map(function(t,i){return '<option value="'+i+'">'+kzName(i)+'</option>';}).join('');_s.value=String(Math.min(_k.ng,KZ_T.length-1));document.getElementById('d_kzOn').checked=!!_k.on;document.getElementById('d_kzBook').value=_k.book||'';document.getElementById('d_kzN').value=String(_k.n||2);}catch(e){}try{var _p=phwS();document.getElementById('d_phwOn').checked=!!_p.on;document.getElementById('d_phwBook').value=_p.book||'';var _q=phwPg(_p.ng);document.getElementById('d_phwKai').value=_q.k;document.getElementById('d_phwHalf').value=String(_q.i);document.getElementById('d_phwMax').value=_p.max||20;}catch(e){}try{var _cd=document.getElementById('d_clDate');_cd.value=yesterday();_cd.max=yesterday();document.getElementById('d_clLv').value=String(clLevel(yesterday()));_cd.onchange=function(){document.getElementById('d_clLv').value=String(clLevel(_cd.value));};}catch(e){}
   document.getElementById('d_meName').value=S.me.name;document.getElementById('d_meEmoji').value=S.me.emoji;
   document.getElementById('d_paName').value=S.pa.name;document.getElementById('d_paEmoji').value=S.pa.emoji;
   document.getElementById('d_fixed').value=S.cfg.fixed.join('\n');
