@@ -676,7 +676,7 @@
 
   <div class="sec">
     <h3><img class="pface" src="./papa-face.png" alt=""> パパの宿題（国語）</h3>
-    <p class="hint">受験研究社「基本トレーニング 読解力 7級」を、1日2セクション（2日分）ずつ出します。計算と同じく 写真→パパOKで宿題1つに数えます。つねに1つ表示。OKした分は次の日に消えて、次の2セクションが足されます（1日＋2日 → 3日＋4日 … → 29日＋30日 → 進級テスト）。</p>
+    <p class="hint">受験研究社「基本トレーニング 読解力 7級」を、1日2セクション（2日分）ずつ出します。計算と同じく 写真→パパOKで宿題1つに数えます。つねに3つ（2セクションずつ）表示。OKした分は次の日に消えて、次の2セクションが足されます（1日＋2日 → 3日＋4日 … → 29日＋30日 → 進級テスト）。</p>
     <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="d_kzOn" style="width:auto"> 表示する</label>
     <label>教材名</label><input id="d_kzBook" placeholder="読解力 7級">
     <label>次に足すセクション（変えると、まだ終わっていない国語の項目をここから並べ直します）</label>
@@ -1009,7 +1009,9 @@ function phwS(){var p=S.phw;if(!p||(p.v!==2&&p.v!==3&&p.v!==4)){p=S.phw={v:4,on:
   var _sd={};p.items=p.items.filter(function(x){if(!x||_sd[x.id])return false;_sd[x.id]=1;return true;});
   p.items.forEach(function(x){if(x.t===4){var e=(+x.g)+(+x.n||PHW_N);if(e>(+p.ng||0))p.ng=e;}});
   /* 2026-11-22：国語（読解力）パートを追加。1日2セクションずつ、つねに1つ表示 */
-  if(!p.kz)p.kz={on:1,book:'読解力 7級',ng:0,n:2,open:1};
+  if(!p.kz)p.kz={on:1,book:'読解力 7級',ng:0,n:2,open:3,o3:1};
+  /* 2026-11-23：国語も つねに3つ表示に変更（1回だけ切りかえ） */
+  if(!p.kz.o3){p.kz.open=3;p.kz.o3=1;}
   p.items.forEach(function(x){if(x.t===5){var e=(+x.g)+(+x.n||1);if(e>(+p.kz.ng||0))p.kz.ng=e;}});
   return p;}
 /* 国語：受験研究社「基本トレーニング 読解力 7級」のもくじ（1日＝2ページ、31番目は進級テスト） */
@@ -1064,7 +1066,7 @@ function renderPhw(){var el=document.getElementById('phwCard');if(!el)return;var
   var ic=p.items.filter(function(x){return x.t!==5;}),ik=p.items.filter(function(x){return x.t===5;}),both=p.on&&p.kz.on;
   var items=(p.on?(both?'<div class="phw-sub">🧮 計算</div>':'')+ic.map(row).join(''):'')
     +(p.kz.on?(both?'<div class="phw-sub">📖 国語（読解力）</div>':'')+ik.map(row).join('')+(kzFinished()?'<div class="hw-tip" style="font-weight:900">🎉 '+esc(p.kz.book||'読解力')+' ぜんぶ終わったよ！'+(isPapa?'（次の本は保護者メニューで設定）':'')+'</div>':''):'');
-  var tip=isPapa?(pend?'<div class="hw-tip">🔔 確認待ちが '+pend+'件 あります。写真を見て OK／やり直し を押してください</div>':'<div class="hw-tip">計算はつねに3つ、国語は1つ（2日分）表示。OKした分は次の日に消えて、次が足されます</div>')
+  var tip=isPapa?(pend?'<div class="hw-tip">🔔 確認待ちが '+pend+'件 あります。写真を見て OK／やり直し を押してください</div>':'<div class="hw-tip">計算・国語とも つねに3つ表示。OKした分は次の日に消えて、次が足されます</div>')
     :'<div class="hw-tip">📷 1つ終わったら タップして写真をとってパパに送ろう'+(S.cfg.bonusOn&&per?'（OKで +'+per+'分・宿題1つに数えるよ）':'（宿題1つに数えるよ）')+'</div>';
   var fin=(p.on&&phwFinished())?'<div class="hw-tip" style="margin-top:8px;font-weight:900">🎉 第'+(+p.max||20)+'回まで ぜんぶ終わったよ！'+(isPapa?'（次のテキストは保護者メニューで教材名・回を設定してください）':'つぎのテキストはパパが用意するね')+'</div>':'';
   el.innerHTML='<div class="card hwcard phwcard"><div class="hw-h"><span><img class="pface" src="./papa-face.png" alt=""> パパの宿題</span><span class="hw-count">今日OK '+okN+(pend?' ・確認待ち '+pend:'')+'</span></div>'+tip+'<div class="hw-list">'+items+'</div>'+fin+'</div>';}
