@@ -44,6 +44,11 @@
   .ks-note{font-size:.8rem;font-weight:800;color:#8a5a00;background:#fff6dc;border-radius:10px;padding:6px 10px;margin-top:8px}
   .ks-spin{margin-top:10px;background:linear-gradient(90deg,#ff9ac2,#b39bff)!important;color:#fff!important}
   .ks-spin:disabled{opacity:.45}
+  .ks-gbs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
+  .ks-gb{border:none;border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:1px;color:#fff;font-family:inherit;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+  .ks-gb b{font-size:.8rem;white-space:nowrap}.ks-gb span{font-size:.95rem;font-weight:900}.ks-gb i{font-style:normal;font-size:.6rem;opacity:.9}
+  .ks-gb.goods{background:linear-gradient(135deg,#ff9ac2,#ff7a59)}.ks-gb.bg{background:linear-gradient(135deg,#7cc8ff,#6ad6a8)}.ks-gb.face{background:linear-gradient(135deg,#c7a6ff,#ff9ecf)}
+  .ks-gb:disabled{opacity:.45}
   .ks-tabs{display:flex;gap:4px;margin-top:12px}
   .ks-tabs button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:6px 0;font-size:1.2rem;display:flex;flex-direction:column;align-items:center;font-family:inherit}
   .ks-tabs button span{font-size:.66rem;font-weight:800;color:var(--soft)}
@@ -1418,10 +1423,21 @@ function qbPbToday(){var rem=SYNC.astatRemote||{},cache=_lsGet('qb_appstats')||{
    同期中の端末は、学習データ（appstats）を受信するまでは書き込まない（古いデータで上書きしないため） */
 /* ===== 👗 きせかえガチャ券（2026-11-22〜）：カレンダー段階で たまる。🌟1・🌈2・💜3・👑4（その日の最高段階、下がっても減らない） ===== */
 var KSE_START='2026-11-22';
-function kseS(){S.kse=S.kse||{};S.kse.g=S.kse.g||{};S.kse.used=+S.kse.used||0;return S.kse;}
-function kseGrant(d,l){if(!d||d<KSE_START)return false;var k=kseS(),n=Math.max(0,(+l||0)-1);if(n>(+k.g[d]||0)){var add=n-(+k.g[d]||0);k.g[d]=n;return add;}return false;}
-function kseTotal(){var k=kseS(),t=0;for(var d in k.g)t+=(+k.g[d]||0);return t;}
-function kseLeft(){return Math.max(0,kseTotal()-ksUsed());}
+/* 2026-11-23：券を3種類に分けた。その日の段階ごとに 1まいずつ：
+   🌟パーフェクト・🌈レインボー・💜アメジスト→🎁グッズ券 ／ 👑GOD→🏞️背景券 ／ 🦄ユニコーン→😊表情券（2026-11-23 訂正）
+   S.kse.lv[日付]＝その日に届いた最高の段階（下がっても減らない）。前の形（g＝まい数）は lv＝まい数＋1 に読みかえる */
+var KSE_STEP={2:'goods',3:'goods',4:'goods',5:'bg',6:'face'};
+var KSE_TN={goods:'🎁 グッズ券',bg:'🏞️ 背景券',face:'😊 表情券'};
+function kseS(){S.kse=S.kse||{};var k=S.kse;k.g=k.g||{};k.lv=k.lv||{};for(var d in k.g){var v=(+k.g[d]||0)+1;if(v>(+k.lv[d]||0))k.lv[d]=v;}return k;}
+function kseCnt(l){var o={goods:0,bg:0,face:0};for(var st=2;st<=6;st++)if((+l||0)>=st)o[KSE_STEP[st]]++;return o;}
+function kseGrant(d,l){if(!d||d<KSE_START)return false;var k=kseS(),old=+k.lv[d]||0;if((+l||0)<=old)return false;var a=kseCnt(old),b=kseCnt(l),add=[];k.lv[d]=+l;
+  ['goods','bg','face'].forEach(function(t){var x=b[t]-a[t];if(x>0)add.push(KSE_TN[t]+' +'+x);});return add.length?add.join('・'):false;}
+function kseEarned(){var k=kseS(),o={goods:0,bg:0,face:0};for(var d in k.lv){var c=kseCnt(k.lv[d]);o.goods+=c.goods;o.bg+=c.bg;o.face+=c.face;}return o;}
+function ksType(id){var it=ksItem(String(id).split('@')[0]);return !it?'goods':it.cat==='face'?'face':it.cat==='bg'?'bg':'goods';}
+function kseUsedBy(){var o={goods:0,bg:0,face:0},g=ksGl();for(var t in g)o[ksType(g[t])]++;return o;}
+function kseLeftBy(){var e=kseEarned(),u=kseUsedBy();return {goods:Math.max(0,e.goods-u.goods),bg:Math.max(0,e.bg-u.bg),face:Math.max(0,e.face-u.face)};}
+function kseLeft(){var l=kseLeftBy();return l.goods+l.bg+l.face;}
+function kseTotal(){var e=kseEarned();return e.goods+e.bg+e.face;}
 /* ===== 👗 きせかえ（2026-11-22〜）=====
    もと絵（クラスごと）に、かお・ふく・うわぎ・ぼうし の部品（透明PNG）を重ねて1枚にする。色は系統色で塗り直す。
    部品は ks-<モデル>-<部品>.png。ガチャ券はカレンダー段階でたまる（kseGrant）。 */
@@ -1446,6 +1462,7 @@ var KS_ITEMS=[
 /* クラスごとのモデル（部品がそろった順に追加）。tier＝HERO の段階番号（0から） */
 var KS_MODELS=[{id:'capy2',who:'me',tier:1,cls:'冒険者',lv:4,pre:'ks-capy2-',parts:['f_happy','f_angry','f_sad','f_fun','h_cap','h_beanie','h_safari','c_varsity','w_adv'],start:['h_cap','w_adv']}];
 var KS_ORDER=['wear','cape','face','hat'];
+var KSE_HOW={goods:'🌟パーフェクト・🌈レインボー・💜アメジスト の日にたまるよ',bg:'👑GOD の日にたまるよ',face:'🦄ユニコーンの日にたまるよ'};
 function ksItem(id){for(var i=0;i<KS_ITEMS.length;i++)if(KS_ITEMS[i].id===id)return KS_ITEMS[i];return null;}
 function ksFam(k){for(var i=0;i<KS_FAM.length;i++)if(KS_FAM[i].k===k)return KS_FAM[i];return null;}
 function ksModelFor(who,ti){for(var i=0;i<KS_MODELS.length;i++){var m=KS_MODELS[i];if(m.who===who&&m.tier===ti)return m;}return null;}
@@ -1483,11 +1500,11 @@ function ksCompose(m,l){var key=ksKey(m,l);if(KSC[key])return Promise.resolve(KS
 function ksHeroSrc(ti){var m=ksModelFor('me',ti);if(!m)return '';var l=ksLook(),key=ksKey(m,l);if(KSC[key])return KSC[key];
   ksCompose(m,l).then(function(u){if(!u)return;var e=document.getElementById('ksHeroImg');if(e)e.src=u;});return '';}
 /* ===== ガチャ ===== */
-function ksPool(){var m=ksViewModel();if(!m)return [];var own=ksOwnSet(),p=[];
-  m.parts.forEach(function(id){var it=ksItem(id);if(!it)return;if(!own[id])p.push({id:id,w:3});else if(it.band)KS_FAM.forEach(function(f){if(f.k!==it.fam&&!own[id+'@'+f.k])p.push({id:id+'@'+f.k,w:1});});});
+function ksPool(type){var m=ksViewModel();if(!m)return [];var own=ksOwnSet(),p=[];
+  m.parts.forEach(function(id){var it=ksItem(id);if(!it)return;if(type&&ksType(id)!==type)return;if(!own[id])p.push({id:id,w:3});else if(it.band)KS_FAM.forEach(function(f){if(f.k!==it.fam&&!own[id+'@'+f.k])p.push({id:id+'@'+f.k,w:1});});});
   return p;}
 function ksEntryName(e){var p=e.split('@'),it=ksItem(p[0]);if(!it)return e;return p[1]?(it.n+' の '+ksFam(p[1]).n):it.n;}
-function ksSpin(){var left=Math.max(0,kseTotal()-ksUsed()),pool=ksPool();if(left<=0){alert('ガチャ券がないよ。🌟パーフェクト以上の日にたまるよ');return;}if(!pool.length){alert('いま出せるものは ぜんぶ持ってるよ！ 新しい部品を じゅんび中');return;}
+function ksSpin(type){type=type||'goods';var left=kseLeftBy()[type],pool=ksPool(type);if(left<=0){alert(KSE_TN[type]+'がないよ。'+KSE_HOW[type]);return;}if(!pool.length){alert('いま出せるものは ぜんぶ持ってるよ！ 新しい部品を じゅんび中');return;}
   var tw=pool.reduce(function(s,x){return s+x.w;},0),r=Math.random()*tw,pick=pool[0];for(var i=0;i<pool.length;i++){r-=pool[i].w;if(r<=0){pick=pool[i];break;}}
   ksGl()[Date.now().toString(36)+Math.random().toString(36).slice(2,4)]=pick.id;save();maybeSync();
   var box=document.getElementById('ksGacha');box.innerHTML='<div class="ksg-cap">🎰</div><div class="ksg-t">ガチャガチャ…</div>';box.style.display='flex';try{sTick();}catch(e){}
@@ -1505,12 +1522,14 @@ function ksClose(){document.getElementById('ksView').style.display='none';docume
 function ksSet(cat,id){var l=ksLook();if(l[cat]===id&&cat!=='face'&&cat!=='bg')return;l[cat]=id;if(cat!=='face'&&cat!=='bg')l[cat+'C']='';save();maybeSync();ksOpenRender();}
 function ksSetC(cat,v){var l=ksLook();l[cat+'C']=v;save();maybeSync();ksOpenRender();}
 function ksOpenRender(){var el=document.getElementById('ksBody');if(!el||document.getElementById('ksView').style.display!=='block')return;
-  var m=ksViewModel(),l=ksLook(),own=ksOwnSet(),left=Math.max(0,kseTotal()-ksUsed()),ti=heroTier(lv(S.me.xp),HERO),g=HERO[m?m.tier:ti]||HERO[0];
+  var m=ksViewModel(),l=ksLook(),own=ksOwnSet(),LB=kseLeftBy(),ti=heroTier(lv(S.me.xp),HERO),g=HERO[m?m.tier:ti]||HERO[0];
   if(!m){el.innerHTML='<div class="ks-note">きせかえは じゅんび中だよ</div>';return;}
   var note=(m.tier!==ti)?'<div class="ks-note">🔜 Lv.'+m.lv+'「'+m.cls+'」になると、ボードのアバターも この姿になるよ</div>':'';
-  var pool=ksPool().length;
+  var GB=[['goods','🎁 グッズガチャ','ぼうし・うわぎ・ふく・色'],['bg','🏞️ 背景ガチャ','はいけい'],['face','😊 表情ガチャ','かお']];
   var h='<div class="ks-prev" style="background:'+g.bg+'"><img id="ksPrevImg" alt=""></div>'+note
-    +'<button class="btn ks-spin"'+(left&&pool?'':' disabled')+' onclick="ksSpin()">🎰 ガチャをまわす（券 '+left+'まい）</button>'
+    +'<div class="ks-gbs">'+GB.map(function(b){var n=LB[b[0]],pl=ksPool(b[0]).length,dis=!(n&&pl);
+      return '<button class="ks-gb '+b[0]+'"'+(dis?' disabled':'')+' onclick="ksSpin(\''+b[0]+'\')"><b>'+b[1]+'</b><span>券 '+n+'まい</span><i>'+(n&&!pl?(b[0]==='bg'?'絵をじゅんび中':'ぜんぶ持ってる！'):b[2])+'</i></button>';}).join('')+'</div>'
+    +'<div class="ks-note" style="background:#f6f0ff;color:#6a4a9e">🎁グッズ券＝🌟🌈💜の日 ／ 🏞️背景券＝👑の日 ／ 😊表情券＝🦄の日 に1まいずつ</div>'
     +'<div class="ks-tabs">'+KS_CAT.map(function(c){return '<button class="'+(_ksTab===c.k?'on':'')+'" onclick="_ksTab=\''+c.k+'\';ksOpenRender()">'+c.e+'<span>'+c.n+'</span></button>';}).join('')+'</div>';
   var items=KS_ITEMS.filter(function(it){return it.cat===_ksTab;}),cur=l[_ksTab]||'';
   var none=(_ksTab==='face')?'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\'face\',\'\')"><b>🙂</b><span>ふつう</span></button>':(_ksTab==='bg'?'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\'bg\',\'\')"><b>🎨</b><span>クラスの色</span></button>':'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\''+_ksTab+'\',\'\')"><b>✖</b><span>なし</span></button>');
@@ -1524,7 +1543,7 @@ function ksOpenRender(){var el=document.getElementById('ksBody');if(!el||documen
   el.innerHTML=h;
   ksCompose(m,l).then(function(u){var e=document.getElementById('ksPrevImg');if(e&&u)e.src=u;});}
 
-function clRecord(l){S.clog=S.clog||{};var td=today();if(SYNC.on&&!SYNC.astatReady)return;var _ka=kseGrant(td,l);if(_ka){save();maybeSync();setTimeout(function(){try{showCheer('👗 きせかえガチャ券 +'+_ka+'まい ゲット！');}catch(e){}},900);}if(l!==(+S.clog[td]||0)){if(l)S.clog[td]=l;else delete S.clog[td];var ks=Object.keys(S.clog).sort();while(ks.length>400)delete S.clog[ks.shift()];save();maybeSync();setTimeout(function(){try{render();}catch(e){}},0);}}
+function clRecord(l){S.clog=S.clog||{};var td=today();if(SYNC.on&&!SYNC.astatReady)return;var _ka=kseGrant(td,l);if(_ka){save();maybeSync();setTimeout(function(){try{showCheer('👗 '+_ka+' ゲット！');}catch(e){}},900);}if(l!==(+S.clog[td]||0)){if(l)S.clog[td]=l;else delete S.clog[td];var ks=Object.keys(S.clog).sort();while(ks.length>400)delete S.clog[ks.shift()];save();maybeSync();setTimeout(function(){try{render();}catch(e){}},0);}}
 /* パパの手直し：過去の日のカレンダー判定を書きかえる（今日は自動判定のまま） */
 function clEdit(){var k=(document.getElementById('d_clDate').value||'').trim(),lv=+document.getElementById('d_clLv').value||0;if(!/^\d{4}-\d{2}-\d{2}$/.test(k)){alert('日付をえらんでください');return;}
   if(k>=today()){alert('今日の分は、その日の達成状況で自動で決まります');return;}var nm=['お休み','👍 ナイス','🌟 パーフェクト','🌈 レインボー','💜 アメジスト','👑 GOD 神セレブレーション','🦄 ユニコーン'][lv];if(!confirm(k+' を「'+nm+'」に書きかえますか？'))return;
@@ -1571,7 +1590,7 @@ function uniArt(cls){return '<img class="'+cls+' uni-img" src="./unicorn.png" al
 function uniFire(){var o=document.getElementById('uniparty');if(o)o.remove();o=document.createElement('div');o.id='uniparty';
   var st='',i;for(i=0;i<36;i++)st+='<i class="un-star" style="left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*1.8).toFixed(2)+'s"></i>';
   o.innerHTML='<div class="un-sky"></div><div class="un-rainbow"></div><div class="un-cloud c1"></div><div class="un-cloud c2"></div><div class="un-cloud c3"></div>'+st
-    +'<div class="un-core"><div class="un-desc">'+uniArt('un-big')+'</div><div class="un-title">ユニコーン降臨</div><div class="un-sub">🦄 ユニコーン・セレブレーション</div><div class="un-cond">👑GOD ＋ 宿題'+UNI_HW+'つ OK</div></div>';
+    +'<div class="un-core"><div class="un-desc">'+uniArt('un-big')+'</div><div class="un-title">ユニコーン降臨</div><div class="un-sub">🦄 ユニコーン・セレブレーション</div><div class="un-cond">👑GOD ＋ ②も③もコンプ</div></div>';
   document.body.appendChild(o);document.body.classList.add('partying');try{sGod();sUni();}catch(e){}
   function rain(n){for(var k=0;k<n;k++){var d=document.createElement('div');d.className='un-em';d.textContent=UNI_EM[k%UNI_EM.length];d.style.fontSize=(1.2+Math.random()*1.6)+'rem';
     d.style.left=(Math.random()*100)+'vw';d.style.setProperty('--dx',((Math.random()-.5)*90)+'px');d.style.animationDuration=(3.2+Math.random()*2.6)+'s';d.style.animationDelay=(Math.random()*.9)+'s';o.appendChild(d);}}
@@ -1666,7 +1685,7 @@ function angelSVG(){
 function godFire(){var o=document.getElementById('godparty');if(o)o.remove();o=document.createElement('div');o.id='godparty';
   var st='',i;for(i=0;i<40;i++)st+='<i class="gd-star" style="left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*1.6).toFixed(2)+'s"></i>';
   o.innerHTML='<div class="gd-sky"></div><div class="gd-rays"></div><div class="gd-beam"></div>'+st
-    +'<div class="gd-core"><div class="gd-angel-wrap"><div>'+angelSVG()+'</div></div><div class="gd-title">神降臨</div><div class="gd-sub">GOD 神セレブレーション</div><div class="gd-cond">パーフェクト ＋ プラス4つ ぜんぶ</div></div>';
+    +'<div class="gd-core"><div class="gd-angel-wrap"><div>'+angelSVG()+'</div></div><div class="gd-title">神降臨</div><div class="gd-sub">GOD 神セレブレーション</div><div class="gd-cond">パーフェクト ＋ プラス4つ ＋ ②か③コンプ</div></div>';
   document.body.appendChild(o);document.body.classList.add('partying');sGod();
   function dust(n,em){for(var k=0;k<n;k++){var d=document.createElement('div');if(em){d.className='gd-em';d.textContent=GOD_EM[k%GOD_EM.length];d.style.fontSize=(1.3+Math.random()*1.5)+'rem';}else{d.className='gd-dust';var s=4+Math.random()*7;d.style.width=s+'px';d.style.height=s+'px';}
     d.style.left=(Math.random()*100)+'vw';d.style.setProperty('--dx',((Math.random()-.5)*80)+'px');d.style.animationDuration=(3+Math.random()*2.6)+'s';d.style.animationDelay=(Math.random()*.8)+'s';o.appendChild(d);}}
@@ -1721,26 +1740,26 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
     var body=(!s.pair)?'<div class="ps-chips">'+Q[s.items[0]].chips+'</div>':(s.pair).map(function(i){var off=s.items.indexOf(i)<0;return '<div class="ps-it'+(off?' off':'')+(Q[i].done&&!off?' ok':'')+'"><span class="ps-in">'+QNAME[i]+'</span>'+(off?'<span class="ps-offt">昨日やったので今日はパーフェクトカウント外</span>':'<div class="ps-chips">'+Q[i].chips+'</div>')+'</div>';}).join(s.items.length>1?'<div class="ps-or">または</div>':'');
     rowsH+='<div class="ps-row'+(done?' ok':'')+'"><span class="ps-q">'+'①②③'.charAt(si)+' '+s.t+(done?' クリア！':'')+(only?' <span class="ps-day">今日は'+QNAME[only]+'の日</span>':'')+'</span>'+body+'</div>';});
   _bonusRows=3;var all=(n===3);
-  /* カレンダーの段階（2026-11-15 改定②）
-     👍ナイス＝わく2つ ／ 🌟パーフェクト＝わく3つ
-     パーフェクトのあとの「プラス4つ」＝👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題・②ことばの のこり片方・③漢字か読書の のこり片方（読書は1日の最後になりやすいので、どれからでもOK）
-     🌈レインボー＝🌟＋プラス2つ ／ 💜アメジスト＝🌟＋プラス3つ ／ 👑GOD＝🌟＋プラス4つぜんぶ（出ている宿題がない方は数えない。GODはプラス3つ以上かつ、数えるものぜんぶ） */
-  var _hwN=bonusHw().n,_dl=dtList(),EX=[];
-  if(_dl[1].av)EX.push({n:'👨‍🏫先生の宿題',d:!!_dl[1].done});
-  if(_dl[2].av)EX.push({n:'<img class="pface" src="./papa-face.png" alt="">パパの宿題',d:!!_dl[2].done});
-  EX.push({n:'②の のこり（'+(Q.v.done?QNAME.j:Q.j.done?QNAME.v:QNAME.v+'か'+QNAME.j)+'）',d:Q.v.done&&Q.j.done});
-  if(kon)EX.push({n:'③の のこり（'+(Q.k.done?QNAME.r:Q.r.done?QNAME.k:QNAME.k+'か'+QNAME.r)+'）',d:Q.k.done&&Q.r.done});
-  var _exN=EX.filter(function(x){return x.d;}).length,_exRem=EX.filter(function(x){return !x.d;}),_exT=_exRem.map(function(x){return x.n;}).join('・');
-  var lvl=all?((_exN>=3&&!_exRem.length)?5:_exN>=3?4:_exN>=2?3:2):(n>=2?1:0);
-  /* 🦄 ユニコーン（2026-11-22〜）：👑GOD ＋ その日の宿題OKが合計3つ以上 */
-  if(lvl===5&&_hwN>=UNI_HW)lvl=6;
+  /* カレンダーの段階（2026-11-23 改定③）
+     👍ナイス＝わく2つ ／ 🌟パーフェクト＝わく3つ（①＋②のどちらか＋③のどちらか）
+     プラス＝その日の宿題OKの数（先生・パパの計算・パパの国語、1つOKごとに1つ）＋②の のこり＋③の のこり
+     🌈レインボー＝🌟＋プラス2つ ／ 💜アメジスト＝🌟＋プラス3つ（ここまでは宿題の積み上げだけで行ける）
+     👑GOD＝🌟＋プラス4つ ＋ ②か③のどちらかをコンプ（両方クリア）
+     🦄ユニコーン＝👑GOD の条件 ＋ ②も③もコンプ（夜おそくなっても 読書までやり切るごほうび） */
+  var _hwN=bonusHw().n;
+  var compV=Q.v.done&&Q.j.done,compK=kon?(Q.k.done&&Q.r.done):Q.r.done;
+  var remV=Q.v.done?QNAME.j:Q.j.done?QNAME.v:QNAME.v+'と'+QNAME.j,remK=!kon?QNAME.r:Q.k.done?QNAME.r:Q.r.done?QNAME.k:QNAME.k+'と'+QNAME.r;
+  var plus=_hwN+(compV?1:0)+(kon&&compK?1:0);
+  var lvl;if(!all)lvl=(n>=2?1:0);else if(plus>=4&&(compV||compK))lvl=(compV&&compK)?6:5;else if(plus>=3)lvl=4;else if(plus>=2)lvl=3;else lvl=2;
   clRecord(lvl);flagCheck(lvl);partyTrack(lvl,_hwN);amTrack(lvl);godTrack(lvl);uniTrack(lvl);uniTheme();
-  var _need=function(k){return 'あと'+k+'つ（のこり：'+_exT+'）';};
-  var msg=lvl>=6?(isPapa?'<div class="ps-msg uni">🦄 今日は ユニコーン・セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg uni">🦄 ユニコーン降臨 🌈<br><span>GODをこえた一日！宿題 '+_hwN+'つ OK ✨</span></div>')
-    :lvl>=5?(isPapa?'<div class="ps-msg god">👑 今日は GOD 神セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg god">👑 GOD 神セレブレーション ✨<br><span>神降臨の一日！パーフェクト＋プラス'+_exN+'つ ぜんぶ</span><br><span style="font-size:.78rem">宿題を あと'+Math.max(1,UNI_HW-_hwN)+'つ OKで 🦄ユニコーン</span></div>')
-    :lvl===4?(isPapa?'<div class="ps-msg am">💜 今日はアメジスト・パーティ '+partyCount(today())+'回・'+_exT+'で👑GOD</div>':'<div class="ps-msg am">💜 アメジスト！最高の一日 🏆<br><span style="font-size:.8rem">'+_exT+'もクリアで 👑GOD 神セレブレーション</span></div>')
-    :lvl===3?(isPapa?'<div class="ps-msg">🌈 今日はレインボー・パーティ '+partyCount(today())+'回・'+_need(1)+'で'+(_exRem.length<=1?'👑GOD':'💜')+'</div>':'<div class="ps-msg">🌈 レインボー！パーティ '+partyCount(today())+'回目 🥳<br><span style="font-size:.8rem">'+_need(1)+'で '+(_exRem.length<=1?'👑GOD 神セレブレーション':'💜アメジスト')+'</span></div>')
-    :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト・'+_need(2-_exN)+'でレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！<br><span style="font-size:.8rem">'+_need(2-_exN)+'で 🌈レインボー</span></div>')
+  var PL='宿題OKか ②③の のこり';
+  var uniNeed=[compV?'':'②の '+remV,compK?'':'③の '+remK].filter(Boolean).join('・');
+  var godNeed=(plus<4?'あと'+(4-plus)+'つ（'+PL+'）':'')+(!(compV||compK)?(plus<4?'＋':'')+'②か③をコンプ（'+remV+' か '+remK+'）':'');
+  var msg=lvl>=6?(isPapa?'<div class="ps-msg uni">🦄 今日は ユニコーン・セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg uni">🦄 ユニコーン降臨 🌈<br><span>②も③もコンプ！GODをこえた一日 ✨</span></div>')
+    :lvl>=5?(isPapa?'<div class="ps-msg god">👑 今日は GOD・パーティ '+partyCount(today())+'回・'+uniNeed+'で🦄</div>':'<div class="ps-msg god">👑 GOD 神セレブレーション ✨<br><span>神降臨の一日！</span><br><span style="font-size:.78rem">'+uniNeed+' もクリアで 🦄ユニコーン</span></div>')
+    :lvl===4?(isPapa?'<div class="ps-msg am">💜 今日はアメジスト・パーティ '+partyCount(today())+'回・'+godNeed+'で👑GOD</div>':'<div class="ps-msg am">💜 アメジスト！最高の一日 🏆<br><span style="font-size:.8rem">'+godNeed+'で 👑GOD 神セレブレーション</span></div>')
+    :lvl===3?(isPapa?'<div class="ps-msg">🌈 今日はレインボー・パーティ '+partyCount(today())+'回・あと1つ（'+PL+'）で💜</div>':'<div class="ps-msg">🌈 レインボー！パーティ '+partyCount(today())+'回目 🥳<br><span style="font-size:.8rem">あと1つ（'+PL+'）で 💜アメジスト</span></div>')
+    :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト・あと'+(2-plus)+'つ（'+PL+'）でレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！<br><span style="font-size:.8rem">あと'+(2-plus)+'つ（'+PL+'）で 🌈レインボー</span></div>')
     :lvl===1?(isPapa?'<div class="ps-msg">👍 今日はナイス・あと1つでパーフェクト</div>':'<div class="ps-msg">👍 ナイス！あと1つでパーフェクト🌟</div>')
     :'<div class="ps-tip">2つで👍ナイス・3つで🌟パーフェクト</div>';
   window._passN=n;setTimeout(renderTabs,0);
@@ -1780,7 +1799,11 @@ function renderRead(){var el=document.getElementById('readCard');if(!el)return;v
 function renderCalRule(){var el=document.getElementById('calRuleCard');if(!el)return;
   el.innerHTML='<div class="card rlcard calrule"><div class="rl-h" style="margin-top:0">📅 がんばりカレンダーの決まり（補足）</div>'
     +'<div class="legend" style="margin:4px 0 6px;justify-content:flex-start"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-uni"></i>🦄ユニコーン</span></div>'
-    +'<div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋プラス2つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋プラス3つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋プラス4つぜんぶ ／ 🦄 ユニコーン＝👑GOD＋その日の宿題OKが合計3つ以上（先生の宿題・パパの宿題の計算・国語を1つずつ数える）<br>※ プラス4つ＝👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題・②ことばの のこり片方・③漢字か読書の のこり片方。どれからでもOK。宿題はその日に1つOKで ✓。出ている宿題がない方は数えないよ。<br>※ 毎日タスク（がんばりタスク）＝📘語彙トレ・👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。1つ ✓ でアバターの経験値 +10、3つ全部で その日クリア（🔥連続・🎁ガチャにつながる）だよ</div></div>';}
+    +'<div class="rl-n">👍 ナイス＝わく2つ ／ 🌟 パーフェクト＝わく3つ（①＋②のどちらか＋③のどちらか）<br>'
+    +'🌈 レインボー＝🌟＋プラス2つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝🌟＋プラス3つ<br>'
+    +'👑 GOD＝🌟＋プラス4つ ＋ ②か③のどちらかをコンプ（両方クリア）<br>'
+    +'🦄 ユニコーン＝👑GOD ＋ ②も③もコンプ（夜おそくなっても 読書までやり切ろう！）<br>'
+    +'※ プラス＝その日の宿題OKの数（👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題の計算・国語、1つOKごとに1つ）＋②の のこり＋③の のこり。💜アメジストまでは 宿題の積み上げだけで行けるよ<br>※ 毎日タスク（がんばりタスク）＝📘語彙トレ・👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。1つ ✓ でアバターの経験値 +10、3つ全部で その日クリア（🔥連続・🎁ガチャにつながる）だよ</div></div>';}
 function renderRules(){renderCalRule();var el=document.getElementById('rulesCard');if(!el)return;var c=S.cfg,kon=kjOn(),pct=+c.passPct||50,min=+c.passMin||10,bon=!!c.bonusOn;
   function m(v){return bon&&+v?'+'+(+v)+'分':'–';}
   var cdt=['','（ふつう以上）','（むずかしい）'][+c.calcDiff||0];
@@ -1896,7 +1919,7 @@ function dtCardHTML(){var l=dtList(),tp=+S.cfg.taskPer||0,av=l.filter(function(x
   return '<div class="card dtcard"><div class="v-h"><span>📅 毎日やるタスク</span><span class="v-count">'+dn+' / '+av.length+(dn&&dn===av.length?' 🎉':'')+'</span></div>'
     +l.map(function(x){var sub=x.auto?(x.done?'今日のノルマ クリア！'+((S.cfg.bonusOn&&tp)?'（+'+tp+'分）':''):x.auto+((S.cfg.bonusOn&&tp)?'（+'+tp+'分）':'')):(!x.av?'今日は出ている宿題がないよ（数えない）':x.done?'今日OKが出たよ':'📒宿題のタブで1つOKが出たら自動で ✓');
       return '<div class="quest dt'+(x.done?' done':'')+(x.av?'':' off')+'"'+(x.self?' onclick="dtToggle()"':'')+'><div class="chk">'+(x.done?'✓':'')+'</div><div>'+x.e+' '+x.n+'<span class="dt-sub">'+sub+'</span></div></div>';}).join('')
-    +'<div class="dt-note">👨‍🏫先生と<img class="pface" src="./papa-face.png" alt="">パパの宿題は、パーフェクトのあとの「プラス」に入るよ（🌈2つ・💜3つ・👑4つ）。⭐ がんばりクエストは、アバターのレベルアップ用だよ</div></div>';}
+    +'<div class="dt-note">宿題は1つOKごとに カレンダーの「プラス」1つ（🌈2つ・💜3つ・👑4つ＋②か③コンプ・🦄②③ぜんぶコンプ）。⭐ がんばりクエストは、アバターのレベルアップ用だよ</div></div>';}
 function qbTaskDone(){try{if(!meReady())return 0;return meQuests().filter(function(q){return S.day.me[q.key];}).length;}catch(e){return 0;}}
 function bonusBreak(n,all){var w=bonusHw(),p=[];if(w.n)p.push('宿題 '+w.n+'つ +'+(w.n*(+S.cfg.hwPer||0))+'分');if(w.all&&+S.cfg.hwAll)p.push('宿題ぜんぶ +'+S.cfg.hwAll+'分');if(n)p.push('コミットライン '+n+'つ +'+(n*(+S.cfg.bonusPer||0))+'分');if(all&&+S.cfg.bonusAll)p.push('コミットライン全部 +'+S.cfg.bonusAll+'分');var pb=qbPbToday();if(pb&&+S.cfg.pbPer)p.push('計算ベスト更新 '+pb+'回 +'+(pb*(+S.cfg.pbPer))+'分');if(dtGoiN()&&+S.cfg.taskPer)p.push('語彙トレ +'+(+S.cfg.taskPer)+'分');var kj=qbKanjiToday();if(kj.min)p.push('漢字 '+(kj.c?'正解'+kj.c:'')+(kj.c&&kj.f?'・':'')+(kj.f?'直し'+kj.f:'')+(kj.d?(kj.c||kj.f?'・':'')+'パートクリア'+kj.d+'回':'')+' +'+kj.min+'分');return p.join('・');}
 function bonusLogSet(e,g){S.bonusLog=S.bonusLog||{};S.bonusLog[today()]={e:e,g:g};var ks=Object.keys(S.bonusLog).sort();while(ks.length>400)delete S.bonusLog[ks.shift()];}
@@ -2112,7 +2135,7 @@ function render(){
   }
   document.getElementById('rewardLog').innerHTML=rewardCardHTML();
   var _ga=document.getElementById('gachaArea');if(_ga)_ga.innerHTML='<div style="text-align:center;margin-top:8px"><button class="btn gacha-btn" '+(S.prog.gacha<=0?'disabled':'')+' onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：'+S.prog.gacha+'回）</div></div>';
-  var _ke=document.getElementById('kseArea');if(_ke)_ke.innerHTML='<div class="kse-box"><div><b>👗 きせかえガチャ券 '+kseLeft()+'まい</b></div><div class="mini" style="text-align:left">🌟パーフェクトで1まい・🌈で2まい・💜で3まい・👑で4まい・🦄で5まい たまるよ</div><button class="btn ks-open" onclick="ksOpen()">👗 きせかえ・ガチャ</button></div>';
+  var _ke=document.getElementById('kseArea');if(_ke)_ke.innerHTML='<div class="kse-box"><div><b>👗 きせかえガチャ券</b> 🎁'+kseLeftBy().goods+'・🏞️'+kseLeftBy().bg+'・😊'+kseLeftBy().face+'まい</div><div class="mini" style="text-align:left">🎁グッズ券（🌟🌈💜の日）・🏞️背景券（👑の日）・😊表情券（🦄の日）がたまるよ</div><button class="btn ks-open" onclick="ksOpen()">👗 きせかえ・ガチャ</button></div>';
   renderTabs();uniTheme();
   renderFlJump();renderRules();
   checkNewReaction();
