@@ -77,6 +77,53 @@
   .ks-herobtn{white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin:6px 0 4px;border:none;border-radius:12px;padding:8px 6px;font-family:inherit;font-weight:900;font-size:.9rem;color:#fff;background:linear-gradient(90deg,#ff9ac2,#b39bff);box-shadow:0 2px 0 #a07ee0}
   .ks-herobtn span{font-size:.7rem;background:rgba(255,255,255,.3);border-radius:999px;padding:1px 7px}
   .ks-herobtn span:empty{display:none}
+
+  /* 🦄 ユニコーン */
+  .hcell.uni{position:relative;overflow:hidden;background:conic-gradient(from 200deg,#ff9ecf,#ffd27a,#fff59a,#9fe3c8,#8fd3ff,#c7a6ff,#ff9ecf);border-color:#ff7ac0;color:#fff;font-weight:900;text-shadow:0 1px 2px rgba(120,60,160,.7);box-shadow:0 0 0 2px #fff inset,0 0 8px rgba(255,122,192,.9);transform:scale(1.18);z-index:2;display:flex;align-items:center;justify-content:center}
+  .hcell.uni::before{content:'🦄';position:absolute;font-size:.8em;opacity:.55;right:-1px;bottom:-2px}
+  .hcell.uni::after{content:'';position:absolute;inset:-50%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.9) 50%,transparent 58%);animation:godShine 2.2s linear infinite}
+  .legend .l-uni{background:conic-gradient(from 200deg,#ff9ecf,#ffd27a,#fff59a,#9fe3c8,#8fd3ff,#c7a6ff,#ff9ecf);border-color:#ff7ac0;box-shadow:0 0 4px rgba(255,122,192,.95);transform:scale(1.18)}
+  .ps-msg.uni{background:linear-gradient(90deg,#ffe0f1,#efe2ff,#ddf1ff,#e0fff2);border:2px solid #ff9ecf;color:#8a3d9e}
+  #uniparty{position:fixed;inset:0;z-index:95;pointer-events:auto;overflow:hidden;animation:unIn .6s ease-out both}
+  #uniparty.out{animation:unOut .9s ease-in forwards}
+  @keyframes unIn{from{opacity:0}to{opacity:1}} @keyframes unOut{to{opacity:0}}
+  .un-sky{position:absolute;inset:0;background:linear-gradient(180deg,#ffd6ee 0%,#e9d9ff 40%,#d6ecff 75%,#dcfff1 100%)}
+  .un-rainbow{position:absolute;left:50%;top:58%;width:150vmax;height:150vmax;margin-left:-75vmax;border-radius:50%;background:radial-gradient(circle,transparent 47%,#ff7ab8 47.5%,#ff7ab8 49%,#ffb35c 49%,#ffb35c 50.5%,#ffe45c 50.5%,#ffe45c 52%,#7fe0a8 52%,#7fe0a8 53.5%,#6cc8ff 53.5%,#6cc8ff 55%,#b48cff 55%,#b48cff 56.5%,transparent 57%);opacity:0;animation:unBow 1.6s .3s ease-out forwards}
+  @keyframes unBow{from{opacity:0;transform:scale(.6)}to{opacity:.9;transform:scale(1)}}
+  .un-cloud{position:absolute;z-index:1;width:46vw;max-width:240px;height:60px;background:#fff;border-radius:60px;opacity:.85;filter:drop-shadow(0 4px 8px rgba(160,120,200,.25));animation:unCloud 9s linear infinite}
+  .un-cloud::before,.un-cloud::after{content:'';position:absolute;background:#fff;border-radius:50%}
+  .un-cloud::before{width:42%;height:120%;left:14%;top:-50%}.un-cloud::after{width:34%;height:100%;left:48%;top:-34%}
+  .un-cloud.c1{top:12%;left:-10%}.un-cloud.c2{top:30%;left:60%;animation-duration:12s;transform:scale(.7)}.un-cloud.c3{top:72%;left:20%;animation-duration:14s;transform:scale(.85)}
+  @keyframes unCloud{0%{margin-left:-20vw}100%{margin-left:30vw}}
+  .un-star{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 8px 3px #fff,0 0 14px 6px rgba(255,158,207,.7);animation:unTw 1.6s ease-in-out infinite}
+  @keyframes unTw{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.3)}}
+  .un-core{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .un-desc{animation:unDesc 2.4s cubic-bezier(.2,.9,.3,1.2) both,unBob 2.2s 2.4s ease-in-out infinite}
+  @keyframes unDesc{0%{transform:translateY(-110vh) scale(.6) rotate(-8deg)}70%{transform:translateY(12px) scale(1.05) rotate(3deg)}100%{transform:translateY(0) scale(1) rotate(0)}}
+  @keyframes unBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  .un-big{width:min(78vw,360px);height:auto;filter:drop-shadow(0 0 18px rgba(255,255,255,.95)) drop-shadow(0 10px 18px rgba(155,127,209,.45))}
+  .un-title{margin-top:6px;font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-weight:900;font-size:clamp(2.6rem,12vw,4.4rem);letter-spacing:.1em;background:linear-gradient(90deg,#ff5fa8,#ffae3c,#f5d000,#3cc98a,#3aa8ff,#9a6bff,#ff5fa8);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #fff) drop-shadow(0 0 10px rgba(255,255,255,.9));animation:unFlow 2.4s linear infinite,unPop .8s 1.6s both}
+  @keyframes unFlow{to{background-position:200% 0}} @keyframes unPop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+  .un-sub{font-weight:900;color:#8a3d9e;font-size:1.05rem;text-shadow:0 1px 0 #fff;animation:unPop .8s 2s both}
+  .un-cond{margin-top:6px;font-weight:800;font-size:.85rem;color:#fff;background:linear-gradient(90deg,#ff9ecf,#b39bff);border-radius:999px;padding:4px 14px;animation:unPop .8s 2.3s both}
+  .un-em{position:absolute;z-index:4;top:-8vh;animation:unFall linear forwards}
+  @keyframes unFall{to{transform:translate(var(--dx),115vh) rotate(260deg)}}
+  /* ユニコーンの日：ページ全体 */
+  body.uni-day{background:linear-gradient(180deg,#ffe3f3 0%,#f1e6ff 35%,#e2f1ff 68%,#e3fff3 100%) fixed;background-size:auto}
+  body.uni-day::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle,rgba(255,255,255,.95) 0 1.5px,transparent 2.5px),radial-gradient(circle,rgba(255,158,207,.7) 0 1.5px,transparent 2.5px);background-size:46px 46px,70px 70px;background-position:0 0,23px 35px;animation:unDrift 18s linear infinite}
+  @keyframes unDrift{to{background-position:0 460px,23px 735px}}
+  body.uni-day .wrap{position:relative;z-index:1}
+  body.uni-day h1{color:#b04fc4;text-shadow:0 2px 0 #fff,0 0 10px rgba(255,158,207,.8)}
+  body.uni-day .card{border-color:#e6c8ff;box-shadow:0 2px 0 #f3d6ff,0 6px 18px rgba(200,140,230,.18)}
+  body.uni-day .tabbar{background:linear-gradient(90deg,rgba(255,236,247,.97),rgba(240,232,255,.97),rgba(230,244,255,.97));border-top:3px solid transparent;border-image:linear-gradient(90deg,#ff9ecf,#ffd27a,#fff59a,#9fe3c8,#8fd3ff,#c7a6ff) 1}
+  body.uni-day .tabbar button.on{background:#ffe0f1}
+  #uniPet{position:fixed;right:8px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:45;width:96px;cursor:pointer;animation:unPet 2.6s ease-in-out infinite;filter:drop-shadow(0 4px 6px rgba(155,127,209,.4))}
+  #uniPet .un-pet{width:96px;height:auto;display:block}
+  #uniPet.hop{animation:unHop .6s ease-out,unPet 2.6s .6s ease-in-out infinite}
+  @keyframes unPet{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+  @keyframes unHop{0%{transform:translateY(0) scale(1)}40%{transform:translateY(-40px) scale(1.12) rotate(-8deg)}100%{transform:translateY(0) scale(1)}}
+  .un-pet-bub{position:absolute;right:62px;top:-10px;white-space:nowrap;font-size:.66rem;font-weight:900;color:#8a3d9e;background:#fff;border:1.5px solid #ffb3da;border-radius:999px;padding:2px 8px;animation:unBub 4s ease-in-out infinite}
+  @keyframes unBub{0%,60%,100%{opacity:1}75%,90%{opacity:0}}
   .kse-box{margin-top:10px;background:#fff3fb;border:1.5px dashed #f0b6dc;border-radius:12px;padding:8px 10px;font-size:.88rem}
   h1{font-size:1.35rem;text-align:center;margin:.2em 0 .05em}
   .sub{text-align:center;color:var(--soft);font-size:.8rem;margin-bottom:12px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
@@ -683,7 +730,7 @@
     <div class="two"><div><label>1日の目標</label><select id="d_readMin"><option value="5">5ページ</option><option value="10">10ページ</option><option value="15">15ページ</option><option value="20">20ページ</option></select></div><div><label>しおり（いまのページ）</label><input id="d_rdPage" type="number" inputmode="numeric" min="0"></div></div>
     <label style="margin-top:10px">📅 がんばりカレンダーの手直し（過去の日）</label>
     <p class="hint">機能を追加した日など、判定が実際とずれた過去の日を書きかえます。今日の分は自動で決まります。</p>
-    <div class="two"><div><input id="d_clDate" type="date"></div><div><select id="d_clLv"><option value="0">お休み</option><option value="1">👍 ナイス</option><option value="2">🌟 パーフェクト</option><option value="3">🌈 レインボー</option><option value="4">💜 アメジスト</option><option value="5">👑 GOD 神セレブレーション</option></select></div></div>
+    <div class="two"><div><input id="d_clDate" type="date"></div><div><select id="d_clLv"><option value="0">お休み</option><option value="1">👍 ナイス</option><option value="2">🌟 パーフェクト</option><option value="3">🌈 レインボー</option><option value="4">💜 アメジスト</option><option value="5">👑 GOD 神セレブレーション</option><option value="6">🦄 ユニコーン</option></select></div></div>
     <button class="btn gray" onclick="clEdit()">📅 この日の判定を書きかえる</button>
     <label style="margin-top:10px">🔔 申請をパパのスマホにプッシュ通知（ntfy アプリ）</label>
     <p class="hint">iPhone に無料アプリ「ntfy」を入れ、下の通知トピック名を購読すると、娘が申請した瞬間に通知が届きます。トピック名は合言葉なので「生成」で作った推測されにくい名前を使ってください。</p>
@@ -1478,7 +1525,7 @@ function ksOpenRender(){var el=document.getElementById('ksBody');if(!el||documen
 function clRecord(l){S.clog=S.clog||{};var td=today();if(SYNC.on&&!SYNC.astatReady)return;var _ka=kseGrant(td,l);if(_ka){save();maybeSync();setTimeout(function(){try{showCheer('👗 きせかえガチャ券 +'+_ka+'まい ゲット！');}catch(e){}},900);}if(l!==(+S.clog[td]||0)){if(l)S.clog[td]=l;else delete S.clog[td];var ks=Object.keys(S.clog).sort();while(ks.length>400)delete S.clog[ks.shift()];save();maybeSync();setTimeout(function(){try{render();}catch(e){}},0);}}
 /* パパの手直し：過去の日のカレンダー判定を書きかえる（今日は自動判定のまま） */
 function clEdit(){var k=(document.getElementById('d_clDate').value||'').trim(),lv=+document.getElementById('d_clLv').value||0;if(!/^\d{4}-\d{2}-\d{2}$/.test(k)){alert('日付をえらんでください');return;}
-  if(k>=today()){alert('今日の分は、その日の達成状況で自動で決まります');return;}var nm=['お休み','👍 ナイス','🌟 パーフェクト','🌈 レインボー','💜 アメジスト','👑 GOD 神セレブレーション'][lv];if(!confirm(k+' を「'+nm+'」に書きかえますか？'))return;
+  if(k>=today()){alert('今日の分は、その日の達成状況で自動で決まります');return;}var nm=['お休み','👍 ナイス','🌟 パーフェクト','🌈 レインボー','💜 アメジスト','👑 GOD 神セレブレーション','🦄 ユニコーン'][lv];if(!confirm(k+' を「'+nm+'」に書きかえますか？'))return;
   S.clog=S.clog||{};S.clp=S.clp||{};if(lv)S.clog[k]=lv;else delete S.clog[k];kseGrant(k,lv);if(lv>=3){if(!S.clp[k])S.clp[k]={h0:0,n:1};}else delete S.clp[k];
   save();maybeSync();render();alert(k+' を「'+nm+'」にしました');}
 function clLevel(k){return +((S.clog||{})[k])||0;}
@@ -1513,6 +1560,75 @@ function amFire(){var o=document.getElementById('amparty');if(o)o.remove();o=doc
 var GOD_EM=['👑','✨','💎','💠','🌟','🫧','💫','🔱'];
 function godTrack(lvl){if(lvl<5)return;if(SYNC.on&&!SYNC.astatReady)return;var td=today();try{if(localStorage.getItem('qb_godseen')===td)return;localStorage.setItem('qb_godseen',td);}catch(e){return;}
   var w=Math.max(50,_fxUntil-Date.now());_fxUntil=Math.max(_fxUntil,Date.now())+6600;setTimeout(godFire,w);}
+var UNI_HW=3;
+/* 🦄 ユニコーン降臨の演出（端末ごとに1日1回）。GODの演出のあとに続けて出す */
+function uniTrack(lvl){if(lvl<6)return;if(SYNC.on&&!SYNC.astatReady)return;var td=today();try{if(localStorage.getItem('qb_uniseen')===td)return;localStorage.setItem('qb_uniseen',td);}catch(e){return;}
+  var w=Math.max(50,_fxUntil-Date.now());_fxUntil=Math.max(_fxUntil,Date.now())+8200;setTimeout(uniFire,w);}
+var UNI_EM=['🦄','🌈','💖','✨','⭐','🍭','🫧','💜','🩷','🌸'];
+function uniArt(cls){return '<img class="'+cls+' uni-img" src="./unicorn.png" alt="" onerror="this.outerHTML=unicornSVG(\''+cls+'\')">';}
+function uniFire(){var o=document.getElementById('uniparty');if(o)o.remove();o=document.createElement('div');o.id='uniparty';
+  var st='',i;for(i=0;i<36;i++)st+='<i class="un-star" style="left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*1.8).toFixed(2)+'s"></i>';
+  o.innerHTML='<div class="un-sky"></div><div class="un-rainbow"></div><div class="un-cloud c1"></div><div class="un-cloud c2"></div><div class="un-cloud c3"></div>'+st
+    +'<div class="un-core"><div class="un-desc">'+uniArt('un-big')+'</div><div class="un-title">ユニコーン降臨</div><div class="un-sub">🦄 ユニコーン・セレブレーション</div><div class="un-cond">👑GOD ＋ 宿題'+UNI_HW+'つ OK</div></div>';
+  document.body.appendChild(o);document.body.classList.add('partying');try{sGod();sUni();}catch(e){}
+  function rain(n){for(var k=0;k<n;k++){var d=document.createElement('div');d.className='un-em';d.textContent=UNI_EM[k%UNI_EM.length];d.style.fontSize=(1.2+Math.random()*1.6)+'rem';
+    d.style.left=(Math.random()*100)+'vw';d.style.setProperty('--dx',((Math.random()-.5)*90)+'px');d.style.animationDuration=(3.2+Math.random()*2.6)+'s';d.style.animationDelay=(Math.random()*.9)+'s';o.appendChild(d);}}
+  setTimeout(function(){rain(40);},900);setTimeout(function(){rain(34);},2400);setTimeout(function(){rain(28);},3900);
+  setTimeout(function(){o.classList.add('out');},7000);
+  setTimeout(function(){try{o.remove();}catch(e){}document.body.classList.remove('partying');uniTheme();},8000);}
+function sUni(){[1318.5,1568,1760,2093,2349.3,2637,3136].forEach(function(f,i){tone(f,0.7,'triangle',3.0+i*0.09);tone(f*1.5,0.5,'sine',3.05+i*0.09);});}
+/* ユニコーンの日：ページの色をユニコーン色にして、ユニコーンが画面に住みつく */
+function uniTheme(){var on=clLevel(today())>=6;document.body.classList.toggle('uni-day',on);var pet=document.getElementById('uniPet');
+  if(on&&!pet){pet=document.createElement('div');pet.id='uniPet';pet.innerHTML=uniArt('un-pet')+'<span class="un-pet-bub">🦄 ユニコーンの日！</span>';pet.onclick=uniPetTap;document.body.appendChild(pet);}
+  else if(!on&&pet)pet.remove();}
+function uniPetTap(){var p=document.getElementById('uniPet');if(!p)return;p.classList.remove('hop');void p.offsetWidth;p.classList.add('hop');try{burst(18,true,UNI_EM);sTick();}catch(e){}}
+function unicornSVG(cls){
+  var L='#9b7fd1';
+  return '<svg class="'+(cls||'uni-svg')+'" viewBox="0 0 220 200" aria-hidden="true"><defs>'
+   +'<linearGradient id="unBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f1e8ff"/></linearGradient>'
+   +'<linearGradient id="unHorn" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#f6b93b"/><stop offset=".6" stop-color="#ffe27a"/><stop offset="1" stop-color="#fffbe0"/></linearGradient>'
+   +'<radialGradient id="unEye" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#8e6ad8"/><stop offset=".55" stop-color="#5b3aa8"/><stop offset="1" stop-color="#2d1b5e"/></radialGradient>'
+   +'</defs>'
+   /* tail */
+   +'<g stroke="'+L+'" stroke-width="2.5" stroke-linejoin="round">'
+   +'<path d="M52 118 C22 112 14 140 28 156 C18 150 10 132 22 118 C30 108 44 108 52 118Z" fill="#ff9ecf"/>'
+   +'<path d="M50 126 C30 128 26 150 40 162 C26 158 22 138 34 128 C40 123 46 123 50 126Z" fill="#ffd27a"/>'
+   +'<path d="M54 134 C42 142 44 160 58 166 C44 166 36 150 44 138 C47 134 51 133 54 134Z" fill="#9fe3c8"/>'
+   +'</g>'
+   /* legs */
+   +'<g stroke="'+L+'" stroke-width="2.5">'
+   +'<rect x="66" y="140" width="20" height="36" rx="9" fill="url(#unBody)"/><rect x="66" y="166" width="20" height="12" rx="5" fill="#f6c453"/>'
+   +'<rect x="122" y="140" width="20" height="36" rx="9" fill="url(#unBody)"/><rect x="122" y="166" width="20" height="12" rx="5" fill="#f6c453"/>'
+   +'<rect x="88" y="146" width="18" height="30" rx="8" fill="#ece0fb"/><rect x="88" y="168" width="18" height="10" rx="4" fill="#e9b43f"/>'
+   +'<rect x="142" y="146" width="18" height="30" rx="8" fill="#ece0fb"/><rect x="142" y="168" width="18" height="10" rx="4" fill="#e9b43f"/>'
+   +'</g>'
+   /* body */
+   +'<ellipse cx="108" cy="128" rx="58" ry="36" fill="url(#unBody)" stroke="'+L+'" stroke-width="2.5"/>'
+   +'<path d="M80 150 Q108 160 140 150" fill="none" stroke="#e3d4fa" stroke-width="5" stroke-linecap="round"/>'
+   /* head */
+   +'<circle cx="150" cy="82" r="42" fill="url(#unBody)" stroke="'+L+'" stroke-width="2.5"/>'
+   +'<ellipse cx="176" cy="98" rx="24" ry="18" fill="#ffeef6" stroke="'+L+'" stroke-width="2.5"/>'
+   +'<circle cx="184" cy="94" r="2.6" fill="#c9739e"/>'
+   +'<path d="M168 106 Q176 112 186 105" fill="none" stroke="#7a4a9e" stroke-width="2.5" stroke-linecap="round"/>'
+   /* ear */
+   +'<path d="M128 50 L122 22 L146 42 Z" fill="#fff" stroke="'+L+'" stroke-width="2.5" stroke-linejoin="round"/><path d="M129 44 L126 30 L139 41Z" fill="#ffc6e0"/>'
+   /* horn */
+   +'<path d="M150 44 L168 4 L170 46 Z" fill="url(#unHorn)" stroke="#d99a1e" stroke-width="2" stroke-linejoin="round"/>'
+   +'<path d="M153 36 L169 33 M156 26 L169 23 M160 16 L168 14" stroke="#d99a1e" stroke-width="1.8" stroke-linecap="round"/>'
+   /* mane */
+   +'<g stroke="'+L+'" stroke-width="2.5">'
+   +'<circle cx="124" cy="58" r="15" fill="#ff9ecf"/><circle cx="112" cy="76" r="14" fill="#ffb47a"/><circle cx="106" cy="96" r="13" fill="#ffe27a"/>'
+   +'<circle cx="138" cy="44" r="12" fill="#c7a6ff"/><circle cx="110" cy="114" r="11" fill="#9fe3c8"/>'
+   +'<circle cx="152" cy="46" r="10" fill="#8fd3ff"/>'
+   +'</g>'
+   /* eye */
+   +'<ellipse cx="152" cy="84" rx="11" ry="14" fill="url(#unEye)"/><circle cx="148" cy="78" r="4.5" fill="#fff"/><circle cx="156" cy="90" r="2.2" fill="#fff"/>'
+   +'<path d="M142 72 L136 66 M146 69 L142 62 M151 68 L150 61" stroke="#5b3aa8" stroke-width="2" stroke-linecap="round"/>'
+   +'<ellipse cx="164" cy="104" rx="7" ry="4.5" fill="#ffb3d1" opacity=".8"/>'
+   /* sparkles */
+   +'<g fill="#ffd84d"><path d="M196 40 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/><path d="M30 60 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z" fill="#ff9ecf"/></g>'
+   +'</svg>';}
+
 function sGod(){[[261.6,0],[329.6,.06],[392,.12],[493.9,.18],[587.3,.24]].forEach(function(x){tone(x[0],3.2,'sine',x[1]);tone(x[0]*2,2.6,'sine',x[1]+.02);});
   [1046.5,1318.5,1568,1975.5,2349.3,2637].forEach(function(f,i){tone(f,0.9,'triangle',0.9+i*0.11);});[1568,2093,2637,3136].forEach(function(f,i){tone(f,1.4,'sine',2.0+i*0.16);});}
 /* 光の天使：輝く白い姿と、虹色にゆらめく大きな羽（羽根を扇形に重ねて描く） */
@@ -1614,9 +1730,12 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
   if(kon)EX.push({n:'③の のこり（'+(Q.k.done?QNAME.r:Q.r.done?QNAME.k:QNAME.k+'か'+QNAME.r)+'）',d:Q.k.done&&Q.r.done});
   var _exN=EX.filter(function(x){return x.d;}).length,_exRem=EX.filter(function(x){return !x.d;}),_exT=_exRem.map(function(x){return x.n;}).join('・');
   var lvl=all?((_exN>=3&&!_exRem.length)?5:_exN>=3?4:_exN>=2?3:2):(n>=2?1:0);
-  clRecord(lvl);flagCheck(lvl);partyTrack(lvl,_hwN);amTrack(lvl);godTrack(lvl);
+  /* 🦄 ユニコーン（2026-11-22〜）：👑GOD ＋ その日の宿題OKが合計3つ以上 */
+  if(lvl===5&&_hwN>=UNI_HW)lvl=6;
+  clRecord(lvl);flagCheck(lvl);partyTrack(lvl,_hwN);amTrack(lvl);godTrack(lvl);uniTrack(lvl);uniTheme();
   var _need=function(k){return 'あと'+k+'つ（のこり：'+_exT+'）';};
-  var msg=lvl>=5?(isPapa?'<div class="ps-msg god">👑 今日は GOD 神セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg god">👑 GOD 神セレブレーション ✨<br><span>神降臨の一日！パーフェクト＋プラス'+_exN+'つ ぜんぶ</span></div>')
+  var msg=lvl>=6?(isPapa?'<div class="ps-msg uni">🦄 今日は ユニコーン・セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg uni">🦄 ユニコーン降臨 🌈<br><span>GODをこえた一日！宿題 '+_hwN+'つ OK ✨</span></div>')
+    :lvl>=5?(isPapa?'<div class="ps-msg god">👑 今日は GOD 神セレブレーション・パーティ '+partyCount(today())+'回</div>':'<div class="ps-msg god">👑 GOD 神セレブレーション ✨<br><span>神降臨の一日！パーフェクト＋プラス'+_exN+'つ ぜんぶ</span><br><span style="font-size:.78rem">宿題を あと'+Math.max(1,UNI_HW-_hwN)+'つ OKで 🦄ユニコーン</span></div>')
     :lvl===4?(isPapa?'<div class="ps-msg am">💜 今日はアメジスト・パーティ '+partyCount(today())+'回・'+_exT+'で👑GOD</div>':'<div class="ps-msg am">💜 アメジスト！最高の一日 🏆<br><span style="font-size:.8rem">'+_exT+'もクリアで 👑GOD 神セレブレーション</span></div>')
     :lvl===3?(isPapa?'<div class="ps-msg">🌈 今日はレインボー・パーティ '+partyCount(today())+'回・'+_need(1)+'で'+(_exRem.length<=1?'👑GOD':'💜')+'</div>':'<div class="ps-msg">🌈 レインボー！パーティ '+partyCount(today())+'回目 🥳<br><span style="font-size:.8rem">'+_need(1)+'で '+(_exRem.length<=1?'👑GOD 神セレブレーション':'💜アメジスト')+'</span></div>')
     :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト・'+_need(2-_exN)+'でレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！<br><span style="font-size:.8rem">'+_need(2-_exN)+'で 🌈レインボー</span></div>')
@@ -1658,8 +1777,8 @@ function renderRead(){var el=document.getElementById('readCard');if(!el)return;v
 /* ===== 📋 ルール表（ページのいちばん下） ===== */
 function renderCalRule(){var el=document.getElementById('calRuleCard');if(!el)return;
   el.innerHTML='<div class="card rlcard calrule"><div class="rl-h" style="margin-top:0">📅 がんばりカレンダーの決まり（補足）</div>'
-    +'<div class="legend" style="margin:4px 0 6px;justify-content:flex-start"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span></div>'
-    +'<div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋プラス2つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋プラス3つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋プラス4つぜんぶ<br>※ プラス4つ＝👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題・②ことばの のこり片方・③漢字か読書の のこり片方。どれからでもOK。宿題はその日に1つOKで ✓。出ている宿題がない方は数えないよ。<br>※ 毎日タスク（がんばりタスク）＝📘語彙トレ・👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。1つ ✓ でアバターの経験値 +10、3つ全部で その日クリア（🔥連続・🎁ガチャにつながる）だよ</div></div>';}
+    +'<div class="legend" style="margin:4px 0 6px;justify-content:flex-start"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-uni"></i>🦄ユニコーン</span></div>'
+    +'<div class="rl-n">👍 ナイス＝2つ ／ 🌟 パーフェクト＝3つ ／ 🌈 レインボー＝パーフェクト＋プラス2つ（宿題が1つふえるたび🥳パーティ）／ 💜 アメジスト＝パーフェクト＋プラス3つ ／ 👑 GOD 神セレブレーション＝パーフェクト＋プラス4つぜんぶ ／ 🦄 ユニコーン＝👑GOD＋その日の宿題OKが合計3つ以上（先生の宿題・パパの宿題の計算・国語を1つずつ数える）<br>※ プラス4つ＝👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題・②ことばの のこり片方・③漢字か読書の のこり片方。どれからでもOK。宿題はその日に1つOKで ✓。出ている宿題がない方は数えないよ。<br>※ 毎日タスク（がんばりタスク）＝📘語彙トレ・👨‍🏫先生の宿題・<img class="pface" src="./papa-face.png" alt="">パパの宿題（語彙トレは語彙クエストのノルマクリアで、宿題はその日に1つOKで、自動で ✓。出ている宿題がない日は数えない）。1つ ✓ でアバターの経験値 +10、3つ全部で その日クリア（🔥連続・🎁ガチャにつながる）だよ</div></div>';}
 function renderRules(){renderCalRule();var el=document.getElementById('rulesCard');if(!el)return;var c=S.cfg,kon=kjOn(),pct=+c.passPct||50,min=+c.passMin||10,bon=!!c.bonusOn;
   function m(v){return bon&&+v?'+'+(+v)+'分':'–';}
   var cdt=['','（ふつう以上）','（むずかしい）'][+c.calcDiff||0];
@@ -1880,7 +1999,7 @@ function frameClass(level){return 'flvl-'+Math.min(10,Math.max(1,level));}
 function frameOrn(level){var t=Math.min(10,level),o='';var topE=t>=9?'🌟':'⭐',botE=t>=9?'💎':'✨';if(t>=3)o+='<span class="orn tl">'+topE+'</span><span class="orn tr">'+topE+'</span>';if(t>=6)o+='<span class="orn bl">'+botE+'</span><span class="orn br">'+botE+'</span>';if(t>=7)o+='<span class="orn crown">👑</span>';return o;}
 function calHTML(){
   const N=16,base=new Date(),tk=today();let cells='';
-  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const lvl=clLevel(k);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);const pn=(lvl>=3)?partyCount(k):0;cells+='<div class="hcell'+(lvl>=5?' god':lvl===4?' amethyst':lvl===3?' rainbow':lvl===2?' star':lvl===1?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')">'+(pn?pn:'')+'</div>';}
+  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const lvl=clLevel(k);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);const pn=(lvl>=3)?partyCount(k):0;cells+='<div class="hcell'+(lvl>=6?' uni':lvl>=5?' god':lvl===4?' amethyst':lvl===3?' rainbow':lvl===2?' star':lvl===1?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')">'+(pn?pn:'')+'</div>';}
   const lab=(col,txt,al)=>'<span style="grid-column:'+col+(al?';justify-self:'+al:'')+'">'+txt+'</span>';
   const labels=lab(1,'15日前','start')+lab(6,'10日前')+lab(11,'5日前')+lab(16,'今日','end');
   return '<div class="callabels">'+labels+'</div><div class="calgrid">'+cells+'</div><a class="kiroku-link" href="./kiroku.html">📈 がんばり記録を見る</a>';
@@ -1984,15 +2103,15 @@ function render(){
       </div></div>`;
     stage.innerHTML=`<div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
         <div class="calwrap">${calHTML()}</div>
-        <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
-        <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日・🌈レインボー ${histCount(3)}日・💜アメジスト ${histCount(4)-histCount(5)}日・👑GOD ${histCount(5)}日）${partySum()?'<br>🥳 パーティ 合計 '+partySum()+'回':''}</div></div>
+        <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-uni"></i>🦄ユニコーン</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
+        <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日・🌈レインボー ${histCount(3)}日・💜アメジスト ${histCount(4)-histCount(5)}日・👑GOD ${histCount(5)-histCount(6)}日${histCount(6)?'・🦄ユニコーン '+histCount(6)+'日':''}）${partySum()?'<br>🥳 パーティ 合計 '+partySum()+'回':''}</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span></div></div>
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 今日の記録</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読動画やドリルの写真を残そう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=rewardCardHTML();
   var _ga=document.getElementById('gachaArea');if(_ga)_ga.innerHTML='<div style="text-align:center;margin-top:8px"><button class="btn gacha-btn" '+(S.prog.gacha<=0?'disabled':'')+' onclick="spin()">🎁 ガチャをまわす</button><div class="mini">5日クリアごとに1回まわせるよ（まわせる：'+S.prog.gacha+'回）</div></div>';
-  var _ke=document.getElementById('kseArea');if(_ke)_ke.innerHTML='<div class="kse-box"><div><b>👗 きせかえガチャ券 '+kseLeft()+'まい</b></div><div class="mini" style="text-align:left">🌟パーフェクトで1まい・🌈で2まい・💜で3まい・👑で4まい たまるよ</div><button class="btn ks-open" onclick="ksOpen()">👗 きせかえ・ガチャ</button></div>';
-  renderTabs();
+  var _ke=document.getElementById('kseArea');if(_ke)_ke.innerHTML='<div class="kse-box"><div><b>👗 きせかえガチャ券 '+kseLeft()+'まい</b></div><div class="mini" style="text-align:left">🌟パーフェクトで1まい・🌈で2まい・💜で3まい・👑で4まい・🦄で5まい たまるよ</div><button class="btn ks-open" onclick="ksOpen()">👗 きせかえ・ガチャ</button></div>';
+  renderTabs();uniTheme();
   renderFlJump();renderRules();
   checkNewReaction();
   save();maybeSync();
