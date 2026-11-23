@@ -1439,7 +1439,7 @@ function kseLeftBy(){var e=kseEarned(),u=kseUsedBy();return {goods:Math.max(0,e.
 function kseLeft(){var l=kseLeftBy();return l.goods+l.bg+l.face;}
 function kseTotal(){var e=kseEarned();return e.goods+e.bg+e.face;}
 /* ===== 👗 きせかえ（2026-11-22〜）=====
-   もと絵（クラスごと）に、かお・ふく・うわぎ・ぼうし の部品（透明PNG）を重ねて1枚にする。色は系統色で塗り直す。
+   もと絵（クラスごと）に、かお・ふく・うわぎ・くつ・ぼうし の部品（透明PNG）を重ねて1枚にする。色は系統色で塗り直す。
    部品は ks-<モデル>-<部品>.png。ガチャ券はカレンダー段階でたまる（kseGrant）。 */
 var KS_FAM=[
  {k:'red',n:'赤系',sh:[['赤',2,.8,.82],['えんじ',350,.75,.5],['ローズ',345,.5,.92]]},
@@ -1450,24 +1450,29 @@ var KS_FAM=[
  {k:'pur',n:'紫系',sh:[['ラベンダー',265,.35,.9],['むらさき',275,.6,.65],['ぶどう',290,.65,.42]]},
  {k:'pin',n:'桃系',sh:[['ピンク',330,.5,.95],['さくら',345,.25,.98],['ベリー',330,.7,.6]]},
  {k:'mono',n:'モノトーン',sh:[['白',0,0,.97],['グレー',0,0,.62],['黒',0,0,.25]]}];
-var KS_CAT=[{k:'face',n:'かお',e:'😊'},{k:'hat',n:'ぼうし',e:'🧢'},{k:'cape',n:'うわぎ',e:'🧥'},{k:'wear',n:'ふく',e:'👕'},{k:'bg',n:'はいけい',e:'🏞️'}];
+var KS_CAT=[{k:'face',n:'かお',e:'😊'},{k:'hat',n:'ぼうし',e:'🧢'},{k:'cape',n:'うわぎ',e:'🧥'},{k:'wear',n:'ふく',e:'👕'},{k:'shoe',n:'くつ',e:'👟'},{k:'bg',n:'はいけい',e:'🏞️'}];
 var KS_ITEMS=[
- {id:'f_happy',cat:'face',n:'喜（にっこり）',e:'😄'},{id:'f_angry',cat:'face',n:'怒（ぷんぷん）',e:'😠'},{id:'f_sad',cat:'face',n:'哀（しょんぼり）',e:'😢'},{id:'f_fun',cat:'face',n:'楽（わくわく）',e:'🤩'},
+ {id:'f_happy',cat:'face',n:'喜（にっこり）',e:'😄'},{id:'f_angry',cat:'face',n:'怒（ぷんぷん）',e:'😠'},{id:'f_sad',cat:'face',n:'哀（しょんぼり）',e:'😢'},{id:'f_fun',cat:'face',n:'楽（わくわく）',e:'🤩'},{id:'f_wink',cat:'face',n:'ウインク',e:'😉'},{id:'f_surprise',cat:'face',n:'びっくり',e:'😮'},{id:'f_smug',cat:'face',n:'ドヤ顔',e:'😏'},{id:'f_shy',cat:'face',n:'てれ',e:'☺️'},
  {id:'h_cap',cat:'hat',n:'野球帽',e:'🧢',fam:'red',band:[330,25]},{id:'h_beanie',cat:'hat',n:'ニット帽',e:'🧶',fam:'blu',band:[190,250]},{id:'h_safari',cat:'hat',n:'探検隊の帽子',e:'🤠',fam:'yel',band:[15,65],ms:.12},
- {id:'h_goggle',cat:'hat',n:'ゴーグル付きキャップ',e:'🥽'},{id:'h_band',cat:'hat',n:'ヘアバンド',e:'🎽'},{id:'h_tiara',cat:'hat',n:'星のティアラ',e:'👑'},
- {id:'c_varsity',cat:'cape',n:'スタジャン',e:'🧥',fam:'blu',band:[205,265]},{id:'c_denim',cat:'cape',n:'デニムジャケット',e:'👖'},{id:'c_poncho',cat:'cape',n:'レインポンチョ',e:'☔'},{id:'c_hero',cat:'cape',n:'ヒーローマント',e:'🦸'},{id:'c_star',cat:'cape',n:'星空のケープ',e:'🌌'},
- {id:'w_adv',cat:'wear',n:'冒険者の服（マントつき）',e:'🗡️',fam:'blu',band:[190,250]},{id:'w_border',cat:'wear',n:'ボーダーシャツ',e:'👕'},{id:'w_overall',cat:'wear',n:'オーバーオール',e:'👖'},{id:'w_jersey',cat:'wear',n:'ジャージ',e:'🏃'},{id:'w_explorer',cat:'wear',n:'探検服',e:'🧭'},{id:'w_hero',cat:'wear',n:'ヒーロースーツ',e:'⭐'},
+ {id:'h_goggle',cat:'hat',n:'ゴーグル付きキャップ',e:'🥽',fam:'blu',band:[195,250]},{id:'h_band',cat:'hat',n:'ヘアバンド',e:'🎽',fam:'blu',band:[212,258]},{id:'h_tiara',cat:'hat',n:'星のティアラ',e:'👑',fam:'yel',band:[5,45]},
+ {id:'c_varsity',cat:'cape',n:'スタジャン',e:'🧥',fam:'blu',band:[205,265]},{id:'c_denim',cat:'cape',n:'デニムジャケット',e:'👖',fam:'blu',band:[195,250]},{id:'c_poncho',cat:'cape',n:'レインポンチョ',e:'☔',fam:'blu',band:[195,228]},{id:'c_hero',cat:'cape',n:'ヒーローマント',e:'🦸',fam:'red',band:[330,20]},{id:'c_star',cat:'cape',n:'星空のケープ',e:'🌌',fam:'pur',band:[232,300]},
+ {id:'w_adv',cat:'wear',n:'冒険者の服（マントつき）',e:'🗡️',fam:'blu',band:[190,250]},{id:'w_border',cat:'wear',n:'ボーダーシャツ',e:'👕',fam:'blu',band:[200,260]},{id:'w_overall',cat:'wear',n:'オーバーオール',e:'👖',fam:'blu',band:[195,250]},{id:'w_jersey',cat:'wear',n:'ジャージ',e:'🏃',fam:'gre',band:[160,205]},{id:'w_explorer',cat:'wear',n:'探検服',e:'🧭'},{id:'w_hero',cat:'wear',n:'ヒーロースーツ',e:'⭐',fam:'blu',band:[165,200]},
+ {id:'s_sneaker',cat:'shoe',n:'スニーカー',e:'👟'},{id:'s_rain',cat:'shoe',n:'長ぐつ',e:'🥾',fam:'gre',band:[85,165],ms:.1},{id:'s_fluffy',cat:'shoe',n:'もこもこブーツ',e:'⛄',fam:'ora',band:[5,38]},{id:'s_trek',cat:'shoe',n:'冒険ブーツ',e:'🥾',fam:'ora',band:[340,32]},{id:'s_skate',cat:'shoe',n:'ローラースケート',e:'🛼'},{id:'s_star',cat:'shoe',n:'星のくつ',e:'🌟',fam:'blu',band:[200,290]},
  {id:'b_town',cat:'bg',n:'夕焼けの商店街',e:'🌇'},{id:'b_night',cat:'bg',n:'夜の町と星空',e:'🌃'},{id:'b_park',cat:'bg',n:'雨上がりの公園',e:'🌈'},{id:'b_forest',cat:'bg',n:'森のひみつ基地',e:'🌲'},{id:'b_hill',cat:'bg',n:'自転車で走る丘',e:'🚲'},{id:'b_cave',cat:'bg',n:'ふしぎな洞くつ',e:'💎'},
  {id:'b_sakura',cat:'bg',n:'桜の道',e:'🌸'},{id:'b_matsuri',cat:'bg',n:'夏祭り',e:'🏮'},{id:'b_snow',cat:'bg',n:'雪の町',e:'⛄'},{id:'b_space',cat:'bg',n:'宇宙',e:'🪐'},{id:'b_beach',cat:'bg',n:'海辺の朝',e:'🏖️'},{id:'b_temple',cat:'bg',n:'神殿',e:'🏛️'}];
 /* クラスごとのモデル（部品がそろった順に追加）。tier＝HERO の段階番号（0から） */
-var KS_MODELS=[{id:'capy2',who:'me',tier:1,cls:'冒険者',lv:4,pre:'ks-capy2-',parts:['f_happy','f_angry','f_sad','f_fun','h_cap','h_beanie','h_safari','c_varsity','w_adv'],start:['h_cap','w_adv']}];
-var KS_ORDER=['wear','cape','face','hat'];
+var KS_MODELS=[{id:'capy2',who:'me',tier:1,cls:'冒険者',lv:4,pre:'ks-capy2-',parts:['f_happy','f_angry','f_sad','f_fun','f_wink','f_surprise','f_smug','f_shy','h_cap','h_beanie','h_safari','h_goggle','h_band','h_tiara','c_varsity','c_hero','c_denim','c_poncho','c_star','w_adv','w_border','w_overall','w_jersey','w_explorer','w_hero','s_sneaker','s_rain','s_fluffy','s_trek','s_skate','s_star'],start:['h_cap','w_adv']}];
+var KS_ORDER=['wear','cape','shoe','face','hat'];
+/* 背景はクラスに関係なく共通。絵ができたものを ks-bg-<id>.jpg で置き、ここに並べる */
+var KS_BG_READY=['b_town','b_night','b_park','b_forest','b_hill','b_cave','b_sakura','b_matsuri','b_snow','b_space','b_beach','b_temple'];
+function ksReady(m,id){var it=ksItem(id);if(it&&it.cat==='bg')return KS_BG_READY.indexOf(id)>=0;return !!m&&m.parts.indexOf(id)>=0;}
 var KSE_HOW={goods:'🌟パーフェクト・🌈レインボー・💜アメジスト の日にたまるよ',bg:'👑GOD の日にたまるよ',face:'🦄ユニコーンの日にたまるよ'};
 function ksItem(id){for(var i=0;i<KS_ITEMS.length;i++)if(KS_ITEMS[i].id===id)return KS_ITEMS[i];return null;}
 function ksFam(k){for(var i=0;i<KS_FAM.length;i++)if(KS_FAM[i].k===k)return KS_FAM[i];return null;}
-function ksModelFor(who,ti){for(var i=0;i<KS_MODELS.length;i++){var m=KS_MODELS[i];if(m.who===who&&m.tier===ti)return m;}return null;}
+/* 2026-11-23 案A：いまのクラスのきせかえがまだなら、それより前のクラスのきせかえ姿で表示する（ready:false のモデルは使わない） */
+function ksModelFor(who,ti){var best=null;for(var i=0;i<KS_MODELS.length;i++){var m=KS_MODELS[i];if(m.who===who&&m.tier<=ti&&m.ready!==false&&(!best||m.tier>best.tier))best=m;}return best;}
 /* きせかえ画面で使うモデル：いまのクラスにあればそれ、なければ次に用意されているクラス */
-function ksViewModel(){var ti=heroTier(lv(S.me.xp),HERO),m=ksModelFor('me',ti);if(m)return m;var best=null;KS_MODELS.forEach(function(x){if(x.who==='me'&&(!best||Math.abs(x.tier-ti)<Math.abs(best.tier-ti)))best=x;});return best;}
+function ksViewModel(){var ti=heroTier(lv(S.me.xp),HERO),m=ksModelFor('me',ti);if(m)return m;var best=null;KS_MODELS.forEach(function(x){if(x.who==='me'&&x.ready!==false&&x.tier>ti&&(!best||x.tier<best.tier))best=x;});return best;}
 function ksGl(){var k=kseS();k.gl=k.gl||{};return k.gl;}
 function ksUsed(){return Object.keys(ksGl()).length;}
 function ksOwnSet(){var o={};KS_MODELS.forEach(function(m){(m.start||[]).forEach(function(id){o[id]=1;});});var g=ksGl();for(var t in g)o[g[t]]=1;return o;}
@@ -1488,19 +1493,23 @@ function ksTint(im,it,col){var c=document.createElement('canvas');c.width=im.wid
   for(i=0;i<a.length;i+=4){if(!a[i+3])continue;hsv=ksRgb2hsv(a[i]/255,a[i+1]/255,a[i+2]/255);if(!(hsv[1]>ms&&ksInBand(hsv[0],it.band)))continue;
     var s=Math.min(1,hsv[1]/ss*sh[2]),v=Math.min(1,hsv[2]/vv*sh[3]),rgb=ksHsv2rgb(sh[1],s,v);a[i]=rgb[0]*255;a[i+1]=rgb[1]*255;a[i+2]=rgb[2]*255;}
   g.putImageData(d,0,0);return c;}
-function ksKey(m,l){var o=[m.id];KS_ORDER.forEach(function(c){o.push(c+'='+(l[c]||'')+'/'+(l[c+'C']||''));});return o.join('|');}
+function ksKey(m,l){var o=[m.id,'bg='+(l.bg||'')];KS_ORDER.forEach(function(c){o.push(c+'='+(l[c]||'')+'/'+(l[c+'C']||''));});return o.join('|');}
 /* 1枚に重ねて dataURL を返す（同じ組み合わせは使い回す） */
 function ksCompose(m,l){var key=ksKey(m,l);if(KSC[key])return Promise.resolve(KSC[key]);
   var ids=['base'].concat(KS_ORDER.map(function(c){return (l[c]&&m.parts.indexOf(l[c])>=0)?l[c]:'';}));
   return Promise.all(ids.map(function(id){return id?ksLoad(m.pre+id+'.png'):Promise.resolve(null);})).then(function(ims){
-    if(!ims[0])return null;var c=document.createElement('canvas');c.width=ims[0].width;c.height=ims[0].height;var g=c.getContext('2d');g.drawImage(ims[0],0,0);
+    if(!ims[0])return null;var bgi=(l.bg&&KS_BG_READY.indexOf(l.bg)>=0)?ksLoad('ks-bg-'+l.bg+'.jpg'):Promise.resolve(null);
+    return bgi.then(function(bg){var c=document.createElement('canvas');c.width=ims[0].width;c.height=ims[0].height;var g=c.getContext('2d');
+    if(bg){var r=Math.max(c.width/bg.width,c.height/bg.height),w=bg.width*r,h=bg.height*r;g.save();var R=c.width*.08;g.beginPath();g.moveTo(R,0);g.arcTo(c.width,0,c.width,c.height,R);g.arcTo(c.width,c.height,0,c.height,R);g.arcTo(0,c.height,0,0,R);g.arcTo(0,0,c.width,0,R);g.closePath();g.clip();g.drawImage(bg,(c.width-w)/2,(c.height-h)/2,w,h);g.restore();}
+    g.drawImage(ims[0],0,0);
     for(var i=1;i<ims.length;i++){if(!ims[i])continue;var cat=KS_ORDER[i-1];g.drawImage(ksTint(ims[i],ksItem(ids[i]),l[cat+'C']),0,0);}
-    var u=c.toDataURL('image/png');KSC[key]=u;return u;});}
+    var u=c.toDataURL('image/png');KSC[key]=u;return u;});});}
 /* ボードのアバター：いまのクラスにモデルがあれば重ね着の絵にする */
 function ksHeroSrc(ti){var m=ksModelFor('me',ti);if(!m)return '';var l=ksLook(),key=ksKey(m,l);if(KSC[key])return KSC[key];
   ksCompose(m,l).then(function(u){if(!u)return;var e=document.getElementById('ksHeroImg');if(e)e.src=u;});return '';}
 /* ===== ガチャ ===== */
 function ksPool(type){var m=ksViewModel();if(!m)return [];var own=ksOwnSet(),p=[];
+  if(!type||type==='bg')KS_BG_READY.forEach(function(id){if(!own[id])p.push({id:id,w:3});});
   m.parts.forEach(function(id){var it=ksItem(id);if(!it)return;if(type&&ksType(id)!==type)return;if(!own[id])p.push({id:id,w:3});else if(it.band)KS_FAM.forEach(function(f){if(f.k!==it.fam&&!own[id+'@'+f.k])p.push({id:id+'@'+f.k,w:1});});});
   return p;}
 function ksEntryName(e){var p=e.split('@'),it=ksItem(p[0]);if(!it)return e;return p[1]?(it.n+' の '+ksFam(p[1]).n):it.n;}
@@ -1524,22 +1533,22 @@ function ksSetC(cat,v){var l=ksLook();l[cat+'C']=v;save();maybeSync();ksOpenRend
 function ksOpenRender(){var el=document.getElementById('ksBody');if(!el||document.getElementById('ksView').style.display!=='block')return;
   var m=ksViewModel(),l=ksLook(),own=ksOwnSet(),LB=kseLeftBy(),ti=heroTier(lv(S.me.xp),HERO),g=HERO[m?m.tier:ti]||HERO[0];
   if(!m){el.innerHTML='<div class="ks-note">きせかえは じゅんび中だよ</div>';return;}
-  var note=(m.tier!==ti)?'<div class="ks-note">🔜 Lv.'+m.lv+'「'+m.cls+'」になると、ボードのアバターも この姿になるよ</div>':'';
-  var GB=[['goods','🎁 グッズガチャ','ぼうし・うわぎ・ふく・色'],['bg','🏞️ 背景ガチャ','はいけい'],['face','😊 表情ガチャ','かお']];
+  var note=(m.tier>ti)?'<div class="ks-note">🔜 Lv.'+m.lv+'「'+m.cls+'」になると、ボードのアバターも この姿になるよ</div>':(m.tier<ti?'<div class="ks-note">✨ 「'+HERO[ti].cls+'」のきせかえは じゅんび中。いまは「'+m.cls+'」のすがたで きせかえできるよ</div>':'');
+  var GB=[['goods','🎁 グッズガチャ','ぼうし・うわぎ・ふく・くつ・色'],['bg','🏞️ 背景ガチャ','はいけい'],['face','😊 表情ガチャ','かお']];
   var h='<div class="ks-prev" style="background:'+g.bg+'"><img id="ksPrevImg" alt=""></div>'+note
     +'<div class="ks-gbs">'+GB.map(function(b){var n=LB[b[0]],pl=ksPool(b[0]).length,dis=!(n&&pl);
       return '<button class="ks-gb '+b[0]+'"'+(dis?' disabled':'')+' onclick="ksSpin(\''+b[0]+'\')"><b>'+b[1]+'</b><span>券 '+n+'まい</span><i>'+(n&&!pl?(b[0]==='bg'?'絵をじゅんび中':'ぜんぶ持ってる！'):b[2])+'</i></button>';}).join('')+'</div>'
     +'<div class="ks-note" style="background:#f6f0ff;color:#6a4a9e">🎁グッズ券＝🌟🌈💜の日 ／ 🏞️背景券＝👑の日 ／ 😊表情券＝🦄の日 に1まいずつ</div>'
     +'<div class="ks-tabs">'+KS_CAT.map(function(c){return '<button class="'+(_ksTab===c.k?'on':'')+'" onclick="_ksTab=\''+c.k+'\';ksOpenRender()">'+c.e+'<span>'+c.n+'</span></button>';}).join('')+'</div>';
   var items=KS_ITEMS.filter(function(it){return it.cat===_ksTab;}),cur=l[_ksTab]||'';
-  var none=(_ksTab==='face')?'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\'face\',\'\')"><b>🙂</b><span>ふつう</span></button>':(_ksTab==='bg'?'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\'bg\',\'\')"><b>🎨</b><span>クラスの色</span></button>':'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\''+_ksTab+'\',\'\')"><b>✖</b><span>なし</span></button>');
-  h+='<div class="ks-grid">'+none+items.map(function(it){var ready=m.parts.indexOf(it.id)>=0,ok=own[it.id]&&ready;
+  var none=(_ksTab==='face')?'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\'face\',\'\')"><b>🙂</b><span>ふつう</span></button>':(_ksTab==='bg'?'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\'bg\',\'\')"><b>🎨</b><span>クラスの色</span></button>':'<button class="ks-it'+(cur?'':' on')+'" onclick="ksSet(\''+_ksTab+'\',\'\')"><b>'+(_ksTab==='shoe'?'👞':'✖')+'</b><span>'+(_ksTab==='shoe'?'いつもの':'なし')+'</span></button>');
+  h+='<div class="ks-grid">'+none+items.map(function(it){var ready=ksReady(m,it.id),ok=own[it.id]&&ready;
       if(ok)return '<button class="ks-it'+(cur===it.id?' on':'')+'" onclick="ksSet(\''+_ksTab+'\',\''+it.id+'\')"><b>'+it.e+'</b><span>'+esc(it.n)+'</span></button>';
       return '<div class="ks-it lock"><b>'+(ready?'🔒':'⏳')+'</b><span>'+(ready?'？？？':esc(it.n))+'</span><i>'+(ready?'ガチャで出るよ':'じゅんび中')+'</i></div>';}).join('')+'</div>';
   var it=ksItem(cur);
   if(it&&it.band){var cv=l[_ksTab+'C']||'';h+='<div class="ks-col"><div class="ks-col-h">🎨 '+esc(it.n)+' の色</div><div class="ks-sws"><button class="ks-sw'+(cv?'':' on')+'" onclick="ksSetC(\''+_ksTab+'\',\'\')">もとの色</button>'
       +KS_FAM.filter(function(f){return f.k!==it.fam;}).map(function(f){var have=own[it.id+'@'+f.k];return '<div class="ks-fam'+(have?'':' lock')+'"><span>'+f.n+(have?'':' 🔒')+'</span>'+(have?f.sh.map(function(s,i){var v=f.k+':'+i;return '<button class="ks-dot'+(cv===v?' on':'')+'" title="'+s[0]+'" style="background:'+ksSwatch(s)+'" onclick="ksSetC(\''+_ksTab+'\',\''+v+'\')"></button>';}).join(''):'')+'</div>';}).join('')+'</div></div>';}
-  if(_ksTab==='bg')h+='<div class="ks-note">🏞️ はいけいの絵は じゅんび中。できたら ガチャに入るよ</div>';
+  if(_ksTab==='bg'&&!KS_BG_READY.length)h+='<div class="ks-note">🏞️ はいけいの絵は じゅんび中。できたら ガチャに入るよ</div>';
   el.innerHTML=h;
   ksCompose(m,l).then(function(u){var e=document.getElementById('ksPrevImg');if(e&&u)e.src=u;});}
 
