@@ -548,6 +548,56 @@
 .kj-bk-chips span.on{background:#2f9e5e;border-color:#2f9e5e;color:#fff}
 .kj-bk-chips.sg{grid-template-columns:repeat(4,1fr)}
 .kj-sw{width:100%;font:inherit;font-size:1rem;padding:8px 10px;border:2px solid #f0b8b3;border-radius:10px;margin:6px 0}
+  /* 🟥 ケータイお休みルール（2026-11-28 改定：黒カビ・ゾンビ） */
+  #gdFx{position:fixed;inset:0;pointer-events:none;z-index:38;overflow:hidden}
+  #gdFx.gd-dark2{box-shadow:inset 0 0 90px 24px rgba(60,30,90,.4)}
+  #gdBg{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0;transition:opacity 2s;
+    background:radial-gradient(ellipse 38% 28% at 8% 18%,rgba(20,22,16,.75),transparent 70%),radial-gradient(ellipse 30% 24% at 92% 30%,rgba(26,27,20,.7),transparent 70%),
+    radial-gradient(ellipse 36% 30% at 22% 72%,rgba(24,22,16,.72),transparent 70%),radial-gradient(ellipse 34% 26% at 80% 86%,rgba(18,20,14,.72),transparent 70%),
+    radial-gradient(ellipse 22% 16% at 55% 8%,rgba(30,30,22,.6),transparent 70%),radial-gradient(ellipse 20% 18% at 50% 55%,rgba(34,34,26,.45),transparent 70%),
+    linear-gradient(180deg,rgba(78,74,58,.55),rgba(52,50,40,.7))}
+  #gdBg.g{background:radial-gradient(ellipse 38% 28% at 8% 18%,rgba(70,110,40,.75),transparent 70%),radial-gradient(ellipse 30% 24% at 92% 30%,rgba(90,125,45,.7),transparent 70%),
+    radial-gradient(ellipse 36% 30% at 22% 72%,rgba(60,100,35,.72),transparent 70%),radial-gradient(ellipse 34% 26% at 80% 86%,rgba(80,115,40,.72),transparent 70%),
+    radial-gradient(ellipse 22% 16% at 55% 8%,rgba(100,135,55,.6),transparent 70%),radial-gradient(ellipse 20% 18% at 50% 55%,rgba(95,130,50,.45),transparent 70%),
+    linear-gradient(180deg,rgba(140,160,90,.5),rgba(105,130,70,.62))}
+  body.gd-on .wrap{position:relative;z-index:1}
+  .gd-mold{position:absolute;border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(14,15,11,.95) 0 26%,rgba(32,34,26,.8) 40%,rgba(58,58,44,.4) 56%,transparent 72%);animation:gdGrow 6s ease-in-out infinite}
+  .gd-mold::before,.gd-mold::after{content:'';position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(16,17,13,.9) 0 34%,rgba(40,40,30,.45) 52%,transparent 72%)}
+  .gd-mold::before{width:42%;height:42%;left:-18%;top:58%}
+  .gd-mold::after{width:30%;height:30%;right:-12%;top:-6%}
+  .gd-mold.g{background:radial-gradient(circle at 50% 50%,rgba(52,92,30,.95) 0 26%,rgba(88,130,48,.8) 40%,rgba(140,170,80,.45) 56%,transparent 72%)}
+  .gd-mold.g::before,.gd-mold.g::after{background:radial-gradient(circle,rgba(60,100,34,.9) 0 34%,rgba(120,155,70,.45) 52%,transparent 72%)}
+  @keyframes gdGrow{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.1) rotate(8deg)}}
+  .gd-sl,.gd-zw{position:absolute;left:0;top:0;will-change:transform}
+  .gd-sli{display:block;width:100%;height:100%;opacity:.9;animation:gdOoze 2.6s ease-in-out infinite alternate;filter:drop-shadow(0 3px 3px rgba(20,40,5,.35))}
+  @keyframes gdOoze{0%{transform:scale(1,1) rotate(-4deg)}50%{transform:scale(1.14,.86) rotate(3deg)}100%{transform:scale(.9,1.12) rotate(-2deg)}}
+  .gd-zi{display:block;width:100%;height:100%;opacity:.95;animation:gdSway 1.6s ease-in-out infinite;filter:drop-shadow(0 4px 3px rgba(0,0,0,.35))}
+  .gd-zi.fl{transform:scaleX(-1)}
+  .gd-zi.fl{animation-name:gdSwayF}
+  @keyframes gdSway{0%,100%{transform:rotate(-5deg) translateY(0)}50%{transform:rotate(5deg) translateY(-3px)}}
+  @keyframes gdSwayF{0%,100%{transform:scaleX(-1) rotate(-5deg) translateY(0)}50%{transform:scaleX(-1) rotate(5deg) translateY(-3px)}}
+  .gd-zi .zl{transform-box:fill-box;transform-origin:50% 0;animation:gdLeg 1.6s ease-in-out infinite}
+  .gd-zi .zl2{animation-delay:-.8s}
+  @keyframes gdLeg{0%,100%{transform:rotate(-16deg)}50%{transform:rotate(16deg)}}
+  .gd-zi .za{transform-box:fill-box;transform-origin:0 50%;animation:gdArm 1.6s ease-in-out infinite}
+  .gd-zi .za2{animation-delay:-.5s}
+  @keyframes gdArm{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(7deg)}}
+  .gd-zi .zh{transform-box:fill-box;transform-origin:50% 100%;animation:gdHead 3.2s ease-in-out infinite}
+  @keyframes gdHead{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(10deg)}}
+  #gdFx.gd-dark-g{box-shadow:inset 0 0 90px 24px rgba(50,90,20,.38)}
+  #gdFx.gd-dark-k{box-shadow:inset 0 0 90px 24px rgba(30,32,36,.45)}
+  @media (prefers-reduced-motion:reduce){.gd-sl,.gd-zw{animation-duration:90s!important}}
+  .gd-z{position:absolute;opacity:.9;line-height:1;animation:gdShuf 3s ease-in-out infinite;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+  @keyframes gdShuf{0%,100%{transform:translateX(0) rotate(-6deg)}25%{transform:translateX(-5px) rotate(5deg)}75%{transform:translateX(5px) rotate(-4deg)}}
+  .gd-card{border:2.5px solid #7a3fb0;background:linear-gradient(180deg,#f3ecfb,#e7dcf6);text-align:center}
+  .gd-card.free{border-color:#34a853;background:#eef8f0}
+  .gd-card.warn{border-color:#5a5a48;background:#f1efe6}
+  .gd-card.req{border-color:#ff7a59;background:#fff3ee}
+  .gd-h{font-weight:900;font-size:1.05rem;margin-bottom:4px}
+  .gd-s{font-size:.82rem;font-weight:700;line-height:1.6;color:#4a3a5a}
+  .gd-meter{margin-top:8px;font-weight:900;font-size:1rem;color:#5a2a8a}
+  .gd-card .btn{margin-top:8px}
+  .gd-row{display:flex;gap:6px;margin-top:8px}.gd-row select{flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--line);font-size:.9rem;font-weight:700}
 </style>
 </head>
 <body>
@@ -561,6 +611,7 @@
   <div id="seasonStub" hidden><span id="seasonName"></span><span id="seasonProg"></span><span id="seasonGoal"></span><span id="seasonReward"></span><div id="seasonFill"></div></div>
 
   <div class="tabpane" id="tab-home">
+  <div id="gdBar"></div>
   <div id="stageTop"></div>
   <div id="stage"></div>
   <div class="card rwcard">
@@ -576,7 +627,6 @@
     <div id="kseArea"></div>
     <div id="rewardLog"></div>
   </div>
-  <div id="flJump"></div>
   </div>
 
   <div class="tabpane" id="tab-hw" hidden>
@@ -604,11 +654,14 @@
   <div class="tabpane" id="tab-commit" hidden>
   <div id="passCard"></div>
   <div id="calRuleCard"></div>
+  <div id="gdReqCard"></div>
   <a class="kiroku-link" style="margin:2px auto 14px" href="./kiroku.html">📈 がんばり記録を見る</a>
+  <div id="flJump"></div>
   </div>
 
   <div class="tabpane" id="tab-rules" hidden>
   <div id="rulesCard"></div>
+  <div id="gdRuleCard"></div>
   </div>
 </div>
 <nav class="tabbar" id="tabbar">
@@ -737,6 +790,13 @@
     <p class="hint">機能を追加した日など、判定が実際とずれた過去の日を書きかえます。今日の分は自動で決まります。</p>
     <div class="two"><div><input id="d_clDate" type="date"></div><div><select id="d_clLv"><option value="0">お休み</option><option value="1">👍 ナイス</option><option value="2">🌟 パーフェクト</option><option value="3">🌈 レインボー</option><option value="4">💜 アメジスト</option><option value="5">👑 GOD 神セレブレーション</option><option value="6">🦄 ユニコーン</option></select></div></div>
     <button class="btn gray" onclick="clEdit()">📅 この日の判定を書きかえる</button>
+    <label style="margin-top:12px">🟥 ケータイお休みルール</label>
+    <p class="hint">👍ナイスなしが続く日数・🌟パーフェクトなしが続く日数のどちらかに届いたら、次の日はケータイお休み（スマホ時間のお願いも止まる）。ナイスなしで入ったら👍ナイス、パーフェクトなしで入ったら🌟パーフェクトに、その日のうちに届けば解除。あと1日でお休みになる「リーチの日」は、15時からカビがふえはじめ（👍ナイスまでは緑カビ、ナイスのあとパーフェクトまでは黒カビ）、20時をすぎると一気にふえて、ボードの地の色もカビの色になっていきます（文字では知らせません）。パパのリーチカードは20時から出ます。ケータイお休みの日は、ナイスなしで入ったら緑ヘドロ、パーフェクトなしで入ったらゾンビがボードの上を横切ります（タップのじゃまはしません）。「使う」にするとルールタブに決まりが出ます。娘と読んで合意してから開始日を入れてください（開始日が空なら判定しません）。</p>
+    <div class="two"><div><label>ルール</label><select id="d_gOn"><option value="0">使わない</option><option value="1">使う</option></select></div><div><label>開始日（この日の結果から数える）</label><input id="d_gStart" type="date"></div></div>
+    <div class="two"><div><label>👍ナイスなしが何日で</label><select id="d_gNn"><option value="1">1日</option><option value="2">2日</option><option value="0">使わない</option></select></div><div><label>🌟パーフェクトなしが何日で</label><select id="d_gPn"><option value="3">3日</option><option value="2">2日</option><option value="4">4日</option><option value="0">使わない</option></select></div></div>
+    <label style="margin-top:6px">おやすみ日（大会・発熱・家族の行事など。連続の数に入れない）　※娘の申請はコミットタブで承認できます</label>
+    <div class="two"><div><input id="d_gEx" type="date"></div><div style="flex:0 0 auto"><button class="btn gray" style="width:auto;padding:8px 12px" onclick="gdExAdd()">追加</button></div></div>
+    <div id="gdExList" class="hint"></div>
     <label style="margin-top:10px">🔔 申請をパパのスマホにプッシュ通知（ntfy アプリ）</label>
     <p class="hint">iPhone に無料アプリ「ntfy」を入れ、下の通知トピック名を購読すると、娘が申請した瞬間に通知が届きます。トピック名は合言葉なので「生成」で作った推測されにくい名前を使ってください。</p>
     <div class="two"><div><input id="d_ntfy" placeholder="例: qb-xxxxxxxx"></div><div style="flex:0 0 auto"><button class="btn gray" style="width:auto;padding:8px 12px" onclick="genNtfy()">生成</button></div></div>
@@ -1456,13 +1516,15 @@ var KS_ITEMS=[
  {id:'h_cap',cat:'hat',n:'野球帽',e:'🧢',fam:'red',band:[330,25]},{id:'h_beanie',cat:'hat',n:'ニット帽',e:'🧶',fam:'blu',band:[190,250]},{id:'h_safari',cat:'hat',n:'探検隊の帽子',e:'🤠',fam:'yel',band:[15,65],ms:.12},
  {id:'h_goggle',cat:'hat',n:'ゴーグル付きキャップ',e:'🥽',fam:'blu',band:[195,250]},{id:'h_band',cat:'hat',n:'ヘアバンド',e:'🎽',fam:'blu',band:[212,258]},{id:'h_tiara',cat:'hat',n:'星のティアラ',e:'👑',fam:'yel',band:[5,45]},{id:'h_helmet',cat:'hat',n:'ライト付きヘルメット',e:'⛑️',fam:'red',band:[335,15]},
  {id:'c_varsity',cat:'cape',n:'スタジャン',e:'🧥',fam:'blu',band:[205,265]},{id:'c_denim',cat:'cape',n:'デニムジャケット',e:'👖',fam:'blu',band:[195,250]},{id:'c_poncho',cat:'cape',n:'レインポンチョ',e:'☔',fam:'blu',band:[195,228]},{id:'c_hero',cat:'cape',n:'ヒーローマント',e:'🦸',fam:'red',band:[330,20]},{id:'c_star',cat:'cape',n:'星空のケープ',e:'🌌',fam:'pur',band:[232,300]},
- {id:'w_adv',cat:'wear',n:'冒険者の服（マントつき）',e:'🗡️',fam:'blu',band:[190,250]},{id:'w_border',cat:'wear',n:'ボーダーシャツ',e:'👕',fam:'blu',band:[200,260]},{id:'w_overall',cat:'wear',n:'オーバーオール',e:'👖',fam:'blu',band:[195,250]},{id:'w_jersey',cat:'wear',n:'ジャージ',e:'🏃',fam:'gre',band:[160,205]},{id:'w_explorer',cat:'wear',n:'探検服',e:'🧭'},{id:'w_hero',cat:'wear',n:'ヒーロースーツ',e:'⭐',fam:'blu',band:[165,200]},{id:'w_scout',cat:'wear',n:'探検隊の服',e:'🦺',fam:'yel',band:[32,58]},{id:'w_guard',cat:'wear',n:'守り手の服',e:'🛡️',fam:'blu',band:[200,240]},
+ {id:'w_adv',cat:'wear',n:'冒険者の服（マントつき）',e:'🗡️',fam:'blu',band:[190,250]},{id:'w_border',cat:'wear',n:'ボーダーシャツ',e:'👕',fam:'blu',band:[200,260]},{id:'w_overall',cat:'wear',n:'オーバーオール',e:'👖',fam:'blu',band:[195,250]},{id:'w_jersey',cat:'wear',n:'ジャージ',e:'🏃',fam:'gre',band:[160,205]},{id:'w_explorer',cat:'wear',n:'探検服',e:'🧭'},{id:'w_hero',cat:'wear',n:'ヒーロースーツ',e:'⭐',fam:'blu',band:[165,200]},{id:'w_scout',cat:'wear',n:'探検隊の服',e:'🦺',fam:'yel',band:[32,58]},{id:'w_guard',cat:'wear',n:'守り手の服',e:'🛡️',fam:'blu',band:[200,240]},{id:'w_brave',cat:'wear',n:'勇者の服',e:'🦸',fam:'red',band:[340,15]},{id:'w_psy',cat:'wear',n:'超能力の服',e:'🔮',fam:'pur',band:[255,305]},
  {id:'s_sneaker',cat:'shoe',n:'スニーカー',e:'👟'},{id:'s_rain',cat:'shoe',n:'長ぐつ',e:'🥾',fam:'gre',band:[85,165],ms:.1},{id:'s_fluffy',cat:'shoe',n:'もこもこブーツ',e:'⛄',fam:'ora',band:[5,38]},{id:'s_trek',cat:'shoe',n:'冒険ブーツ',e:'🥾',fam:'ora',band:[340,32]},{id:'s_skate',cat:'shoe',n:'ローラースケート',e:'🛼'},{id:'s_star',cat:'shoe',n:'星のくつ',e:'🌟',fam:'blu',band:[200,290]},
  {id:'b_town',cat:'bg',n:'夕焼けの商店街',e:'🌇'},{id:'b_night',cat:'bg',n:'夜の町と星空',e:'🌃'},{id:'b_park',cat:'bg',n:'雨上がりの公園',e:'🌈'},{id:'b_forest',cat:'bg',n:'森のひみつ基地',e:'🌲'},{id:'b_hill',cat:'bg',n:'自転車で走る丘',e:'🚲'},{id:'b_cave',cat:'bg',n:'ふしぎな洞くつ',e:'💎'},
  {id:'b_sakura',cat:'bg',n:'桜の道',e:'🌸'},{id:'b_matsuri',cat:'bg',n:'夏祭り',e:'🏮'},{id:'b_snow',cat:'bg',n:'雪の町',e:'⛄'},{id:'b_space',cat:'bg',n:'宇宙',e:'🪐'},{id:'b_beach',cat:'bg',n:'海辺の朝',e:'🏖️'},{id:'b_temple',cat:'bg',n:'神殿',e:'🏛️'}];
 /* クラスごとのモデル（部品がそろった順に追加）。tier＝HERO の段階番号（0から） */
 var KS_MODELS=[{id:'capy2',who:'me',tier:1,cls:'冒険者',lv:4,pre:'ks-capy2-',parts:['f_happy','f_angry','f_sad','f_fun','f_wink','f_surprise','f_smug','f_shy','h_cap','h_beanie','h_safari','h_goggle','h_band','h_tiara','c_varsity','c_hero','c_denim','c_poncho','c_star','w_adv','w_border','w_overall','w_jersey','w_explorer','w_hero','s_sneaker','s_rain','s_fluffy','s_trek','s_skate','s_star'],start:['h_cap','w_adv']},{id:'capy3',who:'me',tier:2,cls:'探検隊',lv:7,pre:'ks-capy3-',cut:.87,bands:{h_goggle:0,w_border:0,s_rain:[335,25]},parts:['f_happy','f_angry','f_sad','f_fun','f_wink','f_surprise','f_smug','f_shy','h_cap','h_beanie','h_safari','h_goggle','h_band','h_tiara','c_varsity','c_denim','c_poncho','c_hero','c_star','w_scout','w_adv','w_border','w_overall','w_jersey','w_explorer','w_hero','s_sneaker','s_rain','s_fluffy','s_trek','s_skate','s_star'],start:['h_cap','w_scout']}
-,{id:'capy4',who:'me',tier:3,cls:'守り手',lv:10,pre:'ks-capy4-',cut:.86,bands:{h_goggle:0,c_varsity:[335,8],c_poncho:0,w_border:0,w_jersey:0,w_hero:[205,240],s_rain:[335,25]},parts:['f_happy','f_angry','f_sad','f_fun','f_wink','f_surprise','f_smug','f_shy','h_cap','h_beanie','h_safari','h_goggle','h_band','h_tiara','h_helmet','c_varsity','c_hero','c_denim','c_poncho','c_star','w_adv','w_border','w_overall','w_jersey','w_explorer','w_hero','w_scout','w_guard','s_sneaker','s_rain','s_fluffy','s_trek','s_skate','s_star'],start:['h_helmet','w_guard']}];
+,{id:'capy4',who:'me',tier:3,cls:'守り手',lv:10,pre:'ks-capy4-',cut:.86,bands:{h_goggle:0,c_varsity:[335,8],c_poncho:0,w_border:0,w_jersey:0,w_hero:[205,240],s_rain:[335,25]},parts:['f_happy','f_angry','f_sad','f_fun','f_wink','f_surprise','f_smug','f_shy','h_cap','h_beanie','h_safari','h_goggle','h_band','h_tiara','h_helmet','c_varsity','c_hero','c_denim','c_poncho','c_star','w_adv','w_border','w_overall','w_jersey','w_explorer','w_hero','w_scout','w_guard','s_sneaker','s_rain','s_fluffy','s_trek','s_skate','s_star'],start:['h_helmet','w_guard']}
+,{id:'capy5',who:'me',tier:4,cls:'勇者',lv:13,pre:'ks-capy5-',bands:{h_goggle:0,c_varsity:[135,175],w_jersey:[120,160]},parts:['f_happy','f_angry','f_sad','f_fun','f_wink','f_surprise','f_smug','f_shy','h_cap','h_beanie','h_safari','h_goggle','h_band','h_tiara','h_helmet','c_varsity','c_hero','c_denim','c_poncho','c_star','w_adv','w_border','w_overall','w_jersey','w_explorer','w_hero','w_scout','w_guard','w_brave','s_sneaker','s_rain','s_fluffy','s_trek','s_skate','s_star'],start:['h_helmet','w_brave']}
+,{id:'capy6',who:'me',tier:5,cls:'超能力の見習い',lv:16,pre:'ks-capy6-',bands:{h_goggle:0,c_varsity:[325,10],w_jersey:[105,145],w_hero:[205,240],s_fluffy:[335,15]},parts:['f_happy','f_angry','f_sad','f_fun','f_wink','f_surprise','f_smug','f_shy','h_cap','h_beanie','h_safari','h_goggle','h_band','h_tiara','h_helmet','c_varsity','c_hero','c_denim','c_poncho','c_star','w_adv','w_border','w_overall','w_jersey','w_explorer','w_hero','w_scout','w_guard','w_brave','w_psy','s_sneaker','s_rain','s_fluffy','s_trek','s_skate','s_star'],start:['h_helmet','w_psy']}];
 var KS_ORDER=['wear','cape','shoe','face','hat'];
 /* 背景はクラスに関係なく共通。絵ができたものを ks-bg-<id>.jpg で置き、ここに並べる */
 var KS_BG_READY=['b_town','b_night','b_park','b_forest','b_hill','b_cave','b_sakura','b_matsuri','b_snow','b_space','b_beach','b_temple'];
@@ -1774,7 +1836,7 @@ function renderPass(){var el=document.getElementById('passCard');if(!el)return;
     :lvl===2?(isPapa?'<div class="ps-msg">🌟 今日はパーフェクト・あと'+(2-plus)+'つ（'+PL+'）でレインボー</div>':'<div class="ps-msg">🌟 パーフェクト！<br><span style="font-size:.8rem">あと'+(2-plus)+'つ（'+PL+'）で 🌈レインボー</span></div>')
     :lvl===1?(isPapa?'<div class="ps-msg">👍 今日はナイス・あと1つでパーフェクト</div>':'<div class="ps-msg">👍 ナイス！あと1つでパーフェクト🌟</div>')
     :'<div class="ps-tip">2つで👍ナイス・3つで🌟パーフェクト</div>';
-  window._passN=n;setTimeout(renderTabs,0);
+  window._passN=n;_gdN=n;setTimeout(renderTabs,0);
   el.innerHTML='<div class="card pscard'+(all?' on':'')+'"><div class="v-h"><span>🎯 今日のコミットライン</span><span class="v-count">'+n+' / 3</span></div><div class="ps-line">3つのわくをクリア（くわしくは📋ルールのタブ）</div>'+rowsH+msg+bonusHTML(n,all,isPapa)+'</div>';
   bonusCheer(isPapa);
   if(lvl&&!isPapa){try{var key='qb_passcheer',c=JSON.parse(localStorage.getItem(key)||'{}'),td=qbTodayStr(),ck=td+':'+(lvl>=2?'all':'nice');
@@ -1942,6 +2004,7 @@ function bankCarry(od){if(!od||!S.cfg.bonusOn)return;var L=(S.bonusLog||{})[od];
   var start=(S.bank&&S.bank.d===od)?_num(S.bank.m):bankStart(),m=Math.max(0,start+_num(L.e)-_num(L.g));S.bank={m:m,d:today(),prev:od};}
 function bonusAvail(e){var b=bonusDay();return Math.max(0,bankStart()+e-b.grant);}
 function bonusHTML(n,all,isPapa){_bonusN=n;_bonusAll=all;if(!S.cfg.bonusOn)return '';
+  if(!isPapa&&window.gdLocked&&gdLocked())return '<div class="ps-bonus req"><div class="ps-bh">🧟 今日はケータイお休みの日</div><div class="ps-bs">解除の条件をクリアしたら、スマホ時間のお願いができるよ（ためた時間は消えないよ）</div></div>';
   var e=bonusEarned(n,all),b=bonusDay(),bk=bankStart(),av=bonusAvail(e),left=Math.max(0,av-b.req),per=+S.cfg.bonusPer||0,ab=+S.cfg.bonusAll||0,h='',cls='ps-bonus';
   try{if(S.day&&S.day.date===today()){var L=(S.bonusLog||{})[today()];if(!L||_num(L.e)!==e){bonusLogSet(e,b.grant);save();}}}catch(_e){}
   var src=(bk?'貯金 '+bk+'分＋':'')+'今日 '+e+'分'+(b.grant?'−解放ずみ '+b.grant+'分':'');
@@ -1965,7 +2028,7 @@ function bonusHTML(n,all,isPapa){_bonusN=n;_bonusAll=all;if(!S.cfg.bonusOn)retur
     if(e>0&&!all)h+='<div class="ps-bs">コミットラインあと1つで +'+(per+((n+1===_bonusRows)?ab:0))+'分</div>';
   }
   return '<div class="'+cls+'">'+h+'</div>';}
-function bonusRequest(part){var e=bonusEarned(_bonusN,_bonusAll),b=bonusDay(),left=Math.max(0,bonusAvail(e)-b.req);if(left<=0)return;
+function bonusRequest(part){if(window.gdLocked&&gdLocked())return;var e=bonusEarned(_bonusN,_bonusAll),b=bonusDay(),left=Math.max(0,bonusAvail(e)-b.req);if(left<=0)return;
   var amt=left;if(part){var v=prompt('何分お願いする？（のこりは貯金して、あした以降に使えるよ）',String(Math.min(left,30)));if(v===null)return;amt=Math.max(1,Math.min(left,parseInt(v,10)||0));if(!(amt>0))return;}
   rollover();S.day.bonus={req:b.req+amt,reqAt:Date.now(),grant:b.grant,grantAt:b.grantAt,last:(S.day.bonus&&S.day.bonus.last)||null};bonusLogSet(e,b.grant);save();maybeSync();render();showCheer('📱 パパにお願いしたよ！（+'+(b.req+amt)+'分）'+(amt<left?' のこり '+(left-amt)+'分は貯金':''));sTick();bonusNotify(b.req+amt);}
 /* プッシュ通知（ntfy.sh）：トピック名を購読したパパのスマホに即時通知。失敗しても申請自体はボードに残る */
@@ -2224,13 +2287,13 @@ function restoreAuto(){var b;try{b=JSON.parse(localStorage.getItem('qb_backup')|
 function restoreUndo(){var u;try{u=JSON.parse(localStorage.getItem('qb_undo')||'null');}catch(e){}if(!u||!u.s){alert('取り消せる操作がありません');return;}if(!confirm('直前の状態（'+_fmtTs(u.t)+'）に戻します。よろしいですか？'))return;if(restoreFrom(u.s)){alert('直前の状態に戻しました');dadClose();}}
 
 /* ---- two-device sync (Firebase Realtime DB) ---- */
-function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,phw:S.phw,bank:S.bank,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,kj:S.kj,rd:S.rd,cday:S.cday,kse:S.kse,cfgVer:S.cfgVer};}
+function snapshotState(){return {me:S.me,pa:S.pa,cfg:S.cfg,season:S.season,day:S.day,prog:S.prog,rewards:S.rewards,history:S.history,photoDays:S.photoDays,reactions:S.reactions,papaHistory:S.papaHistory,homework:S.homework,phw:S.phw,bank:S.bank,hwAllSig:S.hwAllSig,bonusLog:S.bonusLog,clog:S.clog,clp:S.clp,kj:S.kj,rd:S.rd,cday:S.cday,kse:S.kse,cfgVer:S.cfgVer,gd:S.gd};}
 /* 2026-11-22：同期の巻き戻し対策。
    以前は「最後に送った端末の状態で全部上書き」だったので、しばらく通信が切れていた端末（古い状態のまま）が
    日付が変わった時などに自動で送信すると、ほかの端末の新しい記録（パパの宿題のOKなど）が消えていた。
    いまは「前回そろった状態（base）」と「サーバーの今」と「この端末の今」をくらべ、変わった所だけを合わせて送る（3方向マージ）。
    送信はトランザクション（サーバーの最新を見てから書く仕組み）で行うので、古い状態で上書きできない。 */
-var SKEYS=['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','phw','bank','hwAllSig','bonusLog','clog','clp','kj','rd','cday','kse','cfgVer'];
+var SKEYS=['me','pa','cfg','season','day','prog','rewards','history','photoDays','reactions','papaHistory','homework','phw','bank','hwAllSig','bonusLog','clog','clp','kj','rd','cday','kse','cfgVer','gd'];
 function _sEmp(x){return x===undefined||x===null||(typeof x==='object'&&(Array.isArray(x)?x.length===0:Object.keys(x).length===0));}
 function _sObj(x){return !!x&&typeof x==='object'&&!Array.isArray(x);}
 function _sEq(a,b){if(a===b)return true;if(_sEmp(a)&&_sEmp(b))return true;if(!a||!b||typeof a!=='object'||typeof b!=='object')return false;
@@ -2513,6 +2576,166 @@ render();
 if(SYNC.creds)initSync();
 if(window._qbJoined){showCheer('✅ このブラウザも同期しました（パパ表示）');}
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+</script>
+<script>
+/* ===== 🟥 ケータイお休みルール（2026-11-28 改定） =====
+   2つのルール（どちらかに届いたら、次の日は「ケータイお休み」）：
+     ・👍ナイスなし（段階0）の日が S.cfg.gNn 日（初期1日）続いた → その日に👍ナイス（段階1以上）で解除
+     ・🌟パーフェクトなし（段階1以下）の日が S.cfg.gPn 日（初期3日）続いた → その日に🌟パーフェクト（段階2以上）で解除
+     両方に届いたときは、きびしい方（パーフェクト）で解除。おやすみ日（S.gd.ex）は数を飛ばす（リセットしない）。
+   リーチの日（今日のうちに届かないと、あしたお休み）：文字は出さず、15時から黒カビがふえはじめ、20時をすぎると一気にふえ、
+     ボードの地の色も黒カビ色になっていく。ナイスのリーチは わく0→そのまま／わく1→半分。パーフェクトのリーチは わく0〜1→そのまま／わく2→半分。
+   ゾンビはケータイお休みの日だけ。
+   おやすみ日は、娘がコミットタブから申請（S.gd.rq）→ パパが認めたら S.gd.ex に入る。
+   状態は毎回カレンダー（S.clog）から計算。保存するのは設定・おやすみ日・申請・通知ずみの印（S.gd.log）だけ（S.gd は同期）。 */
+var _gdN=0,_gdSawMold=false;
+function gdC(){var c=S.cfg||{},st=c.gStart||'',nn=(c.gNn===undefined||c.gNn===null||c.gNn==='')?1:+c.gNn,pn=(c.gPn===undefined||c.gPn===null||c.gPn==='')?3:+c.gPn;
+  return {on:+c.gOn===1&&/^\d{4}-\d{2}-\d{2}$/.test(st),shown:+c.gOn===1,start:st,nn:Math.max(0,nn||0),pn:Math.max(0,pn||0)};}
+function gdS(){S.gd=S.gd||{};S.gd.ex=S.gd.ex||{};S.gd.log=S.gd.log||{};return S.gd;}
+function gdPrev(k){var p=k.split('-'),d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()-1);return dstr(d);}
+function gdNext(k,n){var p=k.split('-'),d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+(n||1));return dstr(d);}
+/* day の前の日からさかのぼって、段階が need 未満の日が何日続いているか（おやすみ日は飛ばす） */
+function gdRun(day,need){var c=gdC(),g=gdS(),k=gdPrev(day),n=0,i=0;
+  while(i++<90&&k>=c.start){if(g.ex[k]){k=gdPrev(k);continue;}if(clLevel(k)<need){n++;k=gdPrev(k);}else break;}return n;}
+function gdState(){var c=gdC();if(!c.on)return {st:'off'};var td=today();if(td<c.start)return {st:'off'};var g=gdS();if(g.ex[td])return {st:'ex'};
+  var lv=clLevel(td),f=+window._passN||_gdN||0,rn=c.nn?gdRun(td,1):0,rp=c.pn?gdRun(td,2):0,L=g.log[td]||{},need=0;
+  if(c.nn&&rn>=c.nn)need=1;if(c.pn&&rp>=c.pn)need=2;
+  var potN=!!c.nn&&rn+1>=c.nn,potP=!!c.pn&&rp+1>=c.pn,rN=potN&&lv<1,rP=potP&&lv<2;
+  var fac=Math.max(rN?(f<=0?1:0.5):0,rP?(f<=1?1:0.5):0);
+  var o={need:need,rn:rn,rp:rp,f:f,lv:lv,rN:rN,rP:rP,fac:fac,man:!!L.man};
+  if(need)o.st=(lv>=need||L.man)?'freed':'lock';
+  else o.st=fac>0?'warn':((potN||potP)?'clean':'safe');
+  return o;}
+function gdLocked(){try{return gdState().st==='lock';}catch(e){return false;}}
+function gdTrim(){var g=gdS(),ks=Object.keys(g.log).sort();while(ks.length>60)delete g.log[ks.shift()];ks=Object.keys(g.ex).sort();while(ks.length>120)delete g.ex[ks.shift()];}
+function gdWhy(st){var c=gdC();return st.need===2?('🌟パーフェクトなしの日が '+st.rp+'日 続いた'):('👍ナイスなしの日が '+st.rn+'日 続いた');}
+function gdGoal(need){return need===2?'🌟パーフェクト（わく3つ）':'👍ナイス（わく2つ）';}
+function gdNotify(st){if(SYNC.on&&!SYNC.astatReady)return;var td=today(),g=gdS(),L=g.log[td]||{};
+  if(st.st==='lock'&&!L.ln){L.ln=Date.now();g.log[td]=L;gdTrim();save();maybeSync();
+    qbNotify('🟥 今日はケータイお休みの日',gdWhy(st)+'ので、今日は娘のケータイお休みの日です。ファミリーリンクでロックしてください。娘が今日'+gdGoal(st.need)+'に届いたら、解除の通知が届きます。',{fl:1});}
+  else if(st.st==='freed'&&L.ln&&!L.un&&!L.man){L.un=Date.now();g.log[td]=L;save();maybeSync();
+    qbNotify('🟢 ケータイお休み 解除','娘が今日'+gdGoal(st.need)+'に届きました。ファミリーリンクでロックを外してください。',{fl:1});}}
+/* ---- 見た目：黒カビ（リーチの日）とゾンビ（お休みの日） ---- */
+function gdNowH(){var d=new Date();return d.getHours()+d.getMinutes()/60;}
+/* 全身ゾンビ（オリジナルの絵）：グレー〜ダーク系。手を前に出して、ふらふら歩く */
+var GD_ZSVG='<svg viewBox="-2 -2 76 108" width="100%" height="100%"><g class="zb" transform="rotate(7 32 98)">'
+ +'<g class="zl zl2"><path d="M34 63 L37 82 L35 96" stroke="#23252a" stroke-width="8.5" stroke-linecap="round" fill="none"/><path d="M31 84 L40 85 L38 88 L41 90" stroke="#1b1c20" stroke-width="1.4" fill="none"/><path d="M29 98 L42 98" stroke="#18191c" stroke-width="6.5" stroke-linecap="round"/></g>'
+ +'<g class="za za2"><path d="M40 41 L58 47" stroke="#4f5455" stroke-width="7" stroke-linecap="round"/><path d="M40 41 L47 43.5" stroke="#34373d" stroke-width="7.5" stroke-linecap="round"/><circle cx="59.5" cy="47.5" r="3.8" fill="#7c8681"/><path d="M61 46 L64 45 M61.5 49 L64.5 49.5" stroke="#7c8681" stroke-width="1.6" stroke-linecap="round"/></g>'
+ +'<path d="M20 38 Q32 31 44 37 L46 66 L41 62 L38 68 L34 62 L30 69 L26 62 L21 66 Z" fill="#3b3e46" stroke="#1b1c20" stroke-width="1.6"/>'
+ +'<path d="M27 37 L32 44 L37 37" fill="#2a2c32" stroke="#1b1c20" stroke-width="1"/>'
+ +'<path d="M25 47 L30 51 M37 46 L39 54 M28 58 L33 60 M41 57 L43 60" stroke="#24262c" stroke-width="1.5"/>'
+ +'<g class="zl zl1"><path d="M28 63 L24 82 L26 96" stroke="#2c2e34" stroke-width="8.5" stroke-linecap="round" fill="none"/><path d="M21 80 L27 81 L25 84 L29 86" stroke="#1b1c20" stroke-width="1.4" fill="none"/><rect x="22" y="72" width="6" height="5" rx="1" fill="#4a4e55"/><path d="M19 98 L33 98" stroke="#18191c" stroke-width="6.5" stroke-linecap="round"/></g>'
+ +'<g class="za za1"><path d="M28 40 L52 50" stroke="#5f6566" stroke-width="7.5" stroke-linecap="round"/><path d="M28 40 L37 44" stroke="#3a3d44" stroke-width="8" stroke-linecap="round"/><circle cx="54" cy="51" r="4.2" fill="#87918b"/><path d="M56 49 L61 48 M56.5 52 L61.5 52.5 M55 54 L59 56" stroke="#87918b" stroke-width="1.8" stroke-linecap="round"/></g>'
+ +'<g class="zh" transform="translate(3 1)"><ellipse cx="33" cy="22" rx="12.5" ry="13" fill="#89938d" stroke="#1b1c20" stroke-width="1.7"/>'
+ +'<path d="M21 17 Q23 8 31 9 Q30 4 37 7 Q44 7 45 16 L42 13 L39 16 L36 11 L32 14 L28 11 L25 16 Z" fill="#2a2c30"/>'
+ +'<ellipse cx="28.5" cy="22.5" rx="3.6" ry="4" fill="#25272a"/><ellipse cx="38.5" cy="23" rx="2.8" ry="3.1" fill="#25272a"/>'
+ +'<circle cx="29.3" cy="22.8" r="1.3" fill="#dfe9cf"/><circle cx="39" cy="23.3" r="1" fill="#dfe9cf"/>'
+ +'<path d="M27 30.5 Q33 28 39 31" stroke="#25272a" stroke-width="1.7" fill="none"/><path d="M29.5 29.6 L29.5 31.6 M32.5 29 L32.5 31 M35.5 29.3 L35.5 31.3" stroke="#25272a" stroke-width="1"/>'
+ +'<path d="M41 15 L44.5 19 M23 26 L25.5 27.5" stroke="#5a625f" stroke-width="1.4"/></g></g></svg>';
+/* 緑ヘドロ（ナイスなしで入ったお休みの日）：ぬめっとした かたまりに、たれた しずく */
+function gdSludge(k){return '<svg viewBox="0 0 120 90" width="100%" height="100%"><defs><radialGradient id="gdsg'+k+'" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#9ccf4a"/><stop offset=".45" stop-color="#5f9a24"/><stop offset="1" stop-color="#2e5410"/></radialGradient></defs>'
+ +'<path d="M14 46 C6 30 22 14 40 18 C50 6 74 6 84 18 C102 14 116 30 108 46 C114 58 100 66 92 62 L90 80 C89 86 82 86 82 80 L80 64 C70 70 60 66 56 70 L55 84 C54 89 47 89 47 84 L46 68 C36 70 30 64 26 62 C14 66 4 56 14 46 Z" fill="url(#gdsg'+k+')" stroke="#24420c" stroke-width="2"/>'
+ +'<ellipse cx="44" cy="30" rx="12" ry="6" fill="#d8f29a" opacity=".55"/><circle cx="76" cy="28" r="4" fill="#d8f29a" opacity=".5"/>'
+ +'<circle cx="62" cy="46" r="5" fill="#3d6a14" opacity=".7"/><circle cx="88" cy="44" r="3.5" fill="#3d6a14" opacity=".7"/><circle cx="30" cy="48" r="3" fill="#3d6a14" opacity=".7"/></svg>';}
+function gdFx(st){var fx=document.getElementById('gdFx');if(!fx){fx=document.createElement('div');fx.id='gdFx';document.body.appendChild(fx);}
+  var bg=document.getElementById('gdBg');if(!bg){bg=document.createElement('div');bg.id='gdBg';document.body.insertBefore(bg,document.body.firstChild);}
+  var t=gdNowH(),nM=0,nZ=0,nS=0,grow=1,bgo=0,dark='',gm=(st.st==='lock')?(st.need===1):!!st.rN; /* 緑＝ナイスのルール／黒・グレー＝パーフェクトのルール */
+  if(st.st==='lock'){if(st.need===1){nS=7;dark='g';}else{nZ=7;dark='k';}bgo=0.5;}
+  else if(st.fac>0){var base=t<15?0:t<17?3:t<20?6:Math.round(8+(t-20)*5);nM=Math.ceil(base*st.fac);if(t>=20){grow=1+Math.min(4,t-20)*0.15;bgo=Math.min(1,(t-20)/4)*0.85*st.fac;}}
+  if(nM>0)_gdSawMold=true;
+  bg.className=gm?'g':'';bg.style.opacity=bgo.toFixed(2);document.body.classList.toggle('gd-on',bgo>0);
+  var key=st.st+':'+nM+':'+nZ+':'+nS+':'+grow.toFixed(2)+':'+gm;if(fx._k===key)return;fx._k=key;
+  if(!nM&&!nZ&&!nS){fx.innerHTML='';fx.className='';return;}
+  var td=today(),seed=7;for(var i=0;i<td.length;i++)seed=(seed*31+td.charCodeAt(i))>>>0;
+  function rnd(){seed=(Math.imul(seed,1103515245)+12345)>>>0;return (seed>>>8)/16777216;}
+  function pos(){var sd=rnd(),x,y;if(sd<.38){x=rnd()*9;y=4+rnd()*84;}else if(sd<.76){x=88+rnd()*9;y=4+rnd()*84;}else if(sd<.88){x=6+rnd()*86;y=rnd()*6;}else{x=6+rnd()*86;y=80+rnd()*8;}return [x,y];}
+  var out='',kf='';
+  for(var j=0;j<nM;j++){var p=pos(),sz=(22+rnd()*22)*grow,dl=(rnd()*4).toFixed(2),du=(5+rnd()*3).toFixed(2);
+    out+='<span class="gd-mold'+(gm?' g':'')+'" style="left:'+p[0].toFixed(1)+'vw;top:'+p[1].toFixed(1)+'vh;width:'+Math.round(sz)+'px;height:'+Math.round(sz*(.8+rnd()*.4))+'px;animation-delay:'+dl+'s;animation-duration:'+du+'s"></span>';}
+  /* ヘドロ：たて・よこ・ななめに画面を横切る。1つずつ道すじ（keyframes）を作る */
+  var PATHS=[[-30,15,110,35],[110,60,-30,40],[20,-25,45,110],[70,110,55,-25],[-30,85,110,5],[110,10,-30,75],[85,-25,10,110],[-30,50,110,70]];
+  for(var a=0;a<nS;a++){var P=PATHS[a%PATHS.length],w=80+rnd()*50,du2=(16+rnd()*12).toFixed(1),dl2=(-rnd()*20).toFixed(1),mx=(P[0]+P[2])/2+(rnd()*30-15),my=(P[1]+P[3])/2+(rnd()*30-15);
+    kf+='@keyframes gdsp'+a+'{0%{transform:translate('+P[0]+'vw,'+P[1]+'vh)}50%{transform:translate('+mx.toFixed(0)+'vw,'+my.toFixed(0)+'vh)}100%{transform:translate('+P[2]+'vw,'+P[3]+'vh)}}';
+    out+='<span class="gd-sl" style="width:'+Math.round(w)+'px;height:'+Math.round(w*.75)+'px;animation:gdsp'+a+' '+du2+'s linear '+dl2+'s infinite"><span class="gd-sli" style="animation-delay:'+(rnd()*2).toFixed(2)+'s">'+gdSludge(a)+'</span></span>';}
+  /* ゾンビ：左右に歩いて横切る（行きと帰りで向きを変える） */
+  for(var z=0;z<nZ;z++){var ltr=z%2===0,y0=6+rnd()*74,y1=Math.max(4,Math.min(80,y0+rnd()*16-8)),zw=54+rnd()*18,du3=(24+rnd()*14).toFixed(1),dl3=(-rnd()*30).toFixed(1);
+    kf+='@keyframes gdzp'+z+'{0%{transform:translate('+(ltr?-25:110)+'vw,'+y0.toFixed(0)+'vh)}100%{transform:translate('+(ltr?110:-25)+'vw,'+y1.toFixed(0)+'vh)}}';
+    out+='<span class="gd-zw" style="width:'+Math.round(zw)+'px;height:'+Math.round(zw*1.62)+'px;animation:gdzp'+z+' '+du3+'s linear '+dl3+'s infinite"><span class="gd-zi'+(ltr?'':' fl')+'" style="animation-delay:'+(rnd()*1).toFixed(2)+'s">'+GD_ZSVG+'</span></span>';}
+  fx.className=dark?('gd-dark-'+dark):'';fx.innerHTML=(kf?'<style>'+kf+'</style>':'')+out;}
+function gdCheer(st,isPapa){if(isPapa)return;var k='qb_gdcheer',v=today()+':'+st.st,o='';try{o=localStorage.getItem(k)||'';}catch(e){}
+  if(o===v)return;var msg='';
+  if(st.st==='freed'&&!st.man)msg=(st.need===1?'🟢 緑ヘドロをやっつけた！':'🧟 ゾンビをやっつけた！')+'ケータイお休み 解除！';
+  else if(st.st==='clean'&&_gdSawMold)msg='🧽 カビをやっつけた！';
+  if(!msg)return;try{localStorage.setItem(k,v);}catch(e){}
+  setTimeout(function(){try{showCheer(msg);sWin();burst();}catch(e){}},600);}
+function gdManual(){var td=today(),g=gdS();if(!confirm('今日のケータイお休みを取り消しますか？（パパの判断で解除）'))return;g.log[td]=g.log[td]||{};g.log[td].man=1;save();maybeSync();render();}
+var FLBTN=function(){return '<a class="btn" style="display:block;text-decoration:none;background:#34a853;box-shadow:0 4px 0 #2a8a44" href="'+esc(flUrl())+'">📲 ファミリーリンクを開く</a>';};
+function renderGuard(){var bar=document.getElementById('gdBar');if(!bar)return;var st=gdState(),isPapa=calcOwner()==='papa',h='';
+  gdNotify(st);
+  if(st.st==='lock'){var nd=st.need+1;
+    if(isPapa)h='<div class="card gd-card"><div class="gd-h">🟥 今日は娘のケータイお休みの日</div><div class="gd-s">'+gdWhy(st)+'。ファミリーリンクでケータイをロックしてください。<br>娘が今日'+gdGoal(st.need)+'に届いたら解除です（いま わく '+st.f+'/3）。</div>'
+      +FLBTN()+'<button class="btn gray" onclick="gdManual()">今日のお休みを取り消す（パパの判断）</button></div>';
+    else h='<div class="card gd-card"><div class="gd-h">'+(st.need===1?'🟢':'🧟')+' 今日はケータイお休みの日</div><div class="gd-s">'+(st.need===1?'緑ヘドロ':'ゾンビ')+'にボードをのっとられた！<br>'+gdGoal(st.need)+'でやっつけると、すぐ解除だよ</div><div class="gd-meter">いま わく '+st.f+'/'+nd+(st.f<nd?'（あと '+(nd-st.f)+'つ）':'')+'</div>'
+      +'<button class="btn" onclick="tabGo(\'commit\')">🎯 コミットラインを見る</button></div>';}
+  else if(st.st==='freed'){
+    if(isPapa)h='<div class="card gd-card free"><div class="gd-h">🟢 ケータイお休み 解除'+(st.man?'（パパの判断）':'')+'</div><div class="gd-s">ファミリーリンクでロックを外してください。</div>'+FLBTN()+'</div>';
+    else h='<div class="card gd-card free"><div class="gd-h">🟢 ケータイお休み 解除！</div><div class="gd-s">'+(st.man?'パパが今日のお休みを取り消してくれたよ':(st.need===1?'緑ヘドロをやっつけた！':'ゾンビをやっつけた！'))+'</div></div>';}
+  if(st.st==='warn'&&isPapa&&gdNowH()>=20){ /* パパのリーチカードは20時から */var ls=[];if(st.rN)ls.push('👍ナイスに届かないと');if(st.rP)ls.push('🌟パーフェクト（パーフェクトなし '+(st.rp+1)+'日目）に届かないと');
+    h+='<div class="card gd-card warn"><div class="gd-h">🦠 リーチの日</div><div class="gd-s">今日'+ls.join('、または ')+'、あしたはケータイお休みです。娘の画面には文字は出さず、15時からカビ（ナイスまでは緑カビ、ナイスのあとパーフェクトまでは黒カビ）がふえ、20時をすぎると地の色もカビの色になっていきます。いま わく '+st.f+'/3。</div></div>';}
+  bar.innerHTML=h;
+  try{gdFx(st);}catch(e){}
+  gdCheer(st,isPapa);
+  renderGuardRule();renderGdReq();}
+function renderGuardRule(){var el=document.getElementById('gdRuleCard');if(!el)return;var c=gdC();if(!c.shown){el.innerHTML='';return;}
+  var r='';
+  if(c.nn)r+='<tr><td>👍ナイスなしの日が '+c.nn+'日'+(c.nn>1?' 続いた':'')+'</td><td>次の日は <b>ケータイお休み</b>。その日に<b>👍ナイス</b>に届いたら、すぐ解除</td></tr>';
+  if(c.pn)r+='<tr><td>🌟パーフェクトなしの日が '+c.pn+'日 続いた</td><td>次の日は <b>ケータイお休み</b>。その日に<b>🌟パーフェクト</b>に届いたら、すぐ解除</td></tr>';
+  el.innerHTML='<div class="card rlcard"><div class="v-h"><span>🟥 ケータイお休みルール</span></div>'
+    +'<table class="rl-t"><tr><th>こうなったら</th><th>どうなる</th></tr>'+r
+    +'<tr><td>あと1日でお休みになる日（リーチの日）</td><td>15時から ボードに<b>カビ</b>がふえはじめる（👍ナイスまでは<b>緑カビ</b>、🌟パーフェクトのリーチは<b>黒カビ</b>）。20時をすぎると一気にふえて、ボードもカビの色に。わくを1つクリアするとカビは半分、条件をクリアすると全部消えるよ</td></tr>'
+    +'<tr><td>ケータイお休みの日</td><td>👍ナイスなしで入った日は<b>緑ヘドロ</b>、🌟パーフェクトなしで入った日は<b>ゾンビ</b>が、ボードの上をうろうろ歩きまわる。スマホ時間のお願いもお休み（ためた時間は消えないよ）</td></tr>'
+    +'<tr><td>おやすみ日（大会・熱・家族の行事など）</td><td>数えない。🎯コミットのタブから申請して、パパがOKしたらおやすみ日になるよ</td></tr></table>'
+    +'<div class="rl-n">はじまる日：'+(c.start?c.start.replace(/-/g,'/'):'まだ（パパと決めてから）')+'</div></div>';}
+/* ---- おやすみ日の申請（コミットタブ） ---- */
+var GD_WHY=['🏆 大会・発表会','🤒 体調が悪い','👪 家族の用事','📝 その他'];
+function gdMd(k){var p=k.split('-');return (+p[1])+'/'+(+p[2]);}
+function renderGdReq(){var el=document.getElementById('gdReqCard');if(!el)return;var c=gdC();if(!c.shown){el.innerHTML='';return;}
+  var g=gdS(),rq=g.rq||null,isPapa=calcOwner()==='papa',td=today(),h='';
+  var pend=rq&&!rq.st&&rq.d>=td;
+  if(isPapa){
+    if(pend)h='<div class="card gd-card req"><div class="gd-h">🙏 おやすみ日の申請</div><div class="gd-s">娘から <b>'+gdMd(rq.d)+'</b>（'+esc(rq.why||'')+'）を おやすみ日にしてほしいと申請が届いています。</div>'
+      +'<div class="gd-row"><button class="btn" style="flex:1;margin:0" onclick="gdReqAns(1)">✅ 認める</button><button class="btn gray" style="flex:1;margin:0" onclick="gdReqAns(0)">✕ 認めない</button></div></div>';
+    else{var ks=Object.keys(g.ex).filter(function(k){return k>=td;}).sort();if(ks.length)h='<div class="card gd-card free"><div class="gd-s">🛌 これからのおやすみ日：'+ks.map(gdMd).join('・')+'</div></div>';}}
+  else{
+    var res='';if(rq&&rq.st&&rq.d>=td)res='<div class="gd-s" style="margin-bottom:6px">'+(rq.st==='ok'?'✅ '+gdMd(rq.d)+' は おやすみ日に なったよ':'✕ '+gdMd(rq.d)+' は おやすみ日に ならなかったよ')+'</div>';
+    if(pend)h='<div class="card gd-card req"><div class="gd-h">⏳ おやすみ日の申請中</div><div class="gd-s">'+gdMd(rq.d)+'（'+esc(rq.why||'')+'）　パパの返事を待ってね</div>'
+      +((Date.now()-(rq.nt||rq.at||0)>120000)?'<button class="btn gray" onclick="gdReqNotify()">🔔 もう一度パパに知らせる</button>':'')+'</div>';
+    else h='<div class="card gd-card free" style="text-align:left"><div class="gd-h" style="text-align:center">🛌 おやすみ日の申請</div>'+res
+      +'<div class="gd-s">大会・熱・家族の用事などで、勉強ができない日は申請してね。パパがOKしたら、その日は数えないよ。</div>'
+      +'<div class="gd-row"><select id="gdRqD">'+[0,1,2].map(function(n){var k=gdNext(td,n);return '<option value="'+k+'">'+['今日','あした','あさって'][n]+'（'+gdMd(k)+'）</option>';}).join('')+'</select>'
+      +'<select id="gdRqW">'+GD_WHY.map(function(w){return '<option>'+w+'</option>';}).join('')+'</select></div>'
+      +'<button class="btn" onclick="gdReqSend()">🙏 パパに申請する</button></div>';}
+  el.innerHTML=h;}
+function gdReqSend(){var d=(document.getElementById('gdRqD')||{}).value,w=(document.getElementById('gdRqW')||{}).value||'';if(!d)return;var g=gdS();
+  if(g.ex[d]){showCheer('🛌 その日は もう おやすみ日だよ');return;}
+  g.rq={d:d,why:w,at:Date.now(),st:''};save();maybeSync();renderGdReq();showCheer('🙏 パパに申請したよ！');gdReqNotify();}
+function gdReqNotify(){var g=gdS(),rq=g.rq;if(!rq||rq.st)return;rq.nt=Date.now();save();maybeSync();
+  qbNotify('🙏 おやすみ日の申請','娘から '+gdMd(rq.d)+'（'+rq.why+'）を おやすみ日にしてほしいと申請が届きました。ボードのコミットタブで「認める／認めない」を選んでください。',{tab:'commit'}).then(function(){try{renderGdReq();}catch(e){}});}
+function gdReqAns(ok){var g=gdS(),rq=g.rq;if(!rq||rq.st)return;if(!confirm(gdMd(rq.d)+'（'+rq.why+'）を おやすみ日に'+(ok?'します':'しません')+'。よろしいですか？'))return;
+  if(ok){g.ex[rq.d]=1;gdTrim();}rq.st=ok?'ok':'ng';rq.ans=Date.now();save();maybeSync();render();}
+/* ---- 保護者メニュー ---- */
+function gdExList(){var el=document.getElementById('gdExList');if(!el)return;var ks=Object.keys(gdS().ex).sort().slice(-20);
+  el.innerHTML=ks.length?ks.map(function(k){return '<span style="display:inline-block;margin:2px 6px 2px 0">'+k.replace(/-/g,'/')+' <a href="#" onclick="gdExDel(\''+k+'\');return false">✕</a></span>';}).join(''):'（まだありません）';}
+function gdExAdd(){var v=(document.getElementById('d_gEx').value||'').trim();if(!/^\d{4}-\d{2}-\d{2}$/.test(v)){alert('日付をえらんでください');return;}gdS().ex[v]=1;gdTrim();save();maybeSync();gdExList();}
+function gdExDel(k){delete gdS().ex[k];save();maybeSync();gdExList();}
+function gdFill(){try{var c=S.cfg||{},g=gdC();document.getElementById('d_gOn').value=+c.gOn===1?'1':'0';document.getElementById('d_gStart').value=c.gStart||'';document.getElementById('d_gNn').value=String(g.nn);document.getElementById('d_gPn').value=String(g.pn);gdExList();}catch(e){}}
+function gdRead(){try{S.cfg.gOn=document.getElementById('d_gOn').value==='1'?1:0;S.cfg.gStart=(document.getElementById('d_gStart').value||'').trim();S.cfg.gNn=parseInt(document.getElementById('d_gNn').value,10)||0;S.cfg.gPn=parseInt(document.getElementById('d_gPn').value,10)||0;}catch(e){}}
+(function(){var _o=dadOpen,_s=dadSave,_r=render;
+  dadOpen=function(){var r=_o.apply(this,arguments);gdFill();return r;};
+  dadSave=function(){gdRead();return _s.apply(this,arguments);};
+  render=function(){var r=_r.apply(this,arguments);try{renderGuard();}catch(e){}return r;};
+  setInterval(function(){try{renderGuard();}catch(e){}},120000);
+  try{renderGuard();}catch(e){}})();
 </script>
 </body>
 </html>
