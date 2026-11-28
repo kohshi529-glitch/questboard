@@ -447,6 +447,8 @@
   .hcell.pa{background:var(--coral);border-color:var(--coral)}
   .pcell{display:flex;align-items:center;justify-content:center;font-size:8px;line-height:1;color:#fff;font-weight:800;overflow:hidden}
   .hcell.today{box-shadow:0 0 0 2px var(--sun)}
+  .hcell{position:relative}.hcell .gdb{position:absolute;left:-3px;top:-6px;font-size:.62rem;line-height:1;pointer-events:none;filter:drop-shadow(0 1px 0 #fff)}.hcell.gdk{background:radial-gradient(circle at 30% 35%,#9bbf4a 0 22%,transparent 24%),radial-gradient(circle at 72% 68%,#7fa63a 0 20%,transparent 22%),#5f7d2c!important;border-color:#4a6322!important}.hcell.gdz{background:repeating-linear-gradient(135deg,#6f6a78 0 3px,#57525f 3px 6px)!important;border-color:#3e3a45!important}.gdp{margin-top:10px;border:1px dashed #c9b48a;border-radius:12px;padding:8px 10px;background:#fffaf0;text-align:left}.gdp-h{font-weight:900;font-size:.9rem}.gdp-it{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.82rem;margin:4px 0 6px}.gdp-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 8px;margin:4px 0;border-radius:10px;background:#eef3df;font-size:.84rem;font-weight:700}.gdp-row.z{background:#ebe8f0}.gdp-b{border:0;border-radius:999px;padding:5px 11px;font-weight:800;font-size:.8rem;background:#7c5cff;color:#fff}.gdp-b:disabled{background:#d9d2c3;color:#8a7d64}.gdp-b.uni{display:block;width:100%;margin:4px 0 6px;background:linear-gradient(90deg,#ff9ecf,#ffd27a,#9fe3c8,#8fd3ff,#c7a6ff);color:#4a2b6b}.gdp-n{font-size:.74rem;color:#8a7d64;margin-top:4px}
+
   .hcell.pic,.hcell.react{position:relative}
   .hcell.pic::after{content:'';position:absolute;top:1px;right:1px;width:5px;height:5px;border-radius:50%;background:var(--coral)}
   .hcell.react::before{content:'♡';position:absolute;bottom:-3px;left:1px;font-size:9px;line-height:1;color:var(--coral)}
@@ -2189,7 +2191,7 @@ function frameClass(level){return 'flvl-'+Math.min(10,Math.max(1,level));}
 function frameOrn(level){var t=Math.min(10,level),o='';var topE=t>=9?'🌟':'⭐',botE=t>=9?'💎':'✨';if(t>=3)o+='<span class="orn tl">'+topE+'</span><span class="orn tr">'+topE+'</span>';if(t>=6)o+='<span class="orn bl">'+botE+'</span><span class="orn br">'+botE+'</span>';if(t>=7)o+='<span class="orn crown">👑</span>';return o;}
 function calHTML(){
   const N=16,base=new Date(),tk=today();let cells='';
-  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const lvl=clLevel(k);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);const pn=(lvl>=3)?partyCount(k):0;cells+='<div class="hcell'+(lvl>=6?' uni':lvl>=5?' god':lvl===4?' amethyst':lvl===3?' rainbow':lvl===2?' star':lvl===1?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')">'+(pn?pn:'')+'</div>';}
+  for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const lvl=clLevel(k);const pic=!!(S.photoDays&&S.photoDays[k]);const rc=!!(S.reactions&&S.reactions[k]);const pn=(lvl>=3)?partyCount(k):0;let gk='',gpu='';try{gk=gdDayKind(k);gpu=gk&&gdPu()[k];}catch(e){}cells+='<div class="hcell'+(lvl>=6?' uni':lvl>=5?' god':lvl===4?' amethyst':lvl===3?' rainbow':lvl===2?' star':lvl===1?' on':'')+(k===tk?' today':'')+(pic?' pic':'')+(rc?' react':'')+(gk&&!gpu?(gk==='z'?' gdz':' gdk'):'')+'" title="'+k+'" onclick="viewPhoto(\''+k+'\')">'+(pn?pn:'')+(gk?'<span class="gdb">'+(gpu?'✨':(gk==='z'?'🧟':'🦠'))+'</span>':'')+'</div>';}
   const lab=(col,txt,al)=>'<span style="grid-column:'+col+(al?';justify-self:'+al:'')+'">'+txt+'</span>';
   const labels=lab(1,'15日前','start')+lab(6,'10日前')+lab(11,'5日前')+lab(16,'今日','end');
   return '<div class="callabels">'+labels+'</div><div class="calgrid">'+cells+'</div><a class="kiroku-link" href="./kiroku.html">📈 がんばり記録を見る</a>';
@@ -2293,8 +2295,8 @@ function render(){
         <div id="ruRow">${ruRowHTML()}</div>
       </div></div>`;
     stage.innerHTML=`<div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
-        <div class="calwrap">${calHTML()}</div>
-        <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-uni"></i>🦄ユニコーン</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
+        <div class="calwrap">${calHTML()}</div>${(typeof gdPureCardHTML==='function')?gdPureCardHTML():''}
+        <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-uni"></i>🦄ユニコーン</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span><span>🦠カビの日</span><span>🧟ゾンビの日</span><span>✨浄化ずみ</span></div>
         <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日・🌈レインボー ${histCount(3)}日・💜アメジスト ${histCount(4)-histCount(5)}日・👑GOD ${histCount(5)-histCount(6)}日${histCount(6)?'・🦄ユニコーン '+histCount(6)+'日':''}）${partySum()?'<br>🥳 パーティ 合計 '+partySum()+'回':''}</div></div>
       <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span><span><b class="ru-g" style="color:#2f5fb3">Р</b>＝ロシア語</span></div></div>
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 今日の記録</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読動画やドリルの写真を残そう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
@@ -2762,6 +2764,36 @@ function gdCheer(st,isPapa){if(isPapa)return;var k='qb_gdcheer',v=today()+':'+st
   else if(st.st==='clean'&&_gdSawMold)msg='🧽 カビをやっつけた！';
   if(!msg)return;try{localStorage.setItem(k,v);}catch(e){}
   setTimeout(function(){try{showCheer(msg);sWin();burst();}catch(e){}},600);}
+/* ===== 🦠カビの日・🧟ゾンビの日をカレンダーに残す ＋ 浄化アイテム（2026-11-28） =====
+   カビの日＝👍ナイスなしで入ったケータイお休みの日（緑ヘドロ）で、その日のうちに解除できなかった日。ゾンビの日＝🌟パーフェクトなしで入った同じような日。
+   浄化アイテム（ルールの開始日からの がんばりカレンダーで たまる）：💜アメジストの日 → 🧴カビ浄化 1つ ／ 👑GODの日 → 🔆ゾンビ浄化 1つ ／ 🦄ユニコーンの日 → 🦄まとめて浄化 1つ（直近7日の カビ・ゾンビを ぜんぶ）。
+   🔆ゾンビ浄化は カビの日にも使える。浄化は カレンダーの記録だけを きれいにする（ケータイお休みルールの数え方は 変わらない）。今日の分は 次の日から浄化できる。 */
+function gdDayKind(k){var c=gdC();if(!c.on||k<c.start||k>today())return '';var g=gdS();if(g.ex[k])return '';
+  var rn=c.nn?gdRun(k,1):0,rp=c.pn?gdRun(k,2):0,need=0;if(c.nn&&rn>=c.nn)need=1;if(c.pn&&rp>=c.pn)need=2;if(!need)return '';
+  var L=g.log[k]||{};if(L.man||clLevel(k)>=need)return '';return need===2?'z':'k';}
+function gdPu(){var g=gdS();g.pu=g.pu||{};return g.pu;}
+function gdItems(){var c=gdC(),pu=gdPu(),g=gdS(),e={k:0,z:0,u:0},u={k:0,z:0,u:+g.uu||0},k=c.start,td=today(),i=0;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(k))while(k<=td&&i++<800){var l=clLevel(k);if(l>=6)e.u++;else if(l===5)e.z++;else if(l===4)e.k++;k=gdNext(k);}
+  for(var d in pu){if(pu[d]==='k')u.k++;else if(pu[d]==='z')u.z++;}
+  return {k:Math.max(0,e.k-u.k),z:Math.max(0,e.z-u.z),u:Math.max(0,e.u-u.u),ek:e.k,ez:e.z,eu:e.u};}
+function gdDirty(){var c=gdC(),pu=gdPu(),out=[],k=gdPrev(today()),i=0;if(!c.on)return out;while(k>=c.start&&i++<60){var t=gdDayKind(k);if(t&&!pu[k])out.push([k,t]);k=gdPrev(k);}return out;}
+function gdPurify(k){var t=gdDayKind(k),pu=gdPu(),it=gdItems();if(!t||pu[k]||k>=today())return;
+  var use=(t==='k'&&it.k>0)?'k':(it.z>0?'z':'');if(!use){alert(t==='z'?'🔆ゾンビ浄化が ないよ。👑GODの日に もらえるよ':'🧴カビ浄化が ないよ。💜アメジストの日に もらえるよ');return;}
+  if(!confirm(gdMd(k)+' の'+(t==='z'?'🧟ゾンビ':'🦠カビ')+'を '+(use==='z'?'🔆ゾンビ浄化':'🧴カビ浄化')+'で きれいにする？'))return;
+  pu[k]=use;save();maybeSync();render();try{showCheer('✨ '+gdMd(k)+' の'+(t==='z'?'ゾンビ':'カビ')+'を 浄化した！');burst(30,true,['✨','🫧','🌟','💎','🕊️']);}catch(e){}}
+function gdPurifyAll(){var it=gdItems();if(it.u<1)return;var pu=gdPu(),td=today(),n=0,list=[];
+  for(var i=1;i<=7;i++){var p=td.split('-'),d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()-i);var k=dstr(d),t=gdDayKind(k);if(t&&!pu[k])list.push(k);}
+  if(!list.length){alert('直近7日に 浄化する日は ないよ（アイテムは とっておくね）');return;}
+  if(!confirm('🦄まとめて浄化で 直近7日の '+list.length+'日を ぜんぶ きれいにする？'))return;
+  list.forEach(function(k){pu[k]='u';});gdS().uu=(+gdS().uu||0)+1;save();maybeSync();render();try{bigCelebrate('🦄 直近7日の カビ・ゾンビを ぜんぶ浄化した！');}catch(e){}}
+function gdPureCardHTML(){var c=gdC();if(!c.on)return '';var it=gdItems(),dl=gdDirty();if(!dl.length&&!it.k&&!it.z&&!it.u&&!Object.keys(gdPu()).length)return '';
+  var rows=dl.slice(0,10).map(function(x){var can=(x[1]==='k'&&(it.k||it.z))||(x[1]==='z'&&it.z);
+    return '<div class="gdp-row'+(x[1]==='z'?' z':'')+'"><span>'+(x[1]==='z'?'🧟':'🦠')+' '+gdMd(x[0])+' '+(x[1]==='z'?'ゾンビの日':'カビの日')+'</span><button class="gdp-b"'+(can?'':' disabled')+' onclick="gdPurify(\''+x[0]+'\')">'+(can?'✨ 浄化する':'アイテムなし')+'</button></div>';}).join('');
+  return '<div class="gdp"><div class="gdp-h">🧪 浄化アイテム</div>'
+    +'<div class="gdp-it"><span>🧴カビ浄化 <b>'+it.k+'</b></span><span>🔆ゾンビ浄化 <b>'+it.z+'</b></span><span>🦄まとめて浄化 <b>'+it.u+'</b></span></div>'
+    +(it.u?'<button class="gdp-b uni" onclick="gdPurifyAll()">🦄 直近7日を まとめて浄化</button>':'')
+    +(rows||'<div class="gdp-n">浄化する日は ないよ ✨</div>')
+    +'<div class="gdp-n">💜アメジスト→🧴1つ ／ 👑GOD→🔆1つ ／ 🦄ユニコーン→🦄1つ（直近7日 ぜんぶ）。🔆はカビの日にも使えるよ</div></div>';}
 function gdManual(){var td=today(),g=gdS();if(!confirm('今日のケータイお休みを取り消しますか？（パパの判断で解除）'))return;g.log[td]=g.log[td]||{};g.log[td].man=1;save();maybeSync();render();}
 var FLBTN=function(){return '<a class="btn" style="display:block;text-decoration:none;background:#34a853;box-shadow:0 4px 0 #2a8a44" href="'+esc(flUrl())+'">📲 ファミリーリンクを開く</a>';};
 function renderGuard(){var bar=document.getElementById('gdBar');if(!bar)return;var st=gdState(),isPapa=calcOwner()==='papa',h='';
@@ -2807,6 +2839,13 @@ function renderGuardRule(){var el=document.getElementById('gdRuleCard');if(!el)r
     +'<div class="rl-n">・ヘドロもゾンビも じゃまをするだけ。ボタンは ふつうに おせるよ。<br>'
     +'・お休みの日は 📱スマホ時間の「パパにお願いする」も お休み。<b>ためた時間は 消えないよ</b>。<br>'
     +'・解除の条件に とどいたら、その場で解除！「緑ヘドロをやっつけた！」「ゾンビをやっつけた！」が出て、パパに知らせが とどくよ（ケータイのロックは パパが外すよ）。</div>'
+    +'<div class="rl-n" style="margin-top:10px">🧪 <b>カビの日・ゾンビの日と 浄化アイテム</b></div>'
+    +'<div class="rl-n" style="margin:0 0 6px">ケータイお休みの日に 解除できなかった日は、がんばりカレンダーに <b>🦠カビの日</b>（👍ナイスなしで入った日）・<b>🧟ゾンビの日</b>（🌟パーフェクトなしで入った日）として のこるよ。アイテムを使うと ✨ きれいにできる。</div>'
+    +'<table class="rl-t"><tr><th>カレンダー</th><th>もらえるアイテム</th><th>きれいにできる日</th></tr>'
+    +'<tr><td>💜アメジスト</td><td>🧴カビ浄化 1つ</td><td>🦠カビの日 1日</td></tr>'
+    +'<tr><td>👑GOD</td><td>🔆ゾンビ浄化 1つ</td><td>🧟ゾンビの日 か 🦠カビの日 1日</td></tr>'
+    +'<tr><td>🦄ユニコーン</td><td>🦄まとめて浄化 1つ</td><td>直近7日の カビ・ゾンビの日 ぜんぶ</td></tr></table>'
+    +'<div class="rl-n">・ホームの がんばりカレンダーの下の「🧪 浄化アイテム」で使うよ。今日の分は 次の日から。<br>・浄化は カレンダーの記録を きれいにするだけ。ケータイお休みルールの数え方は 変わらないよ。</div>'
     +'<div class="rl-n" style="margin-top:10px">🛌 <b>おやすみ日</b>（大会・発表会、体ちょうが悪い日、家族の用事など）</div>'
     +'<table class="rl-t"><tr><th>じゅんばん</th><th>やること</th></tr>'
     +'<tr><td>①</td><td>🎯コミットのタブの「🛌 おやすみ日の申請」で、日（今日・あした・あさって）と りゆうを えらんで 申請</td></tr>'
@@ -2851,7 +2890,7 @@ function gdRead(){try{S.cfg.gOff=document.getElementById('d_gOn').value==='1'?0:
   dadSave=function(){gdRead();return _s.apply(this,arguments);};
   render=function(){var r=_r.apply(this,arguments);try{renderGuard();}catch(e){}return r;};
   setInterval(function(){try{renderGuard();}catch(e){}},120000);
-  try{renderGuard();}catch(e){}})();
+  try{render();}catch(e){try{renderGuard();}catch(_){}}})(); /* カビ・ゾンビの日の表示のため、読みこみ後に もう一度 描く */
 </script>
 </body>
 </html>
