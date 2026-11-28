@@ -1,0 +1,707 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ロシア語 単語カード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Noto+Sans+JP:wght@500;700&display=swap">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* direct cloud sync (case A): push this drill's own progress to rooms/<room>/appstats */
+window.QB_APP='ruvocab';
+(function(){
+  window.qbSyncKick=function(){};
+  /* 覚えた語リスト本体：{語: 時刻}（正=覚えた・負=取り消し）。語ごとに新しい操作が勝つ */
+  window.qbKMerge=function(a,b){var o={},w;a=a||{};b=b||{};for(w in a)o[w]=a[w];for(w in b){if(o[w]==null||Math.abs(b[w])>Math.abs(o[w]))o[w]=b[w];}return o;};
+  window.qbKEnsure=function(key){var k=null;try{k=JSON.parse(localStorage.getItem(key+'_kts')||'null');}catch(e){}if(k)return k;
+    var old={};try{old=JSON.parse(localStorage.getItem(key+'_known')||'{}')||{};}catch(e){}var o={},w;for(w in old){if(old[w])o[w]=1;}
+    try{localStorage.setItem(key+'_kts',JSON.stringify(o));}catch(e){}return o;};
+  var creds=null;try{creds=JSON.parse(localStorage.getItem('qb_sync')||'null');}catch(e){}
+  if(!creds||!creds.fb||!creds.fb.databaseURL||!creds.room||!window.firebase)return;
+  var db,base;
+  try{if(!firebase.apps.length)firebase.initializeApp(creds.fb);db=firebase.database();base='rooms/'+creds.room+'/appstats';}catch(e){return;}
+  function num(x){x=+x;return isFinite(x)?x:0;}
+  function dnum(d){if(!d)return 0;var p=(''+d).split('-');return num(p[0])*10000+num(p[1])*100+num(p[2]);}
+  function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+  function role(){try{return localStorage.getItem('qb_calc_owner')==='papa'?'papa':'child';}catch(e){return 'child';}}
+  function pushVocab(key){var ls=lsGet(key+'_stats');if(!ls)return;
+    try{db.ref(base+'/'+key).transaction(function(cur){
+      if(!cur)return ls;
+      var w=cur;
+      if(num(ls.learned)>num(cur.learned))w=ls;
+      else if(num(ls.learned)===num(cur.learned)&&num(ls.updated)>=num(cur.updated))w=ls;
+      var qa=num(ls.quiz&&ls.quiz.updated),qb=num(cur.quiz&&cur.quiz.updated),q=(qa>=qb)?ls.quiz:cur.quiz; /* 検問記録は新しい方を残す */
+      if(q&&w.quiz!==q){w=JSON.parse(JSON.stringify(w));w.quiz=q;}
+      var nw=(num(ls.updated)>=num(cur.updated))?ls:cur; /* 収録語数・目標は、いちばん新しく書いた端末（＝今のアプリ）の値を使う */
+      if(w!==nw&&(w.deckSize!==nw.deckSize||w.goal!==nw.goal)){w=JSON.parse(JSON.stringify(w));if(nw.deckSize!=null)w.deckSize=nw.deckSize;if(nw.goal!=null)w.goal=nw.goal;}
+      var dm=mergeQDays(ls.quiz&&ls.quiz.days,cur.quiz&&cur.quiz.days);
+      if(dm&&w.quiz&&JSON.stringify(dm)!==JSON.stringify(w.quiz.days||null)){w=JSON.parse(JSON.stringify(w));w.quiz.days=dm;}
+      return w;
+    },function(){},false);}catch(e){}}
+  function pushKeisan(){var ls=lsGet('keisan_stats');if(!ls)return;var r=role();
+    try{db.ref(base+'/'+r).transaction(function(cur){
+      cur=cur||{};var del=cur.del||{},ck=cur.keisan||{},best={},k,cb=ck.best||{},lb=ls.best||{};
+      for(k in cb)best[k]=cb[k];
+      for(k in lb)best[k]=(best[k]==null)?lb[k]:Math.min(best[k],lb[k]);
+      var dc=dnum(ck.date),dl=dnum(ls.date),m={best:best};
+      if(dc===dl){m.date=ck.date||ls.date;m.today=Math.max(num(ck.today),num(ls.today));m.lastAcc=Math.max(num(ck.lastAcc),num(ls.lastAcc));}
+      else if(dc>dl){m.date=ck.date;m.today=num(ck.today);m.lastAcc=ck.lastAcc;}
+      else{m.date=ls.date;m.today=num(ls.today);m.lastAcc=ls.lastAcc;}
+      m.ts=Math.max(num(ck.ts),num(ls.ts));
+      var fb={};for(k in m.best){if(del[k]!=null&&m.best[k]===del[k])continue;fb[k]=m.best[k];}m.best=fb;
+      cur.keisan=m;return cur;
+    },function(){},false);}catch(e){}}
+  /* がんばり記録：検問の日ごとの記録 days={日付:{t:受けた回数,p:満点,b:最高%}}（項目ごとに大きい方） */
+  function mergeQDays(a,b){if(!a&&!b)return null;var o={},d,f;a=a||{};b=b||{};
+    for(d in a)o[d]=a[d];for(d in b){if(!o[d]){o[d]=b[d];continue;}var x=o[d]||{},y=b[d]||{},z={};for(f in x)z[f]=num(x[f]);for(f in y)z[f]=Math.max(num(z[f]),num(y[f]));o[d]=z;}
+    var ks=Object.keys(o).sort(function(p,q){return dnum(p)-dnum(q);});while(ks.length>400)delete o[ks.shift()];return o;}
+  /* 収録語リスト（版 v つき）。新しい版だけがサーバの値を置きかえる */
+  function pushDeck(key){var d=null;try{d=localStorage.getItem(key+'_deck');}catch(e){}if(!d)return;var dv;try{dv=JSON.parse(d);}catch(e){return;}
+    try{if(localStorage.getItem(key+'_deckSent')===d)return;}catch(e){}
+    try{db.ref(base+'/'+key+'_deck').transaction(function(cur){var c=null;if(typeof cur==='string'){try{c=JSON.parse(cur);}catch(e){}}if(c&&num(c.v)>=num(dv.v))return;return d;},function(err){if(!err){try{localStorage.setItem(key+'_deckSent',d);}catch(e){}}},false);}catch(e){}}
+  function pushKnown(key){var loc=window.qbKEnsure(key);
+    try{db.ref(base+'/'+key+'_k').transaction(function(cur){
+      var c={};if(typeof cur==='string'){try{c=JSON.parse(cur)||{};}catch(e){}}
+      var s=JSON.stringify(window.qbKMerge(c,loc));return (s===cur)?undefined:s;
+    },function(err,committed,snap){if(err||!snap)return;var v=snap.val();if(typeof v!=='string')return;var r;try{r=JSON.parse(v)||{};}catch(e){return;}
+      var now=window.qbKEnsure(key),m=window.qbKMerge(now,r);
+      if(JSON.stringify(m)!==JSON.stringify(now)){try{localStorage.setItem(key+'_kts',JSON.stringify(m));}catch(e){}if(window.qbOnKnownSync)window.qbOnKnownSync();}
+    },false);}catch(e){}}
+  function doPush(){if(window.QB_APP==='keisan')pushKeisan();else{pushKnown(window.QB_APP);pushVocab(window.QB_APP);pushDeck(window.QB_APP);}}
+  var t=null;
+  window.qbSyncKick=function(){clearTimeout(t);t=setTimeout(doPush,700);};
+  document.addEventListener('visibilitychange',function(){if(document.hidden)doPush();});
+  window.addEventListener('pagehide',doPush);
+  doPush();
+})();
+</script>
+<style>
+  :root{
+    --bg:#f4f1e8; --card:#ffffff; --card2:#fbf9f3;
+    --ink:#283042; --ink-soft:#5a6475; --ink-faint:#8b94a4;
+    --line:#e6e1d4; --line2:#d8d2c2;
+    --accent:#2f5fb3; --accent-d:#244a8c; --accent-soft:#e6edf9;
+    --warm:#f4a23b; --warm-soft:#fcecd6;
+    --good:#2f9e5e; --good-soft:#e4f3e9;
+    --s1:#2f9e5e; --s2:#1f9e8e; --s3:#e0892a; --s4:#d6504e;
+    --shadow:0 2px 4px rgba(40,48,66,.06),0 10px 26px rgba(40,48,66,.10);
+    --disp:"Fredoka","Nunito",system-ui,sans-serif;
+    --body:"Nunito",system-ui,-apple-system,sans-serif;
+    --jp:"Noto Sans JP",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#14171d; --card:#1f232c; --card2:#262b35;
+      --ink:#eef1f6; --ink-soft:#b9c0cc; --ink-faint:#8a93a2;
+      --line:#333945; --line2:#3e4552;
+      --accent:#49c9b7; --accent-d:#39b3a2; --accent-soft:#1d3330;
+      --warm:#f3b05f; --warm-soft:#33291a;
+      --good:#6fcf90; --good-soft:#1e3326;
+      --s1:#6fcf90; --s2:#49c9b7; --s3:#eab464; --s4:#f0807e;
+      --shadow:0 2px 4px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#14171d; --card:#1f232c; --card2:#262b35;
+    --ink:#eef1f6; --ink-soft:#b9c0cc; --ink-faint:#8a93a2;
+    --line:#333945; --line2:#3e4552;
+    --accent:#49c9b7; --accent-d:#39b3a2; --accent-soft:#1d3330;
+    --warm:#f3b05f; --warm-soft:#33291a;
+    --good:#6fcf90; --good-soft:#1e3326;
+    --s1:#6fcf90; --s2:#49c9b7; --s3:#eab464; --s4:#f0807e;
+    --shadow:0 2px 4px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:560px;margin:0 auto;padding-block:20px 30px;padding-left:18px;padding-right:18px;min-height:100%;display:flex;flex-direction:column}
+  .toboard{align-self:flex-start;display:inline-flex;align-items:center;gap:5px;font-family:var(--jp);font-weight:800;font-size:13px;color:var(--accent-d);background:var(--card);border:1.5px solid var(--line2);border-radius:999px;padding:7px 14px;text-decoration:none;box-shadow:var(--shadow);margin-bottom:4px}
+  .toboard:active{transform:translateY(1px)}
+  #home{flex:1;display:flex;flex-direction:column}
+  header{text-align:center;margin-bottom:8px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-d);font-weight:800;margin:0}
+  h1{font-family:var(--disp);font-weight:700;font-size:26px;margin:2px 0 0;color:var(--ink)}
+  .bar{flex:1;height:9px;background:var(--line);border-radius:999px;overflow:hidden}
+  .fill{height:100%;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3),var(--s4));width:0%;transition:width .4s}
+  .goalbox{margin:14px auto 20px;max-width:420px;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;box-shadow:var(--shadow);padding:16px 18px}
+  .goal-top{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:800;color:var(--ink-soft)}
+  .goal-top .goal-v{color:var(--accent-d)}
+  .goal-main{font-family:var(--disp);font-weight:700;font-size:30px;color:var(--ink);margin:6px 0 10px}
+  .goal-main .goal-unit{font-size:15px;color:var(--ink-faint);font-weight:700}
+  .goalbox .bar{height:11px;margin:0}
+  .goal-sub{margin-top:8px;font-size:12px;color:var(--ink-faint);font-weight:700}
+
+  /* home: stage list — cards sized to content, bigger text (NOT stretched) */
+  .stages{display:grid;gap:12px;margin:14px 0}
+  .stage-card{background:var(--card);border:1px solid var(--line);border-left:7px solid var(--sc);border-radius:18px;
+    box-shadow:var(--shadow);padding:18px 20px;cursor:pointer;display:block;width:100%;text-align:left;font-family:var(--body)}
+  .stage-card:active{transform:translateY(1px)}
+  .sc-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .sc-name{font-family:var(--disp);font-weight:700;font-size:21px;color:var(--ink)}
+  .sc-stars{font-size:15px;color:var(--sc);font-weight:800;letter-spacing:1px}
+  .sc-sub{font-size:13.5px;color:var(--ink-faint);font-weight:700;margin-top:3px}
+  .sc-prog{margin-top:13px;display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-soft);font-weight:800}
+  .sc-bar{flex:1;height:9px;background:var(--line);border-radius:999px;overflow:hidden}
+  .sc-fill{height:100%;background:var(--sc);width:0%;transition:width .4s}
+  .sc-clear{font-size:13px;color:var(--good);font-weight:800}
+  .home-tip{text-align:center;font-size:13.5px;color:var(--ink-faint);margin-top:18px;line-height:1.6}
+
+  /* study */
+  .topbar{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .back{border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:12px;padding:9px 13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+  .back svg{display:block}
+  .study-name{font-family:var(--jp)!important}
+  .back:active{transform:translateY(1px)}
+  .study-name{font-family:var(--disp);font-weight:700;font-size:17px;color:var(--ink)}
+  .study-stars{font-size:12px;color:var(--sc);font-weight:800;margin-left:auto}
+  .prog{margin:10px 0 6px;display:flex;align-items:center;gap:10px;justify-content:center;font-size:13px;color:var(--ink-soft);font-weight:700}
+  .prog .bar{max-width:220px}
+  .prog .fill{background:var(--sc)}
+
+  #study{flex:1;display:flex;flex-direction:column;min-height:0}
+  .studymid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:0}
+  .card3d{width:100%;height:clamp(360px,56vh,520px);display:flex;flex-direction:column}
+  .inner{position:relative;width:100%;flex:1;cursor:pointer}
+  .face{position:absolute;inset:0;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 22px;overflow:hidden;opacity:0;pointer-events:none;transform:scale(.97);transition:opacity .22s ease,transform .22s ease}
+  .face::before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:var(--sc)}
+  .back{background:var(--card2)}
+  .front{justify-content:center;gap:clamp(16px,3.6vh,38px)}
+  /* front shown by default; flip swaps to back. Hidden face gets pointer-events:none so taps always hit the visible face's buttons. */
+  .inner .front{opacity:1;pointer-events:auto;transform:scale(1)}
+  .inner.flip .front{opacity:0;pointer-events:none;transform:scale(.97)}
+  .inner.flip .back{opacity:1;pointer-events:auto;transform:scale(1)}
+  .emoji{font-size:clamp(96px,16vh,176px);line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.12))}
+  .word{font-family:"Nunito",system-ui,sans-serif;font-weight:800;font-weight:700;font-size:clamp(40px,12vw,62px);color:var(--ink);line-height:1.1;max-width:100%;overflow-wrap:anywhere;padding:0 6px}
+  .pos{margin-top:4px;font-size:15px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sc);background:var(--accent-soft);padding:6px 16px;border-radius:999px;display:inline-block}
+  .tiphint{font-size:15px;color:var(--ink-faint);font-weight:700}
+  .listen{position:absolute;top:14px;right:14px;border:none;background:var(--accent-soft);color:var(--accent-d);width:52px;height:52px;border-radius:50%;font-size:23px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+  .listen:active{transform:scale(.92)}
+  .b-label{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+  .b-word{font-family:"Nunito",system-ui,sans-serif;font-weight:800;font-weight:700;font-size:clamp(26px,7.6vw,34px);color:var(--sc);margin-bottom:16px}
+  .def{font-size:clamp(22px,6.2vw,30px);line-height:1.45;color:var(--ink);font-weight:700;max-width:28ch;font-family:var(--jp)}
+  .ex{margin-top:18px;font-size:clamp(17px,4.8vw,21px);line-height:1.55;color:var(--ink-soft);font-style:normal;max-width:32ch;font-family:"Nunito",system-ui,sans-serif}
+  .ex b{color:var(--warm);font-style:normal;font-weight:800}
+  .jp{margin-top:16px}
+  .jp button{border:1px dashed var(--line2);background:transparent;color:var(--ink-faint);font-family:var(--jp);font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 14px;cursor:pointer}
+  .jp .word-jp{font-family:var(--jp);font-weight:700;color:var(--ink-soft);font-size:15px}
+
+  .controls{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:16px}
+  .nav{border:1px solid var(--line2);background:var(--card);color:var(--ink);width:54px;height:54px;border-radius:16px;font-size:22px;cursor:pointer;box-shadow:var(--shadow);font-weight:800}
+  .nav:active{transform:translateY(2px)}
+  .know{flex:1;max-width:220px;border:none;border-radius:16px;padding:16px;font-family:var(--body);font-weight:800;font-size:15px;cursor:pointer;box-shadow:var(--shadow);background:var(--sc);color:#fff}
+  .know.on{background:var(--good)}
+  .know:active{transform:translateY(2px)}
+  .row2{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .mini{border:1px solid var(--line2);background:var(--card);color:var(--ink-soft);border-radius:12px;padding:9px 14px;font-family:var(--body);font-weight:700;font-size:13px;cursor:pointer}
+  .mini:active{transform:translateY(1px)}
+  .hint-line{text-align:center;font-size:12.5px;color:var(--ink-faint);margin-top:12px;line-height:1.6}
+  .done-msg{text-align:center;background:var(--good-soft);border:1px solid var(--good);border-radius:16px;padding:14px;color:var(--good);font-weight:800;margin-top:12px}
+  @media (max-width:380px){.emoji{font-size:clamp(54px,9vh,80px)}}
+
+  /* --- 今日カウンタ＆検問(テスト) --- */
+  .quizbox{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px 16px;margin:0 auto 14px;max-width:420px;text-align:center}
+  .quiz-start{width:100%;border:none;border-radius:14px;padding:13px;font-family:var(--body);font-weight:800;font-size:15px;color:#fff;background:var(--accent);box-shadow:0 3px 0 var(--accent-d);cursor:pointer}
+  .quiz-start:active{transform:translateY(2px);box-shadow:0 1px 0 var(--accent-d)}
+  .quiz-rec{margin-top:8px;font-size:12.5px;color:var(--ink-faint);font-weight:700;line-height:1.5}
+  #quiz{flex:1;display:flex;flex-direction:column;min-height:0}
+  #quiz .fill{background:var(--accent)}
+  .qcard{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;overflow:hidden}
+  .qcard::before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:var(--accent)}
+  .q-prompt{font-family:"Nunito",var(--jp);font-weight:700;font-size:clamp(26px,7vw,40px);color:var(--ink);text-align:center;overflow-wrap:anywhere;line-height:1.25}
+  .q-sub{font-size:15px;color:var(--ink-soft);font-weight:700;font-family:var(--jp)}
+  .q-choices{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:4px}
+  .q-choice{width:100%;border:1.5px solid var(--line2);background:var(--card2);color:var(--ink);border-radius:14px;padding:14px 12px;font-family:var(--body);font-weight:700;font-size:16px;cursor:pointer;text-align:center;line-height:1.4}
+  .q-choice:active{transform:translateY(1px)}
+  .q-choice:disabled{cursor:default}
+  .q-choice.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+  .q-choice.ng{background:#fde8e8;border-color:#e2574f;color:#c0392b}
+  .q-fb{min-height:22px;font-weight:800;font-size:15px;color:var(--ink-soft);font-family:var(--jp);text-align:center}
+  .qresult{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:26px 18px;text-align:center}
+  .qr-score{font-family:var(--disp);font-weight:700;font-size:44px;color:var(--accent-d)}
+  .qr-msg{font-family:var(--jp);font-weight:800;font-size:18px;color:var(--ink);margin:8px 0}
+  .qr-rec{font-size:13px;color:var(--ink-faint);font-weight:700;margin-bottom:16px}
+  .qr-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .q-again,.q-home{border:none;border-radius:14px;padding:12px 18px;font-family:var(--body);font-weight:800;font-size:14px;cursor:pointer}
+  .q-again{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-d)}
+  .q-home{background:var(--card2);color:var(--ink-soft);border:1.5px solid var(--line2)}
+  .q-again:active,.q-home:active{transform:translateY(1px)}
+</style>
+
+<div class="wrap">
+  <a href="./index.html" class="toboard">← クエストボード</a>
+  <header>
+    <p class="eyebrow">Русский язык · Word Cards</p>
+    <h1 id="h1">ロシア語クエスト 🇷🇺</h1>
+  </header>
+
+  <!-- HOME -->
+  <div id="home">
+    <div class="goalbox">
+      <div class="goal-top"><span>🎯 日常会話の目安</span><span class="goal-v">約1,000語</span></div>
+      <div class="goal-main"><span id="ovCount">0</span> <span class="goal-unit">語 覚えた</span></div>
+      <div class="bar"><div class="fill" id="ovFill"></div></div>
+      <div class="goal-sub"><span id="ovPct">0%</span> ・ いま収録 <span id="ovDeck">70</span>語（順次ふやします）<br>今日 覚えた <span id="ovToday">0</span>語</div>
+    </div>
+    <div class="quizbox">
+      <button class="quiz-start" onclick="startQuiz()">✏️ 検問に挑戦（4択・ランダム20問・日本語の意味で答える）</button>
+      <div class="quiz-rec" id="quizRec"></div>
+    </div>
+    <div class="stages" id="stageList"></div>
+    <div class="home-tip">ステージ1から順に。́（アクセント記号）のついた母音を 強く・長めに読みます。<br>今日のノルマ：新しく覚えた語 ＋10 と 検問の合格（10問以上・50%以上）で、ボードのパパのがんばりタスクに ✓ がつきます。</div>
+  </div>
+
+  <!-- STUDY -->
+  <div id="study" hidden>
+    <div class="topbar">
+      <button class="back" onclick="showHome()" aria-label="ステージ一覧へもどる" title="ステージ一覧へもどる"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg></button>
+      <span class="study-name" id="studyName"></span>
+      <span class="study-stars" id="studyStars"></span>
+    </div>
+    <div class="studymid">
+    <div class="prog">
+      <span id="posLabel">1 / 14</span>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <span id="knownLabel">覚えた 0</span>
+    </div>
+    <div class="card3d">
+      <div class="inner" id="inner" onclick="flip()">
+        <div class="face front">
+          <button class="listen" onclick="speakWord(event)" aria-label="listen">🔊</button>
+          <div class="emoji" id="fEmoji">🙂</div>
+          <div class="word" id="fWord">word</div>
+          <div class="pos" id="fPos">adj</div>
+          <div class="tiphint">タップで いみを見る 👆</div>
+        </div>
+        <div class="face back">
+          <button class="listen" onclick="speakWord(event)" aria-label="listen">🔊</button>
+          <div class="b-label">いみ</div>
+          <div class="b-word" id="bWord">word</div>
+          <div class="def" id="bDef">definition</div>
+          <div class="ex" id="bEx"></div>
+          <div class="jp"><button id="jpBtn" onclick="toggleJp(event)">例文の訳を見る</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="nav" onclick="prev()" aria-label="まえ">◀</button>
+      <button class="know" id="knowBtn" onclick="toggleKnow()">覚えた！</button>
+      <button class="nav" onclick="next()" aria-label="つぎ">▶</button>
+    </div>
+    <div class="row2">
+      <button class="mini" onclick="shuffle()">🔀 シャッフル</button>
+      <button class="mini" id="filterBtn" onclick="toggleFilter()">🔁 まだのカードだけ</button>
+    </div>
+    <div class="hint-line">カードをタップでめくる／🔊でロシア語の発音／「覚えた！」でチェック。<br>裏面に いみ と例文。例文の訳は ボタンで出ます。</div>
+    </div>
+  </div>
+
+  <!-- QUIZ(検問) -->
+  <div id="quiz" hidden>
+    <div class="topbar">
+      <button class="back" onclick="quizHome()" aria-label="ホームへもどる" title="ホームへもどる">✕</button>
+      <span class="study-name">📝 検問（テスト）</span>
+    </div>
+    <div class="studymid">
+      <div class="prog"><span id="qPos">1 / 20</span><div class="bar"><div class="fill" id="qFill"></div></div><span id="qRight">正解 0</span></div>
+      <div class="qcard" id="qCard">
+        <div class="q-sub" id="qSub"></div>
+        <div class="q-prompt" id="qWord">word</div>
+        <div class="q-choices" id="qChoices"></div>
+        <div class="q-fb" id="qFb"></div>
+      </div>
+      <div class="qresult" id="qResult" hidden></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ' はアクセント（強く読む母音）の印。画面では ́ で表示し、読み上げでは外す */
+const STAGES=[
+ {name:"ステージ1 あいさつ・会話の基本",sub:"まず使う ことば",stars:1,color:"var(--s1)",words:[
+  {w:"приве'т",pos:"あいさつ",e:"👋",jp:"やあ／こんにちは（親しい人に）",ex:"<b>Приве'т</b>! Как дела'?",exj:"やあ！元気？"},
+  {w:"здра'вствуйте",pos:"あいさつ",e:"🙇",jp:"こんにちは（ていねい）",ex:"<b>Здра'вствуйте</b>, А'нна!",exj:"こんにちは、アンナさん！"},
+  {w:"до'брое у'тро",pos:"あいさつ",e:"🌅",jp:"おはよう",ex:"<b>До'брое у'тро</b>, ма'ма!",exj:"おはよう、ママ！"},
+  {w:"до свида'ния",pos:"あいさつ",e:"🚪",jp:"さようなら",ex:"<b>До свида'ния</b>, до за'втра!",exj:"さようなら、また明日！"},
+  {w:"пока'",pos:"あいさつ",e:"🙋",jp:"じゃあね／またね",ex:"Ну, <b>пока'</b>!",exj:"じゃあ、またね！"},
+  {w:"спаси'бо",pos:"あいさつ",e:"🙏",jp:"ありがとう",ex:"<b>Спаси'бо</b> за пода'рок!",exj:"プレゼントをありがとう！"},
+  {w:"пожа'луйста",pos:"あいさつ",e:"🤲",jp:"お願いします／どうぞ／どういたしまして",ex:"Чай, <b>пожа'луйста</b>.",exj:"お茶をお願いします。"},
+  {w:"извини'те",pos:"あいさつ",e:"🙇‍♂️",jp:"すみません（ていねい）",ex:"<b>Извини'те</b>, где метро'?",exj:"すみません、地下鉄はどこですか？"},
+  {w:"да",pos:"副詞",e:"✅",jp:"はい",ex:"<b>Да</b>, коне'чно.",exj:"はい、もちろん。"},
+  {w:"нет",pos:"副詞",e:"❌",jp:"いいえ／ない",ex:"<b>Нет</b>, спаси'бо.",exj:"いいえ、けっこうです。"},
+  {w:"хорошо'",pos:"副詞",e:"👌",jp:"よい／わかった",ex:"<b>Хорошо'</b>, договори'лись.",exj:"わかった、それで決まりね。"},
+  {w:"ла'дно",pos:"副詞",e:"🤝",jp:"わかった／まあいいよ（くだけた）",ex:"<b>Ла'дно</b>, уви'димся ве'чером.",exj:"わかった、夕方に会おう。"},
+  {w:"коне'чно",pos:"副詞",e:"💯",jp:"もちろん",ex:"<b>Коне'чно</b>, я по'мню!",exj:"もちろん、覚えてるよ！"},
+  {w:"как",pos:"疑問詞",e:"❓",jp:"どのように／どう",ex:"<b>Как</b> тебя' зову'т?",exj:"きみの名前は？"},
+  {w:"что",pos:"疑問詞",e:"🤔",jp:"何",ex:"<b>Что</b> э'то?",exj:"これは何？"},
+  {w:"где",pos:"疑問詞",e:"📍",jp:"どこ",ex:"<b>Где</b> ты сейча'с?",exj:"いまどこにいるの？"},
+  {w:"когда'",pos:"疑問詞",e:"🕐",jp:"いつ",ex:"<b>Когда'</b> ты прие'дешь?",exj:"いつ来るの？"},
+  {w:"почему'",pos:"疑問詞",e:"🧐",jp:"なぜ",ex:"<b>Почему'</b> ты не спишь?",exj:"どうして寝ないの？"},
+  {w:"кто",pos:"疑問詞",e:"👤",jp:"だれ",ex:"<b>Кто</b> э'то на фо'то?",exj:"写真のこの人はだれ？"},
+  {w:"ско'лько",pos:"疑問詞",e:"🔢",jp:"いくつ／いくら",ex:"<b>Ско'лько</b> э'то сто'ит?",exj:"これはいくらですか？"},
+  {w:"я",pos:"代名詞",e:"🙋‍♂️",jp:"わたし",ex:"<b>Я</b> из Япо'нии.",exj:"わたしは日本から来ました。"},
+  {w:"ты",pos:"代名詞",e:"🫵",jp:"きみ／あなた（親しい）",ex:"<b>Ты</b> молоде'ц!",exj:"きみはえらい！"},
+  {w:"вы",pos:"代名詞",e:"🎩",jp:"あなた（ていねい）／あなたたち",ex:"<b>Вы</b> говори'те по-англи'йски?",exj:"英語を話せますか？"},
+  {w:"он",pos:"代名詞",e:"👨",jp:"彼",ex:"<b>Он</b> мой брат.",exj:"彼はわたしの兄弟です。"},
+  {w:"она'",pos:"代名詞",e:"👩",jp:"彼女",ex:"<b>Она'</b> о'чень весёлая.",exj:"彼女はとても明るい。"},
+  {w:"мы",pos:"代名詞",e:"👨‍👩‍👧",jp:"わたしたち",ex:"<b>Мы</b> живём в То'кио.",exj:"わたしたちは東京に住んでいます。"},
+  {w:"они'",pos:"代名詞",e:"👥",jp:"彼ら",ex:"<b>Они'</b> сейча'с до'ма.",exj:"彼らはいま家にいます。"},
+  {w:"мой",pos:"代名詞",e:"🏷️",jp:"わたしの",ex:"Э'то <b>мой</b> дом.",exj:"これはわたしの家です。"},
+  {w:"твой",pos:"代名詞",e:"🎁",jp:"きみの",ex:"Э'то <b>твой</b> телефо'н?",exj:"これはきみの電話？"},
+  {w:"э'то",pos:"代名詞",e:"👉",jp:"これ（は）／それ（は）",ex:"<b>Э'то</b> моя' дочь.",exj:"これはわたしの娘です。"},
+  {w:"здесь",pos:"副詞",e:"📌",jp:"ここで",ex:"Я <b>здесь</b>!",exj:"ここにいるよ！"},
+  {w:"там",pos:"副詞",e:"🗺️",jp:"そこで／あちらで",ex:"<b>Там</b> о'чень хо'лодно.",exj:"あちらはとても寒い。"},
+  {w:"и",pos:"接続詞",e:"➕",jp:"そして／〜と",ex:"Ма'ма <b>и</b> па'па.",exj:"ママとパパ。"},
+  {w:"но",pos:"接続詞",e:"↔️",jp:"しかし",ex:"Я уста'л, <b>но</b> сча'стлив.",exj:"疲れたけど、幸せだ。"},
+  {w:"и'ли",pos:"接続詞",e:"🔀",jp:"または",ex:"Чай <b>и'ли</b> ко'фе?",exj:"お茶、それともコーヒー？"},
+  {w:"то'же",pos:"副詞",e:"🤝",jp:"〜も（同じく）",ex:"Я <b>то'же</b> скуча'ю.",exj:"わたしもさびしいよ。"},
+  {w:"о'чень",pos:"副詞",e:"💪",jp:"とても",ex:"Мне <b>о'чень</b> нра'вится.",exj:"とても気に入っています。"},
+  {w:"прия'тно",pos:"副詞",e:"😊",jp:"心地よい／うれしい",ex:"О'чень <b>прия'тно</b> познако'миться.",exj:"お知り合いになれてうれしいです（はじめまして）。"},
+  {w:"как дела'",pos:"フレーズ",e:"💬",jp:"元気？／調子はどう？",ex:"Приве'т! <b>Как дела'</b>?",exj:"やあ、調子はどう？"},
+  {w:"всё хорошо'",pos:"フレーズ",e:"🌈",jp:"大丈夫／すべて順調",ex:"У нас <b>всё хорошо'</b>.",exj:"こちらはみんな元気です。"}
+ ]},
+ {name:"ステージ2 家族・人・気持ち",sub:"メッセージで よく使う",stars:2,color:"var(--s2)",words:[
+  {w:"семья'",pos:"名詞・女",e:"👨‍👩‍👧",jp:"家族",ex:"У меня' больша'я <b>семья'</b>.",exj:"わたしの家は大家族です。"},
+  {w:"ма'ма",pos:"名詞・女",e:"👩",jp:"ママ",ex:"<b>Ма'ма</b>, я тебя' люблю'.",exj:"ママ、大好きだよ。"},
+  {w:"па'па",pos:"名詞・男",e:"👨",jp:"パパ",ex:"<b>Па'па</b> на рабо'те.",exj:"パパは仕事中です。"},
+  {w:"мать",pos:"名詞・女",e:"🤱",jp:"母",ex:"Моя' <b>мать</b> живёт в Росси'и.",exj:"わたしの母はロシアに住んでいます。"},
+  {w:"оте'ц",pos:"名詞・男",e:"🧔",jp:"父",ex:"Мой <b>оте'ц</b> — инжене'р.",exj:"わたしの父はエンジニアです。"},
+  {w:"дочь",pos:"名詞・女",e:"👧",jp:"娘",ex:"Моя' <b>дочь</b> лю'бит танцева'ть.",exj:"娘は踊るのが好きです。"},
+  {w:"сын",pos:"名詞・男",e:"👦",jp:"息子",ex:"У них есть <b>сын</b>.",exj:"彼らには息子がいます。"},
+  {w:"жена'",pos:"名詞・女",e:"💍",jp:"妻",ex:"Моя' <b>жена'</b> хорошо' гото'вит.",exj:"妻は料理が上手です。"},
+  {w:"муж",pos:"名詞・男",e:"🤵",jp:"夫",ex:"Её <b>муж</b> из Москвы'.",exj:"彼女の夫はモスクワ出身です。"},
+  {w:"брат",pos:"名詞・男",e:"👬",jp:"兄弟",ex:"Мой ста'рший <b>брат</b> — врач.",exj:"わたしの兄は医者です。"},
+  {w:"сестра'",pos:"名詞・女",e:"👭",jp:"姉妹",ex:"У меня' есть мла'дшая <b>сестра'</b>.",exj:"わたしには妹がいます。"},
+  {w:"ба'бушка",pos:"名詞・女",e:"👵",jp:"おばあさん",ex:"<b>Ба'бушка</b> печёт пироги'.",exj:"おばあちゃんがパイを焼いている。"},
+  {w:"де'душка",pos:"名詞・男",e:"👴",jp:"おじいさん",ex:"<b>Де'душка</b> чита'ет газе'ту.",exj:"おじいちゃんは新聞を読んでいる。"},
+  {w:"ребёнок",pos:"名詞・男",e:"🧒",jp:"子ども",ex:"<b>Ребёнок</b> уже' спит.",exj:"子どもはもう寝ている。"},
+  {w:"де'ти",pos:"名詞・複数",e:"🧒👦",jp:"子どもたち",ex:"<b>Де'ти</b> игра'ют в па'рке.",exj:"子どもたちは公園で遊んでいる。"},
+  {w:"друг",pos:"名詞・男",e:"🤝",jp:"友だち（男）",ex:"Он мой лу'чший <b>друг</b>.",exj:"彼はわたしの親友だ。"},
+  {w:"подру'га",pos:"名詞・女",e:"👯",jp:"友だち（女）",ex:"Она' моя' <b>подру'га</b>.",exj:"彼女はわたしの友だちです。"},
+  {w:"челове'к",pos:"名詞・男",e:"🧍",jp:"人",ex:"Он хоро'ший <b>челове'к</b>.",exj:"彼はいい人だ。"},
+  {w:"лю'ди",pos:"名詞・複数",e:"👥",jp:"人々",ex:"<b>Лю'ди</b> здесь о'чень до'брые.",exj:"ここの人たちはとても親切だ。"},
+  {w:"любо'вь",pos:"名詞・女",e:"❤️",jp:"愛",ex:"<b>Любо'вь</b> сильне'е всего'.",exj:"愛は何よりも強い。"},
+  {w:"люби'ть",pos:"動詞（不完了体）",e:"😍",jp:"愛する／好きだ",ex:"Я <b>люблю'</b> тебя'.",exj:"愛してる。"},
+  {w:"скуча'ть",pos:"動詞（不完了体）",e:"🥺",jp:"恋しく思う／さびしい",ex:"Я о'чень <b>скуча'ю</b> по тебе'.",exj:"あなたがとても恋しい。"},
+  {w:"рад",pos:"形容詞（短語尾）",e:"😄",jp:"うれしい（女性は ра'да）",ex:"Я <b>рад</b> тебя' ви'деть!",exj:"会えてうれしい！"},
+  {w:"сча'стье",pos:"名詞・中",e:"🍀",jp:"幸せ",ex:"Жела'ю тебе' <b>сча'стья</b>!",exj:"あなたの幸せを祈っています！"},
+  {w:"счастли'вый",pos:"形容詞",e:"😊",jp:"幸せな",ex:"Э'то был <b>счастли'вый</b> день.",exj:"幸せな一日だった。"},
+  {w:"гру'стно",pos:"副詞",e:"😢",jp:"悲しい（気分）",ex:"Мне <b>гру'стно</b> без тебя'.",exj:"あなたがいなくて悲しい。"},
+  {w:"ве'село",pos:"副詞",e:"🎉",jp:"楽しい",ex:"Нам бы'ло о'чень <b>ве'село</b>!",exj:"とても楽しかった！"},
+  {w:"уста'ть",pos:"動詞（完了体）",e:"😮‍💨",jp:"疲れる",ex:"Я <b>уста'л</b> по'сле рабо'ты.",exj:"仕事のあとで疲れた。"},
+  {w:"боле'ть",pos:"動詞（不完了体）",e:"🤒",jp:"病気になる／具合が悪い",ex:"Не <b>боле'й</b>!",exj:"病気にならないでね（体に気をつけて）！"},
+  {w:"здоро'вье",pos:"名詞・中",e:"💪",jp:"健康",ex:"Как твоё <b>здоро'вье</b>?",exj:"体の具合はどう？"},
+  {w:"волнова'ться",pos:"動詞（不完了体）",e:"😟",jp:"心配する",ex:"Не <b>волну'йся</b>, всё хорошо'.",exj:"心配しないで、大丈夫だよ。"},
+  {w:"наде'яться",pos:"動詞（不完了体）",e:"🙏",jp:"期待する／〜だといいと思う",ex:"<b>Наде'юсь</b>, ты здоро'ва.",exj:"元気だといいな（女性へ）。"},
+  {w:"обнима'ть",pos:"動詞（不完了体）",e:"🤗",jp:"抱きしめる",ex:"<b>Обнима'ю</b> тебя'!",exj:"ハグを送るね！（手紙の結び）"},
+  {w:"целова'ть",pos:"動詞（不完了体）",e:"😘",jp:"キスする",ex:"<b>Целу'ю</b>!",exj:"キスを（親しい人へのメッセージの結び）"},
+  {w:"до'брый",pos:"形容詞",e:"😇",jp:"親切な／やさしい",ex:"У тебя' <b>до'брое</b> се'рдце.",exj:"きみはやさしい心の持ち主だ。"},
+  {w:"се'рдце",pos:"名詞・中",e:"💗",jp:"心臓／心",ex:"Ты всегда' в моём <b>се'рдце</b>.",exj:"あなたはいつもわたしの心の中にいる。"},
+  {w:"гость",pos:"名詞・男",e:"🛎️",jp:"客",ex:"Приезжа'й к нам в <b>го'сти</b>!",exj:"うちに遊びに来てね！"},
+  {w:"сосе'д",pos:"名詞・男",e:"🏘️",jp:"となりの人",ex:"Наш <b>сосе'д</b> о'чень ми'лый.",exj:"うちのおとなりはとても感じがいい。"},
+  {w:"учи'тель",pos:"名詞・男",e:"👩‍🏫",jp:"先生",ex:"<b>Учи'тель</b> хвали'л её.",exj:"先生が彼女をほめた。"},
+  {w:"ми'лый",pos:"形容詞",e:"🥰",jp:"かわいい／感じのよい",ex:"Како'й <b>ми'лый</b> ребёнок!",exj:"なんてかわいい子！"}
+ ]},
+ {name:"ステージ3 毎日の生活",sub:"名詞（男・女・中性つき）",stars:2,color:"var(--s3)",words:[
+  {w:"дом",pos:"名詞・男",e:"🏠",jp:"家",ex:"Наш <b>дом</b> недалеко' от ста'нции.",exj:"うちは駅から近い。"},
+  {w:"рабо'та",pos:"名詞・女",e:"💼",jp:"仕事",ex:"Я иду' на <b>рабо'ту</b>.",exj:"仕事に行くところです。"},
+  {w:"шко'ла",pos:"名詞・女",e:"🏫",jp:"学校",ex:"Дочь хо'дит в <b>шко'лу</b>.",exj:"娘は学校に通っている。"},
+  {w:"еда'",pos:"名詞・女",e:"🍲",jp:"食べ物",ex:"Япо'нская <b>еда'</b> о'чень вку'сная.",exj:"日本の食べ物はとてもおいしい。"},
+  {w:"вода'",pos:"名詞・女",e:"💧",jp:"水",ex:"Да'йте, пожа'луйста, <b>во'ду</b>.",exj:"水をください。"},
+  {w:"чай",pos:"名詞・男",e:"🍵",jp:"お茶",ex:"Я пью зелёный <b>чай</b>.",exj:"わたしは緑茶を飲みます。"},
+  {w:"ко'фе",pos:"名詞・男",e:"☕",jp:"コーヒー",ex:"Ча'шку <b>ко'фе</b>, пожа'луйста.",exj:"コーヒーを1杯ください。"},
+  {w:"хлеб",pos:"名詞・男",e:"🍞",jp:"パン",ex:"Купи', пожа'луйста, <b>хлеб</b>.",exj:"パンを買ってきてね。"},
+  {w:"молоко'",pos:"名詞・中",e:"🥛",jp:"牛乳",ex:"<b>Молоко'</b> в холоди'льнике.",exj:"牛乳は冷蔵庫にあるよ。"},
+  {w:"ры'ба",pos:"名詞・女",e:"🐟",jp:"魚",ex:"Мы ча'сто еди'м <b>ры'бу</b>.",exj:"わたしたちはよく魚を食べる。"},
+  {w:"мя'со",pos:"名詞・中",e:"🥩",jp:"肉",ex:"Ты лю'бишь <b>мя'со</b>?",exj:"お肉は好き？"},
+  {w:"суп",pos:"名詞・男",e:"🥣",jp:"スープ",ex:"<b>Суп</b> ещё горя'чий.",exj:"スープはまだ熱い。"},
+  {w:"вре'мя",pos:"名詞・中",e:"⏰",jp:"時間",ex:"У меня' нет <b>вре'мени</b>.",exj:"時間がない。"},
+  {w:"день",pos:"名詞・男",e:"☀️",jp:"日／昼",ex:"Хоро'шего <b>дня</b>!",exj:"よい一日を！"},
+  {w:"у'тро",pos:"名詞・中",e:"🌄",jp:"朝",ex:"Ка'ждое <b>у'тро</b> я бе'гаю.",exj:"毎朝わたしは走っている。"},
+  {w:"ве'чер",pos:"名詞・男",e:"🌆",jp:"夕方／晩",ex:"До'брый <b>ве'чер</b>!",exj:"こんばんは！"},
+  {w:"ночь",pos:"名詞・女",e:"🌙",jp:"夜",ex:"<b>Ночь</b> была' тёплая.",exj:"暖かい夜だった。"},
+  {w:"неде'ля",pos:"名詞・女",e:"📅",jp:"週",ex:"Уви'димся че'рез <b>неде'лю</b>.",exj:"1週間後に会おう。"},
+  {w:"ме'сяц",pos:"名詞・男",e:"🗓️",jp:"月（1か月）",ex:"Я был там оди'н <b>ме'сяц</b>.",exj:"そこに1か月いた。"},
+  {w:"год",pos:"名詞・男",e:"🎆",jp:"年",ex:"Я живу' здесь уже' оди'н <b>год</b>.",exj:"ここに住んでもう1年になる。"},
+  {w:"пого'да",pos:"名詞・女",e:"🌤️",jp:"天気",ex:"Кака'я сего'дня <b>пого'да</b>?",exj:"今日の天気はどう？"},
+  {w:"снег",pos:"名詞・男",e:"❄️",jp:"雪",ex:"В Москве' уже' <b>снег</b>.",exj:"モスクワはもう雪だ。"},
+  {w:"дождь",pos:"名詞・男",e:"🌧️",jp:"雨",ex:"Сего'дня идёт <b>дождь</b>.",exj:"今日は雨が降っている。"},
+  {w:"со'лнце",pos:"名詞・中",e:"🌞",jp:"太陽",ex:"Све'тит <b>со'лнце</b>.",exj:"日が照っている。"},
+  {w:"го'род",pos:"名詞・男",e:"🏙️",jp:"町／都市",ex:"То'кио — большо'й <b>го'род</b>.",exj:"東京は大都市だ。"},
+  {w:"страна'",pos:"名詞・女",e:"🗾",jp:"国",ex:"Япо'ния — краси'вая <b>страна'</b>.",exj:"日本は美しい国だ。"},
+  {w:"Япо'ния",pos:"名詞・女",e:"🇯🇵",jp:"日本",ex:"Я живу' в <b>Япо'нии</b>.",exj:"わたしは日本に住んでいます。"},
+  {w:"Росси'я",pos:"名詞・女",e:"🇷🇺",jp:"ロシア",ex:"Она' из <b>Росси'и</b>.",exj:"彼女はロシア出身です。"},
+  {w:"у'лица",pos:"名詞・女",e:"🛣️",jp:"通り／外",ex:"На <b>у'лице</b> хо'лодно.",exj:"外は寒い。"},
+  {w:"магази'н",pos:"名詞・男",e:"🏪",jp:"店",ex:"Я сейча'с в <b>магази'не</b>.",exj:"いまお店にいるよ。"},
+  {w:"по'езд",pos:"名詞・男",e:"🚆",jp:"列車",ex:"<b>По'езд</b> опа'здывает.",exj:"電車が遅れている。"},
+  {w:"маши'на",pos:"名詞・女",e:"🚗",jp:"車",ex:"Я е'ду на <b>маши'не</b>.",exj:"車で向かっている。"},
+  {w:"телефо'н",pos:"名詞・男",e:"📱",jp:"電話",ex:"Мой <b>телефо'н</b> разряди'лся.",exj:"電話の充電が切れた。"},
+  {w:"фотогра'фия",pos:"名詞・女",e:"📷",jp:"写真",ex:"Пришли' <b>фотогра'фию</b>!",exj:"写真を送って！"},
+  {w:"письмо'",pos:"名詞・中",e:"✉️",jp:"手紙／メール",ex:"Спаси'бо за <b>письмо'</b>.",exj:"お手紙をありがとう。"},
+  {w:"пода'рок",pos:"名詞・男",e:"🎁",jp:"プレゼント",ex:"Э'то <b>пода'рок</b> для тебя'.",exj:"これはきみへのプレゼントだよ。"},
+  {w:"день рожде'ния",pos:"名詞・男",e:"🎂",jp:"誕生日",ex:"Когда' у тебя' <b>день рожде'ния</b>?",exj:"誕生日はいつ？"},
+  {w:"пра'здник",pos:"名詞・男",e:"🎊",jp:"祝日／お祝い",ex:"Ско'ро <b>пра'здник</b>!",exj:"もうすぐお祝いの日だ！"},
+  {w:"ко'мната",pos:"名詞・女",e:"🛏️",jp:"部屋",ex:"Э'то моя' <b>ко'мната</b>.",exj:"ここがわたしの部屋です。"},
+  {w:"кни'га",pos:"名詞・女",e:"📕",jp:"本",ex:"Я чита'ю интере'сную <b>кни'гу</b>.",exj:"面白い本を読んでいる。"}
+ ]},
+ {name:"ステージ4 よく使う動詞",sub:"不完了体・完了体つき",stars:3,color:"var(--s4)",words:[
+  {w:"быть",pos:"動詞（不完了体）",e:"🟢",jp:"ある／いる／〜である",ex:"Я <b>бу'ду</b> до'ма в семь.",exj:"7時には家にいます。"},
+  {w:"есть",pos:"動詞（不完了体）",e:"🍽️",jp:"食べる",ex:"Что ты хо'чешь <b>есть</b>?",exj:"何が食べたい？"},
+  {w:"пить",pos:"動詞（不完了体）",e:"🥤",jp:"飲む",ex:"Я <b>пью</b> ко'фе по утра'м.",exj:"朝はコーヒーを飲む。"},
+  {w:"жить",pos:"動詞（不完了体）",e:"🏡",jp:"住む／生きる",ex:"Где ты <b>живёшь</b>?",exj:"どこに住んでいるの？"},
+  {w:"рабо'тать",pos:"動詞（不完了体）",e:"👷",jp:"働く",ex:"Я <b>рабо'таю</b> на заво'де.",exj:"わたしは工場で働いています。"},
+  {w:"учи'ться",pos:"動詞（不完了体）",e:"🎒",jp:"（学校などで）学ぶ",ex:"Дочь <b>у'чится</b> в шко'ле.",exj:"娘は学校で学んでいる。"},
+  {w:"изуча'ть",pos:"動詞（不完了体）",e:"📚",jp:"（科目を）勉強する",ex:"Я <b>изуча'ю</b> ру'сский язы'к.",exj:"わたしはロシア語を勉強しています。"},
+  {w:"говори'ть",pos:"動詞（不完了体）",e:"🗣️",jp:"話す",ex:"Я немно'го <b>говорю'</b> по-ру'сски.",exj:"ロシア語を少し話します。"},
+  {w:"знать",pos:"動詞（不完了体）",e:"💡",jp:"知っている",ex:"Я не <b>зна'ю</b>.",exj:"わかりません（知りません）。"},
+  {w:"понима'ть",pos:"動詞（不完了体）",e:"🧠",jp:"理解する",ex:"Я тебя' <b>понима'ю</b>.",exj:"きみの気持ちはわかるよ。"},
+  {w:"хоте'ть",pos:"動詞（不完了体）",e:"🙌",jp:"〜したい／ほしい",ex:"Я <b>хочу'</b> тебя' уви'деть.",exj:"あなたに会いたい。"},
+  {w:"мочь",pos:"動詞（不完了体）",e:"💪",jp:"〜できる",ex:"Я <b>могу'</b> помо'чь.",exj:"手伝えるよ。"},
+  {w:"де'лать",pos:"動詞（不完了体）",e:"🔧",jp:"する／作る",ex:"Что ты <b>де'лаешь</b>?",exj:"何してるの？"},
+  {w:"идти'",pos:"動詞（不完了体）",e:"🚶",jp:"（歩いて）行く",ex:"Я <b>иду'</b> домо'й.",exj:"家に帰るところです。"},
+  {w:"е'хать",pos:"動詞（不完了体）",e:"🚌",jp:"（乗り物で）行く",ex:"Мы <b>е'дем</b> на мо'ре.",exj:"わたしたちは海へ向かっている。"},
+  {w:"ви'деть",pos:"動詞（不完了体）",e:"👀",jp:"見える／会う",ex:"Рад тебя' <b>ви'деть</b>!",exj:"会えてうれしい！"},
+  {w:"смотре'ть",pos:"動詞（不完了体）",e:"📺",jp:"見る",ex:"Мы <b>смо'трим</b> фильм.",exj:"映画を見ている。"},
+  {w:"слу'шать",pos:"動詞（不完了体）",e:"🎧",jp:"聞く",ex:"<b>Слу'шай</b>, у меня' но'вость!",exj:"ねえ聞いて、ニュースがあるの！"},
+  {w:"писа'ть",pos:"動詞（不完了体）",e:"✍️",jp:"書く",ex:"<b>Пиши'</b> мне ча'ще!",exj:"もっとたびたび連絡してね（書いてね）！"},
+  {w:"чита'ть",pos:"動詞（不完了体）",e:"📖",jp:"読む",ex:"Я <b>чита'ю</b> твоё письмо'.",exj:"あなたの手紙を読んでいる。"},
+  {w:"спать",pos:"動詞（不完了体）",e:"😴",jp:"眠る",ex:"Иди' <b>спать</b>!",exj:"もう寝なさい！"},
+  {w:"звони'ть",pos:"動詞（不完了体）",e:"☎️",jp:"電話する",ex:"Я тебе' <b>позвоню'</b> ве'чером.",exj:"夕方に電話するね。"},
+  {w:"ждать",pos:"動詞（不完了体）",e:"⏳",jp:"待つ",ex:"Я <b>жду</b> тебя'.",exj:"あなたを待っています。"},
+  {w:"по'мнить",pos:"動詞（不完了体）",e:"🧩",jp:"覚えている",ex:"Я <b>по'мню</b> э'тот день.",exj:"あの日を覚えている。"},
+  {w:"ду'мать",pos:"動詞（不完了体）",e:"💭",jp:"考える／思う",ex:"Я <b>ду'маю</b> о тебе'.",exj:"あなたのことを思っている。"},
+  {w:"сказа'ть",pos:"動詞（完了体）",e:"💬",jp:"言う",ex:"<b>Скажи'</b>, пожа'луйста…",exj:"ねえ、教えて…"},
+  {w:"спроси'ть",pos:"動詞（完了体）",e:"❔",jp:"たずねる",ex:"Мо'жно <b>спроси'ть</b>?",exj:"聞いてもいい？"},
+  {w:"отве'тить",pos:"動詞（完了体）",e:"↩️",jp:"答える／返事する",ex:"Извини', что не <b>отве'тил</b> сра'зу.",exj:"すぐ返事できなくてごめん。"},
+  {w:"помога'ть",pos:"動詞（不完了体）",e:"🆘",jp:"手伝う／助ける",ex:"Спаси'бо, что <b>помога'ешь</b>.",exj:"手伝ってくれてありがとう。"},
+  {w:"гото'вить",pos:"動詞（不完了体）",e:"🍳",jp:"料理する／準備する",ex:"Сего'дня я <b>гото'влю</b> у'жин.",exj:"今日はわたしが夕食を作る。"},
+  {w:"покупа'ть",pos:"動詞（不完了体）",e:"🛒",jp:"買う",ex:"Я <b>покупа'ю</b> проду'кты.",exj:"食料品を買っている。"},
+  {w:"откры'ть",pos:"動詞（完了体）",e:"🔓",jp:"開ける",ex:"<b>Откро'й</b> окно', пожа'луйста.",exj:"窓を開けて。"},
+  {w:"нра'виться",pos:"動詞（不完了体）",e:"👍",jp:"気に入る",ex:"Мне <b>нра'вится</b> Москва'.",exj:"モスクワが気に入っている。"},
+  {w:"игра'ть",pos:"動詞（不完了体）",e:"🎲",jp:"遊ぶ／演奏する",ex:"Де'ти <b>игра'ют</b> во дворе'.",exj:"子どもたちが中庭で遊んでいる。"},
+  {w:"танцева'ть",pos:"動詞（不完了体）",e:"💃",jp:"踊る",ex:"Дочь краси'во <b>танцу'ет</b>.",exj:"娘はきれいに踊る。"},
+  {w:"гуля'ть",pos:"動詞（不完了体）",e:"🌳",jp:"散歩する",ex:"Мы <b>гуля'ли</b> в па'рке.",exj:"公園を散歩した。"},
+  {w:"отдыха'ть",pos:"動詞（不完了体）",e:"🏖️",jp:"休む",ex:"Хорошо' <b>отдыха'й</b>!",exj:"ゆっくり休んでね！"},
+  {w:"прие'хать",pos:"動詞（完了体）",e:"🛬",jp:"（乗り物で）着く／来る",ex:"Мы <b>прие'хали</b> в Москву'.",exj:"わたしたちはモスクワに着いた。"},
+  {w:"встре'тить",pos:"動詞（完了体）",e:"🙌",jp:"出会う／出迎える",ex:"Я <b>встре'чу</b> тебя' в аэропорту'.",exj:"空港に迎えに行くよ。"},
+  {w:"посла'ть",pos:"動詞（完了体）",e:"📤",jp:"送る",ex:"Я <b>посла'л</b> тебе' фо'то.",exj:"写真を送ったよ。"}
+ ]},
+ {name:"ステージ5 形容詞・副詞・決まり文句",sub:"手紙・メッセージの結びも",stars:3,color:"var(--s1)",words:[
+  {w:"хоро'ший",pos:"形容詞",e:"👍",jp:"よい",ex:"Он <b>хоро'ший</b> друг.",exj:"彼はいい友だちだ。"},
+  {w:"плохо'й",pos:"形容詞",e:"👎",jp:"悪い",ex:"Сего'дня <b>плоха'я</b> пого'да.",exj:"今日は天気が悪い。"},
+  {w:"большо'й",pos:"形容詞",e:"🐘",jp:"大きい",ex:"Э'то <b>больша'я</b> ра'дость.",exj:"それは大きな喜びです。"},
+  {w:"ма'ленький",pos:"形容詞",e:"🐭",jp:"小さい",ex:"Когда' я был <b>ма'леньким</b>…",exj:"わたしが小さかったころ…"},
+  {w:"краси'вый",pos:"形容詞",e:"🌸",jp:"美しい",ex:"Кака'я <b>краси'вая</b> фотогра'фия!",exj:"なんてきれいな写真！"},
+  {w:"но'вый",pos:"形容詞",e:"✨",jp:"新しい",ex:"У меня' <b>но'вая</b> рабо'та.",exj:"新しい仕事についた。"},
+  {w:"ста'рый",pos:"形容詞",e:"🏚️",jp:"古い／年をとった",ex:"Э'то <b>ста'рый</b> го'род.",exj:"ここは古い町だ。"},
+  {w:"вку'сный",pos:"形容詞",e:"😋",jp:"おいしい",ex:"Спаси'бо, бы'ло о'чень <b>вку'сно</b>!",exj:"ごちそうさま、とてもおいしかった！"},
+  {w:"хо'лодно",pos:"副詞",e:"🥶",jp:"寒い",ex:"Сего'дня <b>хо'лодно</b>.",exj:"今日は寒い。"},
+  {w:"тепло'",pos:"副詞",e:"🌡️",jp:"暖かい",ex:"В Япо'нии уже' <b>тепло'</b>.",exj:"日本はもう暖かい。"},
+  {w:"жа'рко",pos:"副詞",e:"🥵",jp:"暑い",ex:"Ле'том в То'кио <b>жа'рко</b>.",exj:"夏の東京は暑い。"},
+  {w:"мно'го",pos:"副詞",e:"📈",jp:"たくさん",ex:"У меня' <b>мно'го</b> рабо'ты.",exj:"仕事がたくさんある。"},
+  {w:"ма'ло",pos:"副詞",e:"📉",jp:"少ない",ex:"У меня' <b>ма'ло</b> вре'мени.",exj:"時間があまりない。"},
+  {w:"немно'го",pos:"副詞",e:"🤏",jp:"少し",ex:"Я <b>немно'го</b> уста'л.",exj:"少し疲れた。"},
+  {w:"всегда'",pos:"副詞",e:"♾️",jp:"いつも",ex:"Я <b>всегда'</b> рад тебе'.",exj:"いつでも大歓迎だよ。"},
+  {w:"иногда'",pos:"副詞",e:"🔄",jp:"ときどき",ex:"<b>Иногда'</b> я гото'влю борщ.",exj:"ときどきボルシチを作る。"},
+  {w:"ча'сто",pos:"副詞",e:"🔁",jp:"よく（しばしば）",ex:"Мы <b>ча'сто</b> вспомина'ем тебя'.",exj:"わたしたちはよくあなたのことを思い出す。"},
+  {w:"сего'дня",pos:"副詞",e:"📆",jp:"今日",ex:"<b>Сего'дня</b> у меня' выходно'й.",exj:"今日は休みです。"},
+  {w:"за'втра",pos:"副詞",e:"➡️",jp:"明日",ex:"До <b>за'втра</b>!",exj:"また明日！"},
+  {w:"вчера'",pos:"副詞",e:"⬅️",jp:"昨日",ex:"<b>Вчера'</b> шёл снег.",exj:"昨日は雪が降っていた。"},
+  {w:"сейча'с",pos:"副詞",e:"⏱️",jp:"いま",ex:"Я <b>сейча'с</b> на рабо'те.",exj:"いま仕事中です。"},
+  {w:"ско'ро",pos:"副詞",e:"🔜",jp:"もうすぐ",ex:"<b>Ско'ро</b> уви'димся!",exj:"もうすぐ会えるね！"},
+  {w:"уже'",pos:"副詞",e:"✔️",jp:"もう（すでに）",ex:"Я <b>уже'</b> до'ма.",exj:"もう家に着いたよ。"},
+  {w:"ещё",pos:"副詞",e:"➕",jp:"まだ／さらに",ex:"<b>Ещё</b> раз, пожа'луйста.",exj:"もう一度お願いします。"},
+  {w:"пото'м",pos:"副詞",e:"⏭️",jp:"あとで",ex:"Позвони' мне <b>пото'м</b>.",exj:"あとで電話してね。"},
+  {w:"вме'сте",pos:"副詞",e:"👫",jp:"いっしょに",ex:"Дава'й пойдём <b>вме'сте</b>!",exj:"いっしょに行こう！"},
+  {w:"пра'вда",pos:"名詞・女",e:"🔎",jp:"本当（のこと）",ex:"Э'то <b>пра'вда</b>?",exj:"それ本当？"},
+  {w:"мо'жно",pos:"述語",e:"🙆",jp:"〜してもいい",ex:"<b>Мо'жно</b> войти'?",exj:"入ってもいい？"},
+  {w:"на'до",pos:"述語",e:"❗",jp:"〜しなければならない",ex:"Мне <b>на'до</b> идти'.",exj:"もう行かなくちゃ。"},
+  {w:"бы'стро",pos:"副詞",e:"🏃",jp:"速く",ex:"Вре'мя идёт так <b>бы'стро</b>!",exj:"時がたつのは本当に早い！"},
+  {w:"ме'дленно",pos:"副詞",e:"🐌",jp:"ゆっくり",ex:"Говори' <b>ме'дленно</b>, пожа'луйста.",exj:"ゆっくり話してね。"},
+  {w:"до'брый день",pos:"フレーズ",e:"🌞",jp:"こんにちは（日中）",ex:"<b>До'брый день</b>! Как вы?",exj:"こんにちは！お元気ですか？"},
+  {w:"споко'йной но'чи",pos:"フレーズ",e:"🌙",jp:"おやすみなさい",ex:"<b>Споко'йной но'чи</b>, сла'дких снов!",exj:"おやすみ、いい夢を！"},
+  {w:"с днём рожде'ния",pos:"フレーズ",e:"🎂",jp:"誕生日おめでとう",ex:"<b>С днём рожде'ния</b>, ма'ма!",exj:"ママ、誕生日おめでとう！"},
+  {w:"с Но'вым го'дом",pos:"フレーズ",e:"🎍",jp:"あけましておめでとう",ex:"<b>С Но'вым го'дом</b> и Рождество'м!",exj:"新年とクリスマスおめでとう！"},
+  {w:"береги' себя'",pos:"フレーズ",e:"🫶",jp:"体を大事にね",ex:"Ма'ма, <b>береги' себя'</b>!",exj:"ママ、体を大事にしてね！"},
+  {w:"всего' хоро'шего",pos:"フレーズ",e:"🍀",jp:"お元気で／ごきげんよう",ex:"Спаси'бо и <b>всего' хоро'шего</b>!",exj:"ありがとう、お元気で！"},
+  {w:"не' за что",pos:"フレーズ",e:"😌",jp:"どういたしまして",ex:"— Спаси'бо! — <b>Не' за что</b>!",exj:"「ありがとう！」「どういたしまして！」"},
+  {w:"жела'ть",pos:"動詞（不完了体）",e:"🌟",jp:"（人に〜を）願う",ex:"<b>Жела'ю</b> тебе' здоро'вья!",exj:"あなたの健康を祈っています！"},
+  {w:"поздравля'ть",pos:"動詞（不完了体）",e:"🎉",jp:"祝う",ex:"<b>Поздравля'ю</b> с пра'здником!",exj:"祝日おめでとう！"}
+ ]}
+];
+const TOTAL=STAGES.reduce(function(n,s){return n+s.words.length;},0);
+const GOAL=1000;
+var known=loadKnown();
+var si=0, order=[], idx=0, flipped=false, filterOn=false;
+
+function loadKnown(){var k=window.qbKEnsure?qbKEnsure('ruvocab'):{},o={},w;for(w in k){if(k[w]>0)o[w]=true;}return o;}
+function kSet(w,on){var k=window.qbKEnsure?qbKEnsure('ruvocab'):{};k[w]=on?Date.now():-Date.now();try{localStorage.setItem('ruvocab_kts',JSON.stringify(k));}catch(e){}}
+function learnedCount(){return STAGES.reduce(function(n,s){return n+stageKnown(s);},0);}
+function writeStats(){try{var o={};try{o=JSON.parse(localStorage.getItem('ruvocab_stats')||'{}')||{};}catch(_){}o.learned=learnedCount();o.deckSize=TOTAL;o.goal=GOAL;o.updated=Date.now();var _ts=(function(){var d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();})();o.today=(typeof ALLW!=='undefined')?qTodayCount():0;o.tday=_ts;localStorage.setItem('ruvocab_stats',JSON.stringify(o));}catch(e){}}
+function saveKnown(){try{localStorage.setItem('ruvocab_known',JSON.stringify(known));}catch(e){}writeStats();try{var o=JSON.parse(localStorage.getItem('ruvocab_stats')||'{}');o.studiedAt=Date.now();localStorage.setItem('ruvocab_stats',JSON.stringify(o));}catch(e){}if(window.qbSyncKick)qbSyncKick();}
+function stageKnown(s){return s.words.filter(function(c){return known[c.w];}).length;}
+
+function renderHome(){
+  var kc=learnedCount();
+  document.getElementById('ovCount').textContent=kc;
+  document.getElementById('ovFill').style.width=Math.min(100,kc/GOAL*100)+'%';
+  document.getElementById('ovPct').textContent=Math.round(kc/GOAL*100)+'%';
+  document.getElementById('ovDeck').textContent=TOTAL;var _ot=document.getElementById('ovToday');if(_ot)_ot.textContent=qTodayCount();renderQuizRec();
+  writeStats();
+  var html=STAGES.map(function(s,i){
+    var k=stageKnown(s), t=s.words.length, pct=Math.round(k/t*100), clear=(k===t);
+    var stars='★'.repeat(s.stars)+'☆'.repeat(5-s.stars);
+    return '<button class="stage-card" style="--sc:'+s.color+'" onclick="openStage('+i+')">'
+      +'<div class="sc-top"><span class="sc-name">'+s.name+'</span><span class="sc-stars">'+stars+'</span></div>'
+      +'<div class="sc-sub">'+s.sub+' ・ '+t+'語</div>'
+      +'<div class="sc-prog"><span>覚えた '+k+' / '+t+'</span><div class="sc-bar"><div class="sc-fill" style="width:'+pct+'%"></div></div>'
+      +(clear?'<span class="sc-clear">クリア！⭐</span>':'<span>'+pct+'%</span>')+'</div>'
+      +'</button>';
+  }).join('');
+  document.getElementById('stageList').innerHTML=html;
+}
+
+function openStage(i){si=i;order=STAGES[i].words.map(function(_,n){return n;});idx=0;filterOn=false;
+  document.getElementById('home').hidden=true;document.getElementById('study').hidden=false;
+  var s=STAGES[i];document.getElementById('study').style.setProperty('--sc',s.color);
+  document.getElementById('studyName').textContent=s.name;
+  document.getElementById('studyStars').textContent='★'.repeat(s.stars)+'☆'.repeat(5-s.stars);
+  render();window.scrollTo(0,0);
+}
+function showHome(){document.getElementById('study').hidden=true;document.getElementById('home').hidden=false;renderHome();window.scrollTo(0,0);}
+
+function activeOrder(){if(!filterOn)return order;var w=STAGES[si].words;var f=order.filter(function(n){return !known[w[n].w];});return f.length?f:order;}
+function curCard(){var o=activeOrder();if(idx>=o.length)idx=0;return STAGES[si].words[o[idx]];}
+
+function RU(t){return String(t).replace(/'/g,'\u0301');}
+function RUplain(t){return String(t).replace(/'/g,'').replace(/<[^>]+>/g,'');}
+function render(){
+  var w=STAGES[si].words,o=activeOrder();if(idx>=o.length)idx=o.length-1;if(idx<0)idx=0;
+  var c=w[o[idx]];
+  flipped=false;document.getElementById('inner').classList.remove('flip');
+  document.getElementById('fEmoji').textContent=c.e;
+  document.getElementById('fWord').textContent=RU(c.w);
+  document.getElementById('fPos').textContent=c.pos;
+  document.getElementById('bWord').textContent=RU(c.w);
+  document.getElementById('bDef').textContent=c.jp;
+  document.getElementById('bEx').innerHTML=RU(c.ex);
+  document.getElementById('jpBtn').outerHTML='<button id="jpBtn" onclick="toggleJp(event)">例文の訳を見る</button>';
+  document.getElementById('posLabel').textContent=(idx+1)+' / '+o.length;
+  var k=stageKnown(STAGES[si]);
+  document.getElementById('knownLabel').textContent='覚えた '+k;
+  document.getElementById('fill').style.width=(k/w.length*100)+'%';
+  var kb=document.getElementById('knowBtn');
+  if(known[c.w]){kb.classList.add('on');kb.textContent='✓ 覚えた！';}else{kb.classList.remove('on');kb.textContent='覚えた！';}
+  document.getElementById('filterBtn').style.outline=filterOn?'2px solid '+STAGES[si].color:'none';
+}
+function flip(){flipped=!flipped;document.getElementById('inner').classList.toggle('flip',flipped);}
+function next(){var o=activeOrder();idx=(idx+1)%o.length;render();}
+function prev(){var o=activeOrder();idx=(idx-1+o.length)%o.length;render();}
+function toggleKnow(){var c=curCard();var _was=!!known[c.w];known[c.w]=!known[c.w];kSet(c.w,known[c.w]);saveKnown();
+  var allNow=STAGES[si].words.every(function(d){return known[d.w];});
+  render();if(allNow)setTimeout(function(){showDone(STAGES[si].name);},250);}
+function toggleFilter(){filterOn=!filterOn;idx=0;render();}
+function shuffle(){for(var i=order.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=order[i];order[i]=order[j];order[j]=t;}idx=0;render();}
+function toggleJp(ev){ev.stopPropagation();var c=curCard();document.getElementById('jpBtn').outerHTML='<span class="word-jp" id="jpBtn">🇯🇵 '+c.exj+'</span>';}
+var enVoice=null;
+function pickVoice(){try{if(!('speechSynthesis'in window))return;var vs=window.speechSynthesis.getVoices()||[];if(!vs.length)return;
+  enVoice=vs.filter(function(v){return /ru[-_]RU/i.test(v.lang);})[0]
+    ||vs.filter(function(v){return /^ru/i.test(v.lang);})[0]
+    ||enVoice;}catch(e){}}
+try{if('speechSynthesis'in window){pickVoice();window.speechSynthesis.onvoiceschanged=pickVoice;}}catch(e){}
+function speakWord(ev){if(ev){ev.stopPropagation();}var c=curCard();
+  try{
+    if(!('speechSynthesis'in window)){alert('この端末は音声読み上げに対応していません');return;}
+    var ss=window.speechSynthesis;ss.cancel();if(ss.paused){try{ss.resume();}catch(e){}}
+    if(!enVoice)pickVoice();
+    var u=new SpeechSynthesisUtterance(RUplain(c.w));u.lang='ru-RU';u.rate=.8;u.pitch=1;
+    if(enVoice)u.voice=enVoice;
+    ss.speak(u);
+    // some mobile engines stall right after load; nudge with a resume on next tick
+    setTimeout(function(){try{if(ss.paused)ss.resume();}catch(e){}},80);
+  }catch(e){}}
+function showDone(name){var st=document.getElementById('study');if(document.getElementById('doneMsg'))return;var d=document.createElement('div');d.className='done-msg';d.id='doneMsg';d.textContent='🎉 '+name+' クリア！全部覚えたね！';st.insertBefore(d,st.querySelector('.card3d'));setTimeout(function(){if(d)d.remove();},4000);}
+
+
+/* ===== 今日カウンタ（今日覚えた語） ===== */
+function qTodayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function _qs(){try{return JSON.parse(localStorage.getItem('ruvocab_stats')||'{}')||{};}catch(e){return {};}}
+function _qsSave(o){try{localStorage.setItem('ruvocab_stats',JSON.stringify(o));}catch(e){}}
+function bumpToday(delta){if(!delta)return;var o=_qs();var ts=qTodayStr();if(o.tday!==ts){o.today=0;}o.today=Math.max(0,(o.today||0)+delta);o.tday=ts;_qsSave(o);}
+function qTodayCount(){var k=window.qbKEnsure?qbKEnsure('ruvocab'):{},n=new Date(),c=0;
+  ALLW.forEach(function(x){var t=k[x.w];if(t>1){var d=new Date(t);if(d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate())c++;}});return c;}
+/* ===== 検問（テスト） ===== */
+var ALLW=[];STAGES.forEach(function(s){s.words.forEach(function(w){ALLW.push(w);});});
+/* 収録語リスト：ボードの「いま収録○語」「覚えた語」はこのリストで数える。語を足したり減らしたりしたら DECK_VER を上げる */
+var DECK_VER=2026112801;
+try{var _dk=JSON.stringify({v:DECK_VER,w:ALLW.map(function(x){return x.w;})});if(localStorage.getItem(QB_APP+'_deck')!==_dk)localStorage.setItem(QB_APP+'_deck',_dk);if(window.qbSyncKick)qbSyncKick();}catch(e){}
+function QANS(c){return c.jp;} /* 日本語の意味で答える */
+/* 合格ライン：クエストボードの保護者メニューで設定（同じ端末の設定を読む） */
+function qPassCfg(){var c={};try{c=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}return {pct:+c.ruPct||50,min:+c.ruMin||10};} /* パパのロシア語：合格ライン（ボードの S.cfg.ruPct / ruMin、なければ 50%・10問） */
+/* ボードの日替わり：今日このクエストがパーフェクトのカウント外か（ボードが今日記録した rot を見る） */
+function qRotOff(){return false;}
+function _qRotOffOld(){try{var s=JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{},r=s.rot,d=new Date(),p=function(n){return (n<10?'0':'')+n;},td=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());return !!(r&&r.d===td&&r.off&&r.off.indexOf('v')>=0);}catch(e){return false;}}
+function loadQuiz(){var o=_qs();return o.quiz||{tests:0,perfects:0,bestPct:0,last:null};}
+function saveQuizRec(q){var o=_qs();o.quiz=q;_qsSave(o);if(window.qbSyncKick)qbSyncKick();}
+function renderQuizRec(){var el=document.getElementById('quizRec');if(!el)return;var q=loadQuiz();var learned=learnedCount();
+  if(learned<4){el.textContent='覚えた語から4択クイズ。あと'+(4-learned)+'語覚えると挑戦できるよ';return;}
+  el.innerHTML='受けた '+(q.tests||0)+'回 ・ 満点 '+(q.perfects||0)+'回'+(q.bestPct?' ・ 自己ベスト '+q.bestPct+'%':'')+(q.last?'（前回 '+q.last.s+'/'+q.last.t+'）':'');}
+var QZ=null;
+function qshuf(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function startQuiz(){
+  var pool=ALLW.filter(function(c){return known[c.w];});
+  if(pool.length<4){alert('覚えた語が4つ以上になったら挑戦できるよ！');return;}
+  var n=Math.min(20,pool.length);
+  QZ={qs:qshuf(pool.slice()).slice(0,n),i:0,right:0,answered:false};
+  document.getElementById('home').hidden=true;document.getElementById('study').hidden=true;document.getElementById('quiz').hidden=false;
+  document.getElementById('qResult').hidden=true;document.getElementById('qCard').hidden=false;
+  renderQ();window.scrollTo(0,0);}
+function quizHome(){document.getElementById('quiz').hidden=true;document.getElementById('home').hidden=false;renderHome();window.scrollTo(0,0);}
+function renderQ(){
+  var c=QZ.qs[QZ.i];QZ.answered=false;
+  document.getElementById('qWord').textContent=RU(c.w);
+  var sub=document.getElementById('qSub');if(sub)sub.textContent='';
+  var correct=QANS(c),seen={};seen[correct]=1;var dis=[];
+  var others=qshuf(ALLW.slice());
+  for(var k=0;k<others.length&&dis.length<3;k++){var a=QANS(others[k]);if(a&&!seen[a]&&others[k].jp!==c.jp){seen[a]=1;dis.push(a);}} // 同じ日本語訳の類義語は誤答に使わない（正解が2つに見えるのを防ぐ）
+  var choices=qshuf([correct].concat(dis));
+  var ch=document.getElementById('qChoices');ch.innerHTML='';
+  choices.forEach(function(t){var b=document.createElement('button');b.className='q-choice';b.textContent=t;b.onclick=function(){answerQ(t,b);};ch.appendChild(b);});
+  document.getElementById('qFb').textContent='';
+  document.getElementById('qPos').textContent=(QZ.i+1)+' / '+QZ.qs.length;
+  document.getElementById('qRight').textContent='正解 '+QZ.right;
+  document.getElementById('qFill').style.width=(QZ.i/QZ.qs.length*100)+'%';}
+function answerQ(t,btn){
+  if(QZ.answered)return;QZ.answered=true;
+  var c=QZ.qs[QZ.i],correct=QANS(c);
+  var btns=document.querySelectorAll('#qChoices .q-choice');
+  for(var k=0;k<btns.length;k++){btns[k].disabled=true;if(btns[k].textContent===correct)btns[k].classList.add('ok');}
+  if(t===correct){QZ.right++;document.getElementById('qFb').textContent='⭕ 正解！';}
+  else{btn.classList.add('ng');document.getElementById('qFb').innerHTML='❌ 正解は「'+correct+'」';}
+  document.getElementById('qRight').textContent='正解 '+QZ.right;
+  setTimeout(function(){QZ.i++;if(QZ.i<QZ.qs.length)renderQ();else finishQuiz();},1000);}
+function finishQuiz(){
+  var n=QZ.qs.length,r=QZ.right,pct=Math.round(r/n*100);
+  var q=loadQuiz();q.tests=(q.tests||0)+1;if(r===n)q.perfects=(q.perfects||0)+1;q.bestPct=Math.max(q.bestPct||0,pct);q.last={s:r,t:n};q.updated=Date.now();var _hd=qTodayStr();if(!q.hist||q.hist.d!==_hd)q.hist={d:_hd,r:[]};q.hist.r.push([r,n,q.updated]);if(q.hist.r.length>30)q.hist.r=q.hist.r.slice(-30);
+  q.days=q.days||{};var _dd=q.days[_hd]||{t:0,p:0,b:0};_dd.t=Math.max((_dd.t||0)+1,q.hist.r.length);if(r===n)_dd.p=(_dd.p||0)+1;_dd.b=Math.max(_dd.b||0,pct);var _pcx=qPassCfg();if(n>=_pcx.min&&pct>=_pcx.pct)_dd.ok=1;q.days[_hd]=_dd;
+  var _dk=Object.keys(q.days);if(_dk.length>400){_dk.sort(function(a,b){var x=a.split('-'),y=b.split('-');return (x[0]*1e4+x[1]*100+ +x[2])-(y[0]*1e4+y[1]*100+ +y[2]);});while(_dk.length>400)delete q.days[_dk.shift()];}
+  saveQuizRec(q);var _pc=qPassCfg(),_pass=(n>=_pc.min&&pct>=_pc.pct);
+  document.getElementById('qCard').hidden=true;
+  var res=document.getElementById('qResult');res.hidden=false;
+  var msg=(r===n)?'🏆 満点！すごい！':(pct>=80?'👏 よくできました！':(pct>=50?'🙂 その調子！':'💪 もう一度やってみよう'));
+  res.innerHTML='<div class="qr-score">'+r+' / '+n+'</div><div class="qr-msg">'+msg+'</div>'
+    +(_pass?(qRotOff()?'<div style="font-weight:800;color:#8a7d64;margin:2px 0 10px">🏅 合格ライン突破！<br><span style="font-size:.85em">ただし今日は📖 語彙の日なので、パーフェクトカウント外だよ</span></div>':'<div style="font-weight:800;color:#b7791f;margin:2px 0 10px">🏅 合格ライン突破！（新しく覚えた語 ＋10 とあわせて、ボードのパパのタスクに ✓）</div>'):'<div class="qr-rec">合格ライン：'+(_pc.pct>=100?'満点':_pc.pct+'%以上')+'・'+_pc.min+'問以上</div>')
+    +'<div class="qr-rec">受けた '+q.tests+'回 ・ 満点 '+q.perfects+'回 ・ 自己ベスト '+q.bestPct+'%</div>'
+    +'<div class="qr-btns"><button class="q-again" onclick="startQuiz()">🔁 もう一度</button><button class="q-home" onclick="quizHome()">🏠 ホームへ</button></div>';
+  document.getElementById('qFill').style.width='100%';window.scrollTo(0,0);}
+
+(function(){var k=window.qbKEnsure?qbKEnsure('ruvocab'):{},inDeck={},ch=false,w;ALLW.forEach(function(x){inDeck[x.w]=1;});
+  for(w in k){if(k[w]>0&&!inDeck[w]){k[w]=-Date.now();ch=true;}}
+  if(ch){try{localStorage.setItem('ruvocab_kts',JSON.stringify(k));}catch(e){}known=loadKnown();if(window.qbSyncKick)qbSyncKick();}})();
+window.qbOnKnownSync=function(){known=loadKnown();writeStats();
+  if(!document.getElementById('home').hidden)renderHome();else if(!document.getElementById('study').hidden)render();};
+renderHome();
+</script>

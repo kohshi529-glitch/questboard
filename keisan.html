@@ -183,6 +183,16 @@ window.QB_APP='keisan';
   #play.hw .ans{min-height:76px}
   .ans .dq{color:var(--warm);text-decoration:underline wavy;text-underline-offset:6px;text-decoration-thickness:2px}
   .hwnote{text-align:center;font-size:12.5px;color:var(--ink-faint);font-weight:800;min-height:18px}
+  /* 🎤 声で答える（2026-11-28） */
+  .vbox{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0 0 10px}
+  .vmic{border:none;border-radius:999px;padding:10px 18px;font-family:var(--jp);font-weight:800;font-size:15px;background:var(--card);color:var(--ink-soft);border:2px solid var(--line2);box-shadow:var(--shadow);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .vmic.on{background:#fff0f0;border-color:#e2574f;color:#c0392b}
+  .vmic.on .vdot{width:11px;height:11px;border-radius:50%;background:#e2574f;animation:vpulse 1s ease-in-out infinite}
+  @keyframes vpulse{0%,100%{transform:scale(.8);opacity:.6}50%{transform:scale(1.25);opacity:1}}
+  .vtxt{min-height:20px;font-size:13.5px;font-weight:800;color:var(--ink-faint);text-align:center;font-family:var(--jp)}
+  #play.voice .pad{grid-template-rows:repeat(4,clamp(48px,7.6vh,72px))}
+  #play.voice .key:not(.del):not(.go){font-size:30px}
+  #play.voice .qbox{gap:12px}
   /* 📝 ノート（筆算） */
   #play.note .q{font-size:clamp(30px,9vw,44px)}
   #play.note .playmid{justify-content:flex-start;gap:12px;margin-top:10px}
@@ -244,6 +254,7 @@ window.QB_APP='keisan';
       <button class="inp" data-i="tap" onclick="setInput('tap')">👆 タップで答える</button>
       <button class="inp" data-i="hw" onclick="setInput('hw')">✍️ 手書きで答える</button>
       <button class="inp" data-i="note" onclick="setInput('note')">📝 ノート（筆算）</button>
+      <button class="inp" data-i="voice" onclick="setInput('voice')">🎤 声で答える</button>
     </div>
     <div class="stat-strip">
       <span class="pill">今日 <span id="todayN">0</span> 問</span>
@@ -273,6 +284,10 @@ window.QB_APP='keisan';
       <div class="q" id="q">7 × 8 =</div>
       <div class="ans" id="ans">&nbsp;</div>
       <div class="ngmsg" id="ngmsg"></div>
+    </div>
+    <div class="vbox" id="vbox" hidden>
+      <button class="vmic" id="vmic" onclick="vToggle()"><span class="vdot"></span><span id="vlab">🎤 マイクをオンにする</span></button>
+      <div class="vtxt" id="vtxt"></div>
     </div>
     <div class="pad">
       <button class="key" onclick="press('7')">7</button>
@@ -329,10 +344,12 @@ const SETSIZE=20;
 const MODE_NAME={add:"たし算",sub:"ひき算",mul:"かけ算",div:"わり算",mix:"ミックス"};
 var diff=1, mode='add', problems=[], pi=0, correct=0, cur="", t0=0, timerId=null, locked=false, SZ=SETSIZE;
 var stats=loadStats();
-var inMode=(function(){try{var v=localStorage.getItem('keisan_input');return (v==='hw'||v==='note')?v:'tap';}catch(e){return 'tap';}})();
+var inMode=(function(){try{var v=localStorage.getItem('keisan_input');return (v==='hw'||v==='note'||v==='voice')?v:'tap';}catch(e){return 'tap';}})();
 /* ベスト記録のキー：手書きは別に記録（例 add1h）。タップより時間がかかるので、くらべないため */
-function bkey(m){return m+diff+(inMode==='hw'?'h':inMode==='note'?'n':'');}
-function setInput(i){inMode=(i==='hw'||i==='note')?i:'tap';try{localStorage.setItem('keisan_input',inMode);}catch(e){}renderHome();}
+/* 声で答える（v）も、タップとは別に記録する */
+function bkey(m){return m+diff+(inMode==='hw'?'h':inMode==='note'?'n':inMode==='voice'?'v':'');}
+function setInput(i){if(i==='voice'&&!vSR()){alert('この端末・ブラウザでは 声の入力が使えないみたい。\nGalaxy の Chrome などで ためしてね（タップ・手書きは そのまま使えるよ）');return;}
+  inMode=(i==='hw'||i==='note'||i==='voice')?i:'tap';try{localStorage.setItem('keisan_input',inMode);}catch(e){}renderHome();}
 
 function todayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 function loadStats(){var s;try{s=JSON.parse(localStorage.getItem('keisan_stats')||'null');}catch(e){}if(!s||typeof s!=='object')s={};if(s.date!==todayStr()){s.date=todayStr();s.today=0;}s.best=s.best||{};s.hist=s.hist||{};
@@ -377,12 +394,14 @@ function renderHome(){
   document.querySelectorAll('.inp').forEach(function(b){b.classList.toggle('on',b.dataset.i===inMode);});
   ['mul','div'].forEach(function(m){var b=document.getElementById('best'+m);if(b&&b.parentElement){b.parentElement.classList.toggle('off',inMode==='note');if(inMode==='note')b.textContent='ノートは たし・ひき だけ';}});
   var bm=document.getElementById('bestmix');if(bm&&inMode==='note'&&!stats.best[bkey('mix')])bm.textContent='たし算・ひき算を まぜて筆算';
+  var tip=document.querySelector('.home-tip');if(tip){if(!tip.dataset.base)tip.dataset.base=tip.innerHTML;tip.innerHTML=(inMode==='voice')?'🎤 問題が出たら、答えの数を 声で言ってね（例：「ごじゅうろく」「56」）。<br>正しい数が聞こえたら すぐ つぎへ。声がうまく通じないときは キーでも答えられるよ。<br>声のベストは タップとは べつに記録するよ（はじめての記録は「記録づくり」）':tip.dataset.base;}
 }
 function show(id){['home','play','result'].forEach(function(v){document.getElementById(v).hidden=(v!==id);});}
 
 function start(m){if(inMode==='note'&&(m==='mul'||m==='div')){alert('ノート（筆算）は たし算・ひき算・ミックス です');return;}mode=m;buildSet();pi=0;correct=0;cur="";locked=false;
-  show('play');document.getElementById('h1').textContent=MODE_NAME[m]+(inMode==='hw'?' ✍️':inMode==='note'?' 📝':' ⚡');
-  document.querySelector('.pad').hidden=(inMode!=='tap');document.getElementById('play').classList.toggle('hw',inMode==='hw');document.getElementById('hwbox').hidden=(inMode!=='hw');
+  show('play');document.getElementById('h1').textContent=MODE_NAME[m]+(inMode==='hw'?' ✍️':inMode==='note'?' 📝':inMode==='voice'?' 🎤':' ⚡');
+  document.querySelector('.pad').hidden=(inMode!=='tap'&&inMode!=='voice');
+  document.getElementById('play').classList.toggle('voice',inMode==='voice');document.getElementById('vbox').hidden=(inMode!=='voice');if(inMode==='voice'){V.want=true;V.denied=false;}else vStop();document.getElementById('play').classList.toggle('hw',inMode==='hw');document.getElementById('hwbox').hidden=(inMode!=='hw');
   document.getElementById('play').classList.toggle('note',inMode==='note');document.getElementById('notebox').hidden=(inMode!=='note');document.getElementById('ans').hidden=(inMode==='note');document.getElementById('ngmsg').hidden=(inMode==='note');
   if(inMode==='hw')hwSize();
   t0=Date.now();if(timerId)clearInterval(timerId);timerId=setInterval(tick,200);tick();
@@ -398,8 +417,9 @@ function showProblem(){
   document.getElementById('qnum').textContent=(pi+1)+' / '+SZ;
   document.getElementById('track').style.width=(pi/SZ*100)+'%';
   if(inMode==='note')setupFromProblem();
+  if(inMode==='voice'){var vt=document.getElementById('vtxt');if(vt&&!V.denied)vt.textContent='';vListen();}
 }
-function press(n){if(locked||inMode!=='tap')return;if(cur.length>=6)return;cur+=n;paint();}
+function press(n){if(locked||(inMode!=='tap'&&inMode!=='voice'))return;if(cur.length>=6)return;cur+=n;paint();}
 function del(){if(locked)return;cur=cur.slice(0,-1);paint();}
 function paint(){var a=document.getElementById('ans');
   if(inMode==='hw'&&HW.res.length){a.innerHTML=HW.res.slice(0,6).map(function(r){return r.p<0.6?'<span class="dq">'+r.d+'</span>':String(r.d);}).join('');return;}
@@ -460,12 +480,12 @@ function submit(){
 }
 function nextProblem(){pi++;if(pi>=SZ){finish();}else{showProblem();}}
 function finish(){
-  if(timerId)clearInterval(timerId);
+  if(timerId)clearInterval(timerId);vStop();
   var ms=Date.now()-t0, sec=Math.round(ms/1000), acc=Math.round(correct/SZ*100),isNote=(inMode==='note');
   var key=bkey(mode), prevBest=stats.best[key], isBest=false, hwFirst=false;
   if(correct===SZ){ if(!prevBest||sec<prevBest){stats.best[key]=sec;isBest=true;} }
   /* 手書きの はじめての記録は「記録づくり」。ベスト更新のごほうびは 2回目から */
-  if(isBest&&inMode==='hw'&&!prevBest){isBest=false;hwFirst=true;}
+  if(isBest&&(inMode==='hw'||inMode==='voice')&&!prevBest){isBest=false;hwFirst=true;}
   /* ベスト更新のボーナスは、その日・その種目（例：たし算・ふつう）で1回だけ。タップと手書きのどちらで更新しても同じ */
   var kind=mode+diff,pbDup=false;
   /* ノート（筆算）は 練習用：ベストは記録するが ボーナス・コミットラインには数えない */
@@ -486,16 +506,69 @@ function finish(){
   var bl=document.getElementById('rBest');
   if(isBest){var _qc={};try{_qc=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}var _pp=(_qc.pbPer===undefined)?5:(+_qc.pbPer||0);
     var _bon=(_qc.bonusOn!==0&&_pp&&(localStorage.getItem('qb_calc_owner')!=='papa'));
-    bl.textContent=(inMode==='hw'?'⭐ 手書きベスト更新！（':isNote?'⭐ ノートのベスト更新！（':'⭐ ベスト更新！（')+fmtBest(sec)+'）'+(_bon&&!isNote?(pbDup?' きょうの'+MODE_NAME[mode]+'のボーナスは もらいずみ':' 📱+'+_pp+'分ゲット！'):'');}
-  else if(hwFirst)bl.textContent='✍️ 手書きの はじめての記録！（'+fmtBest(sec)+'）次はこれをこえよう';
-  else if(stats.best[key])bl.textContent=(inMode==='hw'?'✍️ 手書きベスト ':isNote?'📝 ノートのベスト ':'ベスト ')+fmtBest(stats.best[key]);
+    bl.textContent=(inMode==='hw'?'⭐ 手書きベスト更新！（':inMode==='voice'?'⭐ 声のベスト更新！（':isNote?'⭐ ノートのベスト更新！（':'⭐ ベスト更新！（')+fmtBest(sec)+'）'+(_bon&&!isNote?(pbDup?' きょうの'+MODE_NAME[mode]+'のボーナスは もらいずみ':' 📱+'+_pp+'分ゲット！'):'');}
+  else if(hwFirst)bl.textContent=(inMode==='voice'?'🎤 声の':'✍️ 手書きの')+' はじめての記録！（'+fmtBest(sec)+'）次はこれをこえよう';
+  else if(stats.best[key])bl.textContent=(inMode==='hw'?'✍️ 手書きベスト ':inMode==='voice'?'🎤 声のベスト ':isNote?'📝 ノートのベスト ':'ベスト ')+fmtBest(stats.best[key]);
   else bl.textContent='全問せいかいでベスト記録に挑戦！';
   var cl=document.getElementById('rCommit');if(cl){var mm=['add','sub','mul','div','mix'],left=mm.filter(function(x){return !modeDone(x);});
     cl.textContent=isNote?'📝 ノート（筆算）は れんしゅう用。コミットラインには数えないよ':((correct===SZ&&modeDone(mode))?('✅ 今日の'+MODE_NAME[mode]+' クリア！ '):'')+(left.length?('コミットライン：あと '+left.map(function(x){return MODE_NAME[x];}).join('・')):'🎯 計算のコミットライン 全部クリア！');}
 }
 function again(){start(mode);}
 function goHome(){show('home');document.getElementById('h1').textContent='計算クエスト ⚡';renderHome();window.scrollTo(0,0);}
-function quit(){if(timerId)clearInterval(timerId);goHome();}
+function quit(){if(timerId)clearInterval(timerId);vStop();goHome();}
+
+/* ---- 🎤 声で答えるモード（2026-11-28 娘の要望）----
+   端末の音声認識（Chrome の webkitSpeechRecognition・日本語）で、言った数を読み取る。
+   正しい数が聞こえたら その場で正解。ちがう数が はっきり聞こえたら まちがい。数が聞き取れないときは もう一度きく。
+   タップのキーも そのまま使える（声がうまくいかないとき用）。 */
+var V={rec:null,active:false,want:false,denied:false,len:0,skip:0,mi:-1,ml:0,t:null};
+function vSR(){return window.SpeechRecognition||window.webkitSpeechRecognition||null;}
+function vUI(){var b=document.getElementById('vmic'),l=document.getElementById('vlab');if(!b)return;var on=V.active&&V.want;b.classList.toggle('on',on);
+  l.textContent=on?'きいてるよ… 答えを 声で言ってね':(V.denied?'🎤 マイクが使えないよ（タップで答えてね）':'🎤 マイクをオンにする');}
+function vSay(t){var e=document.getElementById('vtxt');if(e)e.textContent=t||'';}
+function vToggle(){if(V.active&&V.want){vStop();vUI();return;}V.want=true;V.denied=false;vListen();}
+function vStop(){V.want=false;clearTimeout(V.t);if(V.rec&&V.active){try{V.rec.abort();}catch(e){}}V.active=false;vUI();}
+function vListen(){if(!V.want||inMode!=='voice'||document.getElementById('play').hidden)return;if(V.active)return;var SR=vSR();if(!SR){V.denied=true;vUI();vSay('この端末では 声の入力が使えないよ');return;}
+  if(!V.rec){var r=V.rec=new SR();r.lang='ja-JP';r.continuous=true;r.interimResults=true;r.maxAlternatives=5;
+    r.onstart=function(){V.active=true;V.len=0;V.skip=0;V.mi=-1;V.ml=0;vUI();};
+    r.onresult=vOnResult;
+    r.onerror=function(e){var er=e&&e.error;if(er==='not-allowed'||er==='service-not-allowed'||er==='audio-capture'){V.want=false;V.denied=true;vSay(er==='audio-capture'?'マイクが見つからないよ':'マイクの使用が許可されていないよ。ブラウザの設定でマイクを「許可」にしてね');}
+      else if(er==='network'){vSay('ネットにつながらないと 声の入力は使えないよ');}vUI();};
+    r.onend=function(){V.active=false;vUI();if(V.want){clearTimeout(V.t);V.t=setTimeout(vListen,150);}};}
+  try{V.rec.start();V.active=true;}catch(e){V.active=false;}vUI();}
+function vOnResult(e){var rs=e.results;V.len=rs.length;if(locked||document.getElementById('play').hidden)return;var p=problems[pi];if(!p)return;
+  /* すでに使った部分（前の問題の答え）は読まない：skip より前の結果は無視、mark の結果は 使った文字数より後ろだけ読む */
+  function txt(i,a){var t=(rs[i][a]&&rs[i][a].transcript)||'';return (i===V.mi)?t.slice(V.ml):t;}
+  var from=Math.max(e.resultIndex||0,V.skip),shown='',fin=null,finI=-1;
+  for(var i=from;i<rs.length;i++){var r=rs[i];
+    for(var a=0;a<r.length;a++){var tx=txt(i,a);if(!a&&tx.trim())shown=tx;if(tx&&jaNums(tx).indexOf(p.ans)>=0){vAccept(i,tx,((rs[i][0]&&rs[i][0].transcript)||'').length);return;}}
+    if(r.isFinal){var ns=jaNums(txt(i,0));if(!ns.length){for(var b=1;b<r.length;b++){ns=jaNums(txt(i,b));if(ns.length)break;}}if(ns.length){fin=ns[ns.length-1];finI=i;}}}
+  if(shown)vSay('🎤「'+shown.trim()+'」');
+  if(fin!==null){V.skip=finI+1;V.mi=-1;cur=String(fin).slice(0,6);paint();submit();}
+  else{var L=rs.length-1;if(L>=from&&rs[L].isFinal){V.skip=L+1;V.mi=-1;if(shown)vSay('🎤「'+shown.trim()+'」…数が 聞き取れなかったよ。もう一度 言ってね');}}}
+function vAccept(i,tx,full){V.skip=i;V.mi=i;V.ml=full||0;cur=String(problems[pi].ans);paint();vSay('🎤「'+String(tx).trim()+'」');submit();}
+/* 日本語の数の読み取り：「56」「五十六」「ごじゅうろく」「せんきゅうひゃく…」に対応。答えにある数をぜんぶ返す */
+var JA_U=[['ぜろ',0],['れい',0],['まる',0],['いち',1],['いっ',1],['さん',3],['よん',4],['しち',7],['なな',7],['ろく',6],['ろっ',6],['はち',8],['はっ',8],['きゅう',9],['きゅー',9],['に',2],['し',4],['ご',5],['く',9]];
+var JA_M=[['じゅう',10],['じゅー',10],['じゅっ',10],['じっ',10],['ひゃく',100],['びゃく',100],['ぴゃく',100],['せん',1000],['ぜん',1000]];
+var JA_K={'〇':0,'零':0,'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9},JA_KM={'十':10,'百':100,'千':1000};
+var JA_HOMO={'急':9,'級':9,'球':9,'旧':9,'求':9,'救':9,'誤':5,'碁':5,'後':5,'語':5,'午':5,'録':6,'産':3,'参':3,'死':4,'詩':4,'位置':1,'壱':1,'蜂':8,'鉢':8,'似':2,'荷':2,'煮':2,'銃':10,'重':10,'充':10,'自由':10,'百':100,'千':1000,'線':1000,'先':1000,'丸':0,'零':0,'ゼロ':0};
+function jaNums(t){t=String(t||'');try{t=t.normalize('NFKC');}catch(e){}
+  t=t.replace(/[ァ-ヶ]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60);}).replace(/(\d)\s+(?=\d)/g,'$1|').replace(/[、。．！!？?]/g,'|').replace(/[\s,.]/g,'');
+  t=t.replace(/(こたえは|答えは|こたえ|答え|えーと|えっと|ええと|あのー|あの|です|でした|ですか|かな|ください|下さい|だよ|だと|だ|個|こ$)/g,'|');
+  var bare=t.replace(/\|/g,'');if(JA_HOMO.hasOwnProperty(bare))return [JA_HOMO[bare]];
+  var out=[],tot=0,dg=null,has=false,lastM=1e9,i=0;
+  function flush(){if(has)out.push(tot+(dg||0));tot=0;dg=null;has=false;lastM=1e9;}
+  function digit(d){if(dg!==null)flush();dg=d;has=true;}
+  function mult(m){if(m>=lastM)flush();tot+=(dg===null?1:dg)*m;dg=null;lastM=m;has=true;}
+  while(i<t.length){var c=t.charAt(i),m;
+    if(/[0-9]/.test(c)){m=t.slice(i).match(/^[0-9]+/)[0];flush();out.push(parseInt(m,10));i+=m.length;continue;}
+    if(JA_K.hasOwnProperty(c)){digit(JA_K[c]);i++;continue;}
+    if(JA_KM.hasOwnProperty(c)){mult(JA_KM[c]);i++;continue;}
+    var hit=null,k;for(k=0;k<JA_M.length;k++){if(t.substr(i,JA_M[k][0].length)===JA_M[k][0]){hit=['m',JA_M[k]];break;}}
+    if(!hit){for(k=0;k<JA_U.length;k++){if(t.substr(i,JA_U[k][0].length)===JA_U[k][0]){hit=['u',JA_U[k]];break;}}}
+    if(hit){if(hit[0]==='m')mult(hit[1][1]);else digit(hit[1][1]);i+=hit[1][0].length;continue;}
+    flush();i++;}
+  flush();return out;}
 
 document.addEventListener('keydown',function(e){
   if(document.getElementById('play').hidden||inMode==='note')return;
@@ -510,7 +583,7 @@ document.addEventListener('keydown',function(e){
            仮の1は、その位の答えを運んだときに消えて答えにまとまる。いちばん左の仮の1は最後に自動で確定（正規化）。
    ひき算：たりない位は、左の位の上の小さいマスへ「くり下がったあとの数」を運ぶ（例 72−38 → 十の位の上に 6）。
    まちがった数を運んだら その問題は誤答。正しい筆算を見せて「つぎへ」。 */
-var NOTE_SET=5,NT=null;
+var NOTE_SET=20,NT=null;
 function ndig(x){return String(x).split('').reverse().map(Number);}
 function noteGen(m){
   if(m==='mix')m=['add','sub'][rnd(0,1)];

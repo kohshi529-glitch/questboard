@@ -302,6 +302,11 @@
   .rd-in input{flex:1;min-width:0;padding:10px;border-radius:12px;border:2px solid #b9d9a8;font-size:1.05rem;font-family:inherit}
   .rd-in button{flex:none;border:none;background:#3f8f4a;color:#fff;font-weight:900;border-radius:12px;padding:0 14px;font-size:.95rem;font-family:inherit;box-shadow:0 3px 0 #2f6f3a}
   .rlcard{border:2px solid #8a7d64;background:#fffdf7;margin-top:14px}
+  /* 🇷🇺 パパのロシア語クエスト（2026-11-28） */
+  .ru-g{font-style:normal;font-weight:900;font-family:Nunito,system-ui,sans-serif}
+  .quest.ru .dt-sub{display:block;font-size:.72rem;font-weight:700;color:var(--soft);margin-top:2px}
+  .quest.ru.done{text-decoration:none}.quest.ru.done .ru-t{text-decoration:line-through}.quest.ru{cursor:default}
+  .quest.ru .ru-open{display:inline-block;margin-top:4px;font-size:.74rem;font-weight:900;color:#2f5fb3;text-decoration:none;border:1.5px solid #c9d6ef;border-radius:999px;padding:2px 9px;background:#f2f6fd}
   .rl-h{font-weight:900;font-size:.92rem;margin:12px 0 6px;color:#5b4a2e}
   .rl-t{width:100%;border-collapse:collapse;font-size:.8rem;font-weight:700;background:#fff}
   .rl-t th{background:#f3eadb;color:#5b4a2e;font-weight:900;padding:5px 6px;border:1px solid #e3d5b8;text-align:left}
@@ -791,8 +796,8 @@
     <div class="two"><div><input id="d_clDate" type="date"></div><div><select id="d_clLv"><option value="0">お休み</option><option value="1">👍 ナイス</option><option value="2">🌟 パーフェクト</option><option value="3">🌈 レインボー</option><option value="4">💜 アメジスト</option><option value="5">👑 GOD 神セレブレーション</option><option value="6">🦄 ユニコーン</option></select></div></div>
     <button class="btn gray" onclick="clEdit()">📅 この日の判定を書きかえる</button>
     <label style="margin-top:12px">🟥 ケータイお休みルール</label>
-    <p class="hint">👍ナイスなしが続く日数・🌟パーフェクトなしが続く日数のどちらかに届いたら、次の日はケータイお休み（スマホ時間のお願いも止まる）。ナイスなしで入ったら👍ナイス、パーフェクトなしで入ったら🌟パーフェクトに、その日のうちに届けば解除。あと1日でお休みになる「リーチの日」は、15時からカビがふえはじめ（👍ナイスまでは緑カビ、ナイスのあとパーフェクトまでは黒カビ）、20時をすぎると一気にふえて、ボードの地の色もカビの色になっていきます（文字では知らせません）。パパのリーチカードは20時から出ます。ケータイお休みの日は、ナイスなしで入ったら緑ヘドロ、パーフェクトなしで入ったらゾンビがボードの上を横切ります（タップのじゃまはしません）。「使う」にするとルールタブに決まりが出ます。娘と読んで合意してから開始日を入れてください（開始日が空なら判定しません）。</p>
-    <div class="two"><div><label>ルール</label><select id="d_gOn"><option value="0">使わない</option><option value="1">使う</option></select></div><div><label>開始日（この日の結果から数える）</label><input id="d_gStart" type="date"></div></div>
+    <p class="hint">👍ナイスなしが続く日数・🌟パーフェクトなしが続く日数のどちらかに届いたら、次の日はケータイお休み（スマホ時間のお願いも止まる）。ナイスなしで入ったら👍ナイス、パーフェクトなしで入ったら🌟パーフェクトに、その日のうちに届けば解除。あと1日でお休みになる「リーチの日」は、15時からカビがふえはじめ（👍ナイスまでは緑カビ、ナイスのあとパーフェクトまでは黒カビ）、20時をすぎると一気にふえて、ボードの地の色もカビの色になっていきます（文字では知らせません）。パパのリーチカードは20時から出ます。ケータイお休みの日は、ナイスなしで入ったら緑ヘドロ、パーフェクトなしで入ったらゾンビがボードの上を横切ります（タップのじゃまはしません）。はじめから「使う」で、開始日は 2026-11-28（空のときもこの日から数えます）。止めたいときは「使わない」にして保存してください。</p>
+    <div class="two"><div><label>ルール</label><select id="d_gOn"><option value="1">使う</option><option value="0">使わない</option></select></div><div><label>開始日（この日の結果から数える・空なら 2026-11-28）</label><input id="d_gStart" type="date"></div></div>
     <div class="two"><div><label>👍ナイスなしが何日で</label><select id="d_gNn"><option value="1">1日</option><option value="2">2日</option><option value="0">使わない</option></select></div><div><label>🌟パーフェクトなしが何日で</label><select id="d_gPn"><option value="3">3日</option><option value="2">2日</option><option value="4">4日</option><option value="0">使わない</option></select></div></div>
     <label style="margin-top:6px">おやすみ日（大会・発熱・家族の行事など。連続の数に入れない）　※娘の申請はコミットタブで承認できます</label>
     <div class="two"><div><input id="d_gEx" type="date"></div><div style="flex:0 0 auto"><button class="btn gray" style="width:auto;padding:8px 12px" onclick="gdExAdd()">追加</button></div></div>
@@ -1148,8 +1153,28 @@ function phwSave(){var p=phwS(),g=function(id){return document.getElementById(id
 function qbRv(){rollover();S.day.rv=_num(S.day.rv)+1;}
 function qbPending(){var n=(S.homework||[]).filter(function(h){return h.st==='sub';}).length;if(S.phw&&S.phw.on&&S.phw.items)n+=S.phw.items.filter(function(x){return x.st==='sub';}).length;
   ((S.kj&&S.kj.tests)||[]).forEach(function(t){if(t.st==='sub')n++;if(t.fx)Object.keys(t.fx).forEach(function(i){if(t.fx[i].st==='sub')n++;});});return n;}
+/* ===== 🇷🇺 パパのロシア語クエスト（ruvocab.html）：新しく覚えた語＋ノルマ と 検問の合格 で自動 ✓（2026-11-28） ===== */
+function ruCfg(){var c=S.cfg||{};return {nw:+c.ruNew||10,pct:+c.ruPct||50,min:+c.ruMin||10};}
+function ruStat(){var k=qbKStat('ruvocab'),td=qbTodayStr(),loc=_lsGet('ruvocab_stats')||{},raw=(SYNC&&SYNC.astatRaw&&SYNC.astatRaw.ruvocab)||{};
+  function qd(o){return (o&&o.quiz&&o.quiz.days&&o.quiz.days[td])||null;}
+  var a=qd(loc)||{},b=qd(raw)||{};var ok=!!(a.ok||b.ok),best=Math.max(+a.b||0,+b.b||0),tests=Math.max(+a.t||0,+b.t||0);
+  var rt=(raw.tday===td)?(+raw.today||0):0,lt=(loc.tday===td)?(+loc.today||0):0;
+  var today=Math.max(k?k.today:0,rt,lt),learned=Math.max(k?k.learned:0,+raw.learned||0,+loc.learned||0);
+  return {today:today,learned:learned,ok:ok,best:best,tests:tests};}
+function ruDoneNow(){var c=ruCfg(),r=ruStat();return r.today>=c.nw&&r.ok;}
+function ruRowHTML(){var c=ruCfg(),r=ruStat(),done=!!((S.day&&S.day.pa&&S.day.pa.ru)||ruDoneNow());
+  var sub='今日 +'+r.today+'/'+c.nw+'語'+(r.today>=c.nw?' ✅':'')+' ・ 検問 '+(r.ok?'合格 ✅':(r.tests?'ベスト '+r.best+'%（'+c.pct+'%で合格）':'まだ'))+' ・ 覚えた '+r.learned+'語';
+  return '<div class="quest ru'+(done?' done':'')+'"><div class="chk">'+(done?'✓':'')+'</div><div><span class="ru-t">🇷🇺 ロシア語クエスト</span><span class="dt-sub">'+sub+'<br>新しく覚えた語 ＋'+c.nw+' と 検問の合格で 自動で ✓</span><a class="ru-open" href="./ruvocab.html">▶ 単語カードをひらく</a></div></div>';}
+/* パパの端末だけが記録する（経験値 +10・パパのがんばりカレンダーに Р）。二重に足さないよう S.day.pa.ru で1日1回 */
+function ruSync(){if(!S||!S.day||!S.day.pa)return;if(calcOwner()!=='papa')return;if(S.day.pa.ru||!ruDoneNow())return;
+  var before=lv(S.pa.xp);S.day.pa.ru=true;S.pa.xp+=10;papaHistUpdate();save();try{maybeSync();}catch(e){}
+  try{showCheer('🇷🇺 ロシア語クエスト クリア！ パパ 経験値 +10');}catch(e){}}
+function ruRefresh(){ruSync();var el=document.getElementById('ruRow');if(el)el.innerHTML=ruRowHTML();}
+window.addEventListener('focus',function(){try{ruRefresh();}catch(e){}});
+document.addEventListener('visibilitychange',function(){if(!document.hidden){try{ruRefresh();}catch(e){}}});
 function papaHistUpdate(){S.papaHistory=S.papaHistory||{};var td=today();var bee=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/ビーモン/.test(q);});var car=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/迎/.test(q);});
-  var code=((bee&&car)?'bc':bee?'b':car?'c':''),cur=S.papaHistory[td]||'';if(code===cur)return false;if(code)S.papaHistory[td]=code;else delete S.papaHistory[td];return true;}
+  var ru=!!(S.day&&S.day.pa&&S.day.pa.ru);
+  var code=((bee&&car)?'bc':bee?'b':car?'c':'')+(ru?'r':''),cur=S.papaHistory[td]||'';if(code===cur)return false;if(code)S.papaHistory[td]=code;else delete S.papaHistory[td];return true;}
 /* がんばりタスクの候補の整理（2026-11-15決定）：コミットライン・宿題と重なる候補を外す。次の日の切りかえで1回だけ */
 function chFixDup(q){return /計算ドリル/.test(q)||/漢字ドリル/.test(q)||(/読書/.test(q)&&/漢字/.test(q));}
 function chFixApply(){if(!S.cfg||S.cfg.chFix1)return;S.cfg.chFix1=1;var ch=S.cfg.choice||[],out=[];
@@ -1173,7 +1198,7 @@ function fmtLast(ms){ms=+ms;if(!ms||!isFinite(ms))return '';var d=new Date(ms);f
 /* 覚えた語リスト（単語ページと同じ元データ）から 覚えた数・今日の数・最終時刻 を出す */
 /* 収録語リスト（各アプリが {v:版,w:[語…]} を書く）。端末とサーバのうち新しい版を使う */
 function qbDeck(key){var l=null,r=null;try{l=JSON.parse(localStorage.getItem(key+'_deck')||'null');}catch(e){}
-  var rs=SYNC&&SYNC.astatRemote&&SYNC.astatRemote[key+'_deck'];if(typeof rs==='string'){try{r=JSON.parse(rs);}catch(e){}}
+  var rs=(SYNC&&SYNC.astatRemote&&SYNC.astatRemote[key+'_deck'])||(SYNC&&SYNC.astatRaw&&SYNC.astatRaw[key+'_deck']);if(typeof rs==='string'){try{r=JSON.parse(rs);}catch(e){}}
   var d=l;if(r&&r.w&&(!l||_num(r.v)>_num(l.v))){d=r;try{localStorage.setItem(key+'_deck',rs);}catch(e){}}
   if(!d||!d.w||!d.w.length)return null;if(!d.set){var o={};d.w.forEach(function(w){o[w]=1;});d.set=o;}return d;}
 function qbKStat(key){var k=null;try{k=JSON.parse(localStorage.getItem(key+'_kts')||'null');}catch(e){}
@@ -2114,7 +2139,7 @@ function avatarHTML(p){if(p&&p.avatar)return '<img src="'+p.avatar+'" class="ava
 function setAvatar(who,ev){var f=ev.target.files&&ev.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(e){var img=new Image();img.onload=function(){var sz=96,cv=document.createElement('canvas');cv.width=sz;cv.height=sz;var ctx=cv.getContext('2d'),m=Math.min(img.width,img.height),sx=(img.width-m)/2,sy=(img.height-m)/2;ctx.drawImage(img,sx,sy,m,m,0,0,sz,sz);var data;try{data=cv.toDataURL('image/jpeg',0.7);}catch(err){alert('画像を読み込めませんでした');return;}S[who].avatar=data;save();maybeSync();renderAvaPrev();render();};img.src=e.target.result;};rd.readAsDataURL(f);}
 function clearAvatar(who){delete S[who].avatar;save();maybeSync();renderAvaPrev();render();}
 function renderAvaPrev(){var me=document.getElementById('avaPrevMe'),pa=document.getElementById('avaPrevPa');if(me)me.innerHTML=S.me.avatar?('<img src="'+S.me.avatar+'" class="ava">'):'（なし）';if(pa)pa.innerHTML=S.pa.avatar?('<img src="'+S.pa.avatar+'" class="ava">'):'（なし）';}
-function papaCalHTML(){const N=16,base=new Date(),tk=today();let cells='';for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const v=S.papaHistory&&S.papaHistory[k];const on=!!v;var g='';if(v==='b')g='b';else if(v==='c')g=CAR;else if(v==='bc')g='b'+CAR;else if(v)g='●';cells+='<div class="hcell pcell'+(on?' pa':'')+(k===tk?' today':'')+'" title="'+k+'">'+g+'</div>';}return '<div class="calgrid">'+cells+'</div>';}
+function papaCalHTML(){const N=16,base=new Date(),tk=today();let cells='';for(let c=1;c<=N;c++){const daysAgo=N-c;const d=new Date(base);d.setDate(base.getDate()-daysAgo);const k=dstr(d);const v=S.papaHistory&&S.papaHistory[k];const on=!!v;var g='';if(v){var vv=String(v);g=(vv.indexOf('b')>=0?'b':'')+(vv.indexOf('c')>=0?CAR:'')+(vv.indexOf('r')>=0?'<i class="ru-g">Р</i>':'');if(!g)g='●';}cells+='<div class="hcell pcell'+(on?' pa':'')+(k===tk?' today':'')+'" title="'+k+'">'+g+'</div>';}return '<div class="calgrid">'+cells+'</div>';}
 function papaCount(){let c=0;const base=new Date();for(let i=0;i<16;i++){const d=new Date(base);d.setDate(base.getDate()-i);if(S.papaHistory&&S.papaHistory[dstr(d)])c++;}return c;}
 function papaStreak(){let c=0;const base=new Date();let start=(S.papaHistory&&S.papaHistory[dstr(base)])?0:1;for(let j=start;;j++){const d=new Date(base);d.setDate(base.getDate()-j);if(S.papaHistory&&S.papaHistory[dstr(d)])c++;else break;}return c;}
 const PKEY='qb_photos';
@@ -2193,19 +2218,20 @@ function render(){
   }else{
     const mq=meQuests();
     const rc=(S.reactions&&S.reactions[today()])?('<div class="card" style="text-align:center;background:#fff0ea;border-color:#f2c3b2"><div style="font-weight:800">💌 パパからの応援</div><div style="font-size:1.7rem;margin:4px 0">'+S.reactions[today()].e+'</div><div>'+S.reactions[today()].m+'</div></div>'):'';
-    dtSync();
+    dtSync();try{ruSync();}catch(e){}
     stageTop.innerHTML=rc+`<div class="row">
       <div class="player"><h3>${S.me.name}</h3>${heroHTML('me')}<button class="ks-herobtn" onclick="ksOpen()">👗 きせかえ<span>${kseLeft()?'券'+kseLeft():''}</span></button>
         ${dtRowsHTML()}
       </div>
       <div class="player"><h3>${S.pa.name}</h3>${heroHTML('pa')}
         ${S.cfg.pa.map((q,i)=>`<div class="quest ${S.day.pa['p'+i]?'done':''}" onclick="toggle('pa','p'+${i})"><div class="chk">${S.day.pa['p'+i]?'✓':''}</div><div>${q}</div></div>`).join('')}
+        <div id="ruRow">${ruRowHTML()}</div>
       </div></div>`;
     stage.innerHTML=`<div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">📅 がんばりカレンダー</div>
         <div class="calwrap">${calHTML()}</div>
         <div class="legend"><span><i class="l-on"></i>👍ナイス</span><span><i class="l-star"></i>🌟パーフェクト</span><span><i class="l-rainbow"></i>🌈レインボー</span><span><i class="l-amethyst"></i>💜アメジスト</span><span><i class="l-god"></i>👑GOD</span><span><i class="l-uni"></i>🦄ユニコーン</span><span><i class="l-off"></i>お休み</span><span><i class="l-today"></i>今日</span></div>
         <div class="mini">この16日で ナイス ${histCount(1)}日（うち 🌟パーフェクト ${histCount(2)}日・🌈レインボー ${histCount(3)}日・💜アメジスト ${histCount(4)-histCount(5)}日・👑GOD ${histCount(5)-histCount(6)}日${histCount(6)?'・🦄ユニコーン '+histCount(6)+'日':''}）${partySum()?'<br>🥳 パーティ 合計 '+partySum()+'回':''}</div></div>
-      <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span></div></div>
+      <div class="card"><div style="font-weight:800;font-size:.95rem;text-align:center">${S.pa.emoji} ${S.pa.name}のがんばり</div><div class="calwrap">${papaCalHTML()}</div><div class="mini">連続 ${papaStreak()}日 ／ この16日で ${papaCount()}日</div><div class="mini" style="margin-top:2px;display:flex;gap:12px;justify-content:center;align-items:center"><span><b style="color:var(--coral)">b</b>＝ビーモン</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="background:var(--coral);border-radius:3px;padding:1px 3px;display:inline-flex">${CAR}</span>＝送迎</span><span><b class="ru-g" style="color:#2f5fb3">Р</b>＝ロシア語</span></div></div>
       <div class="card" style="text-align:center"><div style="font-weight:800;font-size:.95rem">📸 今日の記録</div>${loadPhotos()[today()]?('<img src="'+loadPhotos()[today()]+'" style="max-width:100%;border-radius:10px;margin-top:8px" onclick="viewPhoto(\''+today()+'\')">'):'<div class="mini">音読動画やドリルの写真を残そう</div>'}<div><label class="btn gray" style="display:inline-block;width:auto;padding:10px 14px;margin-top:8px">📷 写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label></div></div>`;
   }
   document.getElementById('rewardLog').innerHTML=rewardCardHTML();
@@ -2378,7 +2404,7 @@ function initSync(){
     try{SYNC.hwref=firebase.database().ref('rooms/'+SYNC.creds.room+'/hwphotos');var _hwOn=function(sn){if(typeof sn.val()==='string'){HWPH[sn.key]=sn.val();hwPhSave();renderHomework();renderKanji();}};SYNC.hwref.on('child_added',_hwOn);SYNC.hwref.on('child_changed',_hwOn);SYNC.hwref.on('child_removed',function(sn){delete HWPH[sn.key];hwPhSave();});}catch(e){}
     try{SYNC.nref=firebase.database().ref('rooms/'+SYNC.creds.room+'/notify/topic');SYNC.nref.on('value',function(sn){var v=sn.val();if(v===null){if(S.cfg.ntfyTopic)ntfyPush(S.cfg.ntfyTopic);return;}v=String(v||'').trim();ntfyCache(v);if((S.cfg.ntfyTopic||'')!==v){S.cfg.ntfyTopic=v;save();maybeSync();}});}catch(e){}
     try{SYNC.pref=firebase.database().ref('rooms/'+SYNC.creds.room+'/photos');SYNC.pref.on('child_added',handlePhoto);SYNC.pref.on('child_changed',handlePhoto);}catch(e){}
-    try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;SYNC.astatRaw=SYNC.astatRemote;SYNC.astatReady=true;if(SYNC.astatRemote){qbKMergeRemote('vocab',SYNC.astatRemote.vocab_k);qbKMergeRemote('jvocab',SYNC.astatRemote.jvocab_k);}if(SYNC.astatRemote)cacheAppstats(SYNC.astatRemote);appStatsSync();});}catch(e){}
+    try{SYNC.astatRef=firebase.database().ref('rooms/'+SYNC.creds.room+'/appstats');SYNC.astatRef.on('value',function(sn){SYNC.astatRemote=sn.val()||null;SYNC.astatRaw=SYNC.astatRemote;SYNC.astatReady=true;if(SYNC.astatRemote){qbKMergeRemote('vocab',SYNC.astatRemote.vocab_k);qbKMergeRemote('jvocab',SYNC.astatRemote.jvocab_k);qbKMergeRemote('ruvocab',SYNC.astatRemote.ruvocab_k);}if(SYNC.astatRemote)cacheAppstats(SYNC.astatRemote);appStatsSync();});}catch(e){}
   }catch(e){syncStatus('初期化エラー: '+e.message);}
 }
 
@@ -2480,7 +2506,7 @@ function appStatsSync(){
   };
   ['child','papa'].forEach(function(r){var e=+((rem[r]&&rem[r].ep)||0);if(e)SYNC.astatRemote[r].ep=e;});
   cacheAppstats(SYNC.astatRemote);
-  renderVocab();renderJvocab();renderPass();renderCalc();ksFixPaint();
+  renderVocab();renderJvocab();renderPass();renderCalc();ksFixPaint();try{ruRefresh();}catch(e){}
   // 書き込みは「自分のロールのバケット＋共有(vocab/jvocab)」だけ。他ロールの keisan は絶対に書かない（競合・消失の根絶）。
   var mineFin=(role==='papa')?papaFinal:childFinal, mineDel=(role==='papa')?papaDel:childDel;
   var mineRem=(role==='papa')?papaRem:childRem, mineRemDel=(role==='papa')?remPd:remCd;
@@ -2589,8 +2615,11 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){navig
    おやすみ日は、娘がコミットタブから申請（S.gd.rq）→ パパが認めたら S.gd.ex に入る。
    状態は毎回カレンダー（S.clog）から計算。保存するのは設定・おやすみ日・申請・通知ずみの印（S.gd.log）だけ（S.gd は同期）。 */
 var _gdN=0,_gdSawMold=false;
-function gdC(){var c=S.cfg||{},st=c.gStart||'',nn=(c.gNn===undefined||c.gNn===null||c.gNn==='')?1:+c.gNn,pn=(c.gPn===undefined||c.gPn===null||c.gPn==='')?3:+c.gPn;
-  return {on:+c.gOn===1&&/^\d{4}-\d{2}-\d{2}$/.test(st),shown:+c.gOn===1,start:st,nn:Math.max(0,nn||0),pn:Math.max(0,pn||0)};}
+/* 2026-11-28：娘とは話し合いずみなので、合意・設定のステップはなし。最初から「使う」・開始日 2026-11-28（保護者メニューで「使わない」にすると gOff=1） */
+var GD_START0='2026-11-28';
+function gdC(){var c=S.cfg||{},st=c.gStart||GD_START0,nn=(c.gNn===undefined||c.gNn===null||c.gNn==='')?1:+c.gNn,pn=(c.gPn===undefined||c.gPn===null||c.gPn==='')?3:+c.gPn;
+  var off=+c.gOff===1;
+  return {on:!off&&/^\d{4}-\d{2}-\d{2}$/.test(st),shown:!off,start:st,nn:Math.max(0,nn||0),pn:Math.max(0,pn||0)};}
 function gdS(){S.gd=S.gd||{};S.gd.ex=S.gd.ex||{};S.gd.log=S.gd.log||{};return S.gd;}
 function gdPrev(k){var p=k.split('-'),d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()-1);return dstr(d);}
 function gdNext(k,n){var p=k.split('-'),d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+(n||1));return dstr(d);}
@@ -2686,16 +2715,38 @@ function renderGuard(){var bar=document.getElementById('gdBar');if(!bar)return;v
   try{gdFx(st);}catch(e){}
   gdCheer(st,isPapa);
   renderGuardRule();renderGdReq();}
-function renderGuardRule(){var el=document.getElementById('gdRuleCard');if(!el)return;var c=gdC();if(!c.shown){el.innerHTML='';return;}
-  var r='';
-  if(c.nn)r+='<tr><td>👍ナイスなしの日が '+c.nn+'日'+(c.nn>1?' 続いた':'')+'</td><td>次の日は <b>ケータイお休み</b>。その日に<b>👍ナイス</b>に届いたら、すぐ解除</td></tr>';
-  if(c.pn)r+='<tr><td>🌟パーフェクトなしの日が '+c.pn+'日 続いた</td><td>次の日は <b>ケータイお休み</b>。その日に<b>🌟パーフェクト</b>に届いたら、すぐ解除</td></tr>';
+function renderGuardRule(){var el=document.getElementById('gdRuleCard');if(!el)return;var c=gdC();
+  /* 2026-11-28：ルールタブにはいつも説明を出す */
+  var nn=c.nn,pn=c.pn,r='';
+  if(nn)r+='<tr><td>👍ナイスなしの日が <b>'+nn+'日</b>'+(nn>1?' 続いた':'')+'</td><td>次の日は <b>ケータイお休み</b>。その日に<b>👍ナイス</b>に届いたら、すぐ解除</td></tr>';
+  if(pn)r+='<tr><td>🌟パーフェクトなしの日が <b>'+pn+'日 続いた</b></td><td>次の日は <b>ケータイお休み</b>。その日に<b>🌟パーフェクト</b>に届いたら、すぐ解除</td></tr>';
+  if(!r)r='<tr><td colspan="2">いまは数える決まりがありません</td></tr>';
+  var stt=!c.shown?'⏸️ いまは お休み中（パパの設定で 止めているよ）'
+    :'📅 はじまった日：<b>'+c.start.replace(/-/g,'/')+'</b>（この日の けっかから 数えるよ）';
   el.innerHTML='<div class="card rlcard"><div class="v-h"><span>🟥 ケータイお休みルール</span></div>'
-    +'<table class="rl-t"><tr><th>こうなったら</th><th>どうなる</th></tr>'+r
-    +'<tr><td>あと1日でお休みになる日（リーチの日）</td><td>15時から ボードに<b>カビ</b>がふえはじめる（👍ナイスまでは<b>緑カビ</b>、🌟パーフェクトのリーチは<b>黒カビ</b>）。20時をすぎると一気にふえて、ボードもカビの色に。わくを1つクリアするとカビは半分、条件をクリアすると全部消えるよ</td></tr>'
-    +'<tr><td>ケータイお休みの日</td><td>👍ナイスなしで入った日は<b>緑ヘドロ</b>、🌟パーフェクトなしで入った日は<b>ゾンビ</b>が、ボードの上をうろうろ歩きまわる。スマホ時間のお願いもお休み（ためた時間は消えないよ）</td></tr>'
-    +'<tr><td>おやすみ日（大会・熱・家族の行事など）</td><td>数えない。🎯コミットのタブから申請して、パパがOKしたらおやすみ日になるよ</td></tr></table>'
-    +'<div class="rl-n">はじまる日：'+(c.start?c.start.replace(/-/g,'/'):'まだ（パパと決めてから）')+'</div></div>';}
+    +'<div class="rl-n" style="margin:0 0 8px">'+stt+'</div>'
+    +'<div class="rl-n" style="margin:0 0 6px">まいにちの べんきょうを 続けるための やくそく。<b>わく</b>は 🎯コミットのタブの3つのわく（①②③）のことだよ。<br>👍<b>ナイス</b>＝わく2つ クリア ／ 🌟<b>パーフェクト</b>＝わく3つ ぜんぶ クリア</div>'
+    +'<table class="rl-t"><tr><th>こうなったら</th><th>どうなる</th></tr>'+r+'</table>'
+    +'<div class="rl-n" style="margin-top:10px">🦠 <b>リーチの日</b>（今日とどかないと、あしたがケータイお休みになる日）は、文字では知らせないよ。かわりに ボードに<b>カビ</b>がふえていく。</div>'
+    +'<table class="rl-t"><tr><th>時こく</th><th>カビのようす</th></tr>'
+    +'<tr><td>15時まで</td><td>まだ出ない</td></tr>'
+    +'<tr><td>15時〜17時</td><td>すこし出てくる</td></tr>'
+    +'<tr><td>17時〜20時</td><td>ふえてくる</td></tr>'
+    +'<tr><td>20時から</td><td>どんどん ふえて、大きくなる。ボードの色も だんだん カビの色に</td></tr></table>'
+    +'<div class="rl-n">・👍ナイスに とどくまでは <b>緑カビ</b>。ナイスのあと 🌟パーフェクトのリーチが のこっているときは <b>黒カビ</b>。<br>'
+    +'・わくを1つ クリアすると カビは<b>半分</b>。条件に とどくと <b>ぜんぶ消える</b>（「🧽 カビをやっつけた！」）。</div>'
+    +'<div class="rl-n" style="margin-top:10px">📵 <b>ケータイお休みの日</b></div>'
+    +'<table class="rl-t"><tr><th>入りかた</th><th>ボードのようす</th><th>解除</th></tr>'
+    +'<tr><td>👍ナイスなしで入った日</td><td><b>緑ヘドロ</b>が ボードを たて・よこ・ななめに 横切る</td><td>その日に 👍ナイス</td></tr>'
+    +'<tr><td>🌟パーフェクトなしで入った日</td><td><b>ゾンビ</b>が ボードの上を ふらふら 歩きまわる</td><td>その日に 🌟パーフェクト</td></tr></table>'
+    +'<div class="rl-n">・ヘドロもゾンビも じゃまをするだけ。ボタンは ふつうに おせるよ。<br>'
+    +'・お休みの日は 📱スマホ時間の「パパにお願いする」も お休み。<b>ためた時間は 消えないよ</b>。<br>'
+    +'・解除の条件に とどいたら、その場で解除！「緑ヘドロをやっつけた！」「ゾンビをやっつけた！」が出て、パパに知らせが とどくよ（ケータイのロックは パパが外すよ）。</div>'
+    +'<div class="rl-n" style="margin-top:10px">🛌 <b>おやすみ日</b>（大会・発表会、体ちょうが悪い日、家族の用事など）</div>'
+    +'<table class="rl-t"><tr><th>じゅんばん</th><th>やること</th></tr>'
+    +'<tr><td>①</td><td>🎯コミットのタブの「🛌 おやすみ日の申請」で、日（今日・あした・あさって）と りゆうを えらんで 申請</td></tr>'
+    +'<tr><td>②</td><td>パパが「✅ 認める」と、その日は おやすみ日。リーチも お休みも 起きないよ</td></tr>'
+    +'<tr><td>③</td><td>おやすみ日は 日数に 数えない（それまでの数は そのまま のこる）</td></tr></table></div>';}
 /* ---- おやすみ日の申請（コミットタブ） ---- */
 var GD_WHY=['🏆 大会・発表会','🤒 体調が悪い','👪 家族の用事','📝 その他'];
 function gdMd(k){var p=k.split('-');return (+p[1])+'/'+(+p[2]);}
@@ -2728,8 +2779,8 @@ function gdExList(){var el=document.getElementById('gdExList');if(!el)return;var
   el.innerHTML=ks.length?ks.map(function(k){return '<span style="display:inline-block;margin:2px 6px 2px 0">'+k.replace(/-/g,'/')+' <a href="#" onclick="gdExDel(\''+k+'\');return false">✕</a></span>';}).join(''):'（まだありません）';}
 function gdExAdd(){var v=(document.getElementById('d_gEx').value||'').trim();if(!/^\d{4}-\d{2}-\d{2}$/.test(v)){alert('日付をえらんでください');return;}gdS().ex[v]=1;gdTrim();save();maybeSync();gdExList();}
 function gdExDel(k){delete gdS().ex[k];save();maybeSync();gdExList();}
-function gdFill(){try{var c=S.cfg||{},g=gdC();document.getElementById('d_gOn').value=+c.gOn===1?'1':'0';document.getElementById('d_gStart').value=c.gStart||'';document.getElementById('d_gNn').value=String(g.nn);document.getElementById('d_gPn').value=String(g.pn);gdExList();}catch(e){}}
-function gdRead(){try{S.cfg.gOn=document.getElementById('d_gOn').value==='1'?1:0;S.cfg.gStart=(document.getElementById('d_gStart').value||'').trim();S.cfg.gNn=parseInt(document.getElementById('d_gNn').value,10)||0;S.cfg.gPn=parseInt(document.getElementById('d_gPn').value,10)||0;}catch(e){}}
+function gdFill(){try{var c=S.cfg||{},g=gdC();document.getElementById('d_gOn').value=+c.gOff===1?'0':'1';document.getElementById('d_gStart').value=g.start||'';document.getElementById('d_gNn').value=String(g.nn);document.getElementById('d_gPn').value=String(g.pn);gdExList();}catch(e){}}
+function gdRead(){try{S.cfg.gOff=document.getElementById('d_gOn').value==='1'?0:1;S.cfg.gOn=S.cfg.gOff?0:1;S.cfg.gStart=(document.getElementById('d_gStart').value||'').trim();S.cfg.gNn=parseInt(document.getElementById('d_gNn').value,10)||0;S.cfg.gPn=parseInt(document.getElementById('d_gPn').value,10)||0;}catch(e){}}
 (function(){var _o=dadOpen,_s=dadSave,_r=render;
   dadOpen=function(){var r=_o.apply(this,arguments);gdFill();return r;};
   dadSave=function(){gdRead();return _s.apply(this,arguments);};
