@@ -1183,10 +1183,13 @@ function renderRuCard(){var el=document.getElementById('ruCard');if(!el)return;v
     +'<br>今日 覚えた '+r.today+'語・📝 検問 '+(r.ok?'合格':(r.tests?'ベスト '+r.best+'%':'まだ'))+(done?' 🎉 今日のノルマ クリア':'（ノルマ：＋'+c.nw+'語と検問合格）')
     +((q&&q.tests)?'<br>📝 検問 '+q.tests+'回・満点 '+(q.perfects||0)+'回'+(q.bestPct?'・ベスト '+q.bestPct+'%':''):'')
     +(last?'<br><span style="opacity:.85">最終学習：'+last+'</span>':'')+'</div><a class="v-open" href="./ruvocab.html">▶ ロシア語カードをひらく</a></div>';}
-/* パパの端末だけが記録する（経験値 +10・パパのがんばりカレンダーに Р）。二重に足さないよう S.day.pa.ru で1日1回 */
-function ruSync(){if(!S||!S.day||!S.day.pa)return;if(calcOwner()!=='papa')return;if(S.day.pa.ru||!ruDoneNow())return;
-  var before=lv(S.pa.xp);S.day.pa.ru=true;S.pa.xp+=10;papaHistUpdate();save();try{maybeSync();}catch(e){}
-  try{showCheer('🇷🇺 ロシア語クエスト クリア！ パパ 経験値 +10');}catch(e){}}
+/* パパの端末だけが記録する。経験値は進むたびに その都度 上乗せ（2026-11-28）：
+   新しく覚えた語 1語ごとに +1（取り消すと −1）・検問に合格で +5（1日1回）・ノルマ（＋10語と検問合格）クリアで +10（1日1回、パパのカレンダーに Р） */
+function ruSync(){if(!S||!S.day||!S.day.pa)return;if(calcOwner()!=='papa')return;var d=S.day.pa,r=ruStat(),ch=false;
+  var w=Math.max(0,r.today|0),had=+d.ruw||0;if(w!==had){S.pa.xp=Math.max(0,S.pa.xp+(w-had));d.ruw=w;ch=true;}
+  if(r.ok&&!d.ruq){d.ruq=1;S.pa.xp+=5;ch=true;try{showCheer('🇷🇺 ロシア語 検問合格！ パパ 経験値 +5');}catch(e){}}
+  if(!d.ru&&ruDoneNow()){d.ru=true;S.pa.xp+=10;papaHistUpdate();ch=true;try{showCheer('🇷🇺 ロシア語クエスト クリア！ パパ 経験値 +10');}catch(e){}}
+  if(ch){save();try{maybeSync();}catch(e){}}}
 function ruRefresh(){ruSync();var el=document.getElementById('ruRow');if(el)el.innerHTML=ruRowHTML();renderRuCard();}
 window.addEventListener('focus',function(){try{ruRefresh();}catch(e){}});
 document.addEventListener('visibilitychange',function(){if(!document.hidden){try{ruRefresh();}catch(e){}}});
