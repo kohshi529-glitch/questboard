@@ -1162,6 +1162,14 @@ function qbRv(){rollover();S.day.rv=_num(S.day.rv)+1;}
 function qbPending(){var n=(S.homework||[]).filter(function(h){return h.st==='sub';}).length;if(S.phw&&S.phw.on&&S.phw.items)n+=S.phw.items.filter(function(x){return x.st==='sub';}).length;
   ((S.kj&&S.kj.tests)||[]).forEach(function(t){if(t.st==='sub')n++;if(t.fx)Object.keys(t.fx).forEach(function(i){if(t.fx[i].st==='sub')n++;});});return n;}
 /* ===== 🇷🇺 パパのロシア語クエスト（ruvocab.html）：新しく覚えた語＋ノルマ と 検問の合格 で自動 ✓（2026-11-28） ===== */
+/* 今日の検問の合格回数（その端末の記録＋サーバの記録のうち多い方）。経験値ボーナス用（2026-11-28） */
+function qbPassN(key,pct,min){var r=qbQuizToday(key),n=r.filter(function(a){return a[1]>=min&&Math.round(a[0]/a[1]*100)>=pct;}).length,td=qbTodayStr();
+  [_lsGet(key+'_stats'),(SYNC&&SYNC.astatRaw&&SYNC.astatRaw[key])].forEach(function(o){var d=o&&o.quiz&&o.quiz.days&&o.quiz.days[td];if(d){n=Math.max(n,+d.okn||0,(+d.ok&&!n)?1:0);}});return n;}
+/* 🏅 検問マスター（3回つづけて正解して 検問を卒業した語）の数 */
+function qbMastN(key){var st=_lsGet(key+'_stats')||{},raw=(SYNC&&SYNC.astatRaw&&SYNC.astatRaw[key])||{},q=st.quiz,rq=raw.quiz;if(rq&&(!q||(+rq.updated||0)>(+q.updated||0)))q=rq;var m=(q&&q.m)||{},k={},n=0,w;
+  try{k=JSON.parse(localStorage.getItem(key+'_kts')||'{}')||{};}catch(e){}var dk=qbDeck(key),ds=dk&&dk.set;for(w in m){var v=m[w],t=k[w];if(v<0&&t>0&&-v>=t&&(!ds||ds[w]))n++;}return n;}
+/* 検問の合格ボーナス：1日の1回目 +5・2回目から 1回ごとに +2 */
+function qbPassXp(i){return i===0?5:2;}
 function ruCfg(){var c=S.cfg||{};return {nw:+c.ruNew||10,pct:+c.ruPct||50,min:+c.ruMin||10};}
 function ruStat(){var k=qbKStat('ruvocab'),td=qbTodayStr(),loc=_lsGet('ruvocab_stats')||{},raw=(SYNC&&SYNC.astatRaw&&SYNC.astatRaw.ruvocab)||{};
   function qd(o){return (o&&o.quiz&&o.quiz.days&&o.quiz.days[td])||null;}
@@ -1183,15 +1191,27 @@ function renderRuCard(){var el=document.getElementById('ruCard');if(!el)return;v
     +'<div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+r.learned+'語（'+pct+'%）・日常会話の目安 約'+goal.toLocaleString()+'語'
     +'<br>今日 覚えた '+r.today+'語・📝 検問 '+(r.ok?'合格':(r.tests?'ベスト '+r.best+'%':'まだ'))+(done?' 🎉 今日のノルマ クリア':'（ノルマ：＋'+c.nw+'語と検問合格）')
     +((q&&q.tests)?'<br>📝 検問 '+q.tests+'回・満点 '+(q.perfects||0)+'回'+(q.bestPct?'・ベスト '+q.bestPct+'%':''):'')
+    +(qbMastN('ruvocab')?'<br>🏅 マスター '+qbMastN('ruvocab')+'語（検問を卒業）':'')
     +(last?'<br><span style="opacity:.85">最終学習：'+last+'</span>':'')+'</div><a class="v-open" href="./ruvocab.html">▶ ロシア語カードをひらく</a></div>';}
 /* パパの端末だけが記録する。経験値は進むたびに その都度 上乗せ（2026-11-28）：
-   新しく覚えた語 1語ごとに +1（取り消すと −1）・検問に合格で +5（1日1回）・ノルマ（＋10語と検問合格）クリアで +10（1日1回、パパのカレンダーに Р） */
+   新しく覚えた語 1語ごとに +1（取り消すと −1）・検問に合格で 1回目 +5／2回目から1回ごとに +2・ノルマ（＋10語と検問合格）クリアで +10（1日1回、パパのカレンダーに Р） */
 function ruSync(){if(!S||!S.day||!S.day.pa)return;if(calcOwner()!=='papa')return;var d=S.day.pa,r=ruStat(),ch=false;
   var w=Math.max(0,r.today|0),had=+d.ruw||0;if(w!==had){S.pa.xp=Math.max(0,S.pa.xp+(w-had));d.ruw=w;ch=true;}
-  if(r.ok&&!d.ruq){d.ruq=1;S.pa.xp+=5;ch=true;try{showCheer('🇷🇺 ロシア語 検問合格！ パパ 経験値 +5');}catch(e){}}
+  var c=ruCfg(),pn=qbPassN('ruvocab',c.pct,c.min);if(r.ok&&!pn)pn=1;var hq=+d.ruq||0;
+  if(pn>hq){var gx=0;for(var i=hq;i<pn;i++)gx+=qbPassXp(i);S.pa.xp+=gx;d.ruq=pn;ch=true;try{showCheer('🇷🇺 ロシア語 検問合格'+(pn>1?'（今日 '+pn+'回目）':'')+'！ パパ 経験値 +'+gx);}catch(e){}}
   if(!d.ru&&ruDoneNow()){d.ru=true;S.pa.xp+=10;papaHistUpdate();ch=true;try{showCheer('🇷🇺 ロシア語クエスト クリア！ パパ 経験値 +10');}catch(e){}}
   if(ch){save();try{maybeSync();}catch(e){}}}
-function ruRefresh(){ruSync();var el=document.getElementById('ruRow');if(el)el.innerHTML=ruRowHTML();renderRuCard();}
+/* 👧 娘の英単語・語彙：経験値を その都度 上乗せ（2026-11-28）。娘の端末だけが記録する（パパの端末と二重に足さないため）
+   新しく覚えた語 1語ごとに +1（取り消すと −1）・検問に合格で 1回目 +5／2回目から1回ごとに +2 */
+function meStudySync(){if(!S||!S.day||!S.me)return;if(calcOwner()==='papa')return;if(SYNC.on&&!SYNC.astatReady)return;
+  var x=S.day.sx=S.day.sx||{},pct=+S.cfg.passPct||50,min=+S.cfg.passMin||10,before=lv(S.me.xp),gain=0,ch=false,msg=[];
+  [['vocab','v','🔤 英単語'],['jvocab','j','📖 語彙']].forEach(function(a){var w=Math.max(0,qbNewToday(a[0])|0),hw=+x[a[1]+'w']||0;
+    if(w!==hw){gain+=w-hw;x[a[1]+'w']=w;ch=true;if(w>hw)msg.push(a[2]+' +'+(w-hw)+'語');}
+    var pn=qbPassN(a[0],pct,min),hq=+x[a[1]+'q']||0;if(pn>hq){var g=0;for(var i=hq;i<pn;i++)g+=qbPassXp(i);gain+=g;x[a[1]+'q']=pn;ch=true;msg.push(a[2]+' 検問合格'+(pn>1?'（'+pn+'回目）':''));}});
+  if(!ch)return;S.me.xp=Math.max(0,S.me.xp+gain);var after=lv(S.me.xp);
+  if(after>before){try{heroLevelUp(before,after);}catch(e){}}else if(gain>0&&msg.length){try{showCheer(msg.join('・')+'　経験値 +'+gain);}catch(e){}}
+  save();try{maybeSync();}catch(e){}}
+function ruRefresh(){ruSync();try{meStudySync();}catch(e){}var el=document.getElementById('ruRow');if(el)el.innerHTML=ruRowHTML();renderRuCard();}
 window.addEventListener('focus',function(){try{ruRefresh();}catch(e){}});
 document.addEventListener('visibilitychange',function(){if(!document.hidden){try{ruRefresh();}catch(e){}}});
 function papaHistUpdate(){S.papaHistory=S.papaHistory||{};var td=today();var bee=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/ビーモン/.test(q);});var car=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/迎/.test(q);});
@@ -1274,8 +1294,8 @@ function qbQuizTodayTxt(key){var r=qbQuizToday(key);if(!r.length)return '・📝
   r.forEach(function(a){var pa=a[0]/a[1],pb=b[0]/b[1];if(pa>pb||(pa===pb&&a[1]>b[1]))b=a;});
   var p=Math.round(b[0]/b[1]*100),ok=b[1]>=min&&p>=pct;
   return '・📝 検問 <b>'+b[0]+'/'+b[1]+'問（'+p+'%）</b>'+(ok?' ✅':'')+(r.length>1?'（'+r.length+'回）':'');}
-function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('vocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl='<br>今日 覚えた '+_td+'語'+qbQuizTodayTxt('vocab');var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
-function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('jvocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl='<br>今日 覚えた '+_td+'語'+qbQuizTodayTxt('jvocab');var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';renderKanji();renderRead();try{renderRuCard();}catch(e){}}
+function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var QBK='vocab';var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('vocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl='<br>今日 覚えた '+_td+'語'+qbQuizTodayTxt('vocab');var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _mn=qbMastN(QBK);_ql=_ql+(_mn?'<br>🏅 マスター '+_mn+'語（検問を卒業）':'');var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
+function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var QBK='jvocab';var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('jvocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl='<br>今日 覚えた '+_td+'語'+qbQuizTodayTxt('jvocab');var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _mn=qbMastN(QBK);_ql=_ql+(_mn?'<br>🏅 マスター '+_mn+'語（検問を卒業）':'');var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';renderKanji();renderRead();try{renderRuCard();}catch(e){}}
 /* ===== 漢字クエスト（書き取りテスト） =====
    流れ：娘がテスト開始（10問）→ ノートに書く → 写真で提出 → パパが丸つけ（×だけタップ）
          → ×の問題は［］の中を5回書いて写真で提出 → パパが1問ずつ OK／やり直し → 10問ぜんぶクリアで完了
@@ -1956,9 +1976,16 @@ function renderRules(){renderCalRule();var el=document.getElementById('rulesCard
     +'<tr><td>📘 語彙トレ（毎日タスク）</td><td class="mn">'+m(c.taskPer)+'</td></tr>'
     +'<tr><td>⚡ 計算ベスト更新 1回</td><td class="mn">'+m(c.pbPer)+'</td></tr>'
     +(kon?'<tr><td>✍️ 漢字 正解か直しOK 1字</td><td class="mn">'+m(c.kanjiPer)+'</td></tr><tr><td>✍️ 漢字 1パート（10字）クリア</td><td class="mn">'+m(c.kanjiAll)+'</td></tr>':'')+'</table>';
+  var t3='<table class="rl-t"><tr><th>できたこと</th><th>⭐ 経験値</th></tr>'
+    +'<tr><td>⭐ がんばりクエスト 1つ</td><td class="mn">+10</td></tr>'
+    +'<tr><td>📅 毎日やるタスク 1つ</td><td class="mn">+10</td></tr>'
+    +'<tr><td>🔤 英単語・📖 語彙　新しく覚えた 1語</td><td class="mn">+1</td></tr>'
+    +'<tr><td>📝 検問 合格（その日の1回目）</td><td class="mn">+5</td></tr>'
+    +'<tr><td>📝 検問 合格（2回目から 1回ごと）</td><td class="mn">+2</td></tr></table>';
   el.innerHTML='<div class="card rlcard"><div class="v-h"><span>📋 ルール表</span></div>'
     +'<div class="rl-h">🎯 コミットライン：3つのわく</div>'+t1
     +'<div class="rl-n">🔁 <b>日替わり</b>：きのう②で英単語だけやったら、今日は語彙だけ数えるよ（反対も同じ）。③の漢字と読書も同じ。きのう両方やった日・どちらもやらなかった日は、どちらでもOK。</div>'
+    +'<div class="rl-h">⭐ 経験値（アバターのレベル）</div>'+t3+'<div class="rl-n">🏅 <b>検問マスター</b>：検問で 同じ語を <b>3回つづけて正解</b>すると その語はマスター（検問を卒業）。もう検問に出なくなるよ。まちがえたら れんぞくは 0 から。カードの「覚えた」を外すとマスターも外れるよ。</div>'
     +(bon?'<div class="rl-h">📱 スマホ時間のため方</div>'+t2+'<div class="rl-n">たまった時間は「📱 パパにお願いする」でパパに送ってね。使わなかった時間は <b>貯金</b> になって、次の日に持ちこせるよ（一部だけお願いすることもできる）。</div>':'')+'</div>';}
 /* スマホ時間ボーナス：クリア数に応じてたまる → 娘が申請 → パパが Family Link で追加して「付与した」 */
 var _bonusN=0,_bonusAll=false,_bonusRows=3;
@@ -2255,7 +2282,7 @@ function render(){
   }else{
     const mq=meQuests();
     const rc=(S.reactions&&S.reactions[today()])?('<div class="card" style="text-align:center;background:#fff0ea;border-color:#f2c3b2"><div style="font-weight:800">💌 パパからの応援</div><div style="font-size:1.7rem;margin:4px 0">'+S.reactions[today()].e+'</div><div>'+S.reactions[today()].m+'</div></div>'):'';
-    dtSync();try{ruSync();renderRuCard();}catch(e){}
+    dtSync();try{ruSync();meStudySync();renderRuCard();}catch(e){}
     stageTop.innerHTML=rc+`<div class="row">
       <div class="player"><h3>${S.me.name}</h3>${heroHTML('me')}<button class="ks-herobtn" onclick="ksOpen()">👗 きせかえ<span>${kseLeft()?'券'+kseLeft():''}</span></button>
         ${dtRowsHTML()}

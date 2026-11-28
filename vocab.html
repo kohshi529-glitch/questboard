@@ -196,6 +196,7 @@ window.QB_APP='vocab';
   /* 覚えた！を押したら色を反転（白地＋ステージ色の文字とふち）して、覚えたことがひと目でわかるように（2026-11-28） */
   .know.on{background:var(--card);color:var(--sc);box-shadow:inset 0 0 0 3px var(--sc),var(--shadow)}
   .inner.known .face::after{content:"✓ 覚えた";position:absolute;top:16px;left:16px;font-family:var(--jp);font-weight:800;font-size:13px;color:#fff;background:var(--sc);border-radius:999px;padding:4px 11px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+  .inner.known.mast .face::after{content:"🏅 マスター";background:#b7791f}
   .know:active{transform:translateY(2px)}
   .row2{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
   .mini{border:1px solid var(--line2);background:var(--card);color:var(--ink-soft);border-radius:12px;padding:9px 14px;font-family:var(--body);font-weight:700;font-size:13px;cursor:pointer}
@@ -1223,7 +1224,8 @@ function render(){
   document.getElementById('knownLabel').textContent='覚えた '+k;
   document.getElementById('fill').style.width=(k/w.length*100)+'%';
   var kb=document.getElementById('knowBtn');
-  if(known[c.w]){kb.classList.add('on');kb.textContent='✓ 覚えた！';}else{kb.classList.remove('on');kb.textContent='覚えた！';}document.getElementById('inner').classList.toggle('known',!!known[c.w]);
+  var _mm=!!known[c.w]&&qmIsM(c.w);
+  if(known[c.w]){kb.classList.add('on');kb.textContent=_mm?'🏅 マスター（検問卒業）':'✓ 覚えた！';}else{kb.classList.remove('on');kb.textContent='覚えた！';}document.getElementById('inner').classList.toggle('known',!!known[c.w]);document.getElementById('inner').classList.toggle('mast',_mm);
   document.getElementById('filterBtn').style.outline=filterOn?'2px solid '+STAGES[si].color:'none';
 }
 function flip(){flipped=!flipped;document.getElementById('inner').classList.toggle('flip',flipped);}
@@ -1272,18 +1274,25 @@ function QANS(c){return c.def;} /* 英語の意味（カード裏面と同じ）
 function qPassCfg(){var c={};try{c=(JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{}).cfg||{};}catch(e){}return {pct:+c.passPct||50,min:+c.passMin||10};}
 /* ボードの日替わり：今日このクエストがパーフェクトのカウント外か（ボードが今日記録した rot を見る） */
 function qRotOff(){try{var s=JSON.parse(localStorage.getItem('questboard_v3')||'{}')||{},r=s.rot,d=new Date(),p=function(n){return (n<10?'0':'')+n;},td=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());return !!(r&&r.d===td&&r.off&&r.off.indexOf('v')>=0);}catch(e){return false;}}
+/* 🏅 検問マスター（2026-11-28）：検問で同じ語を3回つづけて正解したら「マスター」＝検問に出さない。
+   記録は quiz.m{語:れんぞく正解数}。マスターになった語は 値が −(その時刻)。カードの「覚えた」を外して付け直すとマスターは解除（覚えた時刻のほうが新しくなるため） */
+var QM_N=3;
+function qmKts(){return window.qbKEnsure?qbKEnsure('vocab'):{};}
+function qmIsM(w,m,k){m=m||loadQuiz().m||{};k=k||qmKts();var v=m[w],t=k[w];return (typeof v==='number')&&v<0&&t>0&&-v>=t;}
+function qmCount(){var m=loadQuiz().m||{},k=qmKts(),n=0;ALLW.forEach(function(c){if(known[c.w]&&qmIsM(c.w,m,k))n++;});return n;}
 function loadQuiz(){var o=_qs();return o.quiz||{tests:0,perfects:0,bestPct:0,last:null};}
 function saveQuizRec(q){var o=_qs();o.quiz=q;_qsSave(o);if(window.qbSyncKick)qbSyncKick();}
 function renderQuizRec(){var el=document.getElementById('quizRec');if(!el)return;var q=loadQuiz();var learned=learnedCount();
   if(learned<4){el.textContent='覚えた語から4択クイズ。あと'+(4-learned)+'語覚えると挑戦できるよ';return;}
-  el.innerHTML='受けた '+(q.tests||0)+'回 ・ 満点 '+(q.perfects||0)+'回'+(q.bestPct?' ・ 自己ベスト '+q.bestPct+'%':'')+(q.last?'（前回 '+q.last.s+'/'+q.last.t+'）':'');}
+  el.innerHTML='受けた '+(q.tests||0)+'回 ・ 満点 '+(q.perfects||0)+'回'+(q.bestPct?' ・ 自己ベスト '+q.bestPct+'%':'')+(q.last?'（前回 '+q.last.s+'/'+q.last.t+'）':'');var _mc=qmCount();if(_mc)el.innerHTML+='<br>🏅 マスター '+_mc+'語（3回つづけて正解した語は 検問に出ないよ）';}
 var QZ=null;
 function qshuf(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 function startQuiz(){
-  var pool=ALLW.filter(function(c){return known[c.w];});
-  if(pool.length<4){alert('覚えた語が4つ以上になったら挑戦できるよ！');return;}
+  var _m=loadQuiz().m||{},_k=qmKts(),_all=ALLW.filter(function(c){return known[c.w];}),pool=_all.filter(function(c){return !qmIsM(c.w,_m,_k);});
+  if(pool.length<4){alert(_all.length>=4?'覚えた語は ほとんどマスター（検問を卒業）したよ！ 新しい語を覚えたら また挑戦できるよ':'覚えた語が4つ以上になったら挑戦できるよ！');return;}
+  var _pc0=qPassCfg();if(pool.length<_pc0.min&&!confirm('検問に出る語が '+pool.length+'語だけなので、今回は合格ライン（'+_pc0.min+'問以上）に届かないよ。\n新しい語を覚えてからにする？\n\n［OK］このまま練習する　［キャンセル］やめる'))return;
   var n=Math.min(20,pool.length);
-  QZ={qs:qshuf(pool.slice()).slice(0,n),i:0,right:0,answered:false};
+  QZ={qs:qshuf(pool.slice()).slice(0,n),i:0,right:0,answered:false,res:[]};
   document.getElementById('home').hidden=true;document.getElementById('study').hidden=true;document.getElementById('quiz').hidden=false;
   document.getElementById('qResult').hidden=true;document.getElementById('qCard').hidden=false;
   renderQ();window.scrollTo(0,0);}
@@ -1307,6 +1316,7 @@ function answerQ(t,btn){
   var c=QZ.qs[QZ.i],correct=QANS(c);
   var btns=document.querySelectorAll('#qChoices .q-choice');
   for(var k=0;k<btns.length;k++){btns[k].disabled=true;if(btns[k].textContent===correct)btns[k].classList.add('ok');}
+  QZ.res.push([c.w,t===correct?1:0]);
   if(t===correct){QZ.right++;document.getElementById('qFb').textContent='⭕ 正解！';}
   else{btn.classList.add('ng');document.getElementById('qFb').innerHTML='❌ 正解は「'+correct+'」';}
   document.getElementById('qRight').textContent='正解 '+QZ.right;
@@ -1316,12 +1326,17 @@ function finishQuiz(){
   var q=loadQuiz();q.tests=(q.tests||0)+1;if(r===n)q.perfects=(q.perfects||0)+1;q.bestPct=Math.max(q.bestPct||0,pct);q.last={s:r,t:n};q.updated=Date.now();var _hd=qTodayStr();if(!q.hist||q.hist.d!==_hd)q.hist={d:_hd,r:[]};q.hist.r.push([r,n,q.updated]);if(q.hist.r.length>30)q.hist.r=q.hist.r.slice(-30);
   q.days=q.days||{};var _dd=q.days[_hd]||{t:0,p:0,b:0};_dd.t=Math.max((_dd.t||0)+1,q.hist.r.length);if(r===n)_dd.p=(_dd.p||0)+1;_dd.b=Math.max(_dd.b||0,pct);var _pcx=qPassCfg();if(n>=_pcx.min&&pct>=_pcx.pct)_dd.ok=1;q.days[_hd]=_dd;
   var _dk=Object.keys(q.days);if(_dk.length>400){_dk.sort(function(a,b){var x=a.split('-'),y=b.split('-');return (x[0]*1e4+x[1]*100+ +x[2])-(y[0]*1e4+y[1]*100+ +y[2]);});while(_dk.length>400)delete q.days[_dk.shift()];}
+  var _qm=q.m||{},_qk=qmKts(),_newM=[];(QZ.res||[]).forEach(function(x){var w=x[0],v=_qm[w];if(typeof v!=='number'||v<0)v=0;
+    if(x[1]){v++;if(v>=QM_N){_qm[w]=-Date.now();_newM.push(w);}else _qm[w]=v;}else delete _qm[w];});
+  for(var _w in _qm){if(!(_qk[_w]>0))delete _qm[_w];}q.m=_qm; /* 覚えたを外した語の記録は消す */
+  var _dd2=q.days[_hd];if(n>=_pcx.min&&pct>=_pcx.pct)_dd2.okn=(_dd2.okn||0)+1; /* 今日の合格回数（ボードの経験値ボーナス用） */
   saveQuizRec(q);var _pc=qPassCfg(),_pass=(n>=_pc.min&&pct>=_pc.pct);
   document.getElementById('qCard').hidden=true;
   var res=document.getElementById('qResult');res.hidden=false;
   var msg=(r===n)?'🏆 満点！すごい！':(pct>=80?'👏 よくできました！':(pct>=50?'🙂 その調子！':'💪 もう一度やってみよう'));
   res.innerHTML='<div class="qr-score">'+r+' / '+n+'</div><div class="qr-msg">'+msg+'</div>'
     +(_pass?(qRotOff()?'<div style="font-weight:800;color:#8a7d64;margin:2px 0 10px">🏅 合格ライン突破！<br><span style="font-size:.85em">ただし今日は📖 語彙の日なので、パーフェクトカウント外だよ</span></div>':'<div style="font-weight:800;color:#b7791f;margin:2px 0 10px">🏅 合格ライン突破！クエストボードを見てみよう</div>'):'<div class="qr-rec">合格ライン：'+(_pc.pct>=100?'満点':_pc.pct+'%以上')+'・'+_pc.min+'問以上</div>')
+    +(_newM.length?'<div style="font-weight:800;color:#b7791f;margin:2px 0 10px">🏅 マスター '+_newM.length+'語！（3回つづけて正解 → もう検問に出ないよ）<br><span style="font-size:.85em">'+_newM.map(function(w){return w;}).join('・')+'</span></div>':'')
     +'<div class="qr-rec">受けた '+q.tests+'回 ・ 満点 '+q.perfects+'回 ・ 自己ベスト '+q.bestPct+'%</div>'
     +'<div class="qr-btns"><button class="q-again" onclick="startQuiz()">🔁 もう一度</button><button class="q-home" onclick="quizHome()">🏠 ホームへ</button></div>';
   document.getElementById('qFill').style.width='100%';window.scrollTo(0,0);}
