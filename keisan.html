@@ -536,16 +536,24 @@ function vListen(){if(!V.want||inMode!=='voice'||document.getElementById('play')
       else if(er==='network'){vSay('ネットにつながらないと 声の入力は使えないよ');}vUI();};
     r.onend=function(){V.active=false;vUI();if(V.want){clearTimeout(V.t);V.t=setTimeout(vListen,150);}};}
   try{V.rec.start();V.active=true;}catch(e){V.active=false;}vUI();}
+/* 「取り消し」などが聞こえたら、それより前に言った数は使わない（答えの候補を空にして 次の声を待つ）（2026-11-28）
+   ※ これがないと「とりけし」の「し」が 4 と読まれて まちがいになっていた */
+var V_CANCEL=/(取り消し|取り消す|取消し|取消|とり消し|取りけし|とりけし|トリケシ|キャンセル|きゃんせる|やり直し|やりなおし|ヤリナオシ|まちがえた|間違えた|違う|ちがう|チガウ|消して|けして|ケシテ|クリア|くりあ|リセット)/g;
+function vCut(tx){tx=String(tx||'');var m,end=-1;V_CANCEL.lastIndex=0;while((m=V_CANCEL.exec(tx))){end=m.index+m[0].length;}return end<0?{c:false,t:tx}:{c:true,t:tx.slice(end)};}
 function vOnResult(e){var rs=e.results;V.len=rs.length;if(locked||document.getElementById('play').hidden)return;var p=problems[pi];if(!p)return;
   /* すでに使った部分（前の問題の答え）は読まない：skip より前の結果は無視、mark の結果は 使った文字数より後ろだけ読む */
   function txt(i,a){var t=(rs[i][a]&&rs[i][a].transcript)||'';return (i===V.mi)?t.slice(V.ml):t;}
-  var from=Math.max(e.resultIndex||0,V.skip),shown='',fin=null,finI=-1;
-  for(var i=from;i<rs.length;i++){var r=rs[i];
-    for(var a=0;a<r.length;a++){var tx=txt(i,a);if(!a&&tx.trim())shown=tx;if(tx&&jaNums(tx).indexOf(p.ans)>=0){vAccept(i,tx,((rs[i][0]&&rs[i][0].transcript)||'').length);return;}}
-    if(r.isFinal){var ns=jaNums(txt(i,0));if(!ns.length){for(var b=1;b<r.length;b++){ns=jaNums(txt(i,b));if(ns.length)break;}}if(ns.length){fin=ns[ns.length-1];finI=i;}}}
+  var from=Math.max(e.resultIndex||0,V.skip),shown='',fin=null,finI=-1,cxI=-1;
+  for(var i=from;i<rs.length;i++){var r=rs[i],cx=null;
+    for(var a=0;a<r.length;a++){var tx=txt(i,a),R=vCut(tx);if(!a&&tx.trim())shown=tx;if(R.c&&cx===null)cx=R.t;
+      if(R.t&&jaNums(R.t).indexOf(p.ans)>=0){vAccept(i,tx,((rs[i][0]&&rs[i][0].transcript)||'').length);return;}}
+    if(cx!==null){cxI=i;fin=null;finI=-1;} /* 取り消しより前の数は捨てる */
+    if(r.isFinal){var ns=[];if(cx!==null)ns=jaNums(cx);else{ns=jaNums(txt(i,0));if(!ns.length){for(var b=1;b<r.length;b++){ns=jaNums(txt(i,b));if(ns.length)break;}}}
+      if(ns.length){fin=ns[ns.length-1];finI=i;}}}
   if(shown)vSay('🎤「'+shown.trim()+'」');
-  if(fin!==null){V.skip=finI+1;V.mi=-1;cur=String(fin).slice(0,6);paint();submit();}
-  else{var L=rs.length-1;if(L>=from&&rs[L].isFinal){V.skip=L+1;V.mi=-1;if(shown)vSay('🎤「'+shown.trim()+'」…数が 聞き取れなかったよ。もう一度 言ってね');}}}
+  if(fin!==null){V.skip=finI+1;V.mi=-1;cur=String(fin).slice(0,6);paint();submit();return;}
+  if(cxI>=0){cur='';paint();vSay('🎤「'+shown.trim()+'」 → 取り消したよ。答えを もう一度 言ってね');if(rs[cxI].isFinal){V.skip=cxI+1;V.mi=-1;}return;}
+  var L=rs.length-1;if(L>=from&&rs[L].isFinal){V.skip=L+1;V.mi=-1;if(shown)vSay('🎤「'+shown.trim()+'」…数が 聞き取れなかったよ。もう一度 言ってね');}}
 function vAccept(i,tx,full){V.skip=i;V.mi=i;V.ml=full||0;cur=String(problems[pi].ans);paint();vSay('🎤「'+String(tx).trim()+'」');submit();}
 /* 日本語の数の読み取り：「56」「五十六」「ごじゅうろく」「せんきゅうひゃく…」に対応。答えにある数をぜんぶ返す */
 var JA_U=[['ぜろ',0],['れい',0],['まる',0],['いち',1],['いっ',1],['さん',3],['よん',4],['しち',7],['なな',7],['ろく',6],['ろっ',6],['はち',8],['はっ',8],['きゅう',9],['きゅー',9],['に',2],['し',4],['ご',5],['く',9]];
