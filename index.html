@@ -202,6 +202,12 @@
   .jvcard .v-sub{color:#5a4b73}
   .jvcard .v-open{background:#8a5cd6;box-shadow:0 3px 0 #6f3fc0}
   .jvcard .v-open:active{box-shadow:0 1px 0 #6f3fc0}
+  .rucard{border:2px solid #2f5fb3;background:#eef3fc}
+  .rucard .v-count{color:#244a8c}
+  .rucard .v-fill{background:linear-gradient(90deg,#2f5fb3,#d64545)}
+  .rucard .v-sub{color:#3b4a66}
+  .rucard .v-open{background:#2f5fb3;box-shadow:0 3px 0 #244a8c}
+  .rucard .v-open:active{box-shadow:0 1px 0 #244a8c}
   .kjcard{border:2px solid #d6504e;background:#fdf0ee}
   .kjcard .v-count{color:#b23a37;background:#fff;border:1.5px solid #f0b8b3;border-radius:999px;padding:1px 9px;font-size:.75rem}
   .kj-steps{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
@@ -654,6 +660,7 @@
   <div id="calcCard"></div>
   <div id="kanjiCard"></div>
   <div id="readCard"></div>
+  <div id="ruCard"></div>
   </div>
 
   <div class="tabpane" id="tab-commit" hidden>
@@ -1163,13 +1170,24 @@ function ruStat(){var k=qbKStat('ruvocab'),td=qbTodayStr(),loc=_lsGet('ruvocab_s
   return {today:today,learned:learned,ok:ok,best:best,tests:tests};}
 function ruDoneNow(){var c=ruCfg(),r=ruStat();return r.today>=c.nw&&r.ok;}
 function ruRowHTML(){var c=ruCfg(),r=ruStat(),done=!!((S.day&&S.day.pa&&S.day.pa.ru)||ruDoneNow());
-  var sub='今日 +'+r.today+'/'+c.nw+'語'+(r.today>=c.nw?' ✅':'')+' ・ 検問 '+(r.ok?'合格 ✅':(r.tests?'ベスト '+r.best+'%（'+c.pct+'%で合格）':'まだ'))+' ・ 覚えた '+r.learned+'語';
-  return '<div class="quest ru'+(done?' done':'')+'"><div class="chk">'+(done?'✓':'')+'</div><div><span class="ru-t">🇷🇺 ロシア語クエスト</span><span class="dt-sub">'+sub+'<br>新しく覚えた語 ＋'+c.nw+' と 検問の合格で 自動で ✓</span><a class="ru-open" href="./ruvocab.html">▶ 単語カードをひらく</a></div></div>';}
+  var sub='+'+Math.min(r.today,c.nw)+'/'+c.nw+'語・検問'+(r.ok?'◯':'—');
+  return '<div class="quest ru'+(done?' done':'')+'" onclick="location.href=\'./ruvocab.html\'" style="cursor:pointer"><div class="chk">'+(done?'✓':'')+'</div><div><span class="ru-t">🇷🇺 ロシア語</span><span class="dt-sub">'+sub+'</span></div></div>';}
+/* クエストタブのカード（いちばん下） */
+function renderRuCard(){var el=document.getElementById('ruCard');if(!el)return;var c=ruCfg(),r=ruStat(),dk=qbDeck('ruvocab'),deck=dk?dk.w.length:0,goal=1000;
+  var st=_lsGet('ruvocab_stats')||{},raw=(SYNC&&SYNC.astatRaw&&SYNC.astatRaw.ruvocab)||{},q=(st.quiz&&st.quiz.tests)?st.quiz:(raw.quiz||null);if(!deck)deck=+(st.deckSize||raw.deckSize||0);
+  var pct=deck?Math.min(100,Math.round(r.learned/deck*100)):0,ks=qbKStat('ruvocab'),last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,ks?ks.last:0));
+  var done=!!((S.day&&S.day.pa&&S.day.pa.ru)||ruDoneNow());
+  el.innerHTML='<div class="card rucard"><div class="v-h"><span>🇷🇺 ロシア語クエスト（パパ）</span><span class="v-count">'+(deck?r.learned+' / '+deck+' 語':r.learned+' 語')+'</span></div>'
+    +'<div class="v-bar"><div class="v-fill" style="width:'+pct+'%"></div></div>'
+    +'<div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+r.learned+'語（'+pct+'%）・日常会話の目安 約'+goal.toLocaleString()+'語'
+    +'<br>今日 覚えた '+r.today+'語・📝 検問 '+(r.ok?'合格':(r.tests?'ベスト '+r.best+'%':'まだ'))+(done?' 🎉 今日のノルマ クリア':'（ノルマ：＋'+c.nw+'語と検問合格）')
+    +((q&&q.tests)?'<br>📝 検問 '+q.tests+'回・満点 '+(q.perfects||0)+'回'+(q.bestPct?'・ベスト '+q.bestPct+'%':''):'')
+    +(last?'<br><span style="opacity:.85">最終学習：'+last+'</span>':'')+'</div><a class="v-open" href="./ruvocab.html">▶ ロシア語カードをひらく</a></div>';}
 /* パパの端末だけが記録する（経験値 +10・パパのがんばりカレンダーに Р）。二重に足さないよう S.day.pa.ru で1日1回 */
 function ruSync(){if(!S||!S.day||!S.day.pa)return;if(calcOwner()!=='papa')return;if(S.day.pa.ru||!ruDoneNow())return;
   var before=lv(S.pa.xp);S.day.pa.ru=true;S.pa.xp+=10;papaHistUpdate();save();try{maybeSync();}catch(e){}
   try{showCheer('🇷🇺 ロシア語クエスト クリア！ パパ 経験値 +10');}catch(e){}}
-function ruRefresh(){ruSync();var el=document.getElementById('ruRow');if(el)el.innerHTML=ruRowHTML();}
+function ruRefresh(){ruSync();var el=document.getElementById('ruRow');if(el)el.innerHTML=ruRowHTML();renderRuCard();}
 window.addEventListener('focus',function(){try{ruRefresh();}catch(e){}});
 document.addEventListener('visibilitychange',function(){if(!document.hidden){try{ruRefresh();}catch(e){}}});
 function papaHistUpdate(){S.papaHistory=S.papaHistory||{};var td=today();var bee=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/ビーモン/.test(q);});var car=S.cfg.pa.some(function(q,i){return S.day.pa['p'+i]&&/迎/.test(q);});
@@ -1253,7 +1271,7 @@ function qbQuizTodayTxt(key){var r=qbQuizToday(key);if(!r.length)return '・📝
   var p=Math.round(b[0]/b[1]*100),ok=b[1]>=min&&p>=pct;
   return '・📝 検問 <b>'+b[0]+'/'+b[1]+'問（'+p+'%）</b>'+(ok?' ✅':'')+(r.length>1?'（'+r.length+'回）':'');}
 function renderVocab(){var el=document.getElementById('vocabCard');if(!el)return;var st={learned:0,goal:1900,deckSize:0};try{var s=JSON.parse(localStorage.getItem('vocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1900;var _ks=qbKStat('vocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('vocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl='<br>今日 覚えた '+_td+'語'+qbQuizTodayTxt('vocab');var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card vcard"><div class="v-h"><span>🔤 単語クエスト（英検準1級）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>合格までの目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./vocab.html">▶ 単語カードをひらく</a></div>';}
-function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('jvocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl='<br>今日 覚えた '+_td+'語'+qbQuizTodayTxt('jvocab');var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';renderKanji();renderRead();}
+function renderJvocab(){var el=document.getElementById('jvocabCard');if(!el)return;var st={learned:0,goal:1400,deckSize:0};try{var s=JSON.parse(localStorage.getItem('jvocab_stats')||'null');if(s)st=s;}catch(e){}var goal=st.goal||1400;var _ks=qbKStat('jvocab');var learned=_ks?_ks.learned:(st.learned||0);var _dk=qbDeck('jvocab'),deck=_dk?_dk.w.length:(st.deckSize||0);var pct=Math.min(100,Math.round(learned/goal*100));var deckPct=deck?Math.min(100,Math.round(learned/deck*100)):0;var cnt=deck?(learned+' / '+deck+' 語'):(learned+' 語');var _td=_ks?_ks.today:((st.tday===qbTodayStr())?(st.today||0):0);var _tdl='<br>今日 覚えた '+_td+'語'+qbQuizTodayTxt('jvocab');var _q=st.quiz||null,_ql=(_q&&_q.tests)?('<br>📝 検問 '+_q.tests+'回・満点 '+_q.perfects+'回'+(_q.bestPct?'・ベスト '+_q.bestPct+'%':'')):'';var _last=fmtLast(Math.max(+(st.studiedAt||st.updated)||0,_ks?_ks.last:0)),_lh=_last?('<br><span style="opacity:.85">最終学習：'+_last+'</span>'):'';el.innerHTML='<div class="card jvcard"><div class="v-h"><span>📖 語彙クエスト（中学入試）</span><span class="v-count">'+cnt+'</span></div><div class="v-bar"><div class="v-fill" style="width:'+(deck?deckPct:pct)+'%"></div></div><div class="v-sub">いま収録 '+deck+'語のうち 覚えた '+learned+'語（'+deckPct+'%）<br>めざす目標 約'+goal.toLocaleString()+'語 ・ 達成 '+pct+'%'+_tdl+_ql+_lh+'</div><a class="v-open" href="./jvocab.html">▶ 語彙カードをひらく</a></div>';renderKanji();renderRead();try{renderRuCard();}catch(e){}}
 /* ===== 漢字クエスト（書き取りテスト） =====
    流れ：娘がテスト開始（10問）→ ノートに書く → 写真で提出 → パパが丸つけ（×だけタップ）
          → ×の問題は［］の中を5回書いて写真で提出 → パパが1問ずつ OK／やり直し → 10問ぜんぶクリアで完了
@@ -2218,7 +2236,7 @@ function render(){
   }else{
     const mq=meQuests();
     const rc=(S.reactions&&S.reactions[today()])?('<div class="card" style="text-align:center;background:#fff0ea;border-color:#f2c3b2"><div style="font-weight:800">💌 パパからの応援</div><div style="font-size:1.7rem;margin:4px 0">'+S.reactions[today()].e+'</div><div>'+S.reactions[today()].m+'</div></div>'):'';
-    dtSync();try{ruSync();}catch(e){}
+    dtSync();try{ruSync();renderRuCard();}catch(e){}
     stageTop.innerHTML=rc+`<div class="row">
       <div class="player"><h3>${S.me.name}</h3>${heroHTML('me')}<button class="ks-herobtn" onclick="ksOpen()">👗 きせかえ<span>${kseLeft()?'券'+kseLeft():''}</span></button>
         ${dtRowsHTML()}
